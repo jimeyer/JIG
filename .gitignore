@@ -1,0 +1,35 @@
+.DS_Store
+.claude/
+.obsidian/
+.vscode/
+.hypothesis/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+#window positions
+config/window_positions.json
+
+
+# Log files
+logs/
+*.log
+
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Performance monitoring reports
+test/performance/reports/
+test/performance/benchmarks.json
+
+# Test artifacts
+test/__pycache__/
+test/*/__pycache__/
+
+# User-specific window positions
+config/window_positions.json
+
+cached.diff
