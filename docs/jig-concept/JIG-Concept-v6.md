@@ -21,13 +21,13 @@ JIG (Jig Intent Graph) represents software development as a **constraint-satisfa
 **1. Intent (OSTC) - Positional Truth**
 - Describes **where we are now**
 - Timeless, canonical, maintained
-- Lives in `.jig/` as structured nodes
+- Lives in `jig/` as structured nodes
 - Captures **state**: "What the system is/should be"
 
 **2. Deltas - Vectorial Narratives**
 - Describes **how we got here and where we're going**
 - Temporal, branch-scoped, disposable
-- Lives in `docs/deltas/` during work
+- Lives in `jig/deltas/` during work
 - Captures **change**: "The journey from A→B"
 
 ### The Development Flow
@@ -65,9 +65,9 @@ JIG design follows Linus Torvalds' principles:
 
 | Element | Type of Truth | Purpose | Location |
 |---------|---------------|---------|----------|
-| **Outcome (O)** | Narrative truth | Why we build | `.jig/outcomes/` |
-| **Specification (S)** | Logical truth | What we build | `.jig/specifications/` |
-| **Test (T)** | Empirical truth | How we verify | `.jig/tests/` |
+| **Outcome (O)** | Narrative truth | Why we build | `jig/outcomes/` |
+| **Specification (S)** | Logical truth | What we build | `jig/specifications/` |
+| **Test (T)** | Empirical truth | How we verify | `jig/tests/` |
 | **Code (C)** | Operational truth | How we implement | Source files (annotated) |
 
 **Properties of Intent:**
@@ -235,21 +235,21 @@ This is not coincidence—**this is the natural lifecycle**.
 └─────────────────────────────────────────────────────────┘
 
 Phase 1: CONCEPTION (pre-branch)
-├─ Location: docs/deltas/active/
+├─ Location: jig/deltas/active/
 ├─ Documents: Delta-Proposal, Delta-Scope, Delta-Analysis
 ├─ Status: Exploring, deciding
 └─ Git: main branch, no feature branch yet
 
 Phase 2: EXECUTION (active branch)
 ├─ Branch created: feature/bike-echoform-relay
-├─ Location: docs/deltas/active/bike-echoform-relay/
+├─ Location: jig/deltas/active/bike-echoform-relay/
 ├─ Documents: Delta-Plan, Delta-Analysis, Delta-Issue
 ├─ Status: Active development
 ├─ Pattern: Frequent commits to both code and Deltas
 └─ Git: Feature branch, many commits
 
 Phase 3: HARVEST (merge preparation)
-├─ Location: Still docs/deltas/active/bike-echoform-relay/
+├─ Location: Still jig/deltas/active/bike-echoform-relay/
 ├─ Documents: Delta-Retrospective created
 ├─ Action: **HARVEST & DISTILL**
 │  ├─ Extract discoveries → HarvestReport
@@ -260,13 +260,13 @@ Phase 3: HARVEST (merge preparation)
 
 Phase 4: ARCHIVE (post-merge)
 ├─ Branch merged to main
-├─ Action: Move docs/deltas/active/X/ → docs/deltas/archive/X/
+├─ Action: Move jig/deltas/active/X/ → jig/deltas/archive/X/
 ├─ Documents: Frozen, read-only
 ├─ Retention: See retention tiers
 └─ Git: Merge commit tagged with harvest metadata
 
 Phase 5: DECAY (long-term)
-├─ Location: docs/deltas/archive/X/ (unchanged)
+├─ Location: jig/deltas/archive/X/ (unchanged)
 ├─ Access: Rare reference, git archaeology
 ├─ Value: Diminishes as context fades
 └─ Eventually: Compress or delete per retention tier
@@ -282,16 +282,16 @@ jigy delta new --type plan
 # Commit with Delta reference
 git commit -m "WU7.3: Fix device tests
 
-See: docs/deltas/active/PLAN_Operations.md#WU7.3
+See: jig/deltas/active/PLAN_Operations.md#WU7.3
 Implements: S-PS-004
 Tests: test_device_operations.py::test_button_press"
 
 # Before merge: harvest
-jigy distill --branch bike-echoform-relay
+jig ai-distill --branch bike-echoform-relay
 
 # After merge: archive
 git merge bike-echoform-relay
-jigy delta archive --branch bike-echoform-relay --retention long-term
+jig delta archive --branch bike-echoform-relay --retention long-term
 ```
 
 ### 3.3 Retention Tiers
@@ -407,7 +407,7 @@ ostc_nodes:
 ```
 
 **Why this design?**
-- **Grep-able**: `grep -r "#DISCOVERY:" docs/deltas/`
+- **Grep-able**: `grep -r "#DISCOVERY:" jig/deltas/`
 - **Simple**: No special tools to read/write
 - **Fast**: Regex extraction <1 second
 - **Explicit**: No magic, just markers
@@ -420,17 +420,18 @@ ostc_nodes:
 ### 5.1 Core Commands (Composable)
 
 ```bash
-# Plumbing (low-level, composable)
-jigy extract --branch bike-echoform-relay --output harvest.yaml
-jigy synthesize --harvest harvest.yaml --output synthesis.yaml
-jigy integrate --synthesis synthesis.yaml --approve all
+# Plumbing (low-level, deterministic, no LLM)
+jig extract --branch bike-echoform-relay --output harvest.yaml
+jig integrate --harvest harvest.yaml --approve all
 
-# Porcelain (high-level, convenience)
-jigy distill --branch bike-echoform-relay
-# (runs extract → synthesize → integrate with review)
+# Porcelain (convenience, may use LLM)
+jig ai-synthesize --harvest harvest.yaml --output synthesis.yaml
+jig ai-integrate --synthesis synthesis.yaml   # Interactive integration with AI assistance
+jig ai-distill --branch bike-echoform-relay   # Full pipeline: extract → synthesize → integrate
+# (runs extract → ai-synthesize → ai-integrate with review)
 
 # Status (like git status)
-jigy status
+jig status
 # Shows:
 # - Alignment violations
 # - Unharvested deltas
@@ -438,17 +439,12 @@ jigy status
 # - Recent Intent changes
 
 # Validate (like git fsck)
-jigy validate --check-all
+jig validate --check-all
 # Checks:
 # - OSTC references valid
 # - No orphaned nodes
 # - Subsystem boundaries respected
 # - No circular dependencies
-
-# Graph (visualization)
-jigy graph --mode subsystem     # Subsystem boundaries
-jigy graph --mode layers        # Architectural layers
-jigy graph --mode coupling      # Coupling strength
 ```
 
 ### 5.2 Fast Operations
@@ -457,14 +453,13 @@ jigy graph --mode coupling      # Coupling strength
 
 ```bash
 # Fast deterministic operations
-jigy extract    # <1s for 1000 files
-jigy validate   # <1s for full graph
-jigy status     # <100ms
-jigy graph      # <1s to generate
+jig extract    # <1s for 1000 files
+jig validate   # <1s for full graph
+jig status     # <100ms
 
-# Slow LLM operations (explicit)
-jigy synthesize # 30-60s (LLM call)
-jigy distill    # 30-60s (includes synthesis)
+# Slow LLM operations (explicit, prefixed with 'ai-')
+jig ai-synthesize # 30-60s (LLM call)
+jig ai-distill    # 30-60s (includes synthesis)
 ```
 
 ### 5.3 Text-Based Formats
@@ -472,21 +467,21 @@ jigy distill    # 30-60s (includes synthesis)
 **Everything is grep-able, diff-able, merge-able.**
 
 ```yaml
-# .jig/graph-index.yaml (content-addressable)
+# jig/graph-index.yaml (content-addressable)
 nodes:
   S-CRDT-042:
-    file: .jig/specifications/S-CRDT-042.md
+    file: jig/specifications/S-CRDT-042.md
     type: specification
     subsystem: crdt
     edges:
       implements: [O-CRDT-005]
       tested_by: [T-CRDT-089]
     source_deltas:
-      - file: docs/deltas/archive/bike-relay/ANALYSIS.md
+      - file: jig/deltas/archive/bike-relay/ANALYSIS.md
         line: 67
         commit: a37d344
 
-# .jig/subsystems.yaml
+# jig/subsystems.yaml
 subsystems:
   auth:
     internal_edges: 47
@@ -502,8 +497,8 @@ subsystems:
 **No servers, no network dependencies.**
 
 - All analysis runs locally
-- Intent Graph in `.jig/` directory
-- Deltas in `docs/deltas/`
+- Intent Graph in `jig/` directory
+- Deltas in `jig/deltas/`
 - Everything in git
 - LLM calls optional (can skip synthesis step)
 
@@ -519,24 +514,24 @@ git checkout bike-echoform-relay
 git status  # Clean working directory
 
 # 2. Write retrospective
-jigy delta new --type retrospective
-# Edit docs/deltas/active/bike-relay/RETROSPECTIVE.md
+jig delta new --type retrospective
+# Edit jig/deltas/active/bike-relay/RETROSPECTIVE.md
 
 # 3. Run harvest pipeline
-jigy distill --branch bike-echoform-relay
+jig ai-distill --branch bike-echoform-relay
 
 # What happens:
 # - Extract: Scans all Delta files for markers (fast)
 # - Synthesize: LLM proposes Intent updates (slow)
 # - Review: Human approves/rejects in terminal UI
-# - Integrate: Updates .jig/ files (fast)
+# - Integrate: Updates jig/ files (fast)
 
 # 4. Review changes
-git diff .jig/
-jigy validate --check-all
+git diff jig/
+jig validate --check-all
 
 # 5. Commit harvest
-git add .jig/ docs/
+git add jig/
 git commit -m "Harvest insights from bike-echoform-relay
 
 Distilled 47 markers into 12 OSTC nodes:
@@ -545,15 +540,15 @@ Distilled 47 markers into 12 OSTC nodes:
 - 3 new Tests
 - 2 architectural patterns
 
-See: .jig/harvest-reports/bike-relay-2025-11-16.yaml"
+See: jig/harvest-reports/bike-relay-2025-11-16.yaml"
 
 # 6. Merge branch
 git checkout main
 git merge bike-echoform-relay
 
 # 7. Archive deltas
-jigy delta archive --branch bike-echoform-relay --retention long-term
-# Moves: docs/deltas/active/bike-relay/ → docs/deltas/archive/bike-relay/
+jig delta archive --branch bike-echoform-relay --retention long-term
+# Moves: jig/deltas/active/bike-relay/ → jig/deltas/archive/bike-relay/
 ```
 
 ### 6.2 Workflow: Continuous Harvest
@@ -563,17 +558,17 @@ jigy delta archive --branch bike-echoform-relay --retention long-term
 echo '#DISCOVERY:042 "Widget factory needs lazy init"' >> PLAN.md
 
 # Stage for later
-jigy extract --incremental --delta PLAN.md --stage
-# Adds to .jig/staging/discoveries.yaml
+jig extract --incremental --delta PLAN.md --stage
+# Adds to jig/staging/discoveries.yaml
 
 # At branch completion
-jigy distill --from-staging --review
+jig ai-distill --from-staging --review
 ```
 
 ### 6.3 Harvest Report Example
 
 ```yaml
-# .jig/harvest-reports/bike-relay-2025-11-16.yaml
+# jig/harvest-reports/bike-relay-2025-11-16.yaml
 
 metadata:
   timestamp: 2025-11-16T14:32:00Z
@@ -584,13 +579,13 @@ metadata:
   marker_count: 47
 
 markers:
-  - file: docs/deltas/active/bike-relay/PLAN.md
+  - file: jig/deltas/active/bike-relay/PLAN.md
     line: 234
     type: VIB
     subtype: Value
     text: "User input must win over periodic updates"
 
-  - file: docs/deltas/active/bike-relay/ANALYSIS.md
+  - file: jig/deltas/active/bike-relay/ANALYSIS.md
     line: 67
     type: DISCOVERY
     id: "042"
@@ -598,7 +593,7 @@ markers:
 
 decisions:
   - id: D-001
-    file: docs/deltas/active/bike-relay/RETROSPECTIVE.md
+    file: jig/deltas/active/bike-relay/RETROSPECTIVE.md
     line: 145
     title: "WebSocket vs gRPC"
     choice: websocket
@@ -627,7 +622,7 @@ synthesis:
         OR-Set elements MUST be hashable (str, int, tuple).
         Lists MUST be expanded to individual add operations.
       source_deltas:
-        - file: docs/deltas/active/bike-relay/ANALYSIS.md
+        - file: jig/deltas/active/bike-relay/ANALYSIS.md
           line: 67
           marker: DISCOVERY:042
       subsystem: crdt
@@ -662,16 +657,13 @@ synthesis:
 
 ```bash
 # Detect subsystems automatically
-jigy decompose --detect
+jig decompose --detect
 
 # Validate decomposability health
-jigy decompose --validate
+jig decompose --validate
 
 # Calculate metrics
-jigy decompose --metrics
-
-# Generate subsystem visualization
-jigy graph --mode subsystem
+jig decompose --metrics
 ```
 
 ### 7.2 Metrics Dashboard
@@ -757,11 +749,11 @@ auto_approve = ["new_code_refs"]  # Low-risk changes
 
 ```bash
 # Create template
-jigy delta template --type plan --output templates/PLAN_TEMPLATE.md
+jig delta template --type plan --output templates/PLAN_TEMPLATE.md
 
 # Use template
-jigy delta new --type plan --branch feature/new-work
-# Creates: docs/deltas/active/new-work/PLAN_new_work.md from template
+jig delta new --type plan --branch feature/new-work
+# Creates: jig/deltas/active/new-work/PLAN_new_work.md from template
 ```
 
 ---
@@ -769,19 +761,19 @@ jigy delta new --type plan --branch feature/new-work
 ## 9. Implementation Roadmap
 
 ### Phase 1: Core Tools (Weeks 1-2)
-- [ ] Implement deterministic extractor (`jigy extract`)
+- [ ] Implement deterministic extractor (`jig extract`)
 - [ ] YAML-based harvest report format
 - [ ] Basic marker validation
 - [ ] Simple integration tool (update OSTC files)
 
 ### Phase 2: LLM Synthesis (Weeks 3-4)
-- [ ] LLM synthesis prompts
+- [ ] LLM synthesis prompts (`jig ai-synthesize`)
 - [ ] Synthesis proposal format
 - [ ] Conflict detection
 - [ ] Pattern recognition
 
 ### Phase 3: Review & Integration (Weeks 5-6)
-- [ ] Terminal UI for review
+- [ ] Terminal UI for review (`jig ai-integrate`)
 - [ ] Human approval workflow
 - [ ] Traceability linking (Delta ↔ Intent)
 - [ ] Changelog generation
@@ -789,7 +781,6 @@ jigy delta new --type plan --branch feature/new-work
 ### Phase 4: Decomposability (Weeks 7-8)
 - [ ] Community detection algorithm
 - [ ] Modularity score calculation
-- [ ] Subsystem visualization
 - [ ] Boundary violation alerts
 
 ### Phase 5: Git Integration (Weeks 9-10)
@@ -812,7 +803,7 @@ jigy delta new --type plan --branch feature/new-work
 
 ### 10.3 Composable Commands
 **Git:** `git diff | git apply`, pipes work
-**JIG:** `jigy extract | jigy synthesize | jigy integrate`
+**JIG:** `jig extract | jig ai-synthesize | jig integrate`
 
 ### 10.4 Local-First
 **Git:** Everything local, distributed by design
@@ -833,8 +824,8 @@ jigy delta new --type plan --branch feature/new-work
 ### 10.8 Plumbing vs Porcelain
 **Git:** Low-level commands (plumbing) + convenience (porcelain)
 **JIG:**
-- Plumbing: `extract`, `synthesize`, `integrate`
-- Porcelain: `distill`, `status`, `validate`
+- Plumbing: `extract`, `integrate`, `validate`
+- Porcelain: `ai-synthesize`, `ai-integrate`, `ai-distill`, `status`
 
 ---
 
@@ -858,15 +849,15 @@ Like git commit messages: valuable context, but you don't keep all feature branc
 ### Q: Isn't the LLM synthesis step slow?
 
 **A:** Yes (30-60s), but it's **opt-in** and **batched**.
-Fast path: `jigy extract` (deterministic, <1s) → manual review → `jigy integrate`
-Slow path: `jigy distill` (includes LLM synthesis)
+Fast path: `jig extract` (deterministic, <1s) → manual review → `jig integrate`
+Slow path: `jig ai-distill` (includes LLM synthesis)
 
 Most developers will batch harvest at branch completion, not per-commit.
 
 ### Q: What if I don't want to use markers?
 
 **A:** JIG works without markers:
-- Minimal: Just OSTC nodes in `.jig/`, no Deltas
+- Minimal: Just OSTC nodes in `jig/`, no Deltas
 - Standard: OSTC + Deltas, manual harvest
 - Full: OSTC + Deltas + markers, automated harvest
 
@@ -879,7 +870,7 @@ Git philosophy: provide powerful tools, don't force usage.
 - Intent Graph partitioned by subsystem
 - Deltas are branch-scoped (isolated)
 - Harvest happens per-branch (no coordination needed)
-- Merge conflicts in `.jig/` are rare (append-only growth)
+- Merge conflicts in `jig/` are rare (append-only growth)
 
 ---
 
