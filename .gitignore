@@ -1,35 +1,76 @@
-.DS_Store
-.claude/
-.obsidian/
-.vscode/
-.hypothesis/
-venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-#window positions
-config/window_positions.json
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
 
-
-# Log files
-logs/
-*.log
-
-# Coverage reports
+# Testing
+.pytest_cache/
 .coverage
 coverage.xml
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+.hypothesis/
 
-# Performance monitoring reports
-test/performance/reports/
-test/performance/benchmarks.json
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# IDEs
+.vscode/
+.idea/
+.claude/
+.obsidian/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# JIG-specific
+jig/deltas/active/*/scratch/
+*.tmp
+*.bak
+cached.diff
+
+# Build artifacts
+logs/
+*.log
 
 # Test artifacts
 test/__pycache__/
 test/*/__pycache__/
+test/performance/reports/
+test/performance/benchmarks.json
 
-# User-specific window positions
+# User-specific configs
 config/window_positions.json
-
-cached.diff

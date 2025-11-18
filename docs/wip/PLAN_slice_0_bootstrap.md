@@ -30,7 +30,7 @@ branch: bootstrap-slice-0
 
 ## Work Unit Checklist
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
-- [ ] WU1: Project setup & infrastructure — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Project setup & infrastructure — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU2: Core utilities (io, yaml_utils) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Config loader & parser — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: `jigy init` command — tests ☐ / docs ☐ / reflect ☐
@@ -153,15 +153,13 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tools]
+  - [tools] pyproject.toml modern config format is clean and expressive
+  - [process] Virtual environment setup smooth with Python 3.12
+  - [tools] ruff and mypy strict configs work well together
 - What could be better:
-  - [scope]
-- Next experiment:
-  - [tools]
+  - [scope] templates/ directory not created yet (deferred to WU5)
 - Discoveries:
-  - [scope]
-- Risk watchlist:
-  - [risk]
+  - [tools] Python 3.12.10 available, exceeds 3.11+ requirement
 
 **Links:**
 - Commit: [to be filled]
