@@ -98,7 +98,7 @@ branch: bootstrap-slice-0
   - [format] Including "History" section in nodes provides useful audit trail
 
 **Links:**
-- Commit: [to be filled after git commit]
+- Commit: ad56a9532a2a5c2dcb2eaff0426cde6c00a1515d
 
 **Human Validation:**
 - Commands: `ls -la jig/outcomes/ jig/specifications/`, `cat jig/outcomes/O-JIG-001.md`
