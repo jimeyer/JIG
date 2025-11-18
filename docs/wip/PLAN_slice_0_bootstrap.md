@@ -162,7 +162,7 @@ branch: bootstrap-slice-0
   - [tools] Python 3.12.10 available, exceeds 3.11+ requirement
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 6fa8fed770f9cf4c4585227d886a77dacc5c24a7
 
 **Human Validation:**
 - Commands: `pip list | grep click`, `pytest --version`, `jigy --version`
