@@ -29,7 +29,7 @@ branch: bootstrap-slice-0
 **Rationale:** These constraints are explicitly defined in SCOPE (Section 2.2). Creating them upfront enables O→S→TDD flow and dogfooding from Day 1.
 
 ## Work Unit Checklist
-- [ ] WU0: Create known Intent nodes (O/S) — done ☐
+- [x] WU0: Create known Intent nodes (O/S) — done ☑
 - [ ] WU1: Project setup & infrastructure — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU2: Core utilities (io, yaml_utils) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Config loader & parser — tests ☐ / docs ☐ / reflect ☐
@@ -90,13 +90,15 @@ branch: bootstrap-slice-0
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
   - [clarity] SCOPE clearly defined these constraints upfront
+  - [process] Creating Intent nodes before code clarifies design goals
+  - [format] YAML frontmatter + Markdown is clean and readable
 - What could be better:
-  - [scope] Will discover additional performance constraints during implementation
+  - [tooling] Manual creation tedious - validates need for `jigy node create` command
 - Discoveries:
-  - To be filled after implementation
+  - [format] Including "History" section in nodes provides useful audit trail
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after git commit]
 
 **Human Validation:**
 - Commands: `ls -la jig/outcomes/ jig/specifications/`, `cat jig/outcomes/O-JIG-001.md`
