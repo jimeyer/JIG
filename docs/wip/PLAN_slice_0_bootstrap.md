@@ -38,7 +38,7 @@ branch: bootstrap-slice-0
 - [x] WU6: `jigy node create` command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU7: OSTC validator — tests ☑ / docs ☑ / reflect ☑
 - [x] WU8: `jigy validate` command — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU9: Dogfooding - create JIG's own nodes — tests ☐ / docs ☐ / reflect ☐
+- [x] WU9: Dogfooding - create JIG's own nodes — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU10: Documentation & release — tests ☐ / docs ☐ / reflect ☐
 
 ---
@@ -857,16 +857,19 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [process] Dogfooding revealed usability issues early
+  - [process] Nodes created in WU0 provided excellent starting point for dogfooding
+  - [tools] All 9 nodes already existed with meaningful content and proper relationships
+  - [validation] jigy validate confirmed all nodes are valid with clear relationship mapping
 - What could be better:
-  - [tools] Commands worked as expected or had issues?
+  - [process] Some nodes (O-PERF-001, S-API-001, etc.) lack subsystem fields - minor issue
+  - [tools] Graph index warnings about unreferenced nodes - may need future refinement
 - Discoveries:
-  - [scope] Any missing features discovered during dogfooding?
-- Next experiment:
-  - [process]
+  - [scope] The WU0 approach (creating Intent nodes first) proved highly effective
+  - [design] YAML frontmatter + Markdown format is readable and maintainable
+  - [validation] Validation tool catches issues early with clear, actionable warnings
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 
 **Human Validation:**
 - Commands:
