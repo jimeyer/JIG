@@ -441,7 +441,7 @@ branch: bootstrap-slice-0
   - [design] sys.exit() with specific codes (0/1/2) enables scripting and CI integration
 
 **Links:**
-- Commit: [to be filled]
+- Commit: b4bbeb9aef9cf60622222fc6a96d529f2c78587f
 
 **Human Validation:**
 - Commands:
