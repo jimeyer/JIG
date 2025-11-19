@@ -350,7 +350,7 @@ branch: bootstrap-slice-0
   - [design] Returning defaults when config missing enables zero-config quick starts
 
 **Links:**
-- Commit: [to be filled]
+- Commit: ba48aa8b15f1fb365a2592ef9b0be4cd62b80178
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_config.py tests/unit/test_parser.py -v`
