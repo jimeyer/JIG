@@ -596,7 +596,7 @@ branch: bootstrap-slice-0
   - [design] Graph index auto-update eliminates manual bookkeeping for users
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 2c7da04a53c5c80af910711e7f17c355d9a34443
 
 **Human Validation:**
 - Commands:
