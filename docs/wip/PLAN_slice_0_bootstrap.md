@@ -37,7 +37,7 @@ branch: bootstrap-slice-0
 - [x] WU5: Node templates — tests ☑ / docs ☑ / reflect ☑
 - [x] WU6: `jigy node create` command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU7: OSTC validator — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU8: `jigy validate` command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU8: `jigy validate` command — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU9: Dogfooding - create JIG's own nodes — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU10: Documentation & release — tests ☐ / docs ☐ / reflect ☐
 
@@ -781,11 +781,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tools]
+  - [tools] click.style() provides clean, colorized output without external dependencies
+  - [tests] 13 integration tests with comprehensive coverage of all exit codes and output modes
+  - [ux] Structured output (errors, warnings, summary) provides clear actionable feedback
 - What could be better:
-  - [scope]
+  - [scope] Could add JSON output format for machine consumption (deferred)
 - Discoveries:
-  - [scope]
+  - [performance] Validates 100 nodes in 0.59s, far exceeding <1s target
+  - [design] Exit code 3 for "not initialized" enables clear distinction from validation errors
 
 **Links:**
 - Commit: [to be filled]
