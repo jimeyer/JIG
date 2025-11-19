@@ -32,7 +32,7 @@ branch: bootstrap-slice-0
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
 - [x] WU1: Project setup & infrastructure — tests ☑ / docs ☑ / reflect ☑
 - [x] WU2: Core utilities (io, yaml_utils) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU3: Config loader & parser — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Config loader & parser — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU4: `jigy init` command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Node templates — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: `jigy node create` command — tests ☐ / docs ☐ / reflect ☐
@@ -340,11 +340,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tools]
+  - [tools] python-frontmatter library makes YAML frontmatter parsing simple and clean
+  - [tests] Comprehensive test coverage (98.67%) achieved with clear, focused test cases
+  - [design] Dataclass-based design for config and nodes provides type safety and clarity
 - What could be better:
-  - [scope]
+  - [tools] frontmatter library lacks type stubs, requires type: ignore comments
 - Discoveries:
-  - [scope]
+  - [testing] Testing date parsing edge cases (invalid formats) prevents runtime errors
+  - [design] Returning defaults when config missing enables zero-config quick starts
 
 **Links:**
 - Commit: [to be filled]
