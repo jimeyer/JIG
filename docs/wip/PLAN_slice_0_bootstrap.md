@@ -869,7 +869,7 @@ branch: bootstrap-slice-0
   - [validation] Validation tool catches issues early with clear, actionable warnings
 
 **Links:**
-- Commit: [to be filled after commit]
+- Commit: 60f651b2e8f25d62f02a22c0f8f58e7c46e0e3ed
 
 **Human Validation:**
 - Commands:
