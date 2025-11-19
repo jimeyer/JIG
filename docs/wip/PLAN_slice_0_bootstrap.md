@@ -511,7 +511,7 @@ branch: bootstrap-slice-0
   - [validation] Parser from WU3 provides perfect validation for templates
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 631ef69e677b637607dd2be47f469dcf40c2939e
 
 **Human Validation:**
 - Commands: `ls templates/`, `cat templates/outcome_template.md`
