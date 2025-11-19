@@ -1,3 +1,17 @@
+
+
+we will do a Option D:
+  We have Outcomes-Specs-Tests - but are missing the code.
+  we are repairing the test suite now, not changing code.
+  so make sure O-S-T are linked and correct.
+  then make a document that lists the CODE that is missing. the list of missing CODE will become SCOPE for a new work plan to be completed later.
+  for the tests that need CODE, make sure they all have the correct `@jig` decorators, then mark them Skip with a reference to the document that lists the SCOPE of CODE that must
+  be created.
+
+
+
+
+
 Fix test concept:
 
 prompt:
