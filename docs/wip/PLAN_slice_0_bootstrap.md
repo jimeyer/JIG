@@ -34,7 +34,7 @@ branch: bootstrap-slice-0
 - [x] WU2: Core utilities (io, yaml_utils) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU3: Config loader & parser — tests ☑ / docs ☑ / reflect ☑
 - [x] WU4: `jigy init` command — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU5: Node templates — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: Node templates — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU6: `jigy node create` command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU7: OSTC validator — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU8: `jigy validate` command — tests ☐ / docs ☐ / reflect ☐
@@ -501,11 +501,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [scope]
+  - [structure] Consistent template structure across all four node types aids usability
+  - [tests] 8 unit tests thoroughly validate template parsing and consistency
+  - [ux] HTML-style comments in templates provide inline guidance without cluttering output
 - What could be better:
-  - [scope]
+  - [scope] Could add templates/README.md for placeholder documentation (deferred)
 - Discoveries:
-  - [scope]
+  - [design] Simple string substitution for placeholders is sufficient - no need for templating engine
+  - [validation] Parser from WU3 provides perfect validation for templates
 
 **Links:**
 - Commit: [to be filled]
