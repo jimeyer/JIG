@@ -1,4 +1,6 @@
-# taskTESTREPAIR: SPEC-Driven Test Recovery
+# taskTESTREPAIR: SPEC-Driven Test Recovery (5-Bucket Model)
+
+**Version:** 2.0.0 (Updated: 2025-11-19)
 
 **Purpose:** Recover failing test suites by re-aligning tests with Specifications. Tests are reproducible artifacts—SPECs are the source of truth.
 
@@ -43,30 +45,52 @@ def test_jwt_token_validation():
 - **Old tests aren't sacred** - Delete broken tests confidently if you have the SPEC
 - **No SPEC = No test** - Unspecified behavior is undefined behavior
 
-### 2. Three-Bucket Classification
+### 2. Five-Bucket Classification
 Every failing test falls into exactly one bucket:
 
-| Bucket | SPEC Status | Action | Example |
-|--------|-------------|--------|---------|
-| **A** | Existing SPEC (valid) | Add `@jig` annotation, ensure alignment | Test for JWT validation, SPEC exists |
-| **B** | Missing SPEC (needed) | Create SPEC first, then align/rewrite test | Test for edge case not in SPEC |
-| **C** | Obsolete SPEC | Delete test entirely | Test for removed flat-map feature |
+| Bucket | Name | Condition | Action | Example |
+|--------|------|-----------|--------|---------|
+| **A** | **Align** | SPEC valid, test needs fixing | FIX/REWRITE/ANNOTATE test | Constructor signature changed |
+| **B** | **Create SPEC** | SPEC missing, requirement real | Create SPEC → align test | Implicit security requirement |
+| **C** | **Delete** | SPEC obsolete or redundant | DELETE test entirely | Feature removed, or duplicate test |
+| **D** | **Skip (TDD)** | O-S-T aligned, CODE missing | @pytest.mark.skip → SCOPE doc | Test written before implementation |
+| **E** | **Debug** | CODE bug detected | Redirect to DEBUG workflow | Test reveals CODE violates SPEC |
+
+**Key Insight:** Buckets A/B/C handle SPEC lifecycle. Bucket D handles TDD scenarios. Bucket E detects bugs (redirect to DEBUG workflow).
 
 ### 3. Decision Matrix (No Shims)
 
-For tests in Buckets A and B, choose ONE strategy:
+**For Buckets A and B** (test needs alignment), choose ONE strategy:
 
 | Strategy | When to Use | What to Do | Never Do |
 |----------|-------------|------------|----------|
 | **FIX** | Change is mechanical, result is "as good as new" | Fix the test (add param, fix import) | Add compatibility layers |
 | **REWRITE** | Architecture changed, SPEC semantics evolved | Delete old test, write new test per SPEC | Try to salvage old test logic |
-| **DELETE** | SPEC is obsolete, no replacement needed | Remove test, update graph index | Comment out "just in case" |
+
+**For Bucket C** (SPEC obsolete):
+
+| Strategy | Action |
+|----------|--------|
+| **DELETE** | Remove test entirely, update graph index |
+
+**For Bucket D** (CODE missing - TDD scenario):
+
+| Strategy | Action |
+|----------|--------|
+| **SKIP** | Add `@pytest.mark.skip`, create SCOPE document for future PLAN |
+
+**For Bucket E** (CODE bug detected):
+
+| Strategy | Action |
+|----------|--------|
+| **DEBUG** | Create DEBUG delta, do NOT "fix" test to match buggy code |
 
 **NEVER:**
 - Add shims or adapters to make old tests pass
 - Preserve backwards compatibility for obsolete SPECs
 - Use feature flags to toggle test behavior
 - Comment out tests "temporarily"
+- "Fix" a test to match buggy CODE (Bucket E → DEBUG instead)
 
 ---
 
@@ -96,7 +120,7 @@ For tests in Buckets A and B, choose ONE strategy:
 
 ### Phase 1: SPEC Audit (2-3 hours)
 
-**Goal:** Classify every failing test into Buckets A, B, or C.
+**Goal:** Classify every failing test into Buckets A, B, C, D, or E.
 
 **Process:**
 ```bash
@@ -130,17 +154,40 @@ pytest --tb=no -q | grep FAILED > failing-tests.txt
 |------|-----------|------------------|----------|
 | test_flat_map_merge | test_crdt.py:88 | Flat-map removed | DELETE (replaced by OR-Map) |
 | test_legacy_token_format | test_auth.py:310 | Pre-v2 tokens | DELETE (no migration needed) |
+
+### Bucket D: CODE Missing - TDD Scenario (N tests)
+| Test | File:Line | Verifies SPEC | CODE Status | SCOPE Doc |
+|------|-----------|---------------|-------------|-----------|
+| test_mfa_token_validation | test_auth.py:505 | S-AUTH-007 | Not implemented | SCOPE_AUTH_MFA.md |
+| test_device_enrollment | test_auth.py:520 | S-AUTH-008 | Not implemented | SCOPE_AUTH_MFA.md |
+
+### Bucket E: CODE Bug Detected (N tests)
+| Test | File:Line | Verifies SPEC | Bug Description | DEBUG Delta |
+|------|-----------|---------------|-----------------|-------------|
+| test_device_id_uniqueness | test_auth.py:205 | S-AUTH-004 | Generates duplicate IDs | debug-device-id-collision |
+| test_token_expiry_timing | test_auth.py:175 | S-AUTH-003 | Tokens expire 1hr early | debug-token-expiry |
 ```
 
 **JIG Markers:**
 ```markdown
-#DISCOVERY "Found 23 tests with no traceable SPEC"
+#DISCOVERY "Found 23 tests with no traceable SPEC (Bucket B)"
 Tests were written against implementation, not requirements.
+
+#DISCOVERY "Found 8 tests where CODE not implemented yet (Bucket D - TDD)"
+Tests exist, SPECs exist, but CODE missing. Will create SCOPE docs.
+
+#DISCOVERY "Found 2 CODE bugs during test audit (Bucket E)"
+Tests correctly verify SPECs, but CODE violates SPEC. Redirecting to DEBUG.
 
 #DECISION "Create missing SPECs before fixing tests (Bucket B)"
 **Choice:** SPEC-first approach
 **Rationale:** Tests without SPECs will break again on next refactor
 **Tradeoffs:** More upfront work, but durable alignment
+
+#DECISION "Skip Bucket D tests and create SCOPE docs vs delete tests"
+**Choice:** SKIP with SCOPE doc (preserve TDD intent)
+**Rationale:** Tests and SPECs are correct, CODE will be implemented later
+**Tradeoffs:** Skipped tests reduce coverage temporarily, but maintain O-S-T alignment
 ```
 
 ### Phase 2: Create Missing SPECs (1-2 hours)
@@ -204,7 +251,7 @@ See: jig/deltas/active/<branch>/PLAN.md → Phase 2"
 
 ### Phase 3: Root Cause Grouping (1 hour)
 
-**Goal:** Group Bucket A and B tests by repair strategy (FIX, REWRITE, DELETE).
+**Goal:** Group Bucket A and B tests by repair strategy (FIX, REWRITE). Handle Buckets C, D, E with specific actions.
 
 **Process:**
 ```markdown
@@ -233,6 +280,18 @@ See: jig/deltas/active/<branch>/PLAN.md → Phase 2"
 **Strategy:** FIX (add annotations only)
 **Files:** tests/*/test_*.py (scattered)
 **Action:** Add `@jig T-XXX-NNN verifies:S-YYY-NNN` annotations
+
+### Group 5: MFA CODE Not Implemented (SKIP - Bucket D) - 8 tests
+**Root Cause:** Tests and SPECs exist, but CODE not implemented yet (TDD)
+**Strategy:** SKIP (O-S-T aligned, waiting for CODE)
+**Files:** tests/auth/test_mfa.py
+**Action:** Add `@pytest.mark.skip`, create SCOPE_AUTH_MFA.md for future PLAN
+
+### Group 6: CODE Bugs Detected (DEBUG - Bucket E) - 2 tests
+**Root Cause:** Tests correctly verify SPECs, but CODE violates SPEC
+**Strategy:** DEBUG (redirect to DEBUG workflow, not test repair)
+**Files:** tests/auth/test_device_id.py, test_token_expiry.py
+**Action:** Create DEBUG deltas, do NOT "fix" tests to match buggy CODE
 ```
 
 **JIG Markers:**
@@ -365,6 +424,140 @@ Unit: Test Repair Phase 4.3
 See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
 ```
 
+#### Strategy: SKIP (Bucket D - CODE Missing, TDD)
+
+```python
+# Test exists, SPEC exists, but CODE not implemented yet
+# @jig T-AUTH-045 verifies:S-AUTH-007 subsystem:auth
+@pytest.mark.skip(reason="CODE not implemented - see SCOPE_AUTH_MFA.md")
+def test_mfa_token_validation():
+    """Verify MFA tokens validate correctly (S-AUTH-007)"""
+    token = create_mfa_token(user_id="user-123", device_id="device-456")
+    assert validate_mfa_token(token) is True
+
+# @jig T-AUTH-046 verifies:S-AUTH-008 subsystem:auth
+@pytest.mark.skip(reason="CODE not implemented - see SCOPE_AUTH_MFA.md")
+def test_mfa_device_enrollment():
+    """Verify MFA device enrollment generates unique device IDs (S-AUTH-008)"""
+    device1 = enroll_mfa_device(user_id="user-123")
+    device2 = enroll_mfa_device(user_id="user-123")
+    assert device1.id != device2.id
+```
+
+**Create SCOPE document:**
+
+```bash
+# Create SCOPE document listing missing CODE
+cat > jig/deltas/active/<branch>/SCOPE_AUTH_MFA.md <<'EOF'
+# SCOPE: Missing CODE for Auth MFA
+
+**Created:** 2025-11-19
+**Subsystem:** auth
+**Priority:** P2
+
+## Tests Skipped (waiting for CODE)
+
+| Test | Verifies SPEC | Skip Reason |
+|------|---------------|-------------|
+| test_mfa_token_validation | S-AUTH-007 | MFA validation logic not implemented |
+| test_mfa_device_enrollment | S-AUTH-008 | Device enrollment API missing |
+| test_mfa_backup_codes | S-AUTH-009 | Backup code generation not implemented |
+
+## Work Required
+
+This SCOPE will become input to a future PLAN:
+- Implement MFA token validation (S-AUTH-007)
+- Implement device enrollment API (S-AUTH-008)
+- Implement backup code generation (S-AUTH-009)
+
+## OSTC Alignment
+
+- **O-AUTH-001:** "Zero unauthorized access" (exists) ✓
+- **S-AUTH-007, 008, 009:** Specifications exist ✓
+- **T-AUTH-045, 046, 047:** Tests exist and skipped ✓
+- **C-AUTH-MFA:** CODE missing (this SCOPE) ✗
+
+**Next:** Create PLAN for WU-AUTH-MFA based on this SCOPE
+EOF
+
+git add tests/auth/ jig/deltas/
+git commit -m "test(auth): skip MFA tests pending CODE implementation (Group 5)
+
+Skipped 8 tests for MFA feature (TDD scenario).
+
+Strategy: SKIP (O-S-T aligned, CODE not implemented yet)
+Root Cause: Tests written before CODE (Bucket D - TDD)
+Created: SCOPE_AUTH_MFA.md for future PLAN
+
+Tests have correct @jig annotations and verify valid SPECs.
+Will implement CODE in future Work Unit.
+
+Unit: Test Repair Phase 4.4
+See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+```
+
+#### Strategy: DEBUG (Bucket E - CODE Bug Detected)
+
+```bash
+# DO NOT "fix" tests to match buggy CODE
+# Instead, redirect to DEBUG workflow
+
+# Tests reveal CODE bugs:
+# - test_device_id_uniqueness: CODE generates duplicate device IDs (violates S-AUTH-004)
+# - test_token_expiry_timing: Tokens expire 1hr early (violates S-AUTH-003)
+
+# Create DEBUG deltas for each bug
+jig delta new --type debug --issue device-id-collision
+jig delta new --type debug --issue token-expiry-timing
+
+# Document in test repair notes
+cat >> jig/deltas/active/<branch>/PLAN.md <<'EOF'
+
+## Bucket E: CODE Bugs Detected During Test Repair
+
+During test audit, discovered 2 tests that correctly verify SPECs,
+but CODE violates SPECs (actual bugs, not test issues).
+
+**Redirecting to DEBUG workflow:**
+
+1. **Bug: Device ID Collision**
+   - Test: test_device_id_uniqueness (tests/auth/test_device_id.py:205)
+   - Verifies: S-AUTH-004 ("Device IDs must be globally unique")
+   - Issue: CODE generates duplicate IDs (~1% collision rate)
+   - Action: Created debug-device-id-collision delta
+
+2. **Bug: Token Expiry Timing**
+   - Test: test_token_expiry_timing (tests/auth/test_token_expiry.py:175)
+   - Verifies: S-AUTH-003 ("Tokens expire after 24 hours")
+   - Issue: Tokens expire at 23 hours (timezone calculation bug)
+   - Action: Created debug-token-expiry-timing delta
+
+**Do NOT "fix" these tests - they are correct!**
+The CODE is buggy. Following DEBUG workflow for each.
+EOF
+
+git add jig/deltas/
+git commit -m "test: identify CODE bugs during test repair (Group 6 - Bucket E)
+
+Found 2 tests that correctly verify SPECs but reveal CODE bugs.
+
+Strategy: DEBUG (redirect to DEBUG workflow, not test repair)
+Tests: test_device_id_uniqueness, test_token_expiry_timing
+Action: Created DEBUG deltas for each bug
+
+These are NOT test failures - these are CODE bugs.
+Tests are working as intended (catching bugs).
+
+Created:
+- jig/deltas/active/debug-device-id-collision/
+- jig/deltas/active/debug-token-expiry-timing/
+
+Will fix CODE bugs separately via DEBUG workflow.
+
+Unit: Test Repair Phase 4.5
+See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+```
+
 ### Phase 5: JIG Integration & Validation (1-2 hours)
 
 **Goal:** Ensure all tests have `@jig` annotations and graph alignment is correct.
@@ -473,14 +666,24 @@ Always annotate tests at creation time.
 > 1. Read the test function and docstring
 > 2. Determine: What requirement does this test verify?
 > 3. Search `jig/specifications/` for matching SPEC
-> 4. Classify:
->    - **Bucket A:** SPEC exists (note the SPEC ID)
+> 4. Classify using decision tree:
+>    - **Bucket A:** SPEC exists, test needs alignment
 >    - **Bucket B:** SPEC missing but needed (note what SPEC should say)
 >    - **Bucket C:** SPEC obsolete (note why it's no longer relevant)
+>    - **Bucket D:** SPEC exists, test correct, but CODE missing (TDD scenario)
+>    - **Bucket E:** SPEC exists, test correct, but CODE violates SPEC (bug detected)
+>
+> **Decision tree for Buckets D and E:**
+> - If SPEC exists and test looks correct:
+>   - Does the CODE for this feature exist?
+>     - No → **Bucket D** (TDD: test written before CODE)
+>     - Yes → Does CODE pass the test when run?
+>       - No, and test is correct → **Bucket E** (CODE bug)
+>       - No, and test is wrong → **Bucket A** (align test)
 >
 > **Output:** Markdown table per bucket (see Phase 1 template)
 >
-> **Focus:** Be ruthless about Bucket C. If you can't justify why a test should exist (business value, safety requirement), it's obsolete.
+> **Focus:** Be ruthless about Bucket C. If you can't justify why a test should exist (business value, safety requirement), it's obsolete. For Bucket E, DO NOT "fix" the test—the test is doing its job (catching bugs).
 
 ### Phase 2: Create Missing SPECs
 
@@ -662,9 +865,9 @@ When executing a test repair task:
 ### Phase 1: SPEC Audit
 - [ ] List all failing tests
 - [ ] For each test, identify SPEC it verifies
-- [ ] Classify into Buckets A, B, C
+- [ ] Classify into Buckets A, B, C, D, E
 - [ ] Create audit table in Delta (PLAN or NOTES)
-- [ ] Add `#DISCOVERY` markers for gaps found
+- [ ] Add `#DISCOVERY` markers for gaps found (including Bucket D and E discoveries)
 
 ### Phase 2: Create Missing SPECs
 - [ ] For each Bucket B test, create SPEC file
@@ -675,14 +878,18 @@ When executing a test repair task:
 
 ### Phase 3: Root Cause Grouping
 - [ ] Group tests by root cause
-- [ ] Assign strategy to each group (FIX/REWRITE/DELETE)
+- [ ] Assign strategy to each group (FIX/REWRITE/DELETE/SKIP/DEBUG)
 - [ ] Document strategy rationale in Delta
 - [ ] Add `#LEARNED` marker about grouping benefits
+- [ ] For Bucket D: Identify CODE needed, prepare SCOPE doc
+- [ ] For Bucket E: Prepare DEBUG delta creation
 
 ### Phase 4: Execute Repairs
 - [ ] For FIX groups: apply mechanical changes, ensure `@jig` annotations
 - [ ] For REWRITE groups: delete old tests, write new tests per SPEC
 - [ ] For DELETE groups: remove test files entirely
+- [ ] For SKIP groups (Bucket D): add @pytest.mark.skip, create SCOPE doc
+- [ ] For DEBUG groups (Bucket E): create DEBUG deltas, do NOT fix tests
 - [ ] One commit per group with clear strategy in message
 - [ ] No shims, no adapters, no backwards compatibility
 - [ ] Run tests after each group to verify
@@ -722,14 +929,18 @@ When executing a test repair task:
 - Blocked by imports: 77
 
 ### Classification
-- Bucket A (existing SPEC): 65 tests
-- Bucket B (missing SPEC): 30 tests
-- Bucket C (obsolete): 23 tests
+- Bucket A (align - existing SPEC): 65 tests
+- Bucket B (create SPEC - missing SPEC): 30 tests
+- Bucket C (delete - obsolete): 18 tests
+- Bucket D (skip - CODE missing, TDD): 8 tests
+- Bucket E (debug - CODE bug detected): 2 tests
 
 ### Strategy Execution
 - FIX: 65 tests (mechanical changes)
 - REWRITE: 30 tests (deleted old, wrote new per SPEC)
-- DELETE: 23 tests (obsolete features)
+- DELETE: 18 tests (obsolete features)
+- SKIP: 8 tests (CODE not implemented, created SCOPE doc)
+- DEBUG: 2 tests (redirected to DEBUG workflow)
 
 ### SPECs Created (Bucket B)
 - S-CRYPTO-005: Constant-time JWT validation
@@ -738,12 +949,25 @@ When executing a test repair task:
 - S-IPC-002: WebSocket reconnection strategy
 - S-CRDT-008: OR-Set conflict-free semantics
 
+### SCOPE Docs Created (Bucket D - TDD)
+- SCOPE_AUTH_MFA.md: 8 tests skipped, waiting for MFA implementation
+  - Tests: test_mfa_token_validation, test_mfa_device_enrollment, test_mfa_backup_codes
+  - Next: Create PLAN for WU-AUTH-MFA
+
+### DEBUG Deltas Created (Bucket E - CODE Bugs)
+- debug-device-id-collision: Device ID uniqueness bug (violates S-AUTH-004)
+- debug-token-expiry-timing: Token expires 1hr early (violates S-AUTH-003)
+- Action: Following DEBUG workflow to fix CODE bugs
+
 ### Final State
-- Total tests: 1,482 (97% healthy)
+- Total tests: 1,490 (100% passing + skipped)
+- Passing: 1,482 (99.5%)
+- Skipped: 8 (0.5% - Bucket D, TDD scenario)
 - Failing: 0 (0%)
 - SPEC coverage: 100% (all tests have @jig annotations)
 - Alignment: `jig validate` passes (0 orphaned nodes)
 - Coverage: 84.2% (above 80% target)
+- CODE bugs found: 2 (redirected to DEBUG workflow)
 
 ### Key Decisions
 #DECISION "REWRITE OR-Map tests vs backwards compatibility"
@@ -802,30 +1026,38 @@ When executing a test repair task:
 
 ---
 
-## 9) Quick Reference: Decision Matrix
+## 9) Quick Reference: Decision Matrix (5 Buckets)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ For each failing test:                                      │
-│                                                              │
-│ 1. What SPEC does this verify?                              │
-│    ├─ Existing SPEC → Bucket A                              │
-│    ├─ Missing SPEC (needed) → Bucket B                      │
-│    └─ Obsolete SPEC → Bucket C                              │
-│                                                              │
-│ 2. What's the root cause?                                   │
-│    ├─ Mechanical change (constructor, import) → FIX         │
-│    ├─ Architecture change (semantics evolved) → REWRITE     │
-│    └─ Feature removed (obsolete) → DELETE                   │
-│                                                              │
-│ 3. Execute strategy:                                        │
-│    ├─ FIX: Minimal change, verify SPEC still correct        │
-│    ├─ REWRITE: Delete old, write new per SPEC               │
-│    └─ DELETE: Remove test, update graph index               │
-│                                                              │
-│ NEVER: shims, adapters, backwards compatibility             │
-│ ALWAYS: @jig T-XXX verifies:S-YYY annotation                │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│ For each failing test:                                               │
+│                                                                       │
+│ 1. What SPEC does this verify?                                       │
+│    ├─ SPEC doesn't exist                                             │
+│    │  ├─ Requirement is real → Bucket B (create SPEC)                │
+│    │  └─ Requirement is obsolete → Bucket C (delete test)            │
+│    │                                                                  │
+│    └─ SPEC exists and is valid                                       │
+│       ├─ Does CODE exist?                                            │
+│       │  ├─ No → Bucket D (skip test, document SCOPE)                │
+│       │  └─ Yes → Continue...                                        │
+│       │                                                               │
+│       ├─ Does CODE implement SPEC correctly?                         │
+│       │  ├─ No → Bucket E (CODE bug → DEBUG workflow)                │
+│       │  └─ Yes → Bucket A (align test)                              │
+│       │                                                               │
+│       └─ SPEC is obsolete → Bucket C (delete test)                   │
+│                                                                       │
+│ 2. Execute strategy per bucket:                                      │
+│    ├─ Bucket A (Align): FIX or REWRITE test                          │
+│    ├─ Bucket B (Create SPEC): Create SPEC → align test               │
+│    ├─ Bucket C (Delete): Remove test, update graph                   │
+│    ├─ Bucket D (Skip/TDD): @pytest.mark.skip + SCOPE doc             │
+│    └─ Bucket E (Debug): Create DEBUG delta, don't fix test           │
+│                                                                       │
+│ NEVER: shims, adapters, backwards compatibility, "fix" test for bug  │
+│ ALWAYS: @jig T-XXX verifies:S-YYY annotation                         │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -860,13 +1092,15 @@ When executing a test repair task:
 
 **TL;DR:**
 
-1. **Classify:** Every failing test is Bucket A (existing SPEC), B (missing SPEC), or C (obsolete)
+1. **Classify:** Every failing test is Bucket A (align), B (create SPEC), C (delete), D (skip - TDD), or E (debug - CODE bug)
 2. **Create SPECs:** For Bucket B, create the SPEC before fixing the test
-3. **Group:** Batch tests by root cause and strategy (FIX/REWRITE/DELETE)
-4. **Execute:** No shims, no adapters—fix, rewrite from SPEC, or delete
+3. **Group:** Batch tests by root cause and strategy (FIX/REWRITE/DELETE/SKIP/DEBUG)
+4. **Execute:** No shims, no adapters—fix, rewrite from SPEC, delete, skip with SCOPE, or redirect to DEBUG
 5. **Validate:** All tests have `@jig` annotations, `jig validate` passes, test suite healthy
 
 **Core principle:** SPECs are source of truth. Tests are reproducible. Code is cheap when requirements are clear.
+
+**Key insight:** Bucket D (TDD) preserves O-S-T alignment when CODE is missing. Bucket E (Debug) prevents "fixing" tests to match buggy CODE.
 
 ---
 

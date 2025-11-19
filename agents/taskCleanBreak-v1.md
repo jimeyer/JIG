@@ -1,4 +1,4 @@
-# taskBurnShips: Clean Break Protocol
+# taskCleanBreak: Clean Break Protocol
 
 **Purpose:** Execute clean breaks from old implementations to new ones with zero technical debt.
 
