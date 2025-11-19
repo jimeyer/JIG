@@ -51,10 +51,10 @@ jig/
 ├── specifications/        # What we build (may need updates after debug)
 └── deltas/
     ├── active/
-    │   └── debug-<issue-id>/
-    │       └── DEBUG_<issue-title>.md     # ← YOUR DEBUG SESSION LIVES HERE
+    │   └── debug-[issue-id]/
+    │       └── DEBUG_[issue-title].md     # ← YOUR DEBUG SESSION LIVES HERE
     └── archive/
-        └── debug-<issue-id>/              # Moved after fix merged
+        └── debug-[issue-id]/              # Moved after fix merged
 
 src/                       # Code with bugs (and @jig annotations)
 tests/                     # Tests that should have caught this (and @jig annotations)
@@ -109,43 +109,43 @@ tests/                     # Tests that should have caught this (and @jig annota
 ```markdown
 ---
 delta_type: debug
-issue_id: <ticket/issue number>
-branch: <git-branch-name>
-severity: <critical | high | medium | low>
+issue_id: [ticket/issue number]
+branch: [git-branch-name]
+severity: [critical | high | medium | low]
 ---
 
-# DEBUG: <Issue Title>
+# DEBUG: [Issue Title]
 
-- **Issue ID:** <link to ticket>
-- **Reported:** <YYYY-MM-DD>
-- **Investigator:** <name>
-- **Status:** <Investigating | Root Cause Found | Fixed | Closed>
-- **Subsystem:** <affected subsystem>
-- **Priority:** <P0 | P1 | P2 | P3>
+- **Issue ID:** [link to ticket]
+- **Reported:** [YYYY-MM-DD]
+- **Investigator:** [name]
+- **Status:** [Investigating | Root Cause Found | Fixed | Closed]
+- **Subsystem:** [affected subsystem]
+- **Priority:** [P0 | P1 | P2 | P3]
 
 ## Symptoms
 
 **What's broken:**
-<Clear description of broken behavior>
+[Clear description of broken behavior]
 
 **How to reproduce:**
 1. Step 1
 2. Step 2
-3. Observe: <actual broken behavior>
+3. Observe: [actual broken behavior]
 
 **Expected behavior:**
-<What should happen instead>
+[What should happen instead]
 
 **First observed:**
-- Environment: <prod | staging | dev>
-- Version/Commit: <hash>
-- Frequency: <always | intermittent | rare>
+- Environment: [prod | staging | dev]
+- Version/Commit: [hash]
+- Frequency: [always | intermittent | rare]
 
 **Impact:**
-- Users affected: <count or %>
-- Data integrity: <yes | no>
-- Security: <yes | no>
-- Workaround available: <yes | no>
+- Users affected: [count or %]
+- Data integrity: [yes | no]
+- Security: [yes | no]
+- Workaround available: [yes | no]
 
 ## Constraint Mapping (Intent Alignment)
 
@@ -153,50 +153,50 @@ severity: <critical | high | medium | low>
 
 **Outcomes potentially violated:**
 - O-XXX-001: "Description" (jig/outcomes/O-XXX-001.md)
-  - Violated? <yes | no | unclear>
-  - How: <explanation>
+  - Violated? [yes | no | unclear]
+  - How: [explanation]
 
 **Specifications potentially violated:**
 - S-XXX-001: "Description" (jig/specifications/S-XXX-001.md)
-  - Violated? <yes | no | unclear>
-  - How: <explanation>
+  - Violated? [yes | no | unclear]
+  - How: [explanation]
 
 **Tests that should have caught this:**
 - T-XXX-001: `tests/path/to/test.py::test_function`
-  - Exists? <yes | no>
-  - Passing? <yes | no>
-  - Adequate? <yes | no | needs expansion>
+  - Exists? [yes | no]
+  - Passing? [yes | no]
+  - Adequate? [yes | no | needs expansion]
 
 **Initial hypothesis:**
-<Which constraint model is broken: Intent (O/S wrong) or Reality (C/T wrong)?>
+[Which constraint model is broken: Intent (O/S wrong) or Reality (C/T wrong)?]
 
 ## Investigation Log
 
-### <YYYY-MM-DD HH:MM> - <milestone>
+### [YYYY-MM-DD HH:MM] - [milestone]
 
 **What I tried:**
-<Action taken>
+[Action taken]
 
 **What I found:**
-<Observation>
+[Observation]
 
 **Next step:**
-<What to investigate next>
+[What to investigate next]
 
 ---
 
-### <YYYY-MM-DD HH:MM> - Root Cause Found
+### [YYYY-MM-DD HH:MM] - Root Cause Found
 
 **Root cause:**
-<Clear statement of what's broken>
+[Clear statement of what's broken]
 
 **Why it happened:**
-<Explanation of failure mechanism>
+[Explanation of failure mechanism]
 
 **Constraint violated:**
-- Implementation violated: <S-XXX-NNN>
-- OR Intent was wrong: <S-XXX-NNN needs update>
-- OR Intent was missing: <need new S-XXX-NNN>
+- Implementation violated: [S-XXX-NNN]
+- OR Intent was wrong: [S-XXX-NNN needs update]
+- OR Intent was missing: [need new S-XXX-NNN]
 
 **Evidence:**
 - Stack trace / logs / data
@@ -208,21 +208,21 @@ severity: <critical | high | medium | low>
 ## Fix Strategy
 
 **Approach:**
-<How will we fix this?>
+[How will we fix this?]
 
 **Changes required:**
 - [ ] Code changes in: `src/path/file.py`
 - [ ] Test changes in: `tests/path/test_file.py`
-- [ ] Intent updates: <O-XXX-NNN or S-XXX-NNN>
-- [ ] Documentation updates: <paths>
+- [ ] Intent updates: [O-XXX-NNN or S-XXX-NNN]
+- [ ] Documentation updates: [paths]
 
 **Risk assessment:**
-- Regression risk: <low | medium | high>
-- Scope of change: <isolated | localized | widespread>
-- Testing strategy: <unit | integration | manual>
+- Regression risk: [low | medium | high]
+- Scope of change: [isolated | localized | widespread]
+- Testing strategy: [unit | integration | manual]
 
 **Rollback plan:**
-<How to undo if fix causes issues>
+[How to undo if fix causes issues]
 
 ---
 
@@ -241,8 +241,8 @@ severity: <critical | high | medium | low>
 **Root cause location:**
 - File: `src/path/file.py`
 - Line: 123
-- Problem: <what was wrong>
-- Fix: <what changed>
+- Problem: [what was wrong]
+- Fix: [what changed]
 
 ### Test Changes
 
@@ -256,19 +256,19 @@ severity: <critical | high | medium | low>
   ```
 
 **Why this test didn't exist:**
-<Gap in test strategy, edge case not considered, etc.>
+[Gap in test strategy, edge case not considered, etc.]
 
 ### Intent Updates
 
 **New OSTC nodes created:**
 - S-XXX-042: "Description of new constraint discovered"
-  - Why: <This constraint wasn't explicit before the bug>
+  - Why: [This constraint wasn't explicit before the bug]
   - Location: `jig/specifications/S-XXX-042.md`
 
 **Existing OSTC nodes updated:**
 - S-XXX-001: "Updated description"
-  - What changed: <added constraint about edge case>
-  - Why: <original spec was incomplete>
+  - What changed: [added constraint about edge case]
+  - Why: [original spec was incomplete]
 
 ---
 
@@ -301,7 +301,7 @@ severity: <critical | high | medium | low>
 #DISCOVERY "Need new specification S-XXX-042: Input validation requirements"
 - What: All public APIs must validate inputs before processing
 - Why: This entire class of bugs stems from missing input validation
-- Subsystem: <name>
+- Subsystem: [name]
 
 ---
 
@@ -316,12 +316,12 @@ severity: <critical | high | medium | low>
 - [ ] Regression (worked before, broken by recent change)
 
 **Upstream failure point:**
-<Where in the development process should this have been caught?>
+[Where in the development process should this have been caught?]
 
 **What would have prevented this:**
-1. <Specific practice, test, review step>
-2. <Process improvement>
-3. <Tool/automation>
+1. [Specific practice, test, review step]
+2. [Process improvement]
+3. [Tool/automation]
 
 **Process improvements proposed:**
 
@@ -330,8 +330,8 @@ severity: <critical | high | medium | low>
 
 **Intent Graph gaps identified:**
 
-#DISCOVERY "Subsystem <name> lacks error handling specifications"
-- Need: S-XXX-043: "Error handling strategy for subsystem <name>"
+#DISCOVERY "Subsystem [name] lacks error handling specifications"
+- Need: S-XXX-043: "Error handling strategy for subsystem [name]"
 - Need: O-XXX-007: "System degrades gracefully under invalid input"
 
 ---
@@ -345,45 +345,45 @@ severity: <critical | high | medium | low>
 4. Intent alignment check: `jig validate --check-all`
 
 **Manual testing:**
-- [ ] Reproduction case: <result>
-- [ ] Edge cases: <result>
-- [ ] Performance: <result>
-- [ ] Integration: <result>
+- [ ] Reproduction case: [result]
+- [ ] Edge cases: [result]
+- [ ] Performance: [result]
+- [ ] Integration: [result]
 
 **Rollout plan:**
-- Staging: <YYYY-MM-DD>
-- Production: <YYYY-MM-DD>
-- Monitoring: <metrics to watch>
+- Staging: [YYYY-MM-DD]
+- Production: [YYYY-MM-DD]
+- Monitoring: [metrics to watch]
 
 ---
 
 ## Completion Summary
 
-**Issue resolved:** <yes | no | partial>
+**Issue resolved:** [yes | no | partial]
 
 **Changes delivered:**
-- Code: <# files, # lines changed>
-- Tests: <# tests added>
-- Intent: <# O/S nodes created/updated>
-- Documentation: <what updated>
+- Code: [# files, # lines changed]
+- Tests: [# tests added]
+- Intent: [# O/S nodes created/updated]
+- Documentation: [what updated]
 
 **Constraint alignment:**
-- Implementation now satisfies: <S-XXX-NNN, S-XXX-NNN>
-- New constraints added: <S-XXX-NNN>
-- Tests now verify: <S-XXX-NNN, S-XXX-NNN>
+- Implementation now satisfies: [S-XXX-NNN, S-XXX-NNN]
+- New constraints added: [S-XXX-NNN]
+- Tests now verify: [S-XXX-NNN, S-XXX-NNN]
 
 **Time metrics:**
-- Time to reproduce: <duration>
-- Time to root cause: <duration>
-- Time to fix: <duration>
-- Total time: <duration>
+- Time to reproduce: [duration]
+- Time to root cause: [duration]
+- Time to fix: [duration]
+- Total time: [duration]
 
 **Harvest Preparation (JIG):**
 
 **Markers summary:**
-- Discoveries: <count>
-- Decisions: <count>
-- Learned patterns: <count>
+- Discoveries: [count]
+- Decisions: [count]
+- Learned patterns: [count]
 
 **Recommended OSTC Nodes (from DEBUG learnings):**
 (Focus on DISCOVERIES - new constraints revealed by the bug)
@@ -391,14 +391,11 @@ severity: <critical | high | medium | low>
 - [ ] S-XXX-042: "Input validation required at all public APIs" (NEW - gap discovered)
 - [ ] S-XXX-001: Add "must handle null input gracefully" (UPDATE - incomplete spec)
 - [ ] O-XXX-007: "System degrades gracefully under invalid input" (NEW - outcome clarified)
-- [ ] T-XXX-043: Add regression test for issue #<N> (NEW - test gap)
+- [ ] T-XXX-043: Add regression test for issue #[N] (NEW - test gap)
 
-**Subsystems touched:** <primary>, <secondary>
+**Subsystems touched:** [primary], [secondary]
 
-**Next step:** `jig ai-distill --branch debug-<issue-id>`
-
----
-```
+**Next step:** `jig ai-distill --branch debug-[issue-id]`
 
 ---
 
@@ -410,7 +407,7 @@ severity: <critical | high | medium | low>
    ```bash
    git checkout -b debug-issue-42
    jig delta new --type debug --issue 42
-   # Creates: jig/deltas/active/debug-issue-42/DEBUG_<title>.md
+   # Creates: jig/deltas/active/debug-issue-42/DEBUG_[title].md
    ```
 
 2. **Fill Symptoms section**
@@ -429,9 +426,9 @@ severity: <critical | high | medium | low>
    git add jig/deltas/
    git commit -m "debug: start investigation for issue #42
 
-   Symptom: <one-line summary>
-   Affected subsystem: <name>
-   See: jig/deltas/active/debug-issue-42/DEBUG_<title>.md"
+   Symptom: [one-line summary]
+   Affected subsystem: [name]
+   See: jig/deltas/active/debug-issue-42/DEBUG_[title].md"
    ```
 
 ### Phase 2: Investigation (variable time)
@@ -499,12 +496,12 @@ severity: <critical | high | medium | low>
    git add src/ tests/ jig/
    git commit -m "fix(subsystem): resolve issue #42
 
-   Root cause: <one-line explanation>
-   Fix: <what changed>
+   Root cause: [one-line explanation]
+   Fix: [what changed]
    Implements: S-XXX-NNN
    Adds: T-XXX-NNN (regression test)
 
-   See: jig/deltas/active/debug-issue-42/DEBUG_<title>.md"
+   See: jig/deltas/active/debug-issue-42/DEBUG_[title].md"
    ```
 
 ### Phase 4: RETRO & Harvest
@@ -685,15 +682,15 @@ See: jig/harvest-reports/debug-issue-42-2025-11-18.yaml
 > 4. Form initial hypothesis: Intent wrong or Reality wrong?
 >
 > **Step 3: Initialize DEBUG**
-> 1. Add YAML frontmatter: `delta_type: debug`, `issue_id: <N>`, `branch: debug-issue-N`
+> 1. Add YAML frontmatter: `delta_type: debug`, `issue_id: [N]`, `branch: debug-issue-N`
 > 2. Fill Symptoms and Constraint Mapping sections
 > 3. Create placeholder Investigation Log
-> 4. Save to: `jig/deltas/active/debug-issue-N/DEBUG_<title>.md`
+> 4. Save to: `jig/deltas/active/debug-issue-N/DEBUG_[title].md`
 >
 > **Step 4: Start Investigation**
-> 1. Attempt to reproduce the bug
-> 2. Document findings in Investigation Log
-> 3. Update Constraint Mapping as understanding improves
+> 5. Attempt to reproduce the bug
+> 6. Document findings in Investigation Log
+> 7. Update Constraint Mapping as understanding improves
 
 ### During Investigation
 
@@ -720,7 +717,7 @@ See: jig/harvest-reports/debug-issue-42-2025-11-18.yaml
 > ```python
 > # @jig T-XXX-NNN verifies:S-YYY-NNN subsystem:name
 > def test_regression_issue_N():
->     """Regression test for issue #N - <one-line description>"""
+>     """Regression test for issue #N - [one-line description]"""
 >     # Test should FAIL before fix
 >     # Test should PASS after fix
 > ```
