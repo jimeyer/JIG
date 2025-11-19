@@ -36,7 +36,7 @@ branch: bootstrap-slice-0
 - [x] WU4: `jigy init` command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU5: Node templates — tests ☑ / docs ☑ / reflect ☑
 - [x] WU6: `jigy node create` command — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU7: OSTC validator — tests ☐ / docs ☐ / reflect ☐
+- [x] WU7: OSTC validator — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU8: `jigy validate` command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU9: Dogfooding - create JIG's own nodes — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU10: Documentation & release — tests ☐ / docs ☐ / reflect ☐
@@ -689,11 +689,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tests]
+  - [design] ValidationResult dataclass provides structured, composable validation output
+  - [tests] 24 unit tests with 94.62% coverage ensure robustness
+  - [architecture] Separate validate_node and validate_graph enables both local and global checks
 - What could be better:
-  - [scope]
+  - [scope] Could add validation for node relationships (implements, verifies links)
 - Discoveries:
-  - [scope]
+  - [testing] Comprehensive edge case testing (malformed YAML, duplicate IDs, orphaned nodes) builds confidence
+  - [design] Collecting all errors before returning improves user experience over fail-fast
 
 **Links:**
 - Commit: [to be filled]
