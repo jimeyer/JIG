@@ -31,7 +31,7 @@ branch: bootstrap-slice-0
 ## Work Unit Checklist
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
 - [x] WU1: Project setup & infrastructure — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU2: Core utilities (io, yaml_utils) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Core utilities (io, yaml_utils) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU3: Config loader & parser — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: `jigy init` command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Node templates — tests ☐ / docs ☐ / reflect ☐
@@ -240,11 +240,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tests]
+  - [tests] Comprehensive test coverage (81.4%) achieved with clear, focused test cases
+  - [tools] pathlib.Path usage throughout simplifies file handling and improves type safety
+  - [structure] Separating io and yaml_utils provides clear separation of concerns
 - What could be better:
-  - [scope]
+  - [scope] Testing permission errors is challenging in unit tests, left some branches uncovered
 - Discoveries:
-  - [scope]
+  - [tools] PyYAML's safe_load/safe_dump with proper config gives clean, readable output
+  - [testing] pytest fixtures (tmp_path) make file I/O testing clean and isolated
 
 **Links:**
 - Commit: [to be filled]
