@@ -791,7 +791,7 @@ branch: bootstrap-slice-0
   - [design] Exit code 3 for "not initialized" enables clear distinction from validation errors
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 93497dcbdc6c7ce37b90c88ac3ce8af1c4d3b1f6
 
 **Human Validation:**
 - Commands:
