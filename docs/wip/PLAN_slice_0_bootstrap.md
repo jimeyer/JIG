@@ -250,7 +250,7 @@ branch: bootstrap-slice-0
   - [testing] pytest fixtures (tmp_path) make file I/O testing clean and isolated
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 7f1f97ebb94e3d40b375b1f35e1a42301a9e0aa1
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_io.py -v`, `pytest tests/unit/test_yaml_utils.py -v`
