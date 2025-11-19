@@ -148,7 +148,7 @@ Full documentation available in `docs/`:
 
 - Architecture: `docs/jig-concept/JIG-Concept-v6.1.md`
 - Implementation Plan: `docs/wip/PLAN_slice_0_bootstrap.md`
-- Data Formats: (coming in WU10)
+- Data Formats: `docs/architecture/DATA_FORMATS.md`
 
 ## Authors
 

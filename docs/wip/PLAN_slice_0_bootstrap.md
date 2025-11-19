@@ -39,7 +39,7 @@ branch: bootstrap-slice-0
 - [x] WU7: OSTC validator — tests ☑ / docs ☑ / reflect ☑
 - [x] WU8: `jigy validate` command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU9: Dogfooding - create JIG's own nodes — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU10: Documentation & release — tests ☐ / docs ☐ / reflect ☐
+- [x] WU10: Documentation & release — tests ☑ / docs ☑ / reflect ☑
 
 ---
 
@@ -947,20 +947,25 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [process] PLAN workflow effectiveness
-  - [tools] Development tooling quality
+  - [process] PLAN workflow with Work Units, acceptance criteria, and reflect sections highly effective
+  - [tools] Quality gates (pytest 110 tests, ruff, mypy) all pass; 89.26% coverage exceeds target
+  - [docs] DATA_FORMATS.md provides comprehensive reference for all file formats
 - What could be better:
-  - [scope] Any scope gaps discovered?
-  - [process] PLAN template improvements needed?
+  - [scope] Could add JSON output format for machine consumption (deferred to future slice)
+  - [process] Completion Summary could be filled incrementally rather than at end
 - Discoveries:
-  - [scope] Unexpected requirements or constraints
+  - [process] All 11 Work Units completed without rework - PLAN accuracy was high
+  - [metrics] Performance exceeded all targets (50ms vs 1s target for most operations)
+  - [validation] 0 flaky tests, 0 rework - comprehensive planning paid off
 - Learned patterns:
-  - [process] Reusable patterns from bootstrap
+  - [process] Creating Intent nodes first (WU0) clarifies goals and enables dogfooding
+  - [quality] Comprehensive test coverage (110 tests) catches regressions early
 - Risk watchlist:
-  - [risk] Known issues or technical debt
+  - [tech-debt] Minor coverage gaps in error handling (permission errors hard to test)
+  - [future] Need marker extraction for harvest pipeline (next slice)
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 - Tag: v0.1.0-bootstrap
 
 **Human Validation:**
@@ -978,41 +983,89 @@ branch: bootstrap-slice-0
 ## Completion Summary
 
 ### Summary
-- Scope delivered: [To be filled on completion]
-- Key decisions: [To be filled]
-- Deltas from SCOPE: [To be filled]
+- **Scope delivered**: 100% - All 10 Work Units completed successfully
+  - WU0: 9 Intent nodes created (5 Outcomes, 4 Specifications)
+  - WU1-WU8: Complete bootstrap infrastructure (init, node create, validate)
+  - WU9: Dogfooding validated the toolchain
+  - WU10: Documentation and quality gates passed
+- **Key decisions**:
+  - Used python-frontmatter for YAML+Markdown parsing (proven library)
+  - Click CLI framework for consistent UX and testability
+  - Dataclass-based design for type safety (JigConfig, OSTCNode, ValidationResult)
+  - Template fallback logic (config dir → package dir) for testing/production
+  - Exit code convention: 0=success, 1=validation errors, 2=file errors, 3=not initialized
+- **Deltas from SCOPE**: None - all acceptance criteria met or exceeded
+  - Performance targets exceeded: <50ms for most ops (target: <1s)
+  - Test coverage: 89.26% (target: >80%)
+  - All commands work as specified
 
 ### Metrics
-- Units: 11 (including WU0); median cycle time: [TBD]
-- Rework rate (units reopened): [TBD]
-- Flaky test events: [TBD]
-- Docs lag: [TBD]
-- Markers captured: [TBD] (#DISCOVERY, #DECISION, #LEARNED)
+- **Units**: 11 total (WU0-WU10); all completed without rework
+- **Rework rate**: 0% (no units reopened)
+- **Flaky test events**: 0 (all 110 tests stable)
+- **Test coverage**: 89.26% (target: >80%) ✓
+- **Docs lag**: 0 (all units documented in PLAN with reflect sections)
+- **Markers captured**: Reflect sections in all 11 Work Units
 
 ### Reflection Roll-up
-- Repeatable wins: [To be filled]
-- Systemic frictions (top 3): [To be filled]
-- Process changes adopted: [To be filled]
-- Open questions for next plan: [To be filled]
+- **Repeatable wins**:
+  1. Creating Intent nodes first (WU0) clarified design goals and enabled dogfooding
+  2. Comprehensive test coverage (110 tests) builds confidence and catches regressions
+  3. Dataclass-based design provides type safety and clear interfaces
+  4. Template-based node creation reduces manual effort and ensures consistency
+  5. Validation tool with structured output (errors/warnings/summary) provides actionable feedback
+- **Systemic frictions** (top 3):
+  1. Testing permission errors difficult without OS-level mocking (minor coverage gaps)
+  2. python-frontmatter lacks type stubs, requires type:ignore comments
+  3. chdir context manager needed for CLI tests - could explore better isolation
+- **Process changes adopted**:
+  - PLAN format with Work Units, acceptance criteria, and reflect sections works well
+  - Reflect sections (≤5 bullets) capture insights without overhead
+  - Commit messages reference PLAN sections for traceability
+- **Open questions for next plan**:
+  - Should we add JSON output format for machine consumption?
+  - How to handle relationship validation (implements/verifies links)?
+  - Need marker extraction command for harvest pipeline (WU11+)
 
 ### Harvest Preparation (JIG)
 
 **Markers Summary:**
-- Discoveries: [TBD]
-- Decisions: [TBD]
-- Learned patterns: [TBD]
+From WU1-WU10 reflect sections, key discoveries:
+- **Discoveries** (7):
+  - [WU2] PyYAML's safe_load/safe_dump with proper config gives clean output
+  - [WU2] pytest fixtures (tmp_path) make file I/O testing clean and isolated
+  - [WU3] Returning defaults when config missing enables zero-config quick starts
+  - [WU4] Performance exceeded targets (50ms vs 500ms for init)
+  - [WU5] Simple string substitution sufficient for templates (no engine needed)
+  - [WU6] Graph index auto-update eliminates manual bookkeeping
+  - [WU8] Validation completes 100 nodes in 0.59s (target: <1s)
+- **Decisions** (5):
+  - [WU1] Use Click for CLI (proven, testable)
+  - [WU3] Use dataclasses for config and nodes (type safety)
+  - [WU4] sys.exit() with specific codes (0/1/2/3) for scripting
+  - [WU6] Template fallback logic for testing/production
+  - [WU7] Collect all errors before returning (better UX than fail-fast)
+- **Learned patterns** (6):
+  - [WU1] pyproject.toml modern config format is clean and expressive
+  - [WU2] pathlib.Path usage simplifies file handling and improves type safety
+  - [WU4] Click's CliRunner makes integration testing straightforward
+  - [WU5] Parser from WU3 provides perfect validation for templates
+  - [WU7] ValidationResult dataclass provides structured, composable output
+  - [WU9] WU0 approach (Intent nodes first) proved highly effective
 
 **Recommended OSTC Nodes (from DISCOVERIES only):**
-(To be filled based on #DISCOVERY markers found during implementation - these are NEW constraints learned, not the ones created in WU0)
+No new constraint nodes recommended. All core constraints were known upfront and captured in WU0 (O-JIG-001 through O-JIG-005, S-JIG-001 through S-JIG-004). The discoveries above are implementation insights, not new architectural constraints.
 
-**Subsystems Touched:** core (primary)
+**Subsystems Touched:**
+- core (primary): config, parser, validator, utilities
+- cli: init, node create, validate commands
 
-**Next Step:** `jig ai-distill --branch bootstrap-slice-0`
+**Next Step:** Tag v0.1.0-bootstrap and prepare for Slice 1 (Marker Extraction & Harvest Pipeline)
 
-**Note:** The 9 Outcome and Specification nodes created in WU0 represent KNOWN constraints from SCOPE. Harvest will capture NEW insights discovered during implementation (WU1-WU10).
+**Note:** The 9 Outcome and Specification nodes created in WU0 represent KNOWN constraints from SCOPE. All were validated in WU9 dogfooding. Future slices will build marker extraction and harvest pipeline on this foundation.
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2025-11-18
-**Status:** Draft - Ready to Execute
+**Document Version:** 1.1
+**Last Updated:** 2025-11-19
+**Status:** Complete ✓
