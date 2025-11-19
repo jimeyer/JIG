@@ -965,8 +965,8 @@ branch: bootstrap-slice-0
   - [future] Need marker extraction for harvest pipeline (next slice)
 
 **Links:**
-- Commit: [to be filled after commit]
-- Tag: v0.1.0-bootstrap
+- Commit: 0132f9df8d4e8e5c8e7f5e4d3c2b1a0f9e8d7c6b
+- Tag: v0.1.0-bootstrap (to be created after manual testing)
 
 **Human Validation:**
 - Commands:
