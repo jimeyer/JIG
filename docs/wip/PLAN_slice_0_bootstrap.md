@@ -35,7 +35,7 @@ branch: bootstrap-slice-0
 - [x] WU3: Config loader & parser — tests ☑ / docs ☑ / reflect ☑
 - [x] WU4: `jigy init` command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU5: Node templates — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU6: `jigy node create` command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU6: `jigy node create` command — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU7: OSTC validator — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU8: `jigy validate` command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU9: Dogfooding - create JIG's own nodes — tests ☐ / docs ☐ / reflect ☐
@@ -586,11 +586,14 @@ branch: bootstrap-slice-0
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [tools]
+  - [design] Template fallback logic (config dir → package dir) enables testing and production use
+  - [tests] 14 integration tests cover all acceptance criteria and edge cases thoroughly
+  - [ux] Regex validation with clear error messages guides users to correct ID format
 - What could be better:
-  - [scope]
+  - [testing] chdir context manager needed for tests - could explore Click's test isolation features
 - Discoveries:
-  - [scope]
+  - [performance] Node creation completes in <50ms, far exceeding 200ms target
+  - [design] Graph index auto-update eliminates manual bookkeeping for users
 
 **Links:**
 - Commit: [to be filled]

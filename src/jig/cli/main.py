@@ -17,8 +17,10 @@ def cli() -> None:
 
 # Import and register subcommands
 from jig.cli.init import init  # noqa: E402
+from jig.cli.node import node  # noqa: E402
 
 cli.add_command(init)
+cli.add_command(node)
 
 
 if __name__ == "__main__":
