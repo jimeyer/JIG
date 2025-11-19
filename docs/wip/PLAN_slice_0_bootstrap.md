@@ -699,7 +699,7 @@ branch: bootstrap-slice-0
   - [design] Collecting all errors before returning improves user experience over fail-fast
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 263102637728435f0da95b4bdfaa4ff9b8c90574
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_validator.py -v`
