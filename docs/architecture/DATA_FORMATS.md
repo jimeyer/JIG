@@ -20,14 +20,16 @@ This document specifies the data formats used by JIG for Intent nodes, configura
 
 ## OSTC Node Format
 
-All Intent nodes (Outcome, Specification, Test, Constraint) use YAML frontmatter + Markdown body format.
+Markdown-based Intent nodes (Outcome, Specification, Constraint) use YAML frontmatter + Markdown body format.
+
+**Note:** In the OSTCX v7 model, Test (T) and Code (C) nodes are discovered via `@jig` annotations in test/source code, not stored as markdown files.
 
 ### File Structure
 
 ```markdown
 ---
 id: O-XXX-NNN
-type: outcome|specification|test|constraint
+type: outcome|specification|constraint
 title: "Human-readable title"
 subsystem: subsystem-name
 created: YYYY-MM-DD
@@ -48,8 +50,8 @@ More content...
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string | Node identifier (format: `[OSTC]-[A-Z0-9]+-\d{3}`) |
-| `type` | string | One of: `outcome`, `specification`, `test`, `constraint` |
+| `id` | string | Node identifier (format: `[OSC]-[A-Z0-9]+-\d{3}` for markdown nodes) |
+| `type` | string | One of: `outcome`, `specification`, `constraint` (T nodes use @jig annotations) |
 | `title` | string | Human-readable title (quoted string) |
 
 ### Optional Fields
@@ -68,21 +70,29 @@ More content...
 
 Node IDs follow a strict pattern: `[PREFIX]-[PROJECT]-[NUMBER]`
 
+**Markdown Node Types (stored in jig/):**
+
 | Node Type | Prefix | Example |
 |-----------|--------|---------|
 | Outcome | `O` | `O-JIG-001` |
 | Specification | `S` | `S-JIG-001` |
-| Test | `T` | `T-JIG-001` |
 | Constraint | `C` | `C-JIG-001` |
+
+**Annotation-Based Node Types (discovered in code):**
+
+| Node Type | Prefix | Example | Discovery Method |
+|-----------|--------|---------|------------------|
+| Test | `T` | `T-JIG-001` | `@jig T-JIG-001` in test code |
+| Code | `C` | `C-JIG-001` | `@jig C-JIG-001` in source code |
 
 Where:
 - `{PREFIX}`: Single letter indicating node type
 - `{PROJECT}`: Uppercase project abbreviation (e.g., JIG, AUTH)
 - `{NUMBER}`: Zero-padded 3-digit number (001-999)
 
-**Validation Rules:**
-- ID must match regex: `^[OSTC]-[A-Z0-9]+-\d{3}$`
-- Prefix must match type (O→outcome, S→specification, T→test, C→constraint)
+**Validation Rules (Markdown Nodes):**
+- ID must match regex: `^[OSC]-[A-Z0-9]+-\d{3}$`
+- Prefix must match type (O→outcome, S→specification, C→constraint)
 - IDs must be unique across all nodes
 
 ### Markdown Body
@@ -365,7 +375,6 @@ intent_dir = "jig"
 outcomes_dir = "jig/outcomes"
 specifications_dir = "jig/specifications"
 constraints_dir = "jig/constraints"
-tests_dir = "jig/tests"
 deltas_dir = "jig/deltas"
 templates_dir = "templates"
 
@@ -388,9 +397,10 @@ validation_timeout_ms = 5000
 - `outcomes_dir` (optional): Directory for Outcome nodes (default: `jig/outcomes`)
 - `specifications_dir` (optional): Directory for Specification nodes (default: `jig/specifications`)
 - `constraints_dir` (optional): Directory for Constraint nodes (default: `jig/constraints`)
-- `tests_dir` (optional): Directory for Test nodes (default: `jig/tests`)
 - `deltas_dir` (optional): Directory for Delta artifacts (default: `jig/deltas`)
 - `templates_dir` (optional): Directory for node templates (default: `templates`)
+
+**Note:** Test (T) nodes are discovered via `@jig` annotations in test code, not stored in a directory.
 
 **`[validation]`**
 - `require_subsystem` (optional): Fail validation if node lacks subsystem (default: `false`)
@@ -411,7 +421,6 @@ JigConfig(
     outcomes_dir=Path("jig/outcomes"),
     specifications_dir=Path("jig/specifications"),
     constraints_dir=Path("jig/constraints"),
-    tests_dir=Path("jig/tests"),
     deltas_dir=Path("jig/deltas"),
     templates_dir=Path("templates"),
     require_subsystem=False,
