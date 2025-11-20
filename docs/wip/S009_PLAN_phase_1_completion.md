@@ -775,7 +775,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   - Click's tree formatting characters (├── └──) render well in all tested terminals
 
 **Links:**
-- Commit: [to be filled after commit]
+- Commit: 7f0b513a079c51b1fe63629b6359feb75a68af0e
 
 **Human Validation:**
 - Commands:
