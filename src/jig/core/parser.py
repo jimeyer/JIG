@@ -11,11 +11,14 @@ import frontmatter  # type: ignore[import-untyped]
 
 @dataclass
 class OSTCNode:
-    """Represents a parsed OSTC node (Outcome, Specification, Test, or Constraint).
+    """Represents a parsed OSTC node (Outcome, Specification, or Constraint).
+
+    In the OSTCX model, O/S/X nodes are markdown files (timeless intent).
+    T/C nodes are discovered via @jig annotations in code (executable reality).
 
     Attributes:
-        id: Unique identifier (e.g., O-JIG-001, S-JIG-002)
-        type: Node type (outcome, specification, test, constraint)
+        id: Unique identifier (e.g., O-JIG-001, S-JIG-002, C-PERF-001)
+        type: Node type (outcome, specification, constraint)
         title: Human-readable title
         subsystem: Optional subsystem name (e.g., core, cli, graph)
         status: Optional status (e.g., active, deprecated, draft)

@@ -37,7 +37,7 @@ Tests represent "Empirical truth (verify)" and should be discovered via `@jig` a
 
 ## Work Unit Checklist
 - [x] WU0: Create known Specification nodes (S-JIG-005, S-JIG-006) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU1: Remove test type from validator and parser — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Remove test type from validator and parser — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU2: Remove test directory from graph loading — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Remove test type from CLI node creation — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Delete test template and directory — tests ☐ / docs ☐ / reflect ☐
@@ -106,12 +106,12 @@ S-JIG-006: "Graph loads O/S/X markdown nodes only"
 **Planned Effort:** 45m
 
 **Acceptance Criteria:**
-- [ ] `VALID_TYPES` in validator.py contains only {"outcome", "specification", "constraint"}
-- [ ] `TYPE_PREFIX_MAP` updated (test type removed)
-- [ ] Validation error messages reference OSTCX model
-- [ ] OSTCNode docstring updated to clarify O/S/X markdown nodes
-- [ ] Unit tests pass: test_validator.py
-- [ ] No test type validation tests remain
+- [x] `VALID_TYPES` in validator.py contains only {"outcome", "specification", "constraint"}
+- [x] `TYPE_PREFIX_MAP` updated (test type removed)
+- [x] Validation error messages reference OSTCX model
+- [x] OSTCNode docstring updated to clarify O/S/X markdown nodes
+- [x] Unit tests pass: test_validator.py
+- [x] No test type validation tests remain
 
 **Implementation Notes:**
 
@@ -142,19 +142,23 @@ Expected test changes:
 
 **Reflect (≤5 bullets; keep crisp)**
 
-- What worked well:
+**Completed 2025-11-20:**
 
-- What could be better:
+- What worked well:
+  - Clean removal of test type from VALID_TYPES and TYPE_PREFIX_MAP
+  - Helpful error message guides users to annotations and JIG-Concept-v7.md
+  - All 186 tests pass (25 validator tests, 0 failures)
+  - Updated test validates helpful error message correctly
 
 - Discoveries:
-
-- Risk watchlist:
+  - Existing T-UNIT-001.md now correctly rejected by validation (expected until WU4)
+  - Error message format is clear: "Invalid type: 'test'. Valid types for markdown nodes: constraint, outcome, specification. Test nodes (T) must use @jig annotations in test code."
 
 **Links:**
-- Commit(s): 
+- Commit(s): (next)
 
 **Human Validation:**
-- Commands: `pytest tests/unit/test_validator.py -v`, `jig validate`
+- Commands: `pytest tests/unit/test_validator.py -v`, `jigy validate`
 - Look for: All tests pass, error message is clear and helpful
 
 ---

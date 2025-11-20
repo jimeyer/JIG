@@ -162,11 +162,10 @@ def test_validate_node_warnings_for_optional_fields() -> None:
 
 
 def test_validate_node_all_types_with_correct_prefixes() -> None:
-    """Verify all node types validate with correct prefix."""
+    """Verify all markdown node types (O/S/C) validate with correct prefix."""
     test_cases = [
         ("O-TEST-001", "outcome"),
         ("S-TEST-001", "specification"),
-        ("T-TEST-001", "test"),
         ("C-TEST-001", "constraint"),
     ]
 
@@ -183,6 +182,27 @@ def test_validate_node_all_types_with_correct_prefixes() -> None:
 
         assert result.valid, f"Expected {node_id} with type {node_type} to be valid"
         assert len(result.errors) == 0
+
+
+def test_validate_node_test_type_rejected_with_helpful_error() -> None:
+    """Verify test type is rejected with helpful error message about annotations."""
+    node = OSTCNode(
+        id="T-TEST-001",
+        type="test",
+        title="Test node",
+        subsystem="core",
+        created=date(2025, 11, 19),
+    )
+
+    result = validate_node(node)
+
+    assert not result.valid
+    assert len(result.errors) > 0
+    # Check for helpful error message mentioning annotations and OSTCX model
+    error_text = " ".join(result.errors).lower()
+    assert "test" in error_text
+    assert "annotation" in error_text
+    assert "jig-concept-v7" in error_text
 
 
 # @jig T-CORE-009 verifies:S-JIG-002 subsystem:core

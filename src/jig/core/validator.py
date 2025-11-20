@@ -25,14 +25,14 @@ class ValidationResult:
     warnings: list[str] = field(default_factory=list)
 
 
-# Valid node types
-VALID_TYPES = {"outcome", "specification", "test", "constraint"}
+# Valid node types for markdown nodes (O/S/X in OSTCX model)
+# T/C nodes are discovered via @jig annotations, not markdown files
+VALID_TYPES = {"outcome", "specification", "constraint"}
 
 # Type prefix mapping
 TYPE_PREFIX_MAP = {
     "outcome": "O",
     "specification": "S",
-    "test": "T",
     "constraint": "C",
 }
 
@@ -73,7 +73,10 @@ def validate_node(node: OSTCNode) -> ValidationResult:
     # Validate type value
     if node.type not in VALID_TYPES:
         errors.append(
-            f"Invalid type: '{node.type}'. Must be one of: {', '.join(sorted(VALID_TYPES))}"
+            f"Invalid type: '{node.type}'. Valid types for markdown nodes: "
+            f"{', '.join(sorted(VALID_TYPES))}. "
+            f"Test nodes (T) must use @jig annotations in test code. "
+            f"See: docs/jig-concept/JIG-Concept-v7.md"
         )
     else:
         # Validate ID prefix matches type
