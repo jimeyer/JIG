@@ -276,7 +276,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   - Coupling ratio of infinity for isolated subsystems is mathematically correct and useful signal
 
 **Links:**
-- Commit: [to be filled after commit]
+- Commit: 2678c3a529969fc7f9528b0dc85c055bd3e0f4f8
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_decompose_metrics.py -v`
