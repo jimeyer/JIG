@@ -931,7 +931,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   - YAML output requires careful message suppression to avoid format corruption
 
 **Links:**
-- Commit: [to be filled after commit]
+- Commit: a217c30fe7b88efb960fa13f02b80f3d0e931ecb
 
 **Human Validation:**
 - Commands:
