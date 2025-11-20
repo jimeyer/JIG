@@ -117,27 +117,27 @@ def test_find_path_exists():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a chain: T-001 -> S-001 -> O-001
+        # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1")
 
         edges = [
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "T-TEST-001", "to": "S-TEST-001", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
         ]
         create_test_graph_index(tmp_path, edges, {})
 
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
 
-        # Find path from T-001 to O-001
-        path = graph.find_path("T-TEST-001", "O-TEST-001")
-        assert path == ["T-TEST-001", "S-TEST-001", "O-TEST-001"]
+        # Find path from C-001 to O-001
+        path = graph.find_path("C-TEST-001", "O-TEST-001")
+        assert path == ["C-TEST-001", "S-TEST-001", "O-TEST-001"]
 
         # Path should work in reverse too (undirected traversal)
-        path_reverse = graph.find_path("O-TEST-001", "T-TEST-001")
-        assert path_reverse == ["O-TEST-001", "S-TEST-001", "T-TEST-001"]
+        path_reverse = graph.find_path("O-TEST-001", "C-TEST-001")
+        assert path_reverse == ["O-TEST-001", "S-TEST-001", "C-TEST-001"]
 
 
 # @jig T-GRAPH-007 verifies:S-GRAPH-003 subsystem:core
@@ -319,23 +319,23 @@ def test_find_path_shortest():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a graph with multiple paths:
-        # O-001 <- S-001 <- T-001 (short path)
-        # O-001 <- S-002 <- S-003 <- T-001 (longer path)
+        # Create a graph with multiple paths (using O/S/C nodes):
+        # O-001 <- S-001 <- C-001 (short path)
+        # O-001 <- S-002 <- S-003 <- C-001 (longer path)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
         create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2")
         create_test_node(tmp_path, "S-TEST-003", "specification", "Spec 3")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1")
 
         edges = [
             # Short path
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "T-TEST-001", "to": "S-TEST-001", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
             # Longer path
             {"from": "S-TEST-002", "to": "O-TEST-001", "type": "implements"},
             {"from": "S-TEST-003", "to": "S-TEST-002", "type": "depends_on"},
-            {"from": "T-TEST-001", "to": "S-TEST-003", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-003", "type": "constrains"},
         ]
         create_test_graph_index(tmp_path, edges, {})
 
@@ -343,6 +343,6 @@ def test_find_path_shortest():
         graph = Graph.load_from_dir(tmp_path)
 
         # Find path - should return shortest
-        path = graph.find_path("T-TEST-001", "O-TEST-001")
+        path = graph.find_path("C-TEST-001", "O-TEST-001")
         assert len(path) == 3  # Shortest path has 3 nodes
-        assert path == ["T-TEST-001", "S-TEST-001", "O-TEST-001"]
+        assert path == ["C-TEST-001", "S-TEST-001", "O-TEST-001"]

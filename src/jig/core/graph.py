@@ -62,8 +62,10 @@ class Graph:
         """Load entire graph from jig/ directory.
 
         This loads:
-        1. All OSTC nodes from outcomes/, specifications/, constraints/, tests/
+        1. All O/S/X markdown nodes from outcomes/, specifications/, constraints/
         2. Edges and subsystems from graph-index.yaml
+        
+        Note: T/C nodes will be discovered via @jig annotations (future feature)
 
         Args:
             intent_dir: Path to jig/ directory (e.g., /path/to/project/jig/)
@@ -85,8 +87,9 @@ class Graph:
 
         graph = Graph()
 
-        # Load all OSTC node files
-        node_dirs = ["outcomes", "specifications", "constraints", "tests"]
+        # Load only markdown-based nodes (O/S/X in OSTCX model)
+        # T/C nodes discovered via @jig annotations (future feature)
+        node_dirs = ["outcomes", "specifications", "constraints"]
         for node_dir in node_dirs:
             dir_path = intent_dir / node_dir
             if not dir_path.exists():

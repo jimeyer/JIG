@@ -277,7 +277,7 @@ def test_graph_dataclass_defaults():
 
 
 def test_load_from_dir_with_multiple_node_types():
-    """Verify loading nodes from all supported directories."""
+    """Verify loading nodes from all supported markdown directories (O/S/C)."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
@@ -285,17 +285,18 @@ def test_load_from_dir_with_multiple_node_types():
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec")
         create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint")
+        # Test nodes (T) are NOT loaded from markdown files (annotation-based)
         create_test_node(tmp_path, "T-TEST-001", "test", "Test")
 
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
 
-        # Verify all types loaded
-        assert len(graph.nodes) == 4
+        # Verify only O/S/C types loaded (3 nodes, not 4)
+        assert len(graph.nodes) == 3
         assert "O-TEST-001" in graph.nodes
         assert "S-TEST-001" in graph.nodes
         assert "C-TEST-001" in graph.nodes
-        assert "T-TEST-001" in graph.nodes
+        assert "T-TEST-001" not in graph.nodes  # Test nodes not loaded from markdown
 
 
 def test_find_orphaned_nodes_all_connected():

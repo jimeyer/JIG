@@ -66,14 +66,14 @@ def test_graph_path_finds_route() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a chain: T-001 -> S-001 -> O-001
+        # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
 
         edges = [
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "T-TEST-001", "to": "S-TEST-001", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
         ]
         create_test_graph_index(tmp_path, edges, {})
 
@@ -99,12 +99,12 @@ def test_graph_path_finds_route() -> None:
         try:
             # Run graph path command
             runner = CliRunner()
-            result = runner.invoke(graph, ["path", "T-TEST-001", "O-TEST-001"])
+            result = runner.invoke(graph, ["path", "C-TEST-001", "O-TEST-001"])
 
             # Verify output
             assert result.exit_code == 0
-            assert "Path from T-TEST-001 to O-TEST-001:" in result.output
-            assert "T-TEST-001 → S-TEST-001 → O-TEST-001" in result.output
+            assert "Path from C-TEST-001 to O-TEST-001:" in result.output
+            assert "C-TEST-001 → S-TEST-001 → O-TEST-001" in result.output
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 
@@ -155,14 +155,14 @@ def test_graph_path_no_route() -> None:
 
 # @jig T-GRAPH-022 verifies:S-GRAPH-003 subsystem:core
 def test_graph_list_all_nodes() -> None:
-    """Verify list shows all nodes in table format."""
+    """Verify list shows all nodes in table format (O/S/C only)."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create mixed nodes
+        # Create mixed nodes (O/S/C - test nodes not loaded from markdown)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
 
         create_test_graph_index(tmp_path, [], {})
 
@@ -197,10 +197,10 @@ def test_graph_list_all_nodes() -> None:
             assert "Title" in result.output
             assert "O-TEST-001" in result.output
             assert "S-TEST-001" in result.output
-            assert "T-TEST-001" in result.output
+            assert "C-TEST-001" in result.output
             assert "outcome" in result.output
             assert "specification" in result.output
-            assert "test" in result.output
+            assert "constraint" in result.output
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 

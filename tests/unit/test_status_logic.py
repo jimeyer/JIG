@@ -173,25 +173,26 @@ def test_calculate_status_multiple_subsystems():
 
 
 def test_calculate_status_all_node_types():
-    """Verify status counts all node types correctly."""
+    """Verify status counts all markdown node types correctly (O/S/C)."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes of all types
+        # Create nodes of all markdown types (O/S/C - test nodes not loaded)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec")
         create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint")
+        # Test nodes (T) are NOT loaded from markdown files
         create_test_node(tmp_path, "T-TEST-001", "test", "Test")
 
         # Calculate status
         status = calculate_status(tmp_path)
 
-        # Verify all types counted
-        assert status.total_nodes == 4
+        # Verify only O/S/C types counted (3 nodes, not 4)
+        assert status.total_nodes == 3
         assert status.node_counts["outcome"] == 1
         assert status.node_counts["specification"] == 1
         assert status.node_counts["constraint"] == 1
-        assert status.node_counts["test"] == 1
+        assert "test" not in status.node_counts  # Test nodes not loaded from markdown
 
 
 def test_status_data_dataclass():

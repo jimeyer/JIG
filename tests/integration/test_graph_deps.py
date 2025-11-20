@@ -66,14 +66,14 @@ def test_graph_deps_shows_tree() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a chain: T-001 -> S-001 -> O-001
+        # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
 
         edges = [
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "T-TEST-001", "to": "S-TEST-001", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
         ]
         create_test_graph_index(tmp_path, edges, {})
 
@@ -99,12 +99,12 @@ def test_graph_deps_shows_tree() -> None:
         try:
             # Run graph deps command
             runner = CliRunner()
-            result = runner.invoke(graph, ["deps", "T-TEST-001"])
+            result = runner.invoke(graph, ["deps", "C-TEST-001"])
 
             # Verify output
             assert result.exit_code == 0
-            assert "Dependency tree for T-TEST-001:" in result.output
-            assert "T-TEST-001" in result.output
+            assert "Dependency tree for C-TEST-001:" in result.output
+            assert "C-TEST-001" in result.output
             assert "S-TEST-001" in result.output
             assert "O-TEST-001" in result.output
             # Verify tree structure with connectors
@@ -333,8 +333,8 @@ def test_graph_impact_no_dependents() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a node with no dependents
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
+        # Create a node with no dependents (using O/S/C nodes)
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
         create_test_graph_index(tmp_path, [], {})
 
         # Mock config
@@ -359,11 +359,11 @@ def test_graph_impact_no_dependents() -> None:
         try:
             # Run graph impact command
             runner = CliRunner()
-            result = runner.invoke(graph, ["impact", "T-TEST-001"])
+            result = runner.invoke(graph, ["impact", "C-TEST-001"])
 
             # Verify output shows just the node itself
             assert result.exit_code == 0
-            assert "T-TEST-001" in result.output
+            assert "C-TEST-001" in result.output
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 

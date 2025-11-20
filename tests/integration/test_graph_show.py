@@ -109,19 +109,19 @@ def test_graph_show_displays_relationships() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes with relationships
+        # Create nodes with relationships (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
         create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2", "core")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
 
         # S-TEST-001 implements O-TEST-001
         # S-TEST-002 implements O-TEST-001
-        # T-TEST-001 verifies S-TEST-001
+        # C-TEST-001 constrains S-TEST-001
         edges = [
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
             {"from": "S-TEST-002", "to": "O-TEST-001", "type": "implements"},
-            {"from": "T-TEST-001", "to": "S-TEST-001", "type": "verifies"},
+            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
         ]
         create_test_graph_index(tmp_path, edges, {})
 
@@ -161,10 +161,10 @@ def test_graph_show_displays_relationships() -> None:
             assert "Dependencies:" in result.output
             assert "O-TEST-001" in result.output
             assert "Dependents:" in result.output
-            assert "T-TEST-001" in result.output
+            assert "C-TEST-001" in result.output
 
-            # Show T-TEST-001 - should have 1 dependency, no dependents
-            result = runner.invoke(graph, ["show", "T-TEST-001"])
+            # Show C-TEST-001 - should have 1 dependency, no dependents
+            result = runner.invoke(graph, ["show", "C-TEST-001"])
 
             assert result.exit_code == 0
             assert "Dependencies:" in result.output

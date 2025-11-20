@@ -119,8 +119,9 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
     node_ids: dict[str, Path] = {}
     all_nodes: list[OSTCNode] = []
 
-    # Load and validate all nodes
-    for node_type in ["outcomes", "specifications", "tests", "constraints"]:
+    # Load and validate all nodes (O/S/X markdown nodes only)
+    # T/C nodes discovered via @jig annotations (future feature)
+    for node_type in ["outcomes", "specifications", "constraints"]:
         type_dir = intent_dir / node_type
         if not type_dir.exists():
             warnings.append(f"Directory not found: {type_dir}")

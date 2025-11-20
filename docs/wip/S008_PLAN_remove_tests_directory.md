@@ -38,7 +38,7 @@ Tests represent "Empirical truth (verify)" and should be discovered via `@jig` a
 ## Work Unit Checklist
 - [x] WU0: Create known Specification nodes (S-JIG-005, S-JIG-006) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU1: Remove test type from validator and parser — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU2: Remove test directory from graph loading — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Remove test directory from graph loading — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU3: Remove test type from CLI node creation — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Delete test template and directory — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Update test suite (remove test node tests) — tests ☐ / docs ☐ / reflect ☐
@@ -170,11 +170,11 @@ Expected test changes:
 **Planned Effort:** 30m
 
 **Acceptance Criteria:**
-- [ ] `node_dirs` in graph.py contains only ["outcomes", "specifications", "constraints"]
-- [ ] Comment explains OSTCX model: "T/C nodes discovered via annotations (future)"
-- [ ] Graph loading no longer attempts to scan jig/tests/
-- [ ] Unit tests pass: test_graph.py
-- [ ] Integration tests pass: test_graph_*.py
+- [x] `node_dirs` in graph.py contains only ["outcomes", "specifications", "constraints"]
+- [x] Comment explains OSTCX model: "T/C nodes discovered via annotations (future)"
+- [x] Graph loading no longer attempts to scan jig/tests/
+- [x] Unit tests pass: test_graph.py
+- [x] Integration tests pass: test_graph_*.py
 
 **Implementation Notes:**
 
@@ -208,16 +208,22 @@ Integration tests to verify:
 
 **Reflect (≤5 bullets; keep crisp)**
 
-- What worked well:
+**Completed 2025-11-20:**
 
-- What could be better:
+- What worked well:
+  - Simple change to node_dirs list (removed "tests")
+  - Updated validator.py to also skip tests/ directory scanning
+  - All 186 tests pass after updating test expectations
+  - Clear comments explain OSTCX model split
 
 - Discoveries:
-
-- Risk watchlist:
+  - Multiple integration tests needed updates (5 tests using T nodes)
+  - 3 unit tests also needed updates (graph_traversal, status_logic)
+  - Tests now consistently use O/S/C nodes instead of T nodes
+  - Graph loading docstring updated to clarify O/S/X only
 
 **Links:**
-- Commit(s):
+- Commit(s): (next)
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_graph.py tests/integration/test_graph*.py -v`
