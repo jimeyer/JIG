@@ -632,7 +632,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   - ValidationResult pattern could be extended to nested subsystem validation
 
 **Links:**
-- Commit: [to be filled after commit]
+- Commit: e5ab18ec25660c46258c64483ccf06246f0079b7
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_nested_subsystems.py -v`
