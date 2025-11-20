@@ -183,6 +183,91 @@ class Graph:
         orphaned = [node_id for node_id in self.nodes.keys() if node_id not in connected_nodes]
         return sorted(orphaned)
 
+    def get_dependencies(self, node_id: str) -> list[str]:
+        """Return nodes that this node depends on (incoming edges).
+
+        For 'implements' edges: S-001 implements O-001 → O-001 is dependency of S-001
+        For 'verifies' edges: T-001 verifies S-001 → S-001 is dependency of T-001
+
+        Args:
+            node_id: Node ID to get dependencies for
+
+        Returns:
+            List of node IDs that this node depends on (sorted)
+            Returns empty list if node has no dependencies or doesn't exist
+
+        Example:
+            >>> graph.get_dependencies("S-JIG-001")
+            ["O-JIG-001"]
+        """
+        dependencies = []
+        for edge in self.edges:
+            if edge.from_node == node_id:
+                dependencies.append(edge.to_node)
+        return sorted(dependencies)
+
+    def get_dependents(self, node_id: str) -> list[str]:
+        """Return nodes that depend on this node (outgoing edges).
+
+        For 'implements' edges: S-001 implements O-001 → S-001 is dependent of O-001
+
+        Args:
+            node_id: Node ID to get dependents for
+
+        Returns:
+            List of node IDs that depend on this node (sorted)
+            Returns empty list if node has no dependents or doesn't exist
+
+        Example:
+            >>> graph.get_dependents("O-JIG-001")
+            ["S-JIG-001", "S-JIG-002"]
+        """
+        dependents = []
+        for edge in self.edges:
+            if edge.to_node == node_id:
+                dependents.append(edge.from_node)
+        return sorted(dependents)
+
+    def find_path(self, start: str, end: str) -> list[str] | None:
+        """Find shortest path between two nodes using BFS.
+
+        Traverses edges in both directions (treats graph as undirected for path finding).
+
+        Args:
+            start: Starting node ID
+            end: Ending node ID
+
+        Returns:
+            List of node IDs representing the shortest path from start to end,
+            or None if no path exists or nodes don't exist
+
+        Example:
+            >>> graph.find_path("S-JIG-001", "O-JIG-001")
+            ["S-JIG-001", "O-JIG-001"]
+        """
+        if start not in self.nodes or end not in self.nodes:
+            return None
+
+        # BFS implementation
+        from collections import deque
+
+        queue: deque[tuple[str, list[str]]] = deque([(start, [start])])
+        visited = {start}
+
+        while queue:
+            current, path = queue.popleft()
+            if current == end:
+                return path
+
+            # Explore neighbors (both directions since we traverse undirected)
+            neighbors = self.get_dependencies(current) + self.get_dependents(current)
+            for neighbor in neighbors:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append((neighbor, path + [neighbor]))
+
+        return None  # No path found
+
     def to_networkx(self) -> nx.DiGraph:
         """Convert to NetworkX directed graph for algorithms.
 
