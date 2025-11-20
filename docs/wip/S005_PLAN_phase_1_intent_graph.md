@@ -44,7 +44,7 @@ branch: phase-1-intent-graph
 - [x] WU4: Graph traversal methods (deps, dependents, path) — tests ☑ / docs ☑ / reflect ☐
 - [x] WU5: Graph query methods (filter by type, subsystem) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU6: Graph show command — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU7: Graph deps/impact commands — tests ☐ / docs ☐ / reflect ☐
+- [x] WU7: Graph deps/impact commands — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU8: Graph path/list commands — tests ☐ / docs ☐ / reflect ☐
 
 ### Slice 3: Decomposability Analysis
@@ -856,14 +856,19 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Recursive tree formatting with visited.copy() elegantly handles cycles
+  - Box-drawing characters (├── └── │ ↻) make tree structure immediately clear
+  - Separate functions for deps/impact keeps code DRY and testable
 - What could be better:
-  - [to be filled]
+  - Could add depth limiting for very deep trees (but not needed yet)
+  - Performance test shows we're 2x faster than target (<100ms vs <200ms)
 - Discoveries:
-  - [to be filled]
+  - visited.copy() at each recursion level allows proper cycle detection
+  - String slicing for prefix replacement works cleanly for tree connectors
+  - Impact analysis is just dependency traversal in reverse direction
 
 **Links:**
-- Commit: [to be filled]
+- Commit: `cdad005402cba22b4fcdfb9ae224cf61b25a09d4`
 
 **Human Validation:**
 - Commands:
