@@ -333,7 +333,7 @@ branch: phase-1-intent-graph
   - [performance] Status calculation on 100 nodes completes in ~25ms, well under 100ms target
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 4204d0e7b9473650e7cb6095d1df83bbdca3ba63
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_status_logic.py -v`, `jigy status`
