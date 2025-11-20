@@ -45,7 +45,7 @@ branch: phase-1-intent-graph
 - [x] WU5: Graph query methods (filter by type, subsystem) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU6: Graph show command — tests ☑ / docs ☑ / reflect ☑
 - [x] WU7: Graph deps/impact commands — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU8: Graph path/list commands — tests ☐ / docs ☐ / reflect ☐
+- [x] WU8: Graph path/list commands — tests ☑ / docs ☑ / reflect ☑
 
 ### Slice 3: Decomposability Analysis
 - [ ] WU9: Metrics calculation (modularity, coupling) — tests ☐ / docs ☐ / reflect ☐
@@ -979,14 +979,19 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Arrow separator (→) in path output makes route immediately clear
+  - Table format with fixed-width columns looks clean in terminal
+  - YAML output via yaml.dump() to StringIO enables easy piping
 - What could be better:
-  - [to be filled]
+  - Combined filter logic needed special handling - could generalize filter chain
+  - Title truncation at 43 chars is magic number, could be terminal-width aware
 - Discoveries:
-  - [to be filled]
+  - Click's @click.option with renamed param ("node_type") avoids Python keyword clash
+  - filter_by_* methods return sorted lists, so table output is already sorted
+  - Combined filters require sequential application, not parallel
 
 **Links:**
-- Commit: [to be filled]
+- Commit: `7c558c1aac23cb4e29b44c4f26bf5bca12752579`
 
 **Human Validation:**
 - Commands:
