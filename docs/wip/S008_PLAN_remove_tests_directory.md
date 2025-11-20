@@ -155,7 +155,7 @@ Expected test changes:
   - Error message format is clear: "Invalid type: 'test'. Valid types for markdown nodes: constraint, outcome, specification. Test nodes (T) must use @jig annotations in test code."
 
 **Links:**
-- Commit(s): (next)
+- Commit(s): 70720fd
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_validator.py -v`, `jigy validate`
