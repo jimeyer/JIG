@@ -37,8 +37,8 @@ branch: phase-1-intent-graph
 
 ### Slice 1: Status & Health Monitoring
 - [x] WU1: Graph data structure implementation — tests ☑ / docs ☑ / reflect ☑
-- [x] WU2: Status command implementation — tests ☑ / docs ☑ / reflect ☐
-- [ ] WU3: Status output formatting & CLI — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Status command implementation — tests ☑ / docs ☑ / reflect ☑
+- [x] WU3: Status output formatting & CLI — tests ☑ / docs ☑ / reflect ☐
 
 ### Slice 2: Graph Relationships & Queries
 - [ ] WU4: Graph traversal methods (deps, dependents, path) — tests ☐ / docs ☐ / reflect ☐
@@ -423,11 +423,13 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - [ux] Actionable suggestions make status output immediately useful (not just informational)
+  - [design] format_status_output() returns string, making it testable without Click mocking
+  - [polish] Health indicator (✓ green/yellow) gives instant visual feedback
 - What could be better:
-  - [to be filled]
+  - [suggestions] Could add more context-aware suggestions (e.g., "run jigy graph deps" for specific nodes)
 - Discoveries:
-  - [to be filled]
+  - [testing] Integration tests for CLI output need careful assertion wording to avoid color code issues
 
 **Links:**
 - Commit: [to be filled]

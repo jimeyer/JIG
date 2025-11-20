@@ -172,6 +172,11 @@ def test_status_command_cli_output():
             assert "specification: 1" in result.output
             assert "Orphaned nodes:" in result.output
             assert "O-TEST-002" in result.output
+
+            # Verify suggestions section
+            assert "Suggestions:" in result.output
+            assert "need relationships" in result.output
+            assert "jigy validate" in result.output
         finally:
             # Restore original
             jig.cli.status.load_config = original_load_config
@@ -253,5 +258,95 @@ def test_status_command_not_initialized():
             assert result.exit_code == 3
             assert "Error:" in result.output
             assert "Intent directory not found" in result.output
+        finally:
+            jig.cli.status.load_config = original_load_config
+
+
+def test_status_command_empty_graph():
+    """Verify status command handles empty graph."""
+    from click.testing import CliRunner
+    from jig.cli.status import status
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Mock config to point to empty directory
+        import jig.cli.status
+        original_load_config = jig.cli.status.load_config
+
+        def mock_load_config():
+            from jig.core.config import JigConfig
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.status.load_config = mock_load_config
+
+        try:
+            # Run status command
+            runner = CliRunner()
+            result = runner.invoke(status, [])
+
+            # Verify output for empty graph
+            assert result.exit_code == 0
+            assert "No nodes found" in result.output
+            assert "jigy init" in result.output or "jigy node create" in result.output
+        finally:
+            jig.cli.status.load_config = original_load_config
+
+
+def test_status_command_healthy_graph():
+    """Verify status command shows healthy message when no issues."""
+    from click.testing import CliRunner
+    from jig.cli.status import status
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create well-connected nodes - all have relationships and subsystems
+        create_test_node(tmp_path, "O-TEST-001", "outcome", "Test outcome", "core")
+        create_test_node(tmp_path, "S-TEST-001", "specification", "Test spec", "core")
+
+        # Create edges connecting all nodes
+        edges = [
+            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
+        ]
+        subsystems = {
+            "core": {"nodes": ["O-TEST-001", "S-TEST-001"]}
+        }
+        create_test_graph_index(tmp_path, edges, subsystems)
+
+        # Mock config
+        import jig.cli.status
+        original_load_config = jig.cli.status.load_config
+
+        def mock_load_config():
+            from jig.core.config import JigConfig
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.status.load_config = mock_load_config
+
+        try:
+            # Run status command
+            runner = CliRunner()
+            result = runner.invoke(status, [])
+
+            # Verify healthy output
+            assert result.exit_code == 0
+            assert "Total nodes: 2" in result.output
+            assert "Suggestions:" in result.output
+            assert "Graph looks healthy!" in result.output
         finally:
             jig.cli.status.load_config = original_load_config
