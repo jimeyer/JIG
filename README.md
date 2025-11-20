@@ -22,6 +22,25 @@ Like git transformed version control by being fast, simple, text-based, and dist
 
 ### Installation
 
+**Recommended: Using Make (Linux/macOS)**
+
+```bash
+# Clone the repository
+git clone https://github.com/yourorg/jig.git
+cd jig
+
+# One-command setup with dev dependencies
+make dev-setup
+
+# Activate the virtual environment
+source .venv/bin/activate
+
+# Verify installation
+jigy --version
+```
+
+**Alternative: Manual Installation (All platforms)**
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourorg/jig.git
@@ -37,6 +56,8 @@ pip install -e ".[dev]"
 # Verify installation
 jigy --version
 ```
+
+> **Note**: For production use, run `make install` or `pip install -e .` (without dev dependencies)
 
 ### Initialize a Project
 
@@ -103,12 +124,12 @@ Deltas capture the narrative of change, tied to git branches:
 
 ```bash
 # Run all tests
-pytest
+make test
 
 # Run with coverage
-pytest --cov=src/jig --cov-report=term-missing
+make test-cov
 
-# Run specific test file
+# Run specific test file (activate venv first)
 pytest tests/unit/test_config.py -v
 ```
 
@@ -116,14 +137,30 @@ pytest tests/unit/test_config.py -v
 
 ```bash
 # Run linter
-ruff check src/ tests/
+make lint
 
 # Format code
-ruff format src/ tests/
+make format
 
 # Type checking
-mypy src/
+make typecheck
+
+# Run all checks (lint + typecheck + test)
+make validate
 ```
+
+### Available Make Commands
+
+Run `make help` to see all available commands:
+- `make install` - Basic installation
+- `make install-dev` - Install with dev dependencies
+- `make dev-setup` - Full development setup
+- `make test` - Run tests
+- `make lint` - Run linter
+- `make format` - Format code
+- `make typecheck` - Type checking
+- `make validate` - Run all checks
+- `make clean` - Remove venv and artifacts
 
 ## Requirements
 
@@ -137,6 +174,14 @@ mypy src/
 **Status**: Active development - Slice 0 (Bootstrap Infrastructure)
 
 See `docs/wip/PLAN_slice_0_bootstrap.md` for current roadmap.
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+- Setting up your development environment
+- Running tests and code quality checks
+- Submitting pull requests
+- Code style and conventions
 
 ## License
 
