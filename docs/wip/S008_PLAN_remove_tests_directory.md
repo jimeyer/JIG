@@ -41,7 +41,7 @@ Tests represent "Empirical truth (verify)" and should be discovered via `@jig` a
 - [x] WU2: Remove test directory from graph loading — tests ☑ / docs ☑ / reflect ☑
 - [x] WU3: Remove test type from CLI node creation — tests ☑ / docs ☑ / reflect ☑
 - [x] WU4: Delete test template and directory — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU5: Update test suite (remove test node tests) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: Update test suite (remove test node tests) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU6: Update documentation (README, agents) — tests ☐ / docs ☐ / reflect ☐
 
 ---
@@ -365,58 +365,69 @@ Verify:
 **Planned Effort:** 60m
 
 **Acceptance Criteria:**
-- [ ] All tests referencing test node markdown files removed or updated
-- [ ] Tests validating test type in frontmatter removed
-- [ ] Tests creating test nodes via CLI removed
-- [ ] All remaining tests pass
-- [ ] Test coverage remains >80%
+- [x] All tests referencing test node markdown files removed or updated
+- [x] Tests validating test type in frontmatter removed (completed in WU1)
+- [x] Tests creating test nodes via CLI removed (completed in WU3)
+- [x] All remaining tests pass
+- [x] Test coverage remains >80%
 
 **Implementation Notes:**
 
-Files to update (per SCOPE):
-- `tests/unit/test_graph.py` - Update test verifying directory scanning (expect 3 dirs, not 4)
-- `tests/unit/test_templates.py` - Remove test for test_template.md
-- `tests/unit/test_validator.py` - Remove tests validating `type: test`
-- `tests/integration/test_node_create.py` - Remove tests creating test nodes
+Files updated:
+- `tests/unit/test_graph.py` - Already updated in WU2 ✓
+- `tests/unit/test_templates.py` - Already updated in WU4 ✓
+- `tests/unit/test_validator.py` - Already updated in WU1 ✓
+- `tests/integration/test_node_create.py` - Already updated in WU3 ✓
+- `tests/unit/test_parser.py` - Updated test_parse_node_date_formats to use outcome instead of test ✓
+- `tests/unit/test_graph_queries.py` - Updated test_filter_by_type_empty to filter by constraint instead of test ✓
+- `tests/integration/test_graph_path_list.py` - Updated test_graph_list_empty_result to filter by constraint instead of test ✓
 
-Strategy:
-1. Run `pytest -v` to identify failing tests
-2. For each failing test, decide: delete (test node specific) or update (general test affected)
-3. Ensure no test depends on jig/tests/ directory existing
-4. Verify graph loading tests work with 3 directories
+Strategy used:
+1. Verified all tests pass (184 tests) ✓
+2. Searched for remaining "type: test" references ✓
+3. Updated remaining tests to use O/S/C types instead of T ✓
+4. Verified test coverage remains >80% (91.28%) ✓
 
 **Test Plan:**
 
-Verification steps:
-- Run full test suite: `pytest tests/ -v`
-- Check coverage: `pytest tests/ --cov=src/jig --cov-report=term-missing`
-- Verify no skipped tests remain for removed features
-- Ensure all integration tests pass
+Verification steps completed:
+- Full test suite: `pytest tests/ -v` → 184 passed ✓
+- Coverage: `pytest tests/ --cov=src/jig` → 91.28% (>80% target) ✓
+- No skipped tests for removed features ✓
+- All integration tests pass ✓
 
-Expected changes:
-- Remove: ~5-10 tests specific to test node markdown
-- Update: ~3-5 tests that reference 4 directories → 3 directories
-- Coverage should remain similar (removed feature-specific tests)
+Actual changes:
+- Most updates completed in WU1-WU4
+- WU5 cleaned up 3 remaining test references to use O/S/C types
+- Test count: 184 (stable from WU4)
+- Coverage: 91.28% (well above 80% target)
 
 **Docs to Update:**
 - None (test code only)
 
 **Reflect (≤5 bullets; keep crisp)**
 
-- What worked well:
+**Completed 2025-11-20:**
 
-- What could be better:
+- What worked well:
+  - Incremental approach across WU1-WU4 meant most work already done
+  - Only 3 minor test updates needed in WU5
+  - All 184 tests pass with no failures
+  - Test coverage remains high at 91.28%
+  - Systematic search found all remaining test type references
 
 - Discoveries:
-
-- Risk watchlist:
+  - WU1-WU4 already handled the bulk of test suite updates
+  - Only peripheral tests still referenced test nodes
+  - Updating to use constraint instead of test maintains test validity
+  - No hidden dependencies on test node functionality found
 
 **Links:**
-- Commit(s):
+- Commit(s): (next)
 
 **Human Validation:**
-- Commands: `pytest tests/ -v --cov=src/jig`, `make test`
-- Look for: All tests pass, coverage >80%, no warnings about missing fixtures
+- Commands: `pytest tests/ -v --cov=src/jig`
+- Look for: 184 tests pass, coverage 91.28%, no warnings
 
 ---
 

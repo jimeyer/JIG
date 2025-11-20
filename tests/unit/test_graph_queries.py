@@ -136,9 +136,9 @@ def test_filter_by_type_empty() -> None:
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
 
-        # Filter by test (no tests exist)
-        tests = graph.filter_by_type("test")
-        assert tests == []
+        # Filter by constraint (no constraints exist)
+        constraints = graph.filter_by_type("constraint")
+        assert constraints == []
 
 
 # @jig T-GRAPH-011 verifies:S-GRAPH-003 subsystem:core

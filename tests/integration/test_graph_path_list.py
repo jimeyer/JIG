@@ -467,9 +467,9 @@ def test_graph_list_empty_result() -> None:
         jig.cli.graph.load_config = mock_load_config  # type: ignore[attr-defined, assignment]
 
         try:
-            # Run graph list with --type test (no test nodes exist)
+            # Run graph list with --type constraint (no constraint nodes exist)
             runner = CliRunner()
-            result = runner.invoke(graph, ["list", "--type", "test"])
+            result = runner.invoke(graph, ["list", "--type", "constraint"])
 
             # Verify output
             assert result.exit_code == 0

@@ -170,16 +170,16 @@ title: "Minimal constraint"
 
 def test_parse_node_date_formats(tmp_path: Path) -> None:
     """Verify date parsing handles ISO format."""
-    node_file = tmp_path / "T-TEST-001.md"
+    node_file = tmp_path / "O-TEST-001.md"
     content = """---
-id: T-TEST-001
-type: test
-title: "Test with dates"
+id: O-TEST-001
+type: outcome
+title: "Outcome with dates"
 created: 2025-01-15
 updated: 2025-02-20
 ---
 
-Test body.
+Outcome body.
 """
     node_file.write_text(content)
 
