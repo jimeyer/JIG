@@ -432,7 +432,7 @@ branch: phase-1-intent-graph
   - [testing] Integration tests for CLI output need careful assertion wording to avoid color code issues
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 7d4392f3379745ac089c0eed306363e3a848379a
 
 **Human Validation:**
 - Commands:
