@@ -30,17 +30,77 @@ class Edge:
     type: str
 
 
+# @jig C-NESTED-001 implements:S-NESTED-001 subsystem:core interface:internal
 @dataclass
 class Subsystem:
     """Represents a subsystem grouping of nodes.
 
     Attributes:
-        name: Subsystem name (e.g., core, cli, graph)
-        nodes: List of node IDs in this subsystem
+        name: Subsystem name (local, not fully-qualified)
+        nodes: List of node IDs in this subsystem (leaf only)
+        subsystems: Dictionary of child subsystems (optional)
+        description: Human-readable description (optional)
+        parent_path: Fully-qualified parent path (e.g., "crdt")
     """
 
     name: str
     nodes: list[str] = field(default_factory=list)
+    subsystems: dict[str, "Subsystem"] = field(default_factory=dict)
+    description: str = ""
+    parent_path: str = ""
+
+    @property
+    def full_path(self) -> str:
+        """Return fully-qualified subsystem path."""
+        if self.parent_path:
+            return f"{self.parent_path}.{self.name}"
+        return self.name
+
+    def is_leaf(self) -> bool:
+        """Return True if this subsystem has no children."""
+        return len(self.subsystems) == 0
+
+    def get_all_nodes(self, recursive: bool = False) -> list[str]:
+        """Return all nodes in this subsystem.
+
+        Args:
+            recursive: If True, include nodes from child subsystems
+
+        Returns:
+            List of node IDs
+        """
+        if not recursive:
+            return self.nodes
+
+        all_nodes = list(self.nodes)
+        for child in self.subsystems.values():
+            all_nodes.extend(child.get_all_nodes(recursive=True))
+        return all_nodes
+
+    def find_subsystem(self, path: str) -> "Subsystem | None":
+        """Find subsystem by path (e.g., 'ser' or 'crdt.ser').
+
+        Args:
+            path: Subsystem path (dot notation)
+
+        Returns:
+            Subsystem object or None if not found
+        """
+        parts = path.split(".", 1)
+        if parts[0] != self.name:
+            return None
+
+        if len(parts) == 1:
+            return self
+
+        # Recurse into children
+        child_path = parts[1]
+        for child in self.subsystems.values():
+            result = child.find_subsystem(child_path)
+            if result:
+                return result
+
+        return None
 
 
 @dataclass
@@ -122,13 +182,28 @@ class Graph:
                     )
                     graph.edges.append(edge)
 
-                # Load subsystems
+                # Load subsystems (supports nested hierarchy)
                 subsystems_data = index_data.get("subsystems", {})
-                for subsystem_name, subsystem_dict in subsystems_data.items():
+
+                def parse_subsystem(name: str, data: dict[str, Any], parent_path: str = "") -> Subsystem:
+                    """Recursively parse subsystem and its children."""
                     subsystem = Subsystem(
-                        name=subsystem_name,
-                        nodes=subsystem_dict.get("nodes", []),
+                        name=name,
+                        nodes=data.get("nodes", []),
+                        description=data.get("description", ""),
+                        parent_path=parent_path,
                     )
+
+                    # Parse child subsystems
+                    child_subsystems = data.get("subsystems", {})
+                    for child_name, child_data in child_subsystems.items():
+                        child = parse_subsystem(child_name, child_data, subsystem.full_path)
+                        subsystem.subsystems[child_name] = child
+
+                    return subsystem
+
+                for subsystem_name, subsystem_dict in subsystems_data.items():
+                    subsystem = parse_subsystem(subsystem_name, subsystem_dict)
                     graph.subsystems[subsystem_name] = subsystem
 
             except Exception as e:
@@ -313,6 +388,99 @@ class Graph:
             if node.subsystem and node.subsystem.lower() == subsystem_lower
         ]
         return sorted(filtered, key=lambda n: n.id)
+
+# @jig C-NESTED-002 implements:S-NESTED-002 subsystem:core interface:internal
+    def get_subsystem_by_path(self, path: str) -> Subsystem | None:
+        """Get subsystem by fully-qualified path.
+
+        Args:
+            path: Subsystem path (e.g., 'core', 'crdt.ser')
+
+        Returns:
+            Subsystem object or None if not found
+
+        Example:
+            >>> graph.get_subsystem_by_path("core")
+            Subsystem(name="core", ...)
+            >>> graph.get_subsystem_by_path("crdt.ser")
+            Subsystem(name="ser", parent_path="crdt", ...)
+        """
+        parts = path.split(".")
+        root_name = parts[0]
+
+        if root_name not in self.subsystems:
+            return None
+
+        subsystem = self.subsystems[root_name]
+
+        # Navigate down the hierarchy
+        for part in parts[1:]:
+            if part not in subsystem.subsystems:
+                return None
+            subsystem = subsystem.subsystems[part]
+
+        return subsystem
+
+    def get_all_subsystem_paths(self, flat: bool = False) -> list[str]:
+        """Return all subsystem paths.
+
+        Args:
+            flat: If True, return only leaf subsystems
+
+        Returns:
+            List of fully-qualified subsystem paths, sorted
+
+        Example:
+            >>> graph.get_all_subsystem_paths()
+            ['core', 'crdt', 'crdt.ser', 'cli']
+            >>> graph.get_all_subsystem_paths(flat=True)
+            ['core', 'crdt.ser', 'cli']
+        """
+        paths = []
+
+        def collect_paths(subsystem: Subsystem, include_parents: bool) -> None:
+            if include_parents or subsystem.is_leaf():
+                paths.append(subsystem.full_path)
+
+            for child in subsystem.subsystems.values():
+                collect_paths(child, include_parents)
+
+        for root in self.subsystems.values():
+            collect_paths(root, not flat)
+
+        return sorted(paths)
+
+    def get_constraints_for_subsystem(self, path: str, recursive: bool = True) -> list[str]:
+        """Return all constraints that apply to a subsystem (v7).
+
+        Args:
+            path: Subsystem path (e.g., 'core', 'crdt.ser')
+            recursive: If True, include constraints from child subsystems
+
+        Returns:
+            List of constraint IDs (e.g., ['X-PERF-001']), sorted
+
+        Example:
+            >>> graph.get_constraints_for_subsystem("core")
+            ['X-PERF-001', 'X-SIMPLE-001']
+        """
+        subsystem = self.get_subsystem_by_path(path)
+        if not subsystem:
+            return []
+
+        constraints = set()
+
+        # Get nodes in this subsystem
+        nodes = subsystem.get_all_nodes(recursive=recursive)
+
+        # Collect constraints from all nodes
+        for node_id in nodes:
+            if node_id in self.nodes:
+                node = self.nodes[node_id]
+                if hasattr(node, 'constraints'):
+                    constraints.update(node.constraints)
+
+        return sorted(list(constraints))
 
     def to_networkx(self) -> nx.DiGraph:
         """Convert to NetworkX directed graph for algorithms.

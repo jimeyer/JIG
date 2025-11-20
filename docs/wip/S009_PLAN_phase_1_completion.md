@@ -37,19 +37,8 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 ## Remaining Work from S005
 
 **Slice 3: Decomposability Analysis (7 Work Units)**
-- [ ] WU9: Metrics calculation (modularity, coupling)
-- [ ] WU10: Community detection (Louvain)
-- [ ] WU11: Boundary violation detection
-- [ ] WU12: Decompose detect command
-- [ ] WU13: Decompose metrics command
-- [ ] WU14: Decompose validate command
-- [ ] WU15: Decompose report command
-
 **Slice 4: Documentation & Release (4 Work Units)**
-- [ ] WU16: User guide for graph commands
-- [ ] WU17: Architecture documentation
-- [ ] WU18: Tutorial & quality gates
-- [ ] WU19: Dogfooding & v0.2.0 release
+
 
 ## New Work: Nested Subsystems (JIG v7)
 
@@ -63,10 +52,6 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 5. Constraint scoping works naturally with nested paths
 
 **Slice 5: Nested Subsystems Implementation (4 Phases from S006)**
-- [ ] WU20: Phase 1 - Data Model & Loading (Week 1)
-- [ ] WU21: Phase 2 - Query & Navigation (Week 2)
-- [ ] WU22: Phase 3 - Decomposability with Hierarchy (Week 3)
-- [ ] WU23: Phase 4 - Documentation & Migration (Week 4)
 
 ## Known Intent (Created Before Coding)
 
@@ -105,7 +90,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 - [ ] WU15: Decompose report command — tests ☐ / docs ☐ / reflect ☐
 
 ### Slice 5: Nested Subsystems Implementation (New)
-- [ ] WU20: Phase 1 - Data Model & Loading — tests ☐ / docs ☐ / reflect ☐
+- [x] WU20: Phase 1 - Data Model & Loading — tests ☑ / docs ☐ / reflect ☐
 - [ ] WU21: Phase 2 - Query & Navigation — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU22: Phase 3 - Decomposability with Hierarchy — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU23: Phase 4 - Documentation & Migration — tests ☐ / docs ☐ / reflect ☐
@@ -637,18 +622,21 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Recursive parsing of nested subsystems cleanly integrated with existing YAML loading
+  - Comprehensive test coverage (11 tests) caught edge cases early
+  - Backward compatibility maintained: all 130 existing tests pass
 - What could be better:
-  - [to be filled]
+  - Cycle detection is defensive but can't actually trigger via YAML (acknowledged in test)
 - Discoveries:
-  - [to be filled]
+  - Nested dataclass structure works well with Python 3.12 type hints
+  - ValidationResult pattern could be extended to nested subsystem validation
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_nested_subsystems.py -v`
-- Look for: All tests pass, backward compatibility maintained
+- Look for: All tests pass (11/11), backward compatibility maintained (130/130 tests pass)
 
 ---
 

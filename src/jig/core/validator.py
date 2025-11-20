@@ -9,6 +9,13 @@ import yaml
 
 from jig.core.parser import OSTCNode, parse_ostc_node
 
+# Import Graph and Subsystem for nested subsystem validation
+# (imported at module level to avoid circular imports)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jig.core.graph import Graph, Subsystem
+
 
 @dataclass
 class ValidationResult:
@@ -204,3 +211,59 @@ def validate_node_file(node_file: Path) -> ValidationResult:
     except Exception as e:
         errors.append(f"Failed to parse node file: {e}")
         return ValidationResult(valid=False, errors=errors, warnings=warnings)
+
+
+# @jig C-NESTED-003 implements:S-NESTED-005 subsystem:core interface:internal
+def validate_nested_subsystems(graph: "Graph") -> list[str]:
+    """Validate nested subsystem structure.
+
+    Checks:
+    - No cycles in subsystem hierarchy
+    - Parent subsystems with children have no direct nodes
+    - Node subsystem paths are valid
+
+    Args:
+        graph: Graph to validate
+
+    Returns:
+        List of error messages (empty if valid)
+    """
+    from jig.core.graph import Subsystem
+
+    errors: list[str] = []
+
+    # Check for cycles (DFS)
+    def check_cycles(subsystem: "Subsystem", visited: set[str]) -> bool:
+        if subsystem.full_path in visited:
+            return True  # Cycle detected
+        visited.add(subsystem.full_path)
+        for child in subsystem.subsystems.values():
+            if check_cycles(child, visited.copy()):
+                return True
+        return False
+
+    for subsystem in graph.subsystems.values():
+        if check_cycles(subsystem, set()):
+            errors.append(f"Cycle detected in subsystem hierarchy at {subsystem.name}")
+
+    # Check parent subsystems don't have direct nodes
+    def check_parent_nodes(subsystem: "Subsystem") -> None:
+        if subsystem.subsystems and subsystem.nodes:
+            errors.append(
+                f"Parent subsystem '{subsystem.full_path}' has both children and direct nodes"
+            )
+        for child in subsystem.subsystems.values():
+            check_parent_nodes(child)
+
+    for subsystem in graph.subsystems.values():
+        check_parent_nodes(subsystem)
+
+    # Check node subsystem paths are valid
+    for node_id, node in graph.nodes.items():
+        if node.subsystem:
+            if not graph.get_subsystem_by_path(node.subsystem):
+                errors.append(
+                    f"Node {node_id} references invalid subsystem path '{node.subsystem}'"
+                )
+
+    return errors
