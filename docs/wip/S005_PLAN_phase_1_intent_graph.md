@@ -234,7 +234,7 @@ branch: phase-1-intent-graph
   - [test] NetworkX integration for to_networkx() will enable community detection algorithms
 
 **Links:**
-- Commit: 8407b39815fa36dffcda601dd7299979bd5eabca
+- Commit: a02f25f8bb8e55b4e35c7f1b3b9c3c24b8e5c8e0
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_graph.py -v`, `mypy src/jig/core/graph.py`
