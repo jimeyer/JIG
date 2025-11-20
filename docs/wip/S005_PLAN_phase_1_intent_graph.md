@@ -43,7 +43,7 @@ branch: phase-1-intent-graph
 ### Slice 2: Graph Relationships & Queries
 - [x] WU4: Graph traversal methods (deps, dependents, path) — tests ☑ / docs ☑ / reflect ☐
 - [x] WU5: Graph query methods (filter by type, subsystem) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU6: Graph show command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU6: Graph show command — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU7: Graph deps/impact commands — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU8: Graph path/list commands — tests ☐ / docs ☐ / reflect ☐
 
@@ -747,14 +747,18 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Click command group pattern makes subcommands clean and composable
+  - Body truncation at 10 lines keeps output manageable while showing context
+  - Arrow symbols (→ ←) make dependency direction immediately clear
 - What could be better:
-  - [to be filled]
+  - Test helper duplication continues - conftest.py would eliminate this
+  - Mock pattern for load_config requires type: ignore annotations
 - Discoveries:
-  - [to be filled]
+  - Click automatically formats --help text from docstrings beautifully
+  - Exit code 3 convention for "not initialized" is consistent with status
 
 **Links:**
-- Commit: [to be filled]
+- Commit: `b7672bfd8cb43870f217ac39288f6432f68b1fb0`
 
 **Human Validation:**
 - Commands:
