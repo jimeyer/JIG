@@ -27,6 +27,7 @@ dependencies = [
     "pyyaml>=6.0",
     "python-frontmatter>=1.0.0",
     "toml>=0.10.2",
+    "networkx>=3.0",
 ]
 
 [project.optional-dependencies]
