@@ -555,7 +555,7 @@ branch: phase-1-intent-graph
   - [algorithm] BFS naturally finds shortest path without extra complexity
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 168c9fb497489008bdfa8f9609bfec45b0b1776f
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_graph_traversal.py -v`
