@@ -92,7 +92,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 ### Slice 5: Nested Subsystems Implementation (New)
 - [x] WU20: Phase 1 - Data Model & Loading — tests ☑ / docs ☐ / reflect ☐
 - [x] WU21: Phase 2 - Query & Navigation — tests ☑ / docs ☐ / reflect ☐
-- [ ] WU22: Phase 3 - Decomposability with Hierarchy — tests ☐ / docs ☐ / reflect ☐
+- [x] WU22: Phase 3 - Decomposability with Hierarchy — tests ☑ / docs ☐ / reflect ☐
 - [ ] WU23: Phase 4 - Documentation & Migration — tests ☐ / docs ☐ / reflect ☐
 
 ### Slice 4: Documentation & Release (Updated from S005)
@@ -920,22 +920,28 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - WU9's design already supported hierarchical subsystems, minimizing WU22 work
+  - CLI module cleanly separated metrics calculation from presentation
+  - Hierarchical display with indentation makes parent/child relationships clear
 - What could be better:
-  - [to be filled]
+  - Report generation could be more customizable (filtering, thresholds)
 - Discoveries:
-  - [to be filled]
+  - Building hierarchical support into base metrics (WU9) paid off significantly
+  - Constraint compliance display naturally integrates via get_constraints_for_subsystem()
+  - YAML output requires careful message suppression to avoid format corruption
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 
 **Human Validation:**
 - Commands:
   ```bash
   jigy decompose metrics
   jigy decompose metrics --subsystem crdt
+  jigy decompose report
+  jigy decompose report --format yaml
   ```
-- Look for: Hierarchical metrics, constraint compliance shown
+- Look for: Hierarchical metrics display, constraint compliance shown, subsystem filtering works, report generation succeeds
 
 ---
 

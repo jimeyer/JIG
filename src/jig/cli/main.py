@@ -16,12 +16,14 @@ def cli() -> None:
 
 
 # Import and register subcommands
+from jig.cli.decompose import decompose  # noqa: E402
 from jig.cli.graph import graph  # noqa: E402
 from jig.cli.init import init  # noqa: E402
 from jig.cli.node import node  # noqa: E402
 from jig.cli.status import status  # noqa: E402
 from jig.cli.validate import validate  # noqa: E402
 
+cli.add_command(decompose)
 cli.add_command(graph)
 cli.add_command(init)
 cli.add_command(node)

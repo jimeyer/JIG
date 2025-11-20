@@ -118,21 +118,26 @@ def calculate_modularity(graph: Graph) -> float:
 
 
 def calculate_coupling_ratio(subsystem_name: str, graph: Graph) -> SubsystemMetrics:
-    """Calculate coupling ratio for a subsystem.
+    """Calculate coupling ratio for a subsystem (supports hierarchical subsystems).
 
     Coupling ratio measures how well-isolated a subsystem is from others.
     A high ratio indicates good encapsulation.
 
-    Internal edges: Both endpoints are in the subsystem
+    Internal edges: Both endpoints are in the subsystem (or its children)
     External edges: One endpoint is outside the subsystem
     Ratio: internal / external (higher is better)
+
+    For hierarchical subsystems:
+    - Parent subsystem metrics include ALL descendant nodes
+    - Edges between child subsystems count as internal to the parent
+    - This enables refactoring into hierarchies without degrading metrics
 
     Note: Constraint relationships (type='satisfies') are not counted as edges
     in v7, as they represent predicates over the graph rather than structural
     dependencies.
 
     Args:
-        subsystem_name: Name or path of the subsystem to analyze
+        subsystem_name: Name or path of the subsystem to analyze (e.g., 'core' or 'crdt.ser')
         graph: Graph to analyze
 
     Returns:
@@ -142,9 +147,14 @@ def calculate_coupling_ratio(subsystem_name: str, graph: Graph) -> SubsystemMetr
         ValueError: If subsystem not found
 
     Example:
+        >>> # Flat subsystem
         >>> metrics = calculate_coupling_ratio("core", graph)
         >>> print(f"Coupling ratio: {metrics.coupling_ratio:.2f}")
         Coupling ratio: 5.00
+
+        >>> # Nested subsystem (includes all children)
+        >>> metrics = calculate_coupling_ratio("crdt", graph)
+        >>> # Edges between crdt.ser and crdt.deser count as internal
     """
     subsystem = graph.get_subsystem_by_path(subsystem_name)
     if not subsystem:
