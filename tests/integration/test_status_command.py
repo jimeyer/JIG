@@ -1,0 +1,257 @@
+# @jig T-STATUS-004 verifies:S-GRAPH-001 subsystem:core
+"""Integration tests for status command."""
+
+import tempfile
+import time
+from pathlib import Path
+
+from jig.cli.status import calculate_status
+from jig.utils.yaml_utils import dump_yaml
+
+
+def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
+    """Helper to create a test OSTC node file."""
+    type_to_dir = {
+        "outcome": "outcomes",
+        "specification": "specifications",
+        "constraint": "constraints",
+        "test": "tests",
+    }
+    node_dir = tmp_path / type_to_dir.get(node_type, "outcomes")
+    node_dir.mkdir(parents=True, exist_ok=True)
+
+    node_file = node_dir / f"{node_id}.md"
+    lines = [
+        "---",
+        f"id: {node_id}",
+        f"type: {node_type}",
+        f'title: "{title}"',
+        f"subsystem: {subsystem}",
+        "status: active",
+        "---",
+        "",
+        f"# {title}",
+        "",
+        f"This is a test node for {node_id}.",
+        ""
+    ]
+    content = "\n".join(lines)
+    node_file.write_text(content)
+    return node_file
+
+
+def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict) -> Path:
+    """Helper to create a test graph-index.yaml file."""
+    graph_index_path = tmp_path / "graph-index.yaml"
+    data = {
+        "version": "1.0.0",
+        "edges": edges,
+        "subsystems": subsystems,
+    }
+    dump_yaml(data, graph_index_path)
+    return graph_index_path
+
+
+# @jig T-STATUS-004 verifies:S-GRAPH-001 subsystem:core
+def test_status_performance():
+    """Verify status completes in <100ms for 100 nodes."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create 100 nodes (mix of outcomes and specifications)
+        edges = []
+        node_ids = []
+
+        for i in range(50):
+            # Create outcome
+            outcome_id = f"O-PERF-{i:03d}"
+            create_test_node(tmp_path, outcome_id, "outcome", f"Outcome {i}", "core")
+            node_ids.append(outcome_id)
+
+            # Create specification that implements the outcome
+            spec_id = f"S-PERF-{i:03d}"
+            create_test_node(tmp_path, spec_id, "specification", f"Spec {i}", "core")
+            node_ids.append(spec_id)
+
+            # Add edge
+            edges.append({
+                "from": spec_id,
+                "to": outcome_id,
+                "type": "implements"
+            })
+
+        # Create graph-index.yaml
+        subsystems = {
+            "core": {"nodes": node_ids}
+        }
+        create_test_graph_index(tmp_path, edges, subsystems)
+
+        # Time the status calculation
+        start_time = time.time()
+        status = calculate_status(tmp_path)
+        elapsed_ms = (time.time() - start_time) * 1000
+
+        # Verify results
+        assert status.total_nodes == 100
+        assert status.node_counts["outcome"] == 50
+        assert status.node_counts["specification"] == 50
+        assert len(status.orphaned_nodes) == 0
+
+        # Verify performance: <100ms for 100 nodes
+        assert elapsed_ms < 100, f"Status took {elapsed_ms:.2f}ms, expected <100ms"
+
+
+def test_status_on_real_jig_graph():
+    """Verify status works on JIG's own graph."""
+    # This test runs against the actual JIG graph in the repository
+    jig_intent_dir = Path("jig")
+
+    if not jig_intent_dir.exists():
+        # Skip if not in JIG repository
+        return
+
+    # Calculate status for JIG's own graph
+    start_time = time.time()
+    status = calculate_status(jig_intent_dir)
+    elapsed_ms = (time.time() - start_time) * 1000
+
+    # Verify basic properties
+    assert status.total_nodes > 0
+    assert len(status.node_counts) > 0
+
+    # Verify performance on JIG's own graph (should be <100ms)
+    assert elapsed_ms < 100, f"Status took {elapsed_ms:.2f}ms, expected <100ms"
+
+
+def test_status_command_cli_output():
+    """Verify status command CLI output."""
+    from click.testing import CliRunner
+    from jig.cli.status import status
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create test nodes
+        create_test_node(tmp_path, "O-TEST-001", "outcome", "Test outcome", "core")
+        create_test_node(tmp_path, "S-TEST-001", "specification", "Test spec", "core")
+        create_test_node(tmp_path, "O-TEST-002", "outcome", "Orphaned outcome", "api")
+
+        # Create edges - O-TEST-002 is orphaned
+        edges = [
+            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
+        ]
+        create_test_graph_index(tmp_path, edges, {})
+
+        # Mock config to point to tmp_path
+        import jig.cli.status
+        original_load_config = jig.cli.status.load_config
+
+        def mock_load_config():
+            from jig.core.config import JigConfig
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.status.load_config = mock_load_config
+
+        try:
+            # Run status command
+            runner = CliRunner()
+            result = runner.invoke(status, [])
+
+            # Verify output
+            assert result.exit_code == 0
+            assert "JIG Graph Status" in result.output
+            assert "Total nodes: 3" in result.output
+            assert "outcome: 2" in result.output
+            assert "specification: 1" in result.output
+            assert "Orphaned nodes:" in result.output
+            assert "O-TEST-002" in result.output
+        finally:
+            # Restore original
+            jig.cli.status.load_config = original_load_config
+
+
+def test_status_command_verbose_output():
+    """Verify status command --verbose shows node lists."""
+    from click.testing import CliRunner
+    from jig.cli.status import status
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create test nodes
+        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core outcome", "core")
+        create_test_node(tmp_path, "O-CORE-002", "outcome", "Core outcome 2", "core")
+
+        # Mock config
+        import jig.cli.status
+        original_load_config = jig.cli.status.load_config
+
+        def mock_load_config():
+            from jig.core.config import JigConfig
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.status.load_config = mock_load_config
+
+        try:
+            # Run status command with --verbose
+            runner = CliRunner()
+            result = runner.invoke(status, ["--verbose"])
+
+            # Verify verbose output includes node IDs
+            assert result.exit_code == 0
+            assert "O-CORE-001" in result.output
+            assert "O-CORE-002" in result.output
+        finally:
+            jig.cli.status.load_config = original_load_config
+
+
+def test_status_command_not_initialized():
+    """Verify status command handles missing jig/ directory."""
+    from click.testing import CliRunner
+    from jig.cli.status import status
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir) / "nonexistent"
+
+        # Mock config to point to nonexistent directory
+        import jig.cli.status
+        original_load_config = jig.cli.status.load_config
+
+        def mock_load_config():
+            from jig.core.config import JigConfig
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.status.load_config = mock_load_config
+
+        try:
+            # Run status command
+            runner = CliRunner()
+            result = runner.invoke(status, [])
+
+            # Verify exit code 3 and error message
+            assert result.exit_code == 3
+            assert "Error:" in result.output
+            assert "Intent directory not found" in result.output
+        finally:
+            jig.cli.status.load_config = original_load_config

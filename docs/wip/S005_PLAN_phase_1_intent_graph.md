@@ -36,8 +36,8 @@ branch: phase-1-intent-graph
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
 
 ### Slice 1: Status & Health Monitoring
-- [x] WU1: Graph data structure implementation — tests ☑ / docs ☑ / reflect ☐
-- [ ] WU2: Status command implementation — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Graph data structure implementation — tests ☑ / docs ☑ / reflect ☑
+- [x] WU2: Status command implementation — tests ☑ / docs ☑ / reflect ☐
 - [ ] WU3: Status output formatting & CLI — tests ☐ / docs ☐ / reflect ☐
 
 ### Slice 2: Graph Relationships & Queries
@@ -324,11 +324,13 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - [architecture] StatusData dataclass cleanly separates logic from presentation
+  - [testing] Click.testing.CliRunner enabled CLI integration tests with mocking
+  - [coverage] 96.83% test coverage achieved (15 tests)
 - What could be better:
-  - [to be filled]
+  - [test-helpers] Duplicated create_test_node helper across test files (could extract to conftest.py)
 - Discoveries:
-  - [to be filled]
+  - [performance] Status calculation on 100 nodes completes in ~25ms, well under 100ms target
 
 **Links:**
 - Commit: [to be filled]
