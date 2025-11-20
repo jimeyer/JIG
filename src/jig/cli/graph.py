@@ -250,9 +250,11 @@ def path(start: str, end: str) -> None:
         )
 
 
+# @jig C-NESTED-005 implements:S-NESTED-002 subsystem:core interface:public
 @graph.command("list")
 @click.option("--type", "node_type", help="Filter by node type (e.g., outcome, specification)")
-@click.option("--subsystem", help="Filter by subsystem (e.g., core, cli)")
+@click.option("--subsystem", help="Filter by subsystem (use dot notation for nested, e.g., crdt.ser)")
+@click.option("--recursive", is_flag=True, help="Include child subsystems (when using --subsystem)")
 @click.option(
     "--format",
     "output_format",
@@ -261,17 +263,20 @@ def path(start: str, end: str) -> None:
     help="Output format (table or yaml)",
 )
 def list_nodes(
-    node_type: str | None, subsystem: str | None, output_format: str
+    node_type: str | None, subsystem: str | None, recursive: bool, output_format: str
 ) -> None:
     """List nodes with optional filters.
 
     Display all nodes in the graph or filter by type/subsystem.
-    Supports table format (default) or YAML for piping.
+    Supports nested subsystem paths with dot notation (e.g., crdt.ser).
+    Use --recursive to include nodes from child subsystems.
 
     Examples:
         jigy graph list
         jigy graph list --type outcome
         jigy graph list --subsystem core
+        jigy graph list --subsystem crdt --recursive
+        jigy graph list --subsystem crdt.ser
         jigy graph list --format yaml
     """
     config = load_config()
@@ -289,18 +294,48 @@ def list_nodes(
     # Apply filters sequentially
     if node_type:
         nodes = g.filter_by_type(node_type)
+
     if subsystem:
-        # Filter the already filtered list if type was specified
-        if node_type:
-            nodes = [n for n in nodes if n.subsystem and n.subsystem.lower() == subsystem.lower()]
+        # Try hierarchical subsystem path resolution (v7)
+        subsys = g.get_subsystem_by_path(subsystem)
+
+        if subsys:
+            # Use hierarchical subsystem structure from graph-index.yaml
+            # Get nodes from subsystem (with optional recursion)
+            node_ids = subsys.get_all_nodes(recursive=recursive)
+
+            # Filter to only include nodes that exist in the graph
+            if node_type:
+                # If type filter already applied, filter further
+                nodes = [n for n in nodes if n.id in node_ids]
+            else:
+                nodes = [g.nodes[nid] for nid in node_ids if nid in g.nodes]
         else:
-            nodes = g.filter_by_subsystem(subsystem)
+            # Fall back to filtering by node frontmatter (backward compatible)
+            # This handles cases where subsystems aren't defined in graph-index.yaml
+            if node_type:
+                nodes = [n for n in nodes if n.subsystem and n.subsystem.lower() == subsystem.lower()]
+            else:
+                nodes = g.filter_by_subsystem(subsystem)
+
+            if recursive:
+                click.echo(
+                    click.style("Warning: ", fg="yellow") +
+                    f"Subsystem '{subsystem}' not defined in graph-index.yaml. " +
+                    "Using node frontmatter only (--recursive ignored)."
+                )
 
     # Output based on format
     if output_format == "yaml":
-        from jig.utils.yaml_utils import dump_yaml
-
-        data = [{"id": n.id, "type": n.type, "title": n.title} for n in nodes]
+        data = [
+            {
+                "id": n.id,
+                "type": n.type,
+                "title": n.title,
+                "subsystem": n.subsystem or None
+            }
+            for n in nodes
+        ]
         # Output to string instead of file
         import io
         import yaml
@@ -314,9 +349,9 @@ def list_nodes(
             click.echo(click.style("No nodes found matching criteria", fg="yellow"))
             return
 
-        click.echo(f"{'ID':<20} {'Type':<15} {'Title'}")
-        click.echo("-" * 80)
-        for node in nodes:
-            # Truncate title if too long
-            title = node.title if len(node.title) <= 43 else node.title[:40] + "..."
-            click.echo(f"{node.id:<20} {node.type:<15} {title}")
+        click.echo(f"{'ID':<20} {'Type':<15} {'Subsystem':<20} {'Title'}")
+        click.echo("-" * 90)
+        for node in sorted(nodes, key=lambda n: n.id):
+            subsys = node.subsystem or "(none)"
+            title = node.title[:43] if len(node.title) > 43 else node.title
+            click.echo(f"{node.id:<20} {node.type:<15} {subsys:<20} {title}")

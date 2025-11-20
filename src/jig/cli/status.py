@@ -8,7 +8,42 @@ from pathlib import Path
 import click
 
 from jig.core.config import load_config
-from jig.core.graph import Graph
+from jig.core.graph import Graph, Subsystem
+
+
+# @jig C-NESTED-004 implements:S-NESTED-003 subsystem:core interface:public
+def format_subsystem_tree(subsystem: Subsystem, graph: Graph, indent: str = "") -> list[str]:
+    """Format subsystem hierarchy as tree.
+
+    Args:
+        subsystem: Root subsystem to format
+        graph: Graph for constraint lookup
+        indent: Current indentation level
+
+    Returns:
+        List of formatted lines
+    """
+    lines = []
+    node_count = len(subsystem.get_all_nodes(recursive=True))
+    lines.append(f"{indent}{subsystem.name} ({node_count} nodes)")
+
+    # Show constraints for this subsystem
+    constraints = graph.get_constraints_for_subsystem(subsystem.full_path)
+    if constraints:
+        lines.append(f"{indent}  └── Constraints: {', '.join(constraints)}")
+
+    # Show child subsystems
+    children = list(subsystem.subsystems.values())
+    for i, child in enumerate(children):
+        is_last = (i == len(children) - 1)
+        connector = "└── " if is_last else "├── "
+        extension = "    " if is_last else "│   "
+
+        child_lines = format_subsystem_tree(child, graph, indent + extension)
+        child_lines[0] = indent + connector + child_lines[0].lstrip()
+        lines.extend(child_lines)
+
+    return lines
 
 
 @dataclass
@@ -91,12 +126,14 @@ def calculate_status(intent_dir: Path) -> StatusData:
     )
 
 
-def format_status_output(status_data: StatusData, verbose: bool) -> str:
+def format_status_output(status_data: StatusData, verbose: bool, flat: bool = False, graph: Graph | None = None) -> str:
     """Format status data for terminal output.
 
     Args:
         status_data: Status data to format
         verbose: Whether to show verbose output (node lists)
+        flat: Whether to use flat subsystem display (backward compatible)
+        graph: Graph instance (required for hierarchical view)
 
     Returns:
         Formatted string with colors and styling for terminal output
@@ -127,14 +164,28 @@ def format_status_output(status_data: StatusData, verbose: bool) -> str:
             output.append(f"  {node_type}: {count}")
 
     # Subsystems
-    if status_data.subsystems:
+    if status_data.subsystems or (graph and graph.subsystems):
         output.append("")
         output.append(click.style("Subsystems:", bold=True))
-        for subsystem_name, nodes in sorted(status_data.subsystems.items()):
-            output.append(f"  {subsystem_name}: {len(nodes)} nodes")
-            if verbose:
-                for node_id in sorted(nodes):
-                    output.append(f"    - {node_id}")
+
+        if flat or not graph:
+            # Flat view (backward compatible)
+            for subsystem_name, nodes in sorted(status_data.subsystems.items()):
+                output.append(f"  {subsystem_name}: {len(nodes)} nodes")
+                if verbose:
+                    for node_id in sorted(nodes):
+                        output.append(f"    - {node_id}")
+        else:
+            # Hierarchical tree view
+            for subsystem in sorted(graph.subsystems.values(), key=lambda s: s.name):
+                tree_lines = format_subsystem_tree(subsystem, graph, "  ")
+                output.extend(tree_lines)
+                if verbose:
+                    # Show individual nodes in verbose mode
+                    all_nodes = subsystem.get_all_nodes(recursive=True)
+                    for node_id in sorted(all_nodes):
+                        if node_id in graph.nodes:
+                            output.append(f"    - {node_id}")
 
     # Orphaned nodes (warnings)
     if status_data.orphaned_nodes:
@@ -196,13 +247,14 @@ def format_status_output(status_data: StatusData, verbose: bool) -> str:
 
 @click.command()
 @click.option("--verbose", is_flag=True, help="Show detailed statistics")
-def status(verbose: bool) -> None:
+@click.option("--flat", is_flag=True, help="Show flat subsystem view (backward compatible)")
+def status(verbose: bool, flat: bool) -> None:
     """Show JIG graph status and health.
 
     Displays:
     - Total node count
     - Node counts by type (outcome, specification, test, constraint)
-    - Subsystem breakdown
+    - Subsystem breakdown (hierarchical tree by default, --flat for legacy view)
     - Orphaned nodes (nodes without relationships)
     - Actionable suggestions for improving graph health
 
@@ -218,6 +270,15 @@ def status(verbose: bool) -> None:
         click.echo(click.style("✗ Error: ", fg="red") + str(e))
         sys.exit(3)
 
+    # Load graph for hierarchical view (if not flat)
+    graph = None
+    if not flat:
+        try:
+            graph = Graph.load_from_dir(config.intent_dir)
+        except (FileNotFoundError, ValueError):
+            # Fall back to flat view if graph can't be loaded
+            flat = True
+
     # Format and display status
-    output = format_status_output(status_data, verbose)
+    output = format_status_output(status_data, verbose, flat, graph)
     click.echo(output)

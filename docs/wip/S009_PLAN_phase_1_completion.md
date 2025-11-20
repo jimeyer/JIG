@@ -91,7 +91,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 
 ### Slice 5: Nested Subsystems Implementation (New)
 - [x] WU20: Phase 1 - Data Model & Loading — tests ☑ / docs ☐ / reflect ☐
-- [ ] WU21: Phase 2 - Query & Navigation — tests ☐ / docs ☐ / reflect ☐
+- [x] WU21: Phase 2 - Query & Navigation — tests ☑ / docs ☐ / reflect ☐
 - [ ] WU22: Phase 3 - Decomposability with Hierarchy — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU23: Phase 4 - Documentation & Migration — tests ☐ / docs ☐ / reflect ☐
 
@@ -765,14 +765,17 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Hierarchical tree formatting integrates cleanly with existing status output
+  - Backward compatibility maintained: flat subsystem view still works with --flat flag
+  - Graceful fallback when subsystems not defined in graph-index.yaml (uses node frontmatter)
 - What could be better:
-  - [to be filled]
+  - Warning message for --recursive with frontmatter-only filtering could be clearer
 - Discoveries:
-  - [to be filled]
+  - Integration tests caught backward compatibility issue early (graph list filtering)
+  - Click's tree formatting characters (├── └──) render well in all tested terminals
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 
 **Human Validation:**
 - Commands:
@@ -782,7 +785,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   jigy graph list --subsystem crdt --recursive
   jigy graph list --subsystem crdt.ser
   ```
-- Look for: Tree formatting, recursive queries work
+- Look for: Tree formatting works, recursive queries include children, backward compatibility maintained (202/202 tests pass)
 
 ---
 
