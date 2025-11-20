@@ -24,8 +24,8 @@ def node() -> None:
     "--type",
     "node_type",
     required=True,
-    type=click.Choice(["outcome", "specification", "test", "constraint"]),
-    help="Type of node to create",
+    type=click.Choice(["outcome", "specification", "constraint"]),
+    help="Node type (O/S/X only; T/C use @jig annotations)",
 )
 @click.option(
     "--id",
@@ -61,10 +61,10 @@ def create(node_type: str, node_id: str, title: str, subsystem: str | None) -> N
             err=True,
         )
         click.echo(
-            "ID must match pattern: [OSTC]-[A-Z0-9]+-[0-9]{3}",
+            "ID must match pattern: [OSC]-[A-Z0-9]+-[0-9]{3}",
             err=True,
         )
-        click.echo("Examples: O-JIG-001, S-TEST-002, T-API-001, C-PERF-001", err=True)
+        click.echo("Examples: O-JIG-001, S-TEST-002, C-PERF-001", err=True)
         sys.exit(1)
 
     # Validate ID prefix matches type
@@ -172,7 +172,7 @@ def _validate_id_format(node_id: str) -> bool:
     Returns:
         True if valid, False otherwise
     """
-    pattern = r"^[OSTC]-[A-Z0-9]+-\d{3}$"
+    pattern = r"^[OSC]-[A-Z0-9]+-\d{3}$"
     return re.match(pattern, node_id) is not None
 
 
@@ -181,7 +181,7 @@ def _validate_id_prefix(node_id: str, node_type: str) -> bool:
 
     Args:
         node_id: Node ID to validate
-        node_type: Type of node (outcome, specification, test, constraint)
+        node_type: Type of node (outcome, specification, constraint)
 
     Returns:
         True if prefix matches type, False otherwise
@@ -198,12 +198,11 @@ def _get_type_prefix(node_type: str) -> str:
         node_type: Type of node
 
     Returns:
-        Single-letter prefix (O, S, T, or C)
+        Single-letter prefix (O, S, or C)
     """
     prefix_map = {
         "outcome": "O",
         "specification": "S",
-        "test": "T",
         "constraint": "C",
     }
     return prefix_map[node_type]

@@ -105,33 +105,6 @@ def test_jigy_node_create_specification(tmp_path: Path) -> None:
     assert node.type == "specification"
 
 
-def test_jigy_node_create_test_node(tmp_path: Path) -> None:
-    """Verify jigy node create works for test nodes."""
-    runner = CliRunner()
-
-    result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
-    assert result.exit_code == 0
-
-    with chdir(tmp_path):
-        result = runner.invoke(
-            cli,
-            [
-                "node",
-                "create",
-                "--type",
-                "test",
-                "--id",
-                "T-UNIT-001",
-                "--title",
-                "Unit Test",
-            ],
-        )
-
-    assert result.exit_code == 0
-    node_file = tmp_path / "jig" / "tests" / "T-UNIT-001.md"
-    assert node_file.exists()
-
-
 def test_jigy_node_create_constraint(tmp_path: Path) -> None:
     """Verify jigy node create works for constraint nodes."""
     runner = CliRunner()
@@ -370,11 +343,11 @@ def test_jigy_node_create_updates_graph_index(tmp_path: Path) -> None:
     result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
     assert result.exit_code == 0
 
-    # Create multiple nodes
+    # Create multiple nodes (O/S/C only - T nodes use annotations)
     nodes = [
         ("outcome", "O-TEST-001", "Outcome 1"),
         ("specification", "S-TEST-001", "Spec 1"),
-        ("test", "T-TEST-001", "Test 1"),
+        ("constraint", "C-TEST-001", "Constraint 1"),
     ]
 
     with chdir(tmp_path):
@@ -402,7 +375,7 @@ def test_jigy_node_create_updates_graph_index(tmp_path: Path) -> None:
     node_ids = [n["id"] for n in graph_data["nodes"]]
     assert "O-TEST-001" in node_ids
     assert "S-TEST-001" in node_ids
-    assert "T-TEST-001" in node_ids
+    assert "C-TEST-001" in node_ids
 
 
 def test_jigy_node_create_without_subsystem(tmp_path: Path) -> None:

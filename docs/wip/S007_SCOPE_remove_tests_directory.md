@@ -3,27 +3,36 @@
 **Author:** Jim Meyer  
 **Date:** 2025-11-20  
 **Status:** Draft  
-**Related:** JIG-Concept-v6.1.md, S-JIG-002
+**Related:** JIG-Concept-v7.md, S-JIG-002
 
 ---
 
 ## Problem Statement
 
-The `jig/tests/` directory and `type: test` node type are redundant in the current JIG architecture.
+The `jig/tests/` directory and `type: test` node type are redundant in the JIG v7 OSTCX architecture.
 
 **Current State:**
 - ❌ `jig/tests/` directory exists but contains only template file `T-UNIT-001.md`
 - ❌ `type: test` is a valid node type in parser, validator, and CLI
 - ❌ Code scans `jig/tests/` directory for markdown test specification files
-- ✅ All actual tests use `@jig T-XXX` decorators in Python test files
-- ✅ Test nodes are already tracked via annotations, not markdown files
+- ✅ All actual tests use `@jig T-XXX` annotations in Python test files
+- ✅ Test nodes (T) are discovered via annotations, not markdown files (per v7 design)
+
+**JIG v7 Context:**
+
+The OSTCX model (Outcome/Specification/Test/Code/Constraint) has five representations:
+- **O, S, X**: Markdown files in `jig/` subdirectories (timeless intent)
+- **T, C**: Annotations in code with `@jig` decorators (executable reality)
+
+This separation reflects the fundamental distinction: O/S/X are **about** what the system should do; T/C are what it **actually does**. Tests and code are executable; their source of truth is the running implementation, not documentation.
 
 **Why This is Redundant:**
 
-1. **Tests are code, not specifications** - Test nodes (T-XXX) are discovered via `@jig` annotations in actual test files (`tests/unit/`, `tests/integration/`)
+1. **Tests are code, not specifications** - In the OSTCX model, Test nodes (T) represent "Empirical truth (verify)" and are discovered via `@jig` annotations in actual test files (`tests/unit/`, `tests/integration/`)
 2. **Markdown test files duplicate information** - Writing a `jig/tests/T-GRAPH-001.md` file duplicates what's already in the annotated test function
 3. **Single source of truth violated** - Test behavior is defined in code; markdown files would be documentation that drifts
-4. **All existing tests use decorators** - 60+ tests in codebase use `@jig T-XXX` annotations, zero use markdown files
+4. **All existing tests use annotations** - 60+ tests in codebase use `@jig T-XXX` annotations, zero use markdown files
+5. **JIG v7 design intent** - The OSTCX model explicitly stores T nodes as annotations, not markdown (see JIG-Concept-v7.md §1.1)
 
 **Example of Current Pattern (Correct):**
 
@@ -62,7 +71,7 @@ Test that Graph.load_from_dir() works...
    - Update comment explaining only O/S/C nodes are in markdown
 
 2. **`src/jig/core/validator.py`** (Lines 29, 32-36)
-   - Remove `"test"` from `VALID_TYPES`
+   - Remove `"test"` from `VALID_TYPES` (should only contain: outcome, specification, constraint)
    - Remove `"test": "T"` from `TYPE_PREFIX_MAP`
    - Update validation error messages
 
@@ -71,8 +80,8 @@ Test that Graph.load_from_dir() works...
    - Update help text to clarify only O/S/C nodes can be created
 
 4. **`src/jig/core/parser.py`** (Line 18)
-   - Update `OSTCNode` docstring to remove "Test" from list
-   - Rename to `OSCNode` or keep as `OSTCNode` for backwards compatibility
+   - Update `OSTCNode` docstring to clarify: parses O/S/C markdown nodes (not T/X)
+   - Keep name as `OSTCNode` - represents markdown-based Intent nodes in OSTCX model
 
 ### 2. Remove Test Template and Directory
 
@@ -86,15 +95,13 @@ Test that Graph.load_from_dir() works...
 
 **Files to Update:**
 
-1. **`README.md`** - Update OSTC description to clarify:
-   - O/S/C nodes are markdown files in `jig/`
-   - T nodes are `@jig` annotations in test code
+1. **`README.md`** - Update OSTCX description to clarify:
+   - O/S/X nodes are markdown files in `jig/` subdirectories
+   - T/C nodes are `@jig` annotations in test/source code
    
-2. **`agents/jig-agent-instructions.md`** - Already correct, no changes needed
+2. **`agents/jig-agent-instructions.md`** - Verify alignment with v7 model
 
-3. **`docs/jig-concept/JIG-Concept-v6.1.md`** - Update to clarify:
-   - Tests are discovered via `@jig` annotations
-   - No markdown files for test nodes
+3. **`docs/jig-concept/JIG-Concept-v7.md`** - Already correct (Tests via annotations per §1.1, §1.3)
 
 ### 4. Update Tests
 
@@ -134,17 +141,18 @@ This SCOPE only removes the redundant markdown test files, not the annotation-ba
 
 ### 3. Graph Index Can Still Reference Tests
 
-The `graph-index.yaml` can still contain test node references:
+The `graph-index.yaml` can still contain test node (T) references per OSTCX model:
 
 ```yaml
 nodes:
-  - id: T-GRAPH-001
+  T-GRAPH-001:
+    file: tests/unit/test_graph.py
+    line: 79
     type: test
-    file: tests/unit/test_graph.py:79
     subsystem: core
 ```
 
-These are **discovered** from annotations, not loaded from markdown files.
+These are **discovered** from `@jig` annotations, not loaded from markdown files.
 
 ---
 
@@ -180,13 +188,13 @@ These are **discovered** from annotations, not loaded from markdown files.
 
 ### Why Keep Test Node Type in Graph?
 
-Test nodes (T-XXX) still exist in the **graph model** and **annotations**, they just don't have markdown files:
+Test nodes (T) still exist in the **OSTCX graph model** and **annotations**, they just don't have markdown files:
 
-- **Outcomes (O)**: Business value → `jig/outcomes/*.md`
-- **Specifications (S)**: Technical requirements → `jig/specifications/*.md`
-- **Tests (T)**: Verification → `@jig T-XXX` in test code
-- **Code (C)**: Implementation → `@jig C-XXX` in source code
-- **Constraints (C)**: Cross-cutting requirements → `jig/constraints/*.md`
+- **Outcomes (O)**: Narrative truth (why) → `jig/outcomes/*.md`
+- **Specifications (S)**: Logical truth (what) → `jig/specifications/*.md`
+- **Tests (T)**: Empirical truth (verify) → `@jig T-XXX` in test code
+- **Code (C)**: Operational truth (how) → `@jig C-XXX` in source code
+- **Constraints (X)**: System properties (must) → `jig/constraints/*.md` *(predicates, not nodes)*
 
 ### Why This is Safe
 
@@ -206,12 +214,12 @@ Test nodes (T-XXX) still exist in the **graph model** and **annotations**, they 
 - [ ] `jigy node create --type test` returns error with helpful message
 - [ ] `src/jig/core/graph.py` no longer scans `tests/` directory
 - [ ] All existing tests pass (no functionality broken)
-- [ ] Documentation updated to clarify O/S/C are markdown, T/C are annotations
+- [ ] Documentation updated to clarify OSTCX model: O/S/X are markdown, T/C are annotations
 
 ### Should Have
 
-- [ ] Error message explains: "Test nodes use @jig annotations, not markdown files"
-- [ ] README clearly distinguishes markdown nodes (O/S/C) from annotation nodes (T/C)
+- [ ] Error message explains: "Test nodes use @jig annotations, not markdown files. See JIG-Concept-v7.md"
+- [ ] README clearly distinguishes markdown nodes (O/S/X) from annotation nodes (T/C) per OSTCX model
 - [ ] Validator provides clear error if someone manually creates `jig/tests/T-XXX.md`
 
 ### Could Have
@@ -223,14 +231,15 @@ Test nodes (T-XXX) still exist in the **graph model** and **annotations**, they 
 
 ## Open Questions
 
-### 1. Should we rename `OSTCNode` to `OSCNode`?
+### 1. Should we rename `OSTCNode`?
 
 **Options:**
-- A) Keep `OSTCNode` for backwards compatibility (T still exists in graph model)
-- B) Rename to `OSCNode` to reflect only markdown node types
-- C) Rename to `IntentNode` to clarify purpose (intent vs. implementation)
+- A) Keep `OSTCNode` - reflects OSTCX model (parses O/S/X markdown, T/C are annotations)
+- B) Rename to `OSXNode` - reflects only markdown node types
+- C) Rename to `IntentNode` - clarifies purpose (intent vs. implementation)
 
-**Recommendation:** Keep `OSTCNode` - Test nodes still exist in the graph, just not as markdown files.
+**Recommendation:** Keep `OSTCNode` - established name, T/C still part of OSTCX model, just stored differently. Name indicates "Intent Graph nodes that are markdown-based" within the broader OSTCX model.
+**JIM REPLY**: A) Keep `OSTCNode` - reflects OSTCX model 
 
 ### 2. Should we keep `type: test` validation for future use?
 
@@ -240,32 +249,36 @@ Test nodes (T-XXX) still exist in the **graph model** and **annotations**, they 
 - C) Keep but add warning - "Test nodes should use @jig annotations"
 
 **Recommendation:** Remove entirely - if test nodes are in graph index, they don't need frontmatter validation.
+**JIM REPLY**: A) Remove entirely - test nodes never use markdown
 
-### 3. What about Constraint nodes (C-XXX)?
 
-**Current State:**
+### 3. What about Constraint nodes (X-XXX)?
+
+**Current State (v7):**
 - Constraints use markdown files in `jig/constraints/`
-- Constraints are cross-cutting requirements (performance, security, etc.)
-- Constraints are NOT code implementations
+- Constraints are cross-cutting system properties (performance, security, compliance)
+- Constraints are **predicates over the OSTCX graph**, not regular nodes
+- Prefix changed from C-XXX to X-XXX to avoid confusion with Code nodes
 
-**Decision:** Keep constraint markdown files - they are specifications, not code.
-
+**Decision:** Keep constraint markdown files - they are system-wide properties, stored as markdown with query-based scope selectors. This SCOPE only affects Test nodes, not Constraints.
+**JIM REPLY**: Agree.
 ---
 
 ## Related Work
 
 ### Existing Patterns
 
-1. **Outcome/Specification nodes** - Already markdown-only
-2. **Test annotations** - Already decorator-based in all 60+ tests
-3. **Code annotations** - Future feature for C-XXX nodes (not yet implemented)
+1. **Outcome/Specification/Constraint nodes (O/S/X)** - Already markdown-only
+2. **Test annotations (T)** - Already annotation-based in all 60+ tests
+3. **Code annotations (C)** - Future feature for C-XXX nodes (not yet implemented)
 
 ### Future Features (Out of Scope)
 
-1. **Test discovery** - `jig index --scan-code` to find `@jig T-XXX` annotations
-2. **Code discovery** - `jig index --scan-code` to find `@jig C-XXX` annotations
-3. **Traceability queries** - `jig graph show T-GRAPH-001` displays test from code
+1. **Test discovery** - `jig index --scan-code` to find `@jig T-XXX` annotations in test files
+2. **Code discovery** - `jig index --scan-code` to find `@jig C-XXX` annotations in source files
+3. **Traceability queries** - `jig graph show T-GRAPH-001` displays test node details from code
 4. **Coverage analysis** - `jig coverage` shows which S nodes lack T nodes
+5. **Constraint validation** - `jig validate --constraints` checks X node compliance (v7 feature)
 
 ---
 
@@ -280,6 +293,8 @@ VALID_TYPES = {"outcome", "specification", "test", "constraint"}
 
 **After:**
 ```python
+# Only markdown-based node types (O/S/X in OSTCX model)
+# T and C are annotation-based, not validated as markdown frontmatter
 VALID_TYPES = {"outcome", "specification", "constraint"}
 ```
 
@@ -292,6 +307,8 @@ node_dirs = ["outcomes", "specifications", "constraints", "tests"]
 
 **After:**
 ```python
+# Load only markdown-based nodes (O/S/X in OSTCX model)
+# T/C nodes discovered via @jig annotations (future feature)
 node_dirs = ["outcomes", "specifications", "constraints"]
 ```
 
@@ -306,8 +323,9 @@ jigy node create --type test --id T-GRAPH-001 --title "Test graph loading"
 **After:**
 ```bash
 jigy node create --type test --id T-GRAPH-001 --title "Test graph loading"
-# Error: Test nodes must use @jig annotations in test code.
-# See: docs/jig-concept/JIG-Concept-v6.1.md#test-annotations
+# Error: Test nodes (T) must use @jig annotations in test code, not markdown files.
+# In the OSTCX model, only O/S/X nodes use markdown.
+# See: docs/jig-concept/JIG-Concept-v7.md§1.3 (Test annotations)
 ```
 
 ---
@@ -374,8 +392,8 @@ Before implementing:
 
 ## References
 
-- **JIG-Concept-v6.1.md** - Current architecture (tests via annotations)
-- **S-JIG-002** - OSTC node parsing specification
-- **agents/jig-agent-instructions.md** - Already shows correct pattern
-- **tests/** - All 60+ tests use `@jig T-XXX` annotations
+- **JIG-Concept-v7.md** - Current architecture (OSTCX model, tests via annotations §1.3)
+- **S-JIG-002** - OSTC node parsing specification (to be updated for OSX markdown nodes)
+- **agents/jig-agent-instructions.md** - Should reflect v7 OSTCX model
+- **tests/** - All 60+ tests use `@jig T-XXX` annotations (correct pattern)
 

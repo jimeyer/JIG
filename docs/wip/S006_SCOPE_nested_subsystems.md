@@ -2,8 +2,8 @@
 
 **Date:** 2025-11-20  
 **Status:** Draft  
-**Version:** 1.0  
-**Related:** S004_JIG_DEVELOPMENT_STRATEGY_V2.md, S005_PLAN_phase_1_intent_graph.md
+**Version:** 1.1  
+**Related:** S004_JIG_DEVELOPMENT_STRATEGY_V2.md, S005_PLAN_phase_1_intent_graph.md, JIG-Concept-v7.md
 
 > "Enable hierarchical subsystem organization for complex systems while maintaining simplicity for small projects."
 
@@ -11,13 +11,16 @@
 
 ## Executive Summary
 
-This document defines the scope of work for implementing **nested subsystems** in JIG. Currently, JIG supports a flat subsystem structure where all subsystems exist at the same level. This enhancement will allow subsystems to contain child subsystems, enabling better organization of large, complex systems while maintaining backward compatibility with existing flat structures.
+This document defines the scope of work for implementing **nested subsystems** in JIG v7. Currently, JIG supports a flat subsystem structure where all subsystems exist at the same level. This enhancement will allow subsystems to contain child subsystems, enabling better organization of large, complex systems while maintaining backward compatibility with existing flat structures.
+
+**JIG v7 Context:** This feature is part of the broader OSTCX model (Outcome, Specification, Test, Code, Constraint) where constraints act as predicates over the Intent Graph. Nested subsystems enhance the hierarchical organization of the OSTC graph while constraints provide cross-cutting validation.
 
 **Key Benefits:**
 1. **Hierarchical Organization** - Model real system architecture with parent/child subsystem relationships
 2. **Scalability** - Support projects with dozens or hundreds of subsystems without overwhelming flat lists
 3. **Flexible Granularity** - Allow both coarse-grained and fine-grained decomposition analysis
 4. **Backward Compatible** - Existing flat subsystems continue to work unchanged
+5. **Constraint Integration** (v7) - Constraints can target entire subsystem hierarchies or specific leaves, maintaining clean separation between architectural dependencies (OSTC edges) and system properties (constraint predicates)
 
 **Example Use Case:**
 ```yaml
@@ -70,6 +73,13 @@ subsystems:
 
 **Current Graph Index Format (`jig/graph-index.yaml`):**
 ```yaml
+nodes:
+  O-JIG-001:
+    file: jig/outcomes/O-JIG-001.md
+    type: outcome
+    subsystem: core
+    constraints: []
+
 subsystems:
   core:
     nodes:
@@ -111,6 +121,7 @@ subsystems:
 - `jigy graph list --subsystem crdt.ser` SHOULD list only nodes in `crdt.ser`
 - `jigy status` SHOULD show hierarchical subsystem breakdown (tree view)
 - New option: `--flat` to show flattened view (backward compatible)
+- Subsystem queries SHOULD integrate with constraint scoping (e.g., constraints can target `crdt` recursively)
 
 **FR-5: Decomposability Analysis**
 - `jigy decompose metrics` SHOULD calculate metrics at each level of hierarchy
@@ -124,6 +135,7 @@ subsystems:
   - No cycles in subsystem hierarchy
   - Nodes reference valid subsystem paths
   - Parent subsystems with children have no direct nodes
+  - Constraint scope selectors can resolve nested subsystem paths
 
 ### Non-Functional Requirements
 
@@ -266,7 +278,44 @@ class Graph:
             collect_paths(root, not flat)
         
         return sorted(paths)
+    
+    def get_constraints_for_subsystem(self, path: str, recursive: bool = True) -> list[str]:
+        """Return all constraints that apply to a subsystem.
+        
+        Args:
+            path: Subsystem path (e.g., 'core', 'crdt.ser')
+            recursive: If True, include constraints from child subsystems
+        
+        Returns:
+            List of constraint IDs (e.g., ['X-PERF-001'])
+        """
+        subsystem = self.get_subsystem_by_path(path)
+        if not subsystem:
+            return []
+        
+        constraints = set()
+        
+        # Get nodes in this subsystem
+        nodes = subsystem.get_all_nodes(recursive=recursive)
+        
+        # Collect constraints from all nodes
+        for node_id in nodes:
+            if node_id in self.nodes:
+                node = self.nodes[node_id]
+                if hasattr(node, 'constraints'):
+                    constraints.update(node.constraints)
+        
+        return sorted(list(constraints))
 ```
+
+**Integration with Constraints (v7):**
+
+The nested subsystem structure integrates seamlessly with JIG v7's constraint system:
+- Constraints can target specific leaf subsystems: `scope: {subsystems: [crdt.ser]}`
+- Constraints can target parent subsystems recursively: `scope: {subsystems: [crdt], recursive: true}`
+- Constraint queries use dot notation: `query: "subsystem:crdt.* AND type:C"`
+- Metrics exclude constraint relationships to preserve decomposability
+- Status commands show constraint compliance per subsystem
 
 ### YAML Format Changes
 
@@ -310,22 +359,38 @@ subsystems:
 version: 1.0.0
 created: 2025-11-20
 
+nodes:
+  O-JIG-001:
+    file: jig/outcomes/O-JIG-001.md
+    type: outcome
+    subsystem: core
+    constraints: []
+  
+  O-CRDT-SER-001:
+    file: jig/outcomes/O-CRDT-SER-001.md
+    type: outcome
+    subsystem: crdt.ser
+    constraints: [X-PERF-001]
+
 subsystems:
   core:
     nodes:
       - O-JIG-001
       - S-JIG-001
+    constraints: []
   
   crdt.ser:  # Fully-qualified path for nested subsystem
     nodes:
       - O-CRDT-SER-001
       - O-CRDT-SER-002
       - S-CRDT-SER-001
+    constraints: [X-PERF-001]
   
   crdt.sync:
     nodes:
       - O-CRDT-SYNC-001
       - S-CRDT-SYNC-001
+    constraints: [X-PERF-001]
 ```
 
 **Node Frontmatter (Enhanced):**
@@ -337,6 +402,7 @@ title: "CRDT serialization is deterministic"
 subsystem: crdt.ser  # Fully-qualified path
 status: active
 created: 2025-11-20
+constraints: [X-PERF-001]  # Constraints that apply (optional)
 ---
 ```
 
@@ -354,15 +420,19 @@ Total nodes: 47
 Subsystems:
   core (15 nodes)
     ├── O-JIG-001, O-JIG-002, ...
+    └── Constraints: [X-SEC-001]
   crdt (32 nodes)
     ├── ser (18 nodes)
     │   ├── O-CRDT-SER-001, O-CRDT-SER-002, ...
+    │   └── Constraints: [X-PERF-001]
     └── sync (14 nodes)
         ├── O-CRDT-SYNC-001, ...
+        └── Constraints: [X-PERF-001]
 
 Health: ✓ Good
 Suggestions:
   • Run 'jigy decompose metrics' to analyze subsystem boundaries
+  • Run 'jigy validate --constraints' to check constraint compliance
 ```
 
 **jigy status --flat (Backward Compatible):**
@@ -406,12 +476,13 @@ Subsystems: 2 (ser, sync)
 Avg Coupling Ratio: 15.3 (target: >10:1) ✓
 
 Per-Subsystem Metrics:
-Subsystem            Nodes    Internal   External   Ratio
-------------------------------------------------------------
-crdt.ser             18       42         3          14.0 ✓
-crdt.sync            14       28         2          14.0 ✓
+Subsystem            Nodes    Internal   External   Ratio    Constraints
+--------------------------------------------------------------------------
+crdt.ser             18       42         3          14.0 ✓   X-PERF-001 (100%)
+crdt.sync            14       28         2          14.0 ✓   X-PERF-001 (88%)
 
 Boundary Violations: 0 ✓
+Constraint Compliance: 94% overall (1 minor violation in crdt.sync)
 ```
 
 ---
@@ -464,6 +535,8 @@ Boundary Violations: 0 ✓
 - [ ] `jigy status --flat` displays flattened view (backward compatible)
 - [ ] `jigy graph list --subsystem crdt` lists all nodes recursively
 - [ ] `jigy graph list --subsystem crdt.ser` lists only leaf nodes
+- [ ] Constraint information displayed in status output (per subsystem)
+- [ ] Subsystem queries work with constraint scope selectors
 - [ ] Performance: queries complete in <200ms for 100 subsystems
 - [ ] Integration tests verify tree formatting
 
@@ -487,8 +560,10 @@ Boundary Violations: 0 ✓
 - [ ] Modularity calculation works for nested subsystems
 - [ ] Coupling ratio aggregates child subsystem metrics
 - [ ] Boundary violations respect hierarchy (edges within parent OK)
+- [ ] Coupling ratio excludes constraint relationships (preserves decomposability)
 - [ ] `jigy decompose metrics --subsystem crdt` analyzes subtree
-- [ ] `jigy decompose report` includes hierarchical breakdown
+- [ ] `jigy decompose report` includes hierarchical breakdown and constraint compliance
+- [ ] Constraint compliance metrics shown per subsystem
 - [ ] Performance: metrics calculation <5s for 100 subsystems
 - [ ] Unit tests verify hierarchical metric calculations
 
@@ -553,6 +628,9 @@ def test_hierarchical_modularity():
 
 def test_hierarchical_coupling_ratio():
     """Verify coupling ratio aggregates child metrics."""
+
+def test_constraint_exclusion_from_coupling():
+    """Verify constraint relationships not counted in coupling metrics (v7)."""
 ```
 
 ### Integration Tests
@@ -580,6 +658,12 @@ def test_decompose_metrics_subtree():
 
 def test_backward_compatibility_flat():
     """Verify flat subsystems still work unchanged."""
+
+def test_constraint_scope_nested_subsystems():
+    """Verify constraint scopes work with nested subsystem paths (v7)."""
+
+def test_constraint_recursive_matching():
+    """Verify recursive constraint scopes match all child subsystems (v7)."""
 ```
 
 ### Performance Tests
@@ -724,6 +808,7 @@ jigy status --verbose
 - **Mitigation:**
   - Keep nesting methods isolated in Subsystem class
   - Maintain clear separation between flat and nested logic
+  - Keep constraint integration clean (predicates not graph edges)
   - Comprehensive unit tests for edge cases
   - Code review for complexity
 
@@ -791,6 +876,16 @@ jigy status --verbose
 **Q6: Should validation enforce max nesting depth?**
 - **Current Decision:** Warning only (not error) for >4 levels
 - **Rationale:** Don't artificially limit, but discourage deep nesting
+
+**Q7: How do constraints integrate with nested subsystems? (v7)**
+- **Current Decision:** Constraints can target nested paths via scope selectors
+- **Rationale:** Constraints are predicates over OSTC graph; nested paths are first-class in queries
+- **Example:** `scope: {subsystems: [crdt], recursive: true}` matches all nodes under `crdt` parent
+
+**Q8: Should coupling metrics exclude constraint edges? (v7)**
+- **Current Decision:** Yes - constraint relationships are not counted as graph edges
+- **Rationale:** Constraints are system properties (predicates), not architectural dependencies
+- **Impact:** Preserves decomposability metrics; cross-cutting constraints don't pollute coupling ratios
 
 ---
 
@@ -891,29 +986,40 @@ jigy status --verbose
 - Detect subsystems that should be split
 - Recommend hierarchy restructuring
 
+**Feature 6: Constraint-Aware Subsystem Recommendations (v7)**
+- Suggest subsystem groupings based on shared constraints
+- Identify missing constraint coverage in subsystems
+- Recommend constraint scope refinements based on actual hierarchy
+- Visualize constraint overlay on subsystem hierarchy
+
 ---
 
 ## Conclusion
 
-This scope of work defines a comprehensive approach to implementing nested subsystems in JIG. The design maintains backward compatibility while enabling hierarchical organization for complex systems. The phased implementation plan ensures incremental delivery of value, and the testing strategy ensures quality and performance.
+This scope of work defines a comprehensive approach to implementing nested subsystems in JIG v7. The design maintains backward compatibility while enabling hierarchical organization for complex systems. The nested subsystem feature integrates seamlessly with the OSTCX model, where constraints act as predicates over the hierarchical OSTC Intent Graph. The phased implementation plan ensures incremental delivery of value, and the testing strategy ensures quality and performance.
 
 **Key Success Factors:**
-1. Maintain backward compatibility throughout
+1. Maintain backward compatibility throughout (flat subsystems continue to work)
 2. Keep performance within targets (<100ms for most operations)
-3. Provide clear documentation and migration path
-4. Test extensively with both flat and nested structures
-5. Dogfood on JIG's own codebase (if it grows to need nesting)
+3. Integrate cleanly with constraint system (v7) without polluting metrics
+4. Provide clear documentation and migration path
+5. Test extensively with both flat and nested structures
+6. Ensure constraint queries work naturally with nested paths
+7. Dogfood on JIG's own codebase (if it grows to need nesting)
 
 **Next Steps:**
 1. Review and approve this scope document
 2. Create OSTC nodes for nested subsystem feature
-3. Begin Phase 1 implementation (Data Model & Loading)
-4. Iterate based on feedback and discoveries
+3. Ensure constraint system (Phase 4 of v7) is complete or near-complete
+4. Begin Phase 1 implementation (Data Model & Loading)
+5. Coordinate with constraint validation during Phase 2-3
+6. Iterate based on feedback and discoveries
 
 ---
 
-**Document Version:** 1.0  
+**Document Version:** 1.1  
 **Last Updated:** 2025-11-20  
 **Status:** Draft (Ready for Review)  
-**Approver:** [To be assigned]
+**Approver:** [To be assigned]  
+**JIG Version:** v7 (OSTCX model with constraints and nested subsystems)
 
