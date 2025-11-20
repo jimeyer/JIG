@@ -83,33 +83,6 @@ def test_specification_template_parses(tmp_path: Path) -> None:
     assert len(node.body) > 0
 
 
-def test_test_template_parses(tmp_path: Path) -> None:
-    """Verify test template parses with valid YAML frontmatter."""
-    template_file = Path("templates/test_template.md")
-    assert template_file.exists(), "test_template.md not found in templates/"
-
-    # Read template
-    template_content = template_file.read_text()
-
-    # Substitute placeholders
-    node_content = substitute_template(template_content, "T-TEST-001", "Test Test Node")
-
-    # Write to temp file
-    test_file = tmp_path / "T-TEST-001.md"
-    test_file.write_text(node_content)
-
-    # Parse with OSTCNode parser - should not raise
-    node = parse_ostc_node(test_file)
-
-    # Verify required fields present
-    assert node.id == "T-TEST-001"
-    assert node.type == "test"
-    assert node.title == "Test Test Node"
-    assert node.subsystem == "core"
-    assert node.created == date.today()
-    assert len(node.body) > 0
-
-
 def test_constraint_template_parses(tmp_path: Path) -> None:
     """Verify constraint template parses with valid YAML frontmatter."""
     template_file = Path("templates/constraint_template.md")
@@ -138,14 +111,13 @@ def test_constraint_template_parses(tmp_path: Path) -> None:
 
 
 def test_all_templates_exist() -> None:
-    """Verify all four template files exist."""
+    """Verify all three template files exist (O/S/C only; T nodes use annotations)."""
     templates_dir = Path("templates")
     assert templates_dir.is_dir(), "templates/ directory not found"
 
     expected_templates = [
         "outcome_template.md",
         "specification_template.md",
-        "test_template.md",
         "constraint_template.md",
     ]
 
@@ -160,7 +132,6 @@ def test_templates_have_required_sections() -> None:
     templates = {
         "templates/outcome_template.md": ["{id}", "{title}", "{subsystem}", "{date}", "## Value", "## Success Metrics", "## Acceptance Criteria"],
         "templates/specification_template.md": ["{id}", "{title}", "{subsystem}", "{date}", "## Requirements", "## Rationale", "## Acceptance Criteria"],
-        "templates/test_template.md": ["{id}", "{title}", "{subsystem}", "{date}", "## Test Type", "## Test Scenario", "## Verification"],
         "templates/constraint_template.md": ["{id}", "{title}", "{subsystem}", "{date}", "## Constraint Type", "## Rules", "## Validation"],
     }
 
@@ -175,7 +146,7 @@ def test_templates_have_yaml_frontmatter() -> None:
     templates_dir = Path("templates")
     template_files = list(templates_dir.glob("*_template.md"))
 
-    assert len(template_files) == 4, f"Expected 4 templates, found {len(template_files)}"
+    assert len(template_files) == 3, f"Expected 3 templates (O/S/C), found {len(template_files)}"
 
     for template_file in template_files:
         content = template_file.read_text()

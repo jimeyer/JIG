@@ -40,7 +40,7 @@ Tests represent "Empirical truth (verify)" and should be discovered via `@jig` a
 - [x] WU1: Remove test type from validator and parser — tests ☑ / docs ☑ / reflect ☑
 - [x] WU2: Remove test directory from graph loading — tests ☑ / docs ☑ / reflect ☑
 - [x] WU3: Remove test type from CLI node creation — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU4: Delete test template and directory — tests ☐ / docs ☐ / reflect ☐
+- [x] WU4: Delete test template and directory — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU5: Update test suite (remove test node tests) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: Update documentation (README, agents) — tests ☐ / docs ☐ / reflect ☐
 
@@ -297,52 +297,60 @@ Integration tests to update:
 **Planned Effort:** 15m
 
 **Acceptance Criteria:**
-- [ ] `templates/test_template.md` deleted
-- [ ] `jig/tests/T-UNIT-001.md` deleted
-- [ ] `jig/tests/` directory deleted (if empty)
-- [ ] All tests still pass (no dependencies on these files)
-- [ ] Git history preserved (normal git rm, not force)
+- [x] `templates/test_template.md` deleted
+- [x] `jig/tests/T-UNIT-001.md` deleted
+- [x] `jig/tests/` directory deleted (automatically removed when last file deleted)
+- [x] All tests still pass (no dependencies on these files)
+- [x] Git history preserved (normal git rm, not force)
 
 **Implementation Notes:**
 
-Files to delete:
-- `templates/test_template.md`
-- `jig/tests/T-UNIT-001.md`
-- `jig/tests/` (directory, if empty after file removal)
+Files deleted:
+- `templates/test_template.md` ✓
+- `jig/tests/T-UNIT-001.md` ✓
+- `jig/tests/` directory automatically removed ✓
 
-Commands:
+Commands used:
 ```bash
 git rm templates/test_template.md
 git rm jig/tests/T-UNIT-001.md
-rmdir jig/tests  # Only if empty
+# Directory automatically removed when last file deleted
 ```
 
 **Test Plan:**
 
-Tests to update:
-- `tests/unit/test_templates.py`
-  - Remove test_template.md validation test
-  - Verify other templates (outcome, specification, constraint) still work
+Tests updated in `tests/unit/test_templates.py`:
+- Removed `test_test_template_parses` function entirely ✓
+- Updated `test_all_templates_exist` to expect 3 templates instead of 4 ✓
+- Updated `test_templates_have_required_sections` to remove test_template entry ✓
+- Updated `test_templates_have_yaml_frontmatter` to expect 3 templates ✓
+- Other template tests (O/S/C) still pass ✓
 
 Verify:
-- All existing tests pass without these files
-- No hardcoded paths reference deleted files
+- All 184 tests pass (down from 185 - removed 1 test) ✓
+- No hardcoded paths reference deleted files ✓
 
 **Docs to Update:**
 - None (files are just deleted)
 
 **Reflect (≤5 bullets; keep crisp)**
 
-- What worked well:
+**Completed 2025-11-20:**
 
-- What could be better:
+- What worked well:
+  - Clean deletion using git rm preserves history
+  - jig/tests directory automatically removed when last file deleted
+  - All template tests updated and passing (7 tests in test_templates.py)
+  - Simple, straightforward changes with no complications
+  - Test count decreased from 185 to 184 (removed test_test_template_parses)
 
 - Discoveries:
-
-- Risk watchlist:
+  - Git automatically removes empty directories when using git rm
+  - Template tests were well-structured and easy to update
+  - No hidden dependencies on test template or test directory
 
 **Links:**
-- Commit(s):
+- Commit(s): (next)
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_templates.py -v`, `ls jig/tests` (should not exist)
