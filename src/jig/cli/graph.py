@@ -208,3 +208,115 @@ def impact(node_id: str) -> None:
     click.echo("")
     tree = format_impact_tree(node_id, g, set())
     click.echo("\n".join(tree))
+
+
+@graph.command()
+@click.argument("start")
+@click.argument("end")
+def path(start: str, end: str) -> None:
+    """Find shortest path between two nodes.
+
+    Uses BFS to find the shortest path through the Intent Graph.
+    Shows the path with visual arrows (→) between nodes.
+
+    Examples:
+        jigy graph path O-JIG-001 S-JIG-001
+        jigy graph path T-GRAPH-001 O-GRAPH-001
+    """
+    config = load_config()
+
+    try:
+        g = Graph.load_from_dir(config.intent_dir)
+    except FileNotFoundError:
+        click.echo(click.style("Error: Intent directory not found", fg="red"))
+        click.echo("Have you run 'jigy init' to initialize this project?")
+        sys.exit(3)
+
+    if start not in g.nodes:
+        click.echo(click.style(f"Error: Node {start} not found", fg="red"))
+        sys.exit(1)
+    if end not in g.nodes:
+        click.echo(click.style(f"Error: Node {end} not found", fg="red"))
+        sys.exit(1)
+
+    result = g.find_path(start, end)
+    if result:
+        click.echo(click.style(f"Path from {start} to {end}:", bold=True))
+        click.echo("")
+        click.echo(" → ".join(result))
+    else:
+        click.echo(
+            click.style(f"No path found from {start} to {end}", fg="yellow")
+        )
+
+
+@graph.command("list")
+@click.option("--type", "node_type", help="Filter by node type (e.g., outcome, specification)")
+@click.option("--subsystem", help="Filter by subsystem (e.g., core, cli)")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["table", "yaml"]),
+    default="table",
+    help="Output format (table or yaml)",
+)
+def list_nodes(
+    node_type: str | None, subsystem: str | None, output_format: str
+) -> None:
+    """List nodes with optional filters.
+
+    Display all nodes in the graph or filter by type/subsystem.
+    Supports table format (default) or YAML for piping.
+
+    Examples:
+        jigy graph list
+        jigy graph list --type outcome
+        jigy graph list --subsystem core
+        jigy graph list --format yaml
+    """
+    config = load_config()
+
+    try:
+        g = Graph.load_from_dir(config.intent_dir)
+    except FileNotFoundError:
+        click.echo(click.style("Error: Intent directory not found", fg="red"))
+        click.echo("Have you run 'jigy init' to initialize this project?")
+        sys.exit(3)
+
+    # Start with all nodes
+    nodes = list(g.nodes.values())
+
+    # Apply filters sequentially
+    if node_type:
+        nodes = g.filter_by_type(node_type)
+    if subsystem:
+        # Filter the already filtered list if type was specified
+        if node_type:
+            nodes = [n for n in nodes if n.subsystem and n.subsystem.lower() == subsystem.lower()]
+        else:
+            nodes = g.filter_by_subsystem(subsystem)
+
+    # Output based on format
+    if output_format == "yaml":
+        from jig.utils.yaml_utils import dump_yaml
+
+        data = [{"id": n.id, "type": n.type, "title": n.title} for n in nodes]
+        # Output to string instead of file
+        import io
+        import yaml
+
+        stream = io.StringIO()
+        yaml.dump(data, stream, default_flow_style=False, sort_keys=False)
+        click.echo(stream.getvalue().rstrip())
+    else:
+        # Table format
+        if not nodes:
+            click.echo(click.style("No nodes found matching criteria", fg="yellow"))
+            return
+
+        click.echo(f"{'ID':<20} {'Type':<15} {'Title'}")
+        click.echo("-" * 80)
+        for node in nodes:
+            # Truncate title if too long
+            title = node.title if len(node.title) <= 43 else node.title[:40] + "..."
+            click.echo(f"{node.id:<20} {node.type:<15} {title}")
