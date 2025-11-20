@@ -268,6 +268,49 @@ class Graph:
 
         return None  # No path found
 
+    def filter_by_type(self, node_type: str) -> list[OSTCNode]:
+        """Return all nodes of given type (case-insensitive).
+
+        Args:
+            node_type: Node type to filter by (e.g., "outcome", "specification")
+
+        Returns:
+            List of nodes matching the type, sorted by ID
+
+        Example:
+            >>> outcomes = graph.filter_by_type("outcome")
+            >>> [node.id for node in outcomes]
+            ["O-JIG-001", "O-JIG-002"]
+        """
+        node_type_lower = node_type.lower()
+        filtered = [
+            node for node in self.nodes.values()
+            if node.type.lower() == node_type_lower
+        ]
+        return sorted(filtered, key=lambda n: n.id)
+
+    def filter_by_subsystem(self, subsystem: str) -> list[OSTCNode]:
+        """Return all nodes in given subsystem (case-insensitive).
+
+        Args:
+            subsystem: Subsystem name to filter by (e.g., "core", "cli")
+
+        Returns:
+            List of nodes in the subsystem, sorted by ID
+            Returns empty list if no nodes found in subsystem
+
+        Example:
+            >>> core_nodes = graph.filter_by_subsystem("core")
+            >>> [node.id for node in core_nodes]
+            ["O-JIG-001", "S-JIG-001"]
+        """
+        subsystem_lower = subsystem.lower()
+        filtered = [
+            node for node in self.nodes.values()
+            if node.subsystem and node.subsystem.lower() == subsystem_lower
+        ]
+        return sorted(filtered, key=lambda n: n.id)
+
     def to_networkx(self) -> nx.DiGraph:
         """Convert to NetworkX directed graph for algorithms.
 
