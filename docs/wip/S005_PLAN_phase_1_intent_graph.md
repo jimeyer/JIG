@@ -42,7 +42,7 @@ branch: phase-1-intent-graph
 
 ### Slice 2: Graph Relationships & Queries
 - [x] WU4: Graph traversal methods (deps, dependents, path) — tests ☑ / docs ☑ / reflect ☐
-- [ ] WU5: Graph query methods (filter by type, subsystem) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: Graph query methods (filter by type, subsystem) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU6: Graph show command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU7: Graph deps/impact commands — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU8: Graph path/list commands — tests ☐ / docs ☐ / reflect ☐
@@ -625,14 +625,18 @@ branch: phase-1-intent-graph
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - Case-insensitive filtering with `.lower()` makes the API more user-friendly
+  - Returning sorted lists by default ensures consistent, predictable output
+  - List comprehensions with lambda sorting are clean and Pythonic
 - What could be better:
-  - [to be filled]
+  - Test helper functions duplicated again - conftest.py extraction would help
+  - Could optimize with caching for repeated queries, but premature at this scale
 - Discoveries:
-  - [to be filled]
+  - filter_by_subsystem naturally handles None subsystems via short-circuit `and`
+  - Combined filter operations work intuitively for complex queries
 
 **Links:**
-- Commit: [to be filled]
+- Commit: `3831bc5647f1e21d8a1e82e1925a4f4a5edb1726`
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_graph_queries.py -v`
