@@ -81,7 +81,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 ## Work Unit Checklist
 
 ### Slice 3: Decomposability Analysis (Carry-over from S005)
-- [ ] WU9: Metrics calculation (modularity, coupling) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU9: Metrics calculation (modularity, coupling) — tests ☑ / docs ☐ / reflect ☐
 - [ ] WU10: Community detection (Louvain) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU11: Boundary violation detection — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU12: Decompose detect command — tests ☐ / docs ☐ / reflect ☐
@@ -266,18 +266,21 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
 
 **Reflect (≤5 bullets; keep crisp)**
 - What worked well:
-  - [to be filled]
+  - NetworkX integration for modularity calculation works seamlessly
+  - Constraint edge exclusion (v7) cleanly implemented in coupling ratio
+  - Nested subsystem support built in from the start (using get_all_nodes(recursive=True))
 - What could be better:
-  - [to be filled]
+  - Modularity calculation could include more interpretation guidance
 - Discoveries:
-  - [to be filled]
+  - NetworkX's community.modularity() handles filtered communities gracefully
+  - Coupling ratio of infinity for isolated subsystems is mathematically correct and useful signal
 
 **Links:**
-- Commit: [to be filled]
+- Commit: [to be filled after commit]
 
 **Human Validation:**
 - Commands: `pytest tests/unit/test_decompose_metrics.py -v`
-- Look for: Tests pass, modularity calculation correct, constraint edges excluded
+- Look for: All 11 tests pass, modularity calculation correct, constraint edges excluded, nested subsystems supported
 
 ---
 
