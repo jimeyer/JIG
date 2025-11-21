@@ -122,7 +122,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - 17ea5b6 - test(jigy): validate graph query commands (WU5)
 - 3e599fe - docs(jigy): validate path finding & traversal (WU6)
 - 9f63306 - docs(jigy): validate subsystem queries (WU7)
-- [pending] - feat(jigy): fast annotation scanner for @jig annotations (WU8)
+- 3a7e6c1 - feat(jigy): fast annotation scanner for @jig annotations (WU8)
 
 ---
 
