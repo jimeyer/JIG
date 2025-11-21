@@ -60,7 +60,7 @@ user_prompt: |
 **Rationale:** These constraints were identified from the S011_SUMMARY document. The problem is clear: inconsistent terminology and formatting across CLI commands causes confusion and makes the tool harder to learn. Creating Intent nodes upfront enables O→S→TDD flow for all implementation work.
 
 ## Work Unit Checklist
-- [ ] WU0: Create known Intent nodes (O/S) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU0: Create known Intent nodes (O/S) — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU1: Core formatting library — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU2: Update status command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Update validate command — tests ☐ / docs ☐ / reflect ☐
@@ -102,15 +102,28 @@ user_prompt: |
 
 **Reflect:**
 - What was clear from SCOPE:
-  - Problem is well-documented with specific examples in S011_EXAMPLES
-  - Terminology inconsistencies are concrete (e.g., "Orphaned nodes" vs "Nodes not referenced")
-  - Formatting patterns are defined (comma-separated, counts in parens)
+  - Problem is well-documented with specific examples in S011_EXAMPLES [scope]
+  - Terminology inconsistencies are concrete (e.g., "Orphaned nodes" vs "Nodes not referenced") [scope]
+  - Formatting patterns are defined (comma-separated, counts in parens) [scope]
+  - All seven Intent nodes mapped cleanly to requirements from S011_SUMMARY [planning]
+
+- What worked well:
+  - Creating Intent nodes BEFORE implementation provides clear constraints [process]
+  - Reviewing existing nodes (O-JIG-001, S-JIG-001) established format patterns quickly [tools]
+    #LEARNED "Review existing Intent nodes before creating new ones to maintain consistency"
+  - Each Outcome has 1-2 implementing Specifications (good coverage) [planning]
+  - All nodes validated successfully (jigy validate: 27 total nodes, all valid) [validation]
 
 - What was ambiguous:
-  - Exact line-wrapping algorithm for comma-separated lists
-  - Whether to support --legacy flag during transition
-  - Migration timeline (mentioned v0.2.0-v0.4.0 but dates TBD)
-  - Color handling details (mentioned accessibility but implementation TBD)
+  - Exact line-wrapping algorithm for comma-separated lists [implementation]
+  - Whether to support --legacy flag during transition [migration]
+  - Migration timeline (mentioned v0.2.0-v0.4.0 but dates TBD) [planning]
+  - Color handling details (mentioned accessibility but implementation TBD) [implementation]
+
+**Status:** Complete ✅
+
+**Links:**
+- Commit: (see below)
 
 ---
 
