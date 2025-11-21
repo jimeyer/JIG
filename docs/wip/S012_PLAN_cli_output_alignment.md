@@ -65,7 +65,7 @@ user_prompt: |
 - [x] WU2: Update status command — tests ✅ / docs ✅ / reflect ✅
 - [x] WU3: Update validate command — tests ✅ / docs ✅ / reflect ✅
 - [x] WU4: Update graph show command — tests ✅ / docs ✅ / reflect ✅
-- [ ] WU5: Add graph list --format compact — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: Add graph list --format compact — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU6: Update documentation & help text — tests ☐ / docs ☐ / reflect ☐
 
 ---
@@ -478,19 +478,41 @@ user_prompt: |
 
 **Reflect (≤5 bullets; keep crisp)**
 
-_(To be filled during implementation)_
+- What worked well:
+  - Compact format integrates cleanly as elif branch (yaml/compact/table) [architecture]
+  - Reused format_node_list() and pluralization logic from formatting library [implementation]
+    #LEARNED "Shared formatting library pays off - consistent pluralization and wrapping across commands"
+  - All 10 existing tests pass without modification (100% backward compat) [tests]
+  - 3 new tests cover compact format edge cases (default, subsystem filter, grouping) [tests]
+
+- Implementation decisions:
+  - Show subsystem name vs "All nodes" in header based on filter [ux]
+    #DECISION "Dynamic header: subsystem name when filtered, 'All nodes' otherwise"
+    **Choice:** Header shows context (subsystem name or "All nodes")
+    **Rationale:** User knows what they're looking at without checking command args
+    **Tradeoffs:** Slightly more complex header logic, but better UX
+  - Import defaultdict inside function vs top-level [implementation]
+  - Groups sorted by type name (alphabetical) for consistency [ux]
+
+- Discoveries:
+  - Click Choice type automatically validates format options [implementation]
+  - Compact format saves ~80% vertical space (27 nodes: 30 lines → 6 lines) [ux]
+    #LEARNED "Compact format dramatic space savings for large graphs"
+  - format_node_list() handles wrapping automatically - no manual line breaks needed [implementation]
+
+**Status:** Complete ✅
 
 **Links:**
-- MR/PR: _TBD_
-- Commit(s): _TBD_
+- Commit: e92acd2
 
 **Human Validation:**
 - Commands:
   - `jigy graph list` (should show table - default)
   - `jigy graph list --format compact` (should show compact)
   - `jigy graph list --format table` (explicit table)
-  - `pytest tests/integration/test_graph_list.py -v`
+  - `pytest tests/integration/test_graph_path_list.py -v`
 - Look for: Both formats work, default unchanged, compact matches examples
+- Result: ✅ All 13 integration tests pass (10 existing + 3 new), output correct
 
 ---
 
