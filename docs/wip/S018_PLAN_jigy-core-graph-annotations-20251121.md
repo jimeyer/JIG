@@ -96,19 +96,20 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ## Progress Summary
 
-**Overall Status:** Phase 1 Complete (4/12 work units done)
+**Overall Status:** Phase 1 Complete, Phase 2 In Progress (5/12 work units done)
 
 **Completed:**
 - ✅ Phase 0: Intent Creation (WU0)
 - ✅ Phase 1: Core Plumbing (WU1-4) — All tests passing, reflections documented
+- ✅ Phase 2: WU5 (Graph Query Commands) — 24 tests passing
 
-**In Progress:** None
+**In Progress:** Phase 2: Graph Navigation (WU6-7)
 
-**Next Up:** Phase 2: Graph Navigation (WU5-7)
+**Next Up:** WU6: Path Finding & Traversal
 
 **Key Metrics:**
-- Tests: 64 passing (12 relationship + 8 graph-index + 10 registry + 21 edge validation + 13 existing)
-- Performance: Graph loads in 14ms, validates 1000 nodes in <1s
+- Tests: 88 passing (24 graph commands + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
+- Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms
 - Real validation: 40 jig nodes, 18 edges, zero errors
 
 **Commits:**
@@ -117,6 +118,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - 84c10a4 - refactor(jigy): simplify to support only list format
 - c77bea3 - test(jigy): validate unified node registry (WU3)
 - 7197153 - feat(jigy): implement edge validation and orphan detection (WU4)
+- 17ea5b6 - test(jigy): validate graph query commands (WU5)
 
 ---
 
@@ -132,7 +134,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [x] WU4: Edge validation & orphan detection — tests ☑ / docs ☐ / reflect ☑
 
 ### Phase 2: Graph Navigation (jigy v0.3.0)
-- [ ] WU5: Graph data structure & queries — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: Graph data structure & queries — tests ☑ / docs ☐ / reflect ☑
 - [ ] WU6: Path finding & traversal — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU7: Subsystem queries — tests ☐ / docs ☐ / reflect ☐
 
