@@ -101,7 +101,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ### Phase 1: Core Plumbing (jigy v0.2.0)
 - [x] WU1: Parse frontmatter relationships — tests ☑ / docs ☐ / reflect ☑
-- [ ] WU2: Load graph-index.yaml — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Load graph-index.yaml — tests ☑ / docs ☐ / reflect ☑
 - [ ] WU3: Unified node registry — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Edge validation & orphan detection — tests ☐ / docs ☐ / reflect ☐
 
@@ -424,14 +424,26 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - TDD caught format mismatch (list vs dict) immediately [testing]
+  - Flexible implementation handles both list and dict/mapping formats [robustness]
+  - Reused WU1's extract_edges_from_node for node-centric relationships [modularity]
+  - Markdown precedence logic simple and clear (skip O/S if already loaded) [design]
 
 - What could be better:
+  - Should document both supported formats explicitly [documentation]
+  - Could add validation for malformed graph-index.yaml entries [validation]
 
 - Next experiment:
+  - Test with ASE-A's real 126-node graph-index.yaml (WU11) [integration]
+  - See if edge deduplication is needed when merging sources [data quality]
 
 - Discoveries:
+  #LEARNED "Supporting multiple formats (list + dict) increases compatibility with existing data"
+  #DISCOVERY "graph-index.yaml in jig repo uses legacy dict format - still works with new code"
 
 - Risk watchlist:
+  - Large graph-index.yaml files (1000+ nodes) need performance testing [scalability]
+  - Duplicate edges from multiple sources may need deduplication [data integrity]
 
 **Links:**
 - MR/PR: 

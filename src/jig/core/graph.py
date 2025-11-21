@@ -171,13 +171,61 @@ class Graph:
                     # For now, we'll be strict and raise
                     raise ValueError(f"Failed to parse {md_file}: {e}") from e
 
-        # Load graph-index.yaml if it exists
+        # Load graph-index.yaml if it exists (WU2: S-JIGY-002)
         graph_index_path = intent_dir / "graph-index.yaml"
         if graph_index_path.exists():
             try:
                 index_data = load_yaml(graph_index_path)
 
-                # Load edges
+                # Load nodes from graph-index (typically C/T nodes)
+                # Handle both list format and dict/mapping format
+                nodes_data = index_data.get("nodes", [])
+                
+                # Check if nodes_data is a dict (mapping format) or list
+                if isinstance(nodes_data, dict):
+                    # Dict/mapping format: {"C-001": {...}, "T-001": {...}}
+                    node_items = [(node_id, node_dict) for node_id, node_dict in nodes_data.items()]
+                else:
+                    # List format: [{"id": "C-001", ...}, {"id": "T-001", ...}]
+                    node_items = [(node_dict.get("id"), node_dict) for node_dict in nodes_data]
+                
+                for node_id, node_dict in node_items:
+                    # Get type - may be in dict or need to extract from node_dict
+                    if isinstance(node_dict, dict):
+                        node_type = node_dict.get("type")
+                    else:
+                        # Handle edge case where node_dict is not a dict
+                        continue
+                    
+                    # Skip if missing required fields
+                    if not node_id or not node_type:
+                        continue
+                    
+                    # For O/S nodes: markdown takes precedence, skip if already loaded
+                    if node_type in ["outcome", "specification", "constraint"] and node_id in graph.nodes:
+                        continue
+                    
+                    # Create OSTCNode from graph-index data (typically C/T nodes)
+                    # Build metadata dict with node_id included
+                    metadata = dict(node_dict) if isinstance(node_dict, dict) else {}
+                    metadata["id"] = node_id
+                    
+                    node = OSTCNode(
+                        id=node_id,
+                        type=node_type,
+                        title=node_dict.get("title", ""),
+                        subsystem=node_dict.get("subsystem"),
+                        status=node_dict.get("status"),
+                        body="",  # C/T nodes don't have markdown body
+                        metadata=metadata  # Preserve all fields including file, line
+                    )
+                    graph.nodes[node_id] = node
+                    
+                    # Extract edges from node-centric relationships (WU2: S-JIGY-002)
+                    node_edges = extract_edges_from_node(node)
+                    graph.edges.extend(node_edges)
+
+                # Load edges from edge-centric format (existing functionality)
                 edges_data = index_data.get("edges", [])
                 for edge_dict in edges_data:
                     edge = Edge(
