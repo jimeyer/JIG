@@ -96,20 +96,21 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ## Progress Summary
 
-**Overall Status:** Phase 1 & 2 Complete (7/12 work units done)
+**Overall Status:** Phase 1, 2, & WU8 Complete (8/12 work units done)
 
 **Completed:**
 - ✅ Phase 0: Intent Creation (WU0)
 - ✅ Phase 1: Core Plumbing (WU1-4) — All tests passing, reflections documented
 - ✅ Phase 2: Graph Navigation (WU5-7) — All tests passing, reflections documented
+- ✅ WU8: Annotation Scanner — All tests passing, reflection documented
 
 **In Progress:** None
 
-**Next Up:** Phase 3: Annotations (WU8-10)
+**Next Up:** WU9: Index Rebuild, WU10: Annotation Validation
 
 **Key Metrics:**
-- Tests: 121 passing (24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
-- Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms, path finding <100ms
+- Tests: 151 passing (30 annotation scanner + 24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
+- Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms, annotation scan 10k files in ~3.9s
 - Real validation: 40 jig nodes, 18 edges, zero errors
 
 **Commits:**
@@ -121,6 +122,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - 17ea5b6 - test(jigy): validate graph query commands (WU5)
 - 3e599fe - docs(jigy): validate path finding & traversal (WU6)
 - 9f63306 - docs(jigy): validate subsystem queries (WU7)
+- [pending] - feat(jigy): fast annotation scanner for @jig annotations (WU8)
 
 ---
 
@@ -141,7 +143,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [x] WU7: Subsystem queries — tests ☑ / docs ☐ / reflect ☑
 
 ### Phase 3: Annotations (jigy v0.5.0)
-- [ ] WU8: Fast code scanner for @jig annotations — tests ☐ / docs ☐ / reflect ☐
+- [x] WU8: Fast code scanner for @jig annotations — tests ☑ / docs ☐ / reflect ☑
 - [ ] WU9: Index rebuild from sources — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU10: Annotation validation — tests ☐ / docs ☐ / reflect ☐
 
