@@ -63,7 +63,7 @@ user_prompt: |
 - [x] WU0: Create known Intent nodes (O/S) — tests ✅ / docs ✅ / reflect ✅
 - [x] WU1: Core formatting library — tests ✅ / docs ✅ / reflect ✅
 - [x] WU2: Update status command — tests ✅ / docs ✅ / reflect ✅
-- [ ] WU3: Update validate command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Update validate command — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU4: Update graph show command — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Add graph list --format compact — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: Update documentation & help text — tests ☐ / docs ☐ / reflect ☐
@@ -328,15 +328,36 @@ user_prompt: |
 
 **Reflect (≤5 bullets; keep crisp)**
 
-_(To be filled during implementation)_
+- What worked well:
+  - _parse_and_aggregate_warnings() cleanly separates parsing logic from presentation [architecture]
+    #LEARNED "Parse warnings in one place, format in another - easier to test and maintain"
+  - Regex patterns extract node IDs from warning strings elegantly [implementation]
+  - All 13 integration tests pass without modification (100% backward compat!) [tests]
+    #LEARNED "Well-designed tests check behavior, not format - survives refactoring"
+  - Output consolidation dramatic: "Node X: subsystem not specified" (3 lines) → "Unassigned nodes (3): ..." (1 line) [ux]
+
+- Implementation decisions:
+  - Parse warnings vs modify validator to return structured data [architecture]
+    #DECISION "Parse warnings in CLI vs change validator output format"
+    **Choice:** Parse warnings in CLI layer
+    **Rationale:** Preserves validator as pure logic layer, CLI handles presentation
+    **Tradeoffs:** Regex parsing is brittle if warning format changes, but cleaner separation
+  - Node summary uses k.rstrip('s') for pluralization (outcomes → outcome) [implementation]
+
+- Discoveries:
+  - Warnings section only appears if warnings exist (formatting library handles empty gracefully) [edge-case]
+  - Suggestions section provides clear next steps (consistent with status command) [ux]
+  - Node summary conversion: directory names (outcomes, specifications) → type names (outcome, specification) [implementation]
+
+**Status:** Complete ✅
 
 **Links:**
-- MR/PR: _TBD_
-- Commit(s): _TBD_
+- Commit: 119baef
 
 **Human Validation:**
 - Commands: `jigy validate` on test repo, `pytest tests/integration/test_validate_command.py -v`
 - Look for: Output matches S011_EXAMPLES, terminology consistent with status
+- Result: ✅ All 13 integration tests pass, output matches examples
 
 ---
 
