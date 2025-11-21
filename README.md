@@ -81,13 +81,13 @@ jigy init
 jigy node create --type outcome \
   --id O-AUTH-001 \
   --title "Users authenticate securely" \
-  --subsystem auth
+  --subsystem identity.auth
 
 # Create a Specification node
 jigy node create --type specification \
   --id S-AUTH-001 \
   --title "JWT tokens with 24-hour expiration" \
-  --subsystem auth
+  --subsystem identity.auth
 
 # Validate your Intent graph
 jigy validate
@@ -107,8 +107,54 @@ jigy validate
 JIG helps measure and maintain architectural boundaries:
 
 - **Coupling ratio**: Internal edges / external edges (target: >10:1)
-- **Modularity**: Newman-Girvan score (target: >0.5)
+- **Modularity**: Newman-Girvan score (target: >0.7)
 - **Module depth**: LOC / exports (target: >100:1)
+
+### Nested Subsystems
+
+Organize large projects hierarchically with nested subsystems:
+
+```yaml
+# graph-index.yaml
+subsystems:
+  identity:
+    description: "User identity management"
+    subsystems:
+      auth:
+        description: "Authentication"
+        nodes: [O-AUTH-001, S-AUTH-001]
+      profile:
+        description: "User profiles"
+        nodes: [O-USER-001, S-USER-001]
+
+  commerce:
+    description: "E-commerce features"
+    subsystems:
+      catalog:
+        nodes: [O-CATALOG-001]
+      cart:
+        nodes: [O-CART-001]
+```
+
+**Benefits:**
+- Scales to 20+ subsystems without clutter
+- Multi-level analysis (parent + leaf metrics)
+- Better coupling ratios (sibling edges internal to parent)
+- Reflects real system architecture
+
+**Commands:**
+```bash
+# View hierarchical tree
+jigy status
+
+# Query subtree recursively
+jigy graph list --subsystem identity --recursive
+
+# Analyze subsystem metrics
+jigy decompose metrics --subsystem identity
+```
+
+See [Nested Subsystems Guide](docs/user-guide/NESTED_SUBSYSTEMS.md) for details.
 
 ### Deltas: Temporal Work Artifacts
 
@@ -170,10 +216,20 @@ Run `make help` to see all available commands:
 
 ## Project Status
 
-**Current version**: 0.1.0-bootstrap
-**Status**: Active development - Slice 0 (Bootstrap Infrastructure)
+**Current version**: 0.3.0-dev (Phase 1 Completion)
+**Status**: Active development - Phase 1: Decomposability & Nested Subsystems
 
-See `docs/wip/PLAN_slice_0_bootstrap.md` for current roadmap.
+**Completed:**
+- ✅ Slice 0: Bootstrap Infrastructure
+- ✅ Slice 1-2: Status & Graph Commands
+- ✅ Slice 3: Decomposability Analysis (WU9 complete)
+- ✅ Slice 5: Nested Subsystems (WU20-22 complete)
+
+**In Progress:**
+- 🔄 WU23: Documentation & Migration guides
+- 📋 Remaining: WU10-15 (Community detection, boundary violations, additional decompose commands)
+
+See `docs/wip/S009_PLAN_phase_1_completion.md` for current roadmap.
 
 ## Contributing
 
@@ -191,9 +247,15 @@ MIT
 
 Full documentation available in `docs/`:
 
-- Architecture: `docs/jig-concept/JIG-Concept-v6.1.md`
-- Implementation Plan: `docs/wip/PLAN_slice_0_bootstrap.md`
-- Data Formats: `docs/architecture/DATA_FORMATS.md`
+- **Concepts**: `docs/jig-concept/JIG-Concept-v7.md` - OSTCX model
+- **User Guides**:
+  - `docs/user-guide/NESTED_SUBSYSTEMS.md` - Hierarchical subsystems
+  - `docs/user-guide/MIGRATION_NESTED.md` - Flat to nested migration
+- **Tutorials**: `docs/tutorials/NESTED_SUBSYSTEMS_TUTORIAL.md` - Hands-on example
+- **Architecture**:
+  - `docs/architecture/DATA_FORMATS.md` - File formats
+  - `docs/architecture/GRAPH_SUBSYSTEM.md` - Subsystem implementation
+- **Plans**: `docs/wip/S009_PLAN_phase_1_completion.md` - Current development
 
 ## Authors
 
