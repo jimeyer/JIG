@@ -585,7 +585,7 @@ user_prompt: |
 **Status:** Complete ✅
 
 **Links:**
-- Commit: (see below)
+- Commit: 4d9f716
 
 **Human Validation:**
 - Commands: Manually check each `--help` output, review docs in browser/editor
