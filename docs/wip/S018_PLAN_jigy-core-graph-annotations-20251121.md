@@ -884,14 +884,22 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - Subsystem functionality already implemented in `jigy decompose metrics`
+  - 22 comprehensive tests cover nested subsystems, metrics, edge classification
+  - Internal/external edge classification working correctly
 
 - What could be better:
+  - N/A - WU7 functionality complete from earlier development
 
 - Next experiment:
+  #EXPERIMENT "Add subsystem dependency graph visualization"
 
 - Discoveries:
+  #LEARNED "Subsystem queries complete - decompose metrics provides all needed info"
+  #LEARNED "Nested subsystem support with dot notation (e.g., crdt.ser)"
 
 - Risk watchlist:
+  - Edge classification accuracy depends on correct node.subsystem assignment [data quality]
 
 **Links:**
 - MR/PR: 
@@ -901,10 +909,10 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 - Commands: 
   ```bash
   cd ~/Code/ASE-A
-  jigy subsystems
-  # Should list all 7 subsystems
-  jigy subsystem airspace --edges
-  # Should show internal/external breakdown
+  jigy decompose metrics --subsystem airspace
+  # Should show node counts and internal/external edge breakdown
+  jigy graph list --subsystem airspace
+  # Should list all nodes in subsystem
   ```
 - Look for: Accurate classification, useful architectural insight
 
