@@ -96,22 +96,21 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ## Progress Summary
 
-**Overall Status:** Phase 1, 2, & WU8-9 Complete (9/12 work units done)
+**Overall Status:** Phase 0, 1, 2, & 3 Complete (10/12 work units done)
 
 **Completed:**
 - ✅ Phase 0: Intent Creation (WU0)
 - ✅ Phase 1: Core Plumbing (WU1-4) — All tests passing, reflections documented
 - ✅ Phase 2: Graph Navigation (WU5-7) — All tests passing, reflections documented
-- ✅ WU8: Annotation Scanner — All tests passing, reflection documented
-- ✅ WU9: Index Rebuild — All tests passing, reflection documented
+- ✅ Phase 3: Annotations (WU8-10) — All tests passing, reflections documented
 
 **In Progress:** None
 
-**Next Up:** WU10: Annotation Validation
+**Next Up:** WU11: ASE-A Validation & Fixes, WU12: Documentation & Examples
 
 **Key Metrics:**
-- Tests: 176 passing (25 index rebuild + 30 annotation scanner + 24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
-- Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms, annotation scan 10k files in ~3.9s, index rebuild <1s
+- Tests: 197 passing (21 annotation validation + 25 index rebuild + 30 annotation scanner + 24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
+- Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms, annotation scan 10k files in ~3.9s, index rebuild <1s, annotation validation <1s
 - Real validation: 40 jig nodes, 18 edges, zero errors
 
 **Commits:**
@@ -125,6 +124,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - 9f63306 - docs(jigy): validate subsystem queries (WU7)
 - 3a7e6c1 - feat(jigy): fast annotation scanner for @jig annotations (WU8)
 - 1a6388c - feat(jigy): index rebuild from sources (WU9)
+- [pending] - feat(jigy): annotation validation checks all references (WU10)
 
 ---
 
@@ -144,10 +144,10 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [x] WU6: Path finding & traversal — tests ☑ / docs ☐ / reflect ☑
 - [x] WU7: Subsystem queries — tests ☑ / docs ☐ / reflect ☑
 
-### Phase 3: Annotations (jigy v0.5.0)
+### Phase 3: Annotations (jigy v0.5.0) ✅ COMPLETE
 - [x] WU8: Fast code scanner for @jig annotations — tests ☑ / docs ☐ / reflect ☑
 - [x] WU9: Index rebuild from sources — tests ☑ / docs ☐ / reflect ☑
-- [ ] WU10: Annotation validation — tests ☐ / docs ☐ / reflect ☐
+- [x] WU10: Annotation validation — tests ☑ / docs ☐ / reflect ☑
 
 ### Integration & Polish
 - [ ] WU11: ASE-A validation & fixes — tests ☐ / docs ☐ / reflect ☐
@@ -1133,18 +1133,31 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - TDD approach: 21 comprehensive tests written first, all passed immediately [process]
+  - Composition worked perfectly: reused WU8 scanner, WU2 graph loader [architecture]
+  - Semantic validation (code implements, test verifies) caught logical errors [quality]
+  - Coverage metrics provide actionable insight into implementation completeness [value]
 
 - What could be better:
+  - Could add more granular validation rules (interface consistency, etc.) [extensibility]
+  - Coverage calculation is simple - could enhance with trend tracking [metrics]
 
 - Next experiment:
+  #EXPERIMENT "Add strict mode where warnings become errors for CI/CD"
 
 - Discoveries:
+  #LEARNED "Orphan detection needs to respect node status (skip deprecated)" 
+  #LEARNED "Edge type validation prevents semantic errors (code verify vs implement)"
+  #DECISION "Calculate coverage as percentage of active specs with implementations"
+  **Rationale:** Simple metric, actionable, ignores deprecated/planned specs
 
 - Risk watchlist:
+  - Large codebases may need performance optimization [scalability]
+  - Suggestion engine (fix suggestions) would improve UX [feature]
 
 **Links:**
 - MR/PR: 
-- Commit(s): 
+- Commit(s): [To be filled] 
 
 **Human Validation:**
 - Commands: 
