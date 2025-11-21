@@ -523,3 +523,155 @@ def test_graph_list_combined_filters() -> None:
             assert "S-CORE-001" not in result.output  # Wrong type
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
+
+
+# @jig T-CLI-014 verifies:S-CLI-009 subsystem:cli
+def test_graph_list_compact_format() -> None:
+    """Verify list --format compact groups nodes by type."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create diverse nodes
+        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
+        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
+        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
+        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
+
+        create_test_graph_index(tmp_path, [], {})
+
+        # Mock config
+        import jig.cli.graph
+
+        original_load_config = jig.cli.graph.load_config  # type: ignore[attr-defined]
+
+        def mock_load_config():  # type: ignore[no-untyped-def]
+            from jig.core.config import JigConfig
+
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.graph.load_config = mock_load_config  # type: ignore[attr-defined, assignment]
+
+        try:
+            # Run graph list with --format compact
+            runner = CliRunner()
+            result = runner.invoke(graph, ["list", "--format", "compact"])
+
+            # Verify output
+            assert result.exit_code == 0
+            # Header with total count
+            assert "All nodes (4)" in result.output
+            # Groups by type with bullet points and counts
+            assert "• Constraints (1):" in result.output
+            assert "• Outcomes (2):" in result.output
+            assert "• Specifications (1):" in result.output
+            # Comma-separated node IDs
+            assert "O-TEST-001, O-TEST-002" in result.output
+            assert "S-TEST-001" in result.output
+            assert "C-TEST-001" in result.output
+        finally:
+            jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
+
+
+# @jig T-CLI-015 verifies:S-CLI-009 subsystem:cli
+def test_graph_list_compact_with_subsystem_filter() -> None:
+    """Verify compact format shows subsystem name in header."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create nodes in different subsystems
+        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
+        create_test_node(tmp_path, "O-CORE-002", "outcome", "Core Outcome 2", "core")
+        create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI Outcome", "cli")
+
+        create_test_graph_index(tmp_path, [], {})
+
+        # Mock config
+        import jig.cli.graph
+
+        original_load_config = jig.cli.graph.load_config  # type: ignore[attr-defined]
+
+        def mock_load_config():  # type: ignore[no-untyped-def]
+            from jig.core.config import JigConfig
+
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.graph.load_config = mock_load_config  # type: ignore[attr-defined, assignment]
+
+        try:
+            # Run graph list with --subsystem and --format compact
+            runner = CliRunner()
+            result = runner.invoke(
+                graph, ["list", "--subsystem", "core", "--format", "compact"]
+            )
+
+            # Verify output
+            assert result.exit_code == 0
+            # Header shows subsystem name
+            assert "core (2 nodes)" in result.output
+            # Shows only core nodes
+            assert "O-CORE-001" in result.output
+            assert "O-CORE-002" in result.output
+            # CLI node should not be in output
+            assert "O-CLI-001" not in result.output
+        finally:
+            jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
+
+
+# @jig T-CLI-016 verifies:S-CLI-009 subsystem:cli
+def test_graph_list_default_format_is_table() -> None:
+    """Verify default format is still table (backward compatibility)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+
+        # Create test node
+        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
+
+        create_test_graph_index(tmp_path, [], {})
+
+        # Mock config
+        import jig.cli.graph
+
+        original_load_config = jig.cli.graph.load_config  # type: ignore[attr-defined]
+
+        def mock_load_config():  # type: ignore[no-untyped-def]
+            from jig.core.config import JigConfig
+
+            return JigConfig(
+                project_name="test",
+                intent_dir=tmp_path,
+                delta_dir=tmp_path / "deltas",
+                templates_dir=tmp_path / "templates",
+                graph_index_file=tmp_path / "graph-index.yaml",
+                subsystems_file=tmp_path / "subsystems.yaml",
+            )
+
+        jig.cli.graph.load_config = mock_load_config  # type: ignore[attr-defined, assignment]
+
+        try:
+            # Run graph list without --format (should default to table)
+            runner = CliRunner()
+            result = runner.invoke(graph, ["list"])
+
+            # Verify table format (has column headers)
+            assert result.exit_code == 0
+            assert "ID" in result.output
+            assert "Type" in result.output
+            assert "Title" in result.output
+            # Should not have compact format markers
+            assert "• Outcomes" not in result.output
+        finally:
+            jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]

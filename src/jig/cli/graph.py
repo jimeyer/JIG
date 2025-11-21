@@ -261,6 +261,7 @@ def path(start: str, end: str) -> None:
 
 
 # @jig C-NESTED-005 implements:S-NESTED-002 subsystem:core interface:public
+# @jig C-CLI-013 implements:S-CLI-009 subsystem:cli interface:public
 @graph.command("list")
 @click.option("--type", "node_type", help="Filter by node type (e.g., outcome, specification)")
 @click.option("--subsystem", help="Filter by subsystem (use dot notation for nested, e.g., crdt.ser)")
@@ -268,9 +269,9 @@ def path(start: str, end: str) -> None:
 @click.option(
     "--format",
     "output_format",
-    type=click.Choice(["table", "yaml"]),
+    type=click.Choice(["table", "compact", "yaml"]),
     default="table",
-    help="Output format (table or yaml)",
+    help="Output format (table, compact, or yaml)",
 )
 def list_nodes(
     node_type: str | None, subsystem: str | None, recursive: bool, output_format: str
@@ -287,6 +288,7 @@ def list_nodes(
         jigy graph list --subsystem core
         jigy graph list --subsystem crdt --recursive
         jigy graph list --subsystem crdt.ser
+        jigy graph list --format compact
         jigy graph list --format yaml
     """
     config = load_config()
@@ -353,6 +355,49 @@ def list_nodes(
         stream = io.StringIO()
         yaml.dump(data, stream, default_flow_style=False, sort_keys=False)
         click.echo(stream.getvalue().rstrip())
+    elif output_format == "compact":
+        # Compact format - group by type
+        if not nodes:
+            click.echo(click.style("No nodes found matching criteria", fg="yellow"))
+            return
+
+        # Count total nodes
+        total = len(nodes)
+
+        # Show header with total count
+        if subsystem:
+            header = f"{subsystem} ({total} nodes)"
+        else:
+            header = f"All nodes ({total})"
+        click.echo(click.style(header, bold=True))
+        click.echo()
+
+        # Group nodes by type
+        from collections import defaultdict
+        nodes_by_type = defaultdict(list)
+        for node in sorted(nodes, key=lambda n: n.id):
+            nodes_by_type[node.type].append(node.id)
+
+        # Type name pluralization mapping (consistent with format_node_summary)
+        plurals = {
+            "outcome": "Outcomes",
+            "specification": "Specifications",
+            "constraint": "Constraints",
+            "test": "Tests",
+            "code": "Code",
+        }
+
+        # Display each type with comma-separated node IDs
+        for node_type in sorted(nodes_by_type.keys()):
+            node_ids = nodes_by_type[node_type]
+            type_label = plurals.get(node_type, node_type.capitalize() + "s")
+            count = len(node_ids)
+
+            # Use format_node_list for comma-separated output
+            node_list = format_node_list(node_ids)
+
+            # Display with bullet and count
+            click.echo(f"  • {type_label} ({count}): {node_list}")
     else:
         # Table format
         if not nodes:
