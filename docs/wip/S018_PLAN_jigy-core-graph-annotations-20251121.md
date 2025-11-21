@@ -94,16 +94,42 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - Delta management and harvest pipeline
 - LLM synthesis features
 
+## Progress Summary
+
+**Overall Status:** Phase 1 Complete (4/12 work units done)
+
+**Completed:**
+- ✅ Phase 0: Intent Creation (WU0)
+- ✅ Phase 1: Core Plumbing (WU1-4) — All tests passing, reflections documented
+
+**In Progress:** None
+
+**Next Up:** Phase 2: Graph Navigation (WU5-7)
+
+**Key Metrics:**
+- Tests: 64 passing (12 relationship + 8 graph-index + 10 registry + 21 edge validation + 13 existing)
+- Performance: Graph loads in 14ms, validates 1000 nodes in <1s
+- Real validation: 40 jig nodes, 18 edges, zero errors
+
+**Commits:**
+- cd81223 - feat(jigy): parse frontmatter relationships from markdown (WU1)
+- 805b911 - feat(jigy): load graph-index.yaml for C/T node discovery (WU2)
+- 84c10a4 - refactor(jigy): simplify to support only list format
+- c77bea3 - test(jigy): validate unified node registry (WU3)
+- 7197153 - feat(jigy): implement edge validation and orphan detection (WU4)
+
+---
+
 ## Work Unit Checklist
 
 ### Phase 0: Intent Creation (BEFORE coding)
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
 
-### Phase 1: Core Plumbing (jigy v0.2.0)
+### Phase 1: Core Plumbing (jigy v0.2.0) ✅ COMPLETE
 - [x] WU1: Parse frontmatter relationships — tests ☑ / docs ☐ / reflect ☑
 - [x] WU2: Load graph-index.yaml — tests ☑ / docs ☐ / reflect ☑
-- [ ] WU3: Unified node registry — tests ☐ / docs ☐ / reflect ☐
-- [ ] WU4: Edge validation & orphan detection — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Unified node registry — tests ☑ / docs ☐ / reflect ☑
+- [x] WU4: Edge validation & orphan detection — tests ☑ / docs ☐ / reflect ☑
 
 ### Phase 2: Graph Navigation (jigy v0.3.0)
 - [ ] WU5: Graph data structure & queries — tests ☐ / docs ☐ / reflect ☐
