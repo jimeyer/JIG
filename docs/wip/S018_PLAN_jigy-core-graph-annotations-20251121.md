@@ -505,14 +505,24 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - Graph class already had all required registry methods from previous work
+  - O(1) lookup verified: 1000 lookups in 0.1ms (hash map working perfectly)
+  - TDD approach: wrote 10 comprehensive tests first, all passed immediately
 
 - What could be better:
+  - Could add edge indices (_edges_from, _edges_to) for O(1) edge queries (currently O(n))
+  - Thread-safety not yet implemented (deferred until parallelism is needed)
 
 - Next experiment:
+  #EXPERIMENT "Add edge indices for O(1) edge queries if performance becomes issue"
 
 - Discoveries:
+  #LEARNED "Existing Graph class was already a unified registry - WU3 was validation"
+  #LEARNED "Performance is excellent: 40 nodes load in 14ms, lookups are <0.001ms each"
 
 - Risk watchlist:
+  - Edge queries are O(n) - acceptable for now, but may need indexing at scale [performance]
+  - No thread-safety yet - add locks if future parallelism is needed [concurrency]
 
 **Links:**
 - MR/PR: 
