@@ -589,14 +589,25 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - TDD approach: 21 comprehensive tests written first, all passed after implementation
+  - Type-aware validation rules prevent architectural violations (e.g., C->O invalid)
+  - Performance excellent: 1000 nodes validated in <1 second
 
 - What could be better:
+  - Discovered inline comma-separated format (`implements: O-001, O-002`) not handled initially
+  - Fixed by enhancing relationship parser to split on commas
 
 - Next experiment:
+  #EXPERIMENT "Consider stricter validation: warn on non-standard YAML formats"
 
 - Discoveries:
+  #LEARNED "Real-world JIG files use inline comma-separated format for relationships"
+  #LEARNED "Edge type validation catches architectural violations early"
+  #DECISION "Orphaned nodes are warnings, not errors (expected for new Intent nodes)"
 
 - Risk watchlist:
+  - Unknown edge types generate warnings but don't fail validation [extensibility]
+  - Self-loops are errors - may need to allow for certain constraint types [flexibility]
 
 **Links:**
 - MR/PR: 

@@ -41,8 +41,13 @@ def extract_relationships_from_node(node: OSTCNode) -> dict[str, list[str]]:
             
             # Normalize to list
             if isinstance(value, str):
-                # Single value - convert to list
-                relationships[rel_type] = [value]
+                # Check if it's a comma-separated list
+                if "," in value:
+                    # Split by comma and strip whitespace
+                    relationships[rel_type] = [item.strip() for item in value.split(",") if item.strip()]
+                else:
+                    # Single value - convert to list
+                    relationships[rel_type] = [value]
             elif isinstance(value, list):
                 # Already a list
                 relationships[rel_type] = value

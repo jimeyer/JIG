@@ -14,7 +14,8 @@ from jig.cli.formatting import (
     format_suggestion,
 )
 from jig.core.config import load_config
-from jig.core.validator import validate_graph
+from jig.core.graph import Graph
+from jig.core.validator import validate_graph, validate_edges
 
 
 def _parse_and_aggregate_warnings(warnings: list[str]) -> dict:
@@ -116,8 +117,21 @@ def validate(verbose: bool) -> None:
     # Print header
     click.echo(click.style("Validating JIG graph...", bold=True))
 
-    # Validate graph
+    # Validate graph structure (nodes)
     result = validate_graph(config.intent_dir)
+    
+    # Load graph and validate edges
+    try:
+        graph = Graph.load_from_dir(config.intent_dir)
+        edge_result = validate_edges(graph, check_orphans=True)
+        
+        # Merge edge validation results into main result
+        result.errors.extend(edge_result.errors)
+        result.warnings.extend(edge_result.warnings)
+        result.valid = result.valid and edge_result.valid
+    except Exception as e:
+        result.errors.append(f"Failed to validate edges: {e}")
+        result.valid = False
 
     # Count nodes by directory
     node_counts = _count_nodes(config.intent_dir)

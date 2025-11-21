@@ -213,6 +213,95 @@ def validate_node_file(node_file: Path) -> ValidationResult:
         return ValidationResult(valid=False, errors=errors, warnings=warnings)
 
 
+# @jig C-JIGY-011 implements:S-JIGY-004 subsystem:jigy-tool interface:internal
+def validate_edges(graph: "Graph", check_orphans: bool = False) -> ValidationResult:
+    """Validate all edges in the graph.
+    
+    Checks:
+    - Both source and target nodes exist
+    - Edge types are valid for source/target node types
+    - No self-loops
+    - Optionally checks for orphaned nodes (nodes with no edges)
+    
+    Args:
+        graph: Graph to validate
+        check_orphans: If True, add warnings for orphaned nodes
+    
+    Returns:
+        ValidationResult with errors and warnings
+    """
+    from jig.core.graph import Graph
+    
+    errors: list[str] = []
+    warnings: list[str] = []
+    
+    # Define valid edge type rules
+    # Format: edge_type -> [(allowed_source_types, allowed_target_types)]
+    edge_type_rules = {
+        "implements": [
+            ({"specification"}, {"outcome"}),  # S -> O
+            ({"code"}, {"specification"}),     # C -> S
+        ],
+        "satisfies": [
+            ({"specification"}, {"outcome"}),  # S -> O
+        ],
+        "verifies": [
+            ({"test"}, {"specification", "outcome"}),  # T -> S or T -> O
+        ],
+        "depends_on": [
+            ({"outcome", "specification", "code", "test", "constraint"}, 
+             {"outcome", "specification", "code", "test", "constraint"}),  # Any -> Any
+        ],
+    }
+    
+    # Validate each edge
+    for edge in graph.edges:
+        # Check source node exists
+        if edge.from_node not in graph.nodes:
+            errors.append(f"Edge source node '{edge.from_node}' does not exist")
+            continue
+        
+        # Check target node exists
+        if edge.to_node not in graph.nodes:
+            errors.append(f"Edge target node '{edge.to_node}' does not exist")
+            continue
+        
+        # Check for self-loops
+        if edge.from_node == edge.to_node:
+            errors.append(f"Self-loop detected: {edge.from_node} -> {edge.to_node}")
+            continue
+        
+        # Get node types
+        source_type = graph.nodes[edge.from_node].type
+        target_type = graph.nodes[edge.to_node].type
+        
+        # Validate edge type rules
+        if edge.type in edge_type_rules:
+            rules = edge_type_rules[edge.type]
+            valid = False
+            for allowed_sources, allowed_targets in rules:
+                if source_type in allowed_sources and target_type in allowed_targets:
+                    valid = True
+                    break
+            
+            if not valid:
+                errors.append(
+                    f"Invalid edge type '{edge.type}' from {source_type} ({edge.from_node}) "
+                    f"to {target_type} ({edge.to_node})"
+                )
+        else:
+            # Unknown edge type - warn but don't error
+            warnings.append(f"Unknown edge type '{edge.type}' on edge {edge.from_node} -> {edge.to_node}")
+    
+    # Check for orphaned nodes if requested
+    if check_orphans:
+        orphaned = graph.find_orphaned_nodes()
+        if orphaned:
+            warnings.append(f"Orphaned nodes (no edges): {', '.join(orphaned)}")
+    
+    return ValidationResult(valid=len(errors) == 0, errors=errors, warnings=warnings)
+
+
 # @jig C-NESTED-003 implements:S-NESTED-005 subsystem:core interface:internal
 def validate_nested_subsystems(graph: "Graph") -> list[str]:
     """Validate nested subsystem structure.
