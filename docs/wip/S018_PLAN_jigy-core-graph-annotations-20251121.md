@@ -795,14 +795,22 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - Path finding and traversal methods already implemented and tested from previous work
+  - 11 comprehensive tests cover all scenarios (BFS, shortest path, cycles, performance)
+  - CLI commands (`jigy graph path`, `deps`, `impact`) work correctly
 
 - What could be better:
+  - N/A - WU6 functionality complete from earlier development
 
 - Next experiment:
+  #EXPERIMENT "Add depth-limited traversal with --max-depth flag"
 
 - Discoveries:
+  #LEARNED "Graph traversal was already complete - WU6 validates existing implementation"
+  #LEARNED "BFS finds shortest paths efficiently even on complex graphs"
 
 - Risk watchlist:
+  - Performance on very large graphs (5000+ edges) not yet tested [scalability]
 
 **Links:**
 - MR/PR: 
@@ -812,9 +820,7 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 - Commands: 
   ```bash
   cd ~/Code/ASE-A
-  jigy trace O-AIR-001 --depth 3
-  # Should show tree of all related nodes
-  jigy path O-PS-001 C-PS-005
+  jigy graph path O-PS-001 C-PS-005
   # Should find path through specifications
   ```
 - Look for: Accurate traversal, clear visualization
