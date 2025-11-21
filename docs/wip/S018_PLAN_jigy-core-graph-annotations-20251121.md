@@ -438,8 +438,11 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
   - See if edge deduplication is needed when merging sources [data quality]
 
 - Discoveries:
-  #LEARNED "Supporting multiple formats (list + dict) increases compatibility with existing data"
-  #DISCOVERY "graph-index.yaml in jig repo uses legacy dict format - still works with new code"
+  #LEARNED "Supporting multiple formats (list + dict) increases compatibility but adds complexity"
+  #DECISION "Support only list format - simpler codebase, clearer spec"
+  **Choice:** List format only: `nodes: [{id: "C-001", ...}]`
+  **Rationale:** Single format reduces complexity, easier to validate, clearer documentation
+  **Tradeoff:** Legacy files need conversion (one-time cost vs ongoing maintenance)
 
 - Risk watchlist:
   - Large graph-index.yaml files (1000+ nodes) need performance testing [scalability]
