@@ -34,12 +34,13 @@ status: Draft
 
 ### Specifications Created (What we build)
 
-- **S-JIG-005**: "Deterministic orphan detection" (`jig/specifications/S-JIG-005.md`)
+- **S-JIG-012**: "Deterministic orphan detection" (`jig/specifications/S-JIG-012.md`)
   - Detects: Dangling references, unreferenced nodes, malformed structures
   - Performance: <100ms for graphs up to 1000 nodes
   - Output: Structured JSON with node context
+  - Note: S-JIG-005/006 were already assigned to other features
 
-- **S-JIG-006**: "Claude API client with cost management" (`jig/specifications/S-JIG-006.md`)
+- **S-JIG-013**: "Claude API client with cost management" (`jig/specifications/S-JIG-013.md`)
   - Features: Retry logic (3 attempts, exponential backoff), token estimation
   - Accuracy: Cost estimates within 20% of actual usage
   - Models: Support Sonnet (default) and Opus
@@ -77,7 +78,7 @@ These constraints were known from SCOPE S014. The analysis in S013 identified th
 
 ## Work Unit Checklist
 
-- [ ] WU0: Create known Intent nodes (O/S) — done ☐
+- [x] WU0: Create known Intent nodes (O/S) — done ✅
 - [ ] WU1: Deterministic detection module — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU2: Credential management system — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Claude API client — tests ☐ / docs ☐ / reflect ☐
@@ -95,7 +96,7 @@ These constraints were known from SCOPE S014. The analysis in S013 identified th
 
 **Acceptance Criteria:**
 - [x] 4 Outcome nodes created in `jig/outcomes/` (O-JIG-006 through O-JIG-009)
-- [x] 7 Specification nodes created in `jig/specifications/` (S-JIG-005 through S-JIG-011)
+- [x] 7 Specification nodes created in `jig/specifications/` (S-JIG-007 through S-JIG-013, skipping 005/006 which were already assigned)
 - [x] All nodes have proper YAML frontmatter and markdown content
 - [x] Each Specification links to implementing Outcomes via `implements:` field
 - [x] `jig validate` passes
@@ -110,8 +111,8 @@ These constraints were known from SCOPE S014. The analysis in S013 identified th
 - `jig/outcomes/O-JIG-009.md` - Secure credential management
 
 **Specifications:**
-- `jig/specifications/S-JIG-005.md` - Deterministic detection (implements O-JIG-006, O-JIG-007)
-- `jig/specifications/S-JIG-006.md` - Claude API client (implements O-JIG-008)
+- `jig/specifications/S-JIG-012.md` - Deterministic detection (implements O-JIG-006, O-JIG-007)
+- `jig/specifications/S-JIG-013.md` - Claude API client (implements O-JIG-008)
 - `jig/specifications/S-JIG-007.md` - Multi-source credentials (implements O-JIG-009)
 - `jig/specifications/S-JIG-008.md` - CLI with consent (implements O-JIG-006, O-JIG-008)
 - `jig/specifications/S-JIG-009.md` - Secure storage (implements O-JIG-009)
@@ -137,10 +138,10 @@ These constraints were known from SCOPE S014. The analysis in S013 identified th
 
 **Planned Effort:** 90 minutes
 
-**Implements:** S-JIG-005
+**Implements:** S-JIG-012
 
 **Acceptance Criteria:**
-- [ ] Function `check_graph_integrity(graph_path, subsystems_path)` exists
+- [ ] Function `check_graph_integrity(graph_path, subsystems_path)` exists (S-JIG-012)
 - [ ] Detects dangling references (references to non-existent node IDs)
 - [ ] Detects unreferenced nodes (isolated nodes with no incoming refs)
 - [ ] Detects malformed structures (null/invalid relationship fields)
@@ -301,12 +302,12 @@ Integration test in `tests/cli/test_config_commands.py`:
 
 **Planned Effort:** 90 minutes
 
-**Implements:** S-JIG-006, S-JIG-011
+**Implements:** S-JIG-013, S-JIG-011
 
 **Acceptance Criteria:**
-- [ ] Class `ClaudeClient` with `__init__(api_key: Optional[str])` using credential resolution
+- [ ] Class `ClaudeClient` with `__init__(api_key: Optional[str])` using credential resolution (S-JIG-013)
 - [ ] Method `analyze_orphaned_nodes(findings, graph_data, model)` returns markdown report
-- [ ] Method `estimate_token_cost(findings)` returns `{input_tokens, output_tokens, est_cost_usd}`
+- [ ] Method `estimate_token_cost(findings)` returns `{input_tokens, output_tokens, est_cost_usd}` (S-JIG-011)
 - [ ] Retry logic: 3 attempts with exponential backoff on network errors
 - [ ] Rate limit handling: Wait and retry on 429 status
 - [ ] Token tracking: Store `last_usage` with actual token counts and cost
