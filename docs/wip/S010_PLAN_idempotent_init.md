@@ -29,7 +29,8 @@ branch: feat/idempotent-init
 - [x] WU1: Refactor init.py for idempotent directory creation — tests ✅ / docs ✅ / reflect ✅
 - [x] WU2: Implement idempotent file creation/verification — tests ✅ / docs ✅ / reflect ✅ (combined with WU1)
 - [x] WU3: Update user feedback messages — tests ✅ / docs ✅ / reflect ✅ (combined with WU1)
-- [x] WU4: Add integration tests for idempotent behavior — tests ✅ / docs ☐ / reflect ☐
+- [x] WU4: Add integration tests for idempotent behavior — tests ✅ / docs ☐ / reflect ✅
+- [x] WU4.1: Remove jig/tests/ directory (align with v7 OSTCX) — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU5: Update documentation — tests ☐ / docs ☐ / reflect ☐
 
 ## Work Units
@@ -263,6 +264,61 @@ branch: feat/idempotent-init
 **Human Validation**
 - Commands: `pytest tests/integration/test_init_command.py -v`
 - Look for: All tests pass, good coverage of edge cases
+
+---
+
+### Work Unit 4.1: Remove jig/tests/ directory (align with v7 OSTCX)
+
+**Goal:** Remove jig/tests/ directory creation from init to align with v7 OSTCX architecture
+**Planned Effort:** 20m
+**Status:** ✅ COMPLETE
+
+**Context:**
+Per S008_PLAN_remove_tests_directory.md, the jig/tests/ directory was removed from JIG v7 OSTCX architecture. Test nodes (T-*) are discovered via `@jig` annotations in test code, not stored as markdown files. The init implementation incorrectly still created this directory.
+
+**Acceptance Criteria:**
+- ✅ Remove "tests" from directory creation list in init.py
+- ✅ Update S-CLI-003 to reflect 3 directories instead of 4
+- ✅ Update test_init_command.py to not expect jig/tests/ directory
+- ✅ Add comment explaining OSTCX model (T nodes use annotations)
+- ✅ All tests pass
+
+**Implementation Notes:**
+Files modified:
+- `src/jig/cli/init.py` line 46: Removed "tests" from directory list
+- `jig/specifications/S-CLI-003.md`: Updated to document 3 directories (O/S/C)
+- `tests/integration/test_init_command.py` line 28: Removed jig/tests assertion
+- Added clarifying comments about OSTCX model
+
+**Test Plan:**
+- ✅ All 9 integration tests pass
+- ✅ Manual test: jigy init creates only 3 directories
+- ✅ Specification S-CLI-003 validates correctly
+
+**Reflect (≤5 bullets; keep crisp)**
+
+- Discovery: [architecture]
+  - WU1 implementation included jig/tests/ directory, violating v7 OSTCX architecture
+  #DISCOVERY "Init was creating jig/tests/ directory, removed in S008 (v7 OSTCX model)"
+
+- What worked well: [fix]
+  - Simple fix: remove from list, update spec, update test
+  - Clear architectural principle: markdown (O/S/C) vs annotations (T/C)
+  - All tests pass after removal (no hidden dependencies)
+
+- Alignment: [process]
+  - S008_PLAN provided clear architectural context
+  - Fixing now prevents confusion for users
+  #LEARNED "Always check recent PLANs for architectural changes before implementing"
+
+**Links**
+- Related: S008_PLAN_remove_tests_directory.md
+- Commit(s): (next)
+
+**Human Validation**
+- Commands: `jigy init`, `ls jig/` (should show 3 dirs, not 4)
+- Look for: No jig/tests/ directory created
+- ✅ Validated: Only outcomes, specifications, constraints directories created
 
 ---
 

@@ -17,18 +17,19 @@ The `jigy init` command SHALL verify the existence of all required JIG directori
 
 1. `jig/outcomes/` - Outcome nodes (O-*)
 2. `jig/specifications/` - Specification nodes (S-*)
-3. `jig/tests/` - Test node references (future use)
-4. `jig/constraints/` - Constraint nodes (C-*)
+3. `jig/constraints/` - Constraint nodes (C-*)
+
+Note: Test (T) and Code (C) nodes are discovered via `@jig` annotations in code, not stored as markdown files. See JIG-Concept-v7.md for OSTCX model details.
 
 ## Behavior
 
 ### First Run (New Initialization)
-- Create all four directories
+- Create all three directories (outcomes, specifications, constraints)
 - Report: "✓ Initialized JIG in <path>"
 - List all created directories
 
 ### Subsequent Run (All Present)
-- Verify all four directories exist
+- Verify all three directories exist
 - Report: "✓ JIG structure verified - all components present"
 
 ### Repair Run (Some Missing)

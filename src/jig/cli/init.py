@@ -42,8 +42,8 @@ def init(path: str) -> None:
     repaired: list[str] = []
 
     try:
-        # Create/verify directory structure
-        for dir_name in ["outcomes", "specifications", "tests", "constraints"]:
+        # Create/verify directory structure (O/S/C only - T nodes use @jig annotations)
+        for dir_name in ["outcomes", "specifications", "constraints"]:
             dir_path = jig_dir / dir_name
             if not dir_path.exists():
                 ensure_dir(dir_path)

@@ -22,10 +22,9 @@ def test_jigy_init_creates_structure(tmp_path: Path) -> None:
     assert result.exit_code == 0, f"Expected exit code 0, got {result.exit_code}. Output: {result.output}"
     assert "✓ Initialized JIG" in result.output
 
-    # Verify directories created
+    # Verify directories created (O/S/C only - T nodes use @jig annotations)
     assert (tmp_path / "jig" / "outcomes").is_dir()
     assert (tmp_path / "jig" / "specifications").is_dir()
-    assert (tmp_path / "jig" / "tests").is_dir()
     assert (tmp_path / "jig" / "constraints").is_dir()
 
     # Verify graph-index.yaml created and valid
