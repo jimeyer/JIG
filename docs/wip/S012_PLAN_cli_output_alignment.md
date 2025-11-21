@@ -274,7 +274,7 @@ user_prompt: |
 **Status:** Complete ✅
 
 **Links:**
-- Commit: (see below)
+- Commit: 12805ec
 
 **Human Validation:**
 - Commands: `jigy status` on test repo, `pytest tests/integration/test_status_command.py -v`
