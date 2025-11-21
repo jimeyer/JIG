@@ -1014,7 +1014,7 @@ supersedes: S005_PLAN_phase_1_intent_graph.md
   - Tutorial format (flat → nested with metrics comparison) clearly demonstrates value proposition
 
 **Links:**
-- Commit: [to be filled]
+- Commit: 2b1435e1e0af59c8ee17036ae78c2d68ba782552
 
 **Human Validation:**
 - Commands: Follow migration guide on test project
