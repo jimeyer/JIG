@@ -1,10 +1,12 @@
 # @jig C-GRAPH-004 implements:S-GRAPH-003 subsystem:core interface:public
+# @jig C-CLI-012 implements:S-CLI-009 subsystem:cli interface:public
 """Graph commands for querying and navigating the Intent Graph."""
 
 import sys
 
 import click
 
+from jig.cli.formatting import format_node_list, format_section_header
 from jig.core.config import load_config
 from jig.core.graph import Graph
 
@@ -125,26 +127,34 @@ def show(node_id: str) -> None:
     display_lines = lines[:10]
     click.echo("\n".join(display_lines))
     if len(lines) > 10:
-        click.echo(click.style("... (use 'cat' to see full content)", fg="cyan"))
+        # Show full file path for easier navigation
+        file_path = node.file_path if hasattr(node, 'file_path') and node.file_path else f"jig/{node.type}s/{node.id}.md"
+        click.echo(click.style(f"... (see full content: {file_path})", fg="cyan"))
 
     # Display dependencies
     click.echo("")
-    click.echo(click.style("Dependencies:", fg="cyan"))
     deps = g.get_dependencies(node_id)
     if deps:
-        for dep in deps:
-            click.echo(f"  → {dep}")
+        header = format_section_header("Dependencies", len(deps))
+        click.echo(click.style(header, fg="cyan"))
+        # Use comma-separated format for better scannability
+        node_list = format_node_list(deps)
+        click.echo(f"  {node_list}")
     else:
+        click.echo(click.style("Dependencies:", fg="cyan"))
         click.echo("  (none)")
 
     # Display dependents
     click.echo("")
-    click.echo(click.style("Dependents:", fg="cyan"))
     dependents = g.get_dependents(node_id)
     if dependents:
-        for dependent in dependents:
-            click.echo(f"  ← {dependent}")
+        header = format_section_header("Dependents", len(dependents))
+        click.echo(click.style(header, fg="cyan"))
+        # Use comma-separated format for better scannability
+        node_list = format_node_list(dependents)
+        click.echo(f"  {node_list}")
     else:
+        click.echo(click.style("Dependents:", fg="cyan"))
         click.echo("  (none)")
 
 

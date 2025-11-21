@@ -150,7 +150,8 @@ def test_graph_show_displays_relationships() -> None:
             assert result.exit_code == 0
             assert "Dependencies:" in result.output
             assert "(none)" in result.output  # O-TEST-001 has no dependencies
-            assert "Dependents:" in result.output
+            # New format: "Dependents (2):" with count
+            assert "Dependents (2):" in result.output
             assert "S-TEST-001" in result.output
             assert "S-TEST-002" in result.output
 
@@ -158,16 +159,19 @@ def test_graph_show_displays_relationships() -> None:
             result = runner.invoke(graph, ["show", "S-TEST-001"])
 
             assert result.exit_code == 0
-            assert "Dependencies:" in result.output
+            # New format: "Dependencies (1):" with count
+            assert "Dependencies (1):" in result.output
             assert "O-TEST-001" in result.output
-            assert "Dependents:" in result.output
+            # New format: "Dependents (1):" with count
+            assert "Dependents (1):" in result.output
             assert "C-TEST-001" in result.output
 
             # Show C-TEST-001 - should have 1 dependency, no dependents
             result = runner.invoke(graph, ["show", "C-TEST-001"])
 
             assert result.exit_code == 0
-            assert "Dependencies:" in result.output
+            # New format: "Dependencies (1):" with count
+            assert "Dependencies (1):" in result.output
             assert "S-TEST-001" in result.output
             assert "Dependents:" in result.output
             # Check for "(none)" after "Dependents:" section
@@ -324,7 +328,9 @@ def test_graph_show_truncates_long_body() -> None:
             assert "Line 10" not in result.output
             assert "Line 11 should be truncated" not in result.output
             assert "Line 12 should be truncated" not in result.output
-            assert "... (use 'cat' to see full content)" in result.output
+            # New format: shows full file path
+            assert "... (see full content:" in result.output
+            assert "O-LONG-001.md)" in result.output
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 
@@ -370,7 +376,8 @@ def test_graph_show_colorized_output() -> None:
             # Note: We can't easily test for ANSI color codes in the output
             # as Click's testing framework may strip them, but we can verify
             # the structure is correct
-            assert "Dependencies:" in result.output
+            # New format: "Dependencies (1):" with count
+            assert "Dependencies (1):" in result.output
             assert "Dependents:" in result.output
         finally:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
