@@ -128,7 +128,6 @@ def test_jigy_validate_help() -> None:
 
     assert result.exit_code == 0
     assert "Validate OSTC nodes" in result.output
-    assert "--check-all" in result.output
     assert "--verbose" in result.output
 
 
@@ -164,8 +163,8 @@ def test_jigy_validate_verbose(tmp_path: Path) -> None:
     assert "O-TEST-001.md" in result.output
 
 
-def test_jigy_validate_check_all_shows_warnings(tmp_path: Path) -> None:
-    """Verify jigy validate --check-all shows warnings."""
+def test_jigy_validate_shows_warnings(tmp_path: Path) -> None:
+    """Verify jigy validate shows warnings by default."""
     runner = CliRunner()
 
     # Initialize and create node without subsystem
@@ -189,8 +188,8 @@ def test_jigy_validate_check_all_shows_warnings(tmp_path: Path) -> None:
         )
         assert result.exit_code == 0
 
-        # Run validate with check-all
-        result = runner.invoke(cli, ["validate", "--check-all"])
+        # Run validate - warnings should be shown by default
+        result = runner.invoke(cli, ["validate"])
 
     assert result.exit_code == 0
     # Should show warnings

@@ -12,17 +12,12 @@ from jig.core.validator import validate_graph
 
 @click.command()
 @click.option(
-    "--check-all",
-    is_flag=True,
-    help="Show all warnings in addition to errors",
-)
-@click.option(
     "--verbose",
     "-v",
     is_flag=True,
     help="Show detailed validation information",
 )
-def validate(check_all: bool, verbose: bool) -> None:
+def validate(verbose: bool) -> None:
     """Validate OSTC nodes and graph consistency.
 
     Checks all nodes in the JIG intent graph for:
@@ -40,7 +35,6 @@ def validate(check_all: bool, verbose: bool) -> None:
     Examples:
         jigy validate              # Validate with standard output
         jigy validate --verbose    # Show detailed information
-        jigy validate --check-all  # Show warnings too
     """
     # Load config
     try:
@@ -66,7 +60,6 @@ def validate(check_all: bool, verbose: bool) -> None:
 
     # Print header
     click.echo(click.style("Validating JIG graph...", bold=True))
-    click.echo()
 
     # Validate graph
     result = validate_graph(config.intent_dir)
@@ -75,36 +68,12 @@ def validate(check_all: bool, verbose: bool) -> None:
     node_counts = _count_nodes(config.intent_dir)
     total_nodes = sum(node_counts.values())
 
-    # Print per-file validation results if verbose
-    if verbose:
-        _print_verbose_results(config.intent_dir, result)
-
-    # Print errors
-    if result.errors:
-        click.echo(click.style("\nErrors found:", fg="red", bold=True))
-        for error in result.errors:
-            click.echo(click.style("  ✗ ", fg="red") + error)
-
-    # Print warnings if check_all or if there are errors
-    if result.warnings and (check_all or not result.valid):
-        click.echo(click.style("\nWarnings:", fg="yellow", bold=True))
-        for warning in result.warnings:
-            click.echo(click.style("  ⚠ ", fg="yellow") + warning)
-
-    # Print summary
-    click.echo()
+    # Print summary immediately after header
     if result.valid:
         click.echo(
             click.style("✓ ", fg="green", bold=True)
             + click.style(f"All {total_nodes} nodes valid", bold=True)
         )
-        if result.warnings and not check_all:
-            click.echo(
-                click.style(
-                    f"  ({len(result.warnings)} warnings - use --check-all to see them)",
-                    fg="yellow",
-                )
-            )
     else:
         error_count = len(result.errors)
         click.echo(
@@ -115,6 +84,25 @@ def validate(check_all: bool, verbose: bool) -> None:
                 bold=True,
             )
         )
+
+    # Print per-file validation results if verbose
+    if verbose:
+        click.echo()
+        _print_verbose_results(config.intent_dir, result)
+
+    # Print errors
+    if result.errors:
+        click.echo()
+        click.echo(click.style("Errors found:", fg="red", bold=True))
+        for error in result.errors:
+            click.echo(click.style("  ✗ ", fg="red") + error)
+
+    # Always print warnings if there are any
+    if result.warnings:
+        click.echo()
+        click.echo(click.style("Warnings:", fg="yellow", bold=True))
+        for warning in result.warnings:
+            click.echo(click.style("  ⚠ ", fg="yellow") + warning)
 
     # Exit with appropriate code
     sys.exit(0 if result.valid else 1)
