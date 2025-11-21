@@ -116,11 +116,12 @@ branch: feat/idempotent-init
 
 **Links**
 - MR/PR: (to be filled)
-- Commit(s): (to be filled)
+- Commit(s): d4b054e
 
 **Human Validation**
 - Commands: `jigy init` (first run), `jigy init` (second run - should verify/repair)
 - Look for: No error on second run, appropriate "verified" or "repaired" messages
+- ✅ Validated: All scenarios tested manually and via integration tests
 
 ---
 
