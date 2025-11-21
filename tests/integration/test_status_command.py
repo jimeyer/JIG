@@ -167,15 +167,20 @@ def test_status_command_cli_output():
             # Verify output
             assert result.exit_code == 0
             assert "JIG Graph Status" in result.output
-            assert "Total nodes: 3" in result.output
-            assert "outcome: 2" in result.output
-            assert "specification: 1" in result.output
-            assert "Orphaned nodes:" in result.output
+            # New format: "✓ 3 nodes, X edges, Y subsystems"
+            assert "3 nodes" in result.output
+            assert "edges" in result.output
+            # New format: "• Outcomes: 2" and "• Specifications: 1"
+            assert "• Outcomes: 2" in result.output
+            assert "• Specifications: 1" in result.output
+            # Warnings section (new)
+            assert "Warnings:" in result.output
+            assert "Orphaned nodes" in result.output
             assert "O-TEST-002" in result.output
 
             # Verify suggestions section
             assert "Suggestions:" in result.output
-            assert "need relationships" in result.output
+            assert "Add relationships" in result.output
             assert "jigy validate" in result.output
         finally:
             # Restore original
@@ -345,8 +350,10 @@ def test_status_command_healthy_graph():
 
             # Verify healthy output
             assert result.exit_code == 0
-            assert "Total nodes: 2" in result.output
-            assert "Suggestions:" in result.output
+            # New format: "✓ 2 nodes, X edges, Y subsystems"
+            assert "2 nodes" in result.output
+            assert "edges" in result.output
+            # Healthy graph shows success message (not Suggestions section)
             assert "Graph looks healthy!" in result.output
         finally:
             jig.cli.status.load_config = original_load_config
