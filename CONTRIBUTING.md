@@ -78,6 +78,43 @@ make typecheck   # Type checking with mypy
 - Follow PEP 8 conventions
 - All code must have type hints
 
+### CLI Output Formatting Conventions
+
+When implementing CLI commands, follow these formatting standards for consistency:
+
+**Terminology:**
+- Use "Orphaned nodes" (not "Nodes not referenced in graph index")
+- Use "Unassigned nodes" (not "subsystem not specified")
+- Use consistent type pluralization: Outcomes, Specifications, Tests, Constraints
+
+**Output Format:**
+- Use comma-separated lists for node IDs: `O-CLI-001, S-JIG-002, S-GRAPH-003`
+- Show counts in section headers: `Dependencies (3):` or `Dependents (2):`
+- Wrap long lists at ~80 characters using `format_node_list()` from `jig.cli.formatting`
+- Group warnings/suggestions into separate sections
+- Use bullet points (•) for lists and suggestions
+
+**Formatting Library:**
+- Import from `jig.cli.formatting` for consistent output:
+  - `format_node_list()` - Comma-separated node IDs with wrapping
+  - `format_section_header()` - Headers with optional counts
+  - `format_node_summary()` - Node type breakdown
+  - `format_warning()` - Warning messages with node lists
+  - `format_suggestion()` - Actionable suggestion messages
+
+**Example:**
+```python
+from jig.cli.formatting import format_node_list, format_section_header
+
+deps = ["S-JIG-001", "O-CLI-003", "S-GRAPH-002"]
+header = format_section_header("Dependencies", len(deps))
+node_list = format_node_list(deps)
+click.echo(f"{header}\n  {node_list}")
+# Output:
+# Dependencies (3):
+#   S-JIG-001, O-CLI-003, S-GRAPH-002
+```
+
 ### Commit Messages
 
 Follow conventional commit format:

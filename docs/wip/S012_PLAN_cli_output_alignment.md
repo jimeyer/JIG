@@ -66,7 +66,7 @@ user_prompt: |
 - [x] WU3: Update validate command — tests ✅ / docs ✅ / reflect ✅
 - [x] WU4: Update graph show command — tests ✅ / docs ✅ / reflect ✅
 - [x] WU5: Add graph list --format compact — tests ✅ / docs ✅ / reflect ✅
-- [ ] WU6: Update documentation & help text — tests ☐ / docs ☐ / reflect ☐
+- [x] WU6: Update documentation & help text — tests ✅ / docs ✅ / reflect ✅
 
 ---
 
@@ -561,15 +561,36 @@ user_prompt: |
 
 **Reflect (≤5 bullets; keep crisp)**
 
-_(To be filled during implementation)_
+- What worked well:
+  - CLI help text already up-to-date from previous WUs (no updates needed) [process]
+    #LEARNED "Updating help text inline with implementation prevents doc lag"
+  - No old terminology found in user-facing docs (only in meta-docs describing the changes) [quality]
+  - CONTRIBUTING.md formatting conventions section provides clear guidance for future contributors [documentation]
+  - Grep-based search confirmed no stale references to update [validation]
+
+- Implementation decisions:
+  - Added comprehensive formatting conventions section vs minimal guidance [documentation]
+    #DECISION "Comprehensive formatting conventions with examples"
+    **Choice:** Detailed section with terminology, format rules, library functions, and code example
+    **Rationale:** Future contributors need concrete guidance to maintain consistency
+    **Tradeoffs:** More upfront writing, but prevents future inconsistencies
+  - Placed conventions after Code Style, before Commit Messages [organization]
+
+- Discoveries:
+  - All CLI commands already have up-to-date docstrings and help text [implementation]
+    #LEARNED "Inline docstring updates during feature work = zero doc debt at end"
+  - Only references to old terminology are in WIP docs (PLAN, SUMMARY, EXAMPLES) showing before/after [meta]
+  - README.md examples are command-only (no output shown) - nothing to update [scope]
+
+**Status:** Complete ✅
 
 **Links:**
-- MR/PR: _TBD_
-- Commit(s): _TBD_
+- Commit: (see below)
 
 **Human Validation:**
 - Commands: Manually check each `--help` output, review docs in browser/editor
 - Look for: No old terminology remains, examples match current output, formatting conventions documented
+- Result: ✅ All help text current, no stale terminology, CONTRIBUTING.md updated
 
 ---
 
