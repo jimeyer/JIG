@@ -1,13 +1,68 @@
 # @jig C-CLI-004 implements:S-JIG-002 subsystem:core interface:public
+# @jig C-CLI-011 implements:S-CLI-008 subsystem:cli interface:public
 """Validate OSTC nodes and graph consistency."""
 
+import re
 import sys
 from pathlib import Path
 
 import click
 
+from jig.cli.formatting import (
+    format_node_summary,
+    format_warning,
+    format_suggestion,
+)
 from jig.core.config import load_config
 from jig.core.validator import validate_graph
+
+
+def _parse_and_aggregate_warnings(warnings: list[str]) -> dict:
+    """Parse and aggregate validation warnings for consistent formatting.
+
+    Args:
+        warnings: List of warning strings from validator
+
+    Returns:
+        Dictionary with aggregated warnings:
+        {
+            'unassigned_nodes': [node_ids],
+            'missing_created_date': [node_ids],
+            'orphaned_nodes': [node_ids],
+            'other': [other_warnings]
+        }
+    """
+    aggregated = {
+        'unassigned_nodes': [],
+        'missing_created_date': [],
+        'orphaned_nodes': [],
+        'other': []
+    }
+
+    for warning in warnings:
+        # Parse "Node X-YYY-NNN: subsystem not specified"
+        match = re.match(r'Node ([A-Z]+-[A-Z]+-\d+): subsystem not specified', warning)
+        if match:
+            aggregated['unassigned_nodes'].append(match.group(1))
+            continue
+
+        # Parse "Node X-YYY-NNN: created date not specified"
+        match = re.match(r'Node ([A-Z]+-[A-Z]+-\d+): created date not specified', warning)
+        if match:
+            aggregated['missing_created_date'].append(match.group(1))
+            continue
+
+        # Parse "Nodes not referenced in graph index: ..."
+        if warning.startswith("Nodes not referenced in graph index:"):
+            # Extract comma-separated list of node IDs
+            node_list_str = warning.split(":", 1)[1].strip()
+            aggregated['orphaned_nodes'] = [n.strip() for n in node_list_str.split(",")]
+            continue
+
+        # Other warnings pass through
+        aggregated['other'].append(warning)
+
+    return aggregated
 
 
 @click.command()
@@ -85,6 +140,20 @@ def validate(verbose: bool) -> None:
             )
         )
 
+    # Print node summary (consistent with status command)
+    if total_nodes > 0:
+        click.echo()
+        # Convert directory counts to type counts (outcomes -> outcome, etc.)
+        type_counts = {
+            k.rstrip('s'): v for k, v in node_counts.items() if v > 0
+        }
+        node_summary = format_node_summary(type_counts)
+        # Apply styling to first line (header)
+        lines = node_summary.split("\n")
+        lines[0] = click.style(lines[0], bold=True)
+        for line in lines:
+            click.echo(line)
+
     # Print per-file validation results if verbose
     if verbose:
         click.echo()
@@ -97,12 +166,59 @@ def validate(verbose: bool) -> None:
         for error in result.errors:
             click.echo(click.style("  ✗ ", fg="red") + error)
 
-    # Always print warnings if there are any
+    # Parse and aggregate warnings for consistent formatting
     if result.warnings:
+        aggregated = _parse_and_aggregate_warnings(result.warnings)
+        formatted_warnings = []
+
+        # Unassigned nodes (nodes missing subsystem)
+        if aggregated['unassigned_nodes']:
+            warning = format_warning("Unassigned nodes", aggregated['unassigned_nodes'])
+            formatted_warnings.append(click.style(warning, fg="yellow"))
+
+        # Orphaned nodes (nodes not referenced in graph index)
+        if aggregated['orphaned_nodes']:
+            warning = format_warning("Orphaned nodes", aggregated['orphaned_nodes'])
+            formatted_warnings.append(click.style(warning, fg="yellow"))
+
+        # Missing created date (less critical)
+        if aggregated['missing_created_date']:
+            warning = format_warning("Nodes missing created date", aggregated['missing_created_date'])
+            formatted_warnings.append(click.style(warning, fg="yellow"))
+
+        # Other warnings pass through
+        for warning in aggregated['other']:
+            formatted_warnings.append(click.style("⚠ ", fg="yellow") + warning)
+
+        # Print warnings section
+        if formatted_warnings:
+            click.echo()
+            click.echo(click.style("Warnings:", fg="yellow", bold=True))
+            for warning in formatted_warnings:
+                click.echo(f"  {warning}")
+
+    # Print suggestions section
+    suggestions = []
+
+    # Suggest running status for detailed metrics
+    if result.warnings or result.errors:
+        suggestions.append(format_suggestion("Run 'jigy status' for detailed graph health metrics"))
+
+    # Suggest fixing unassigned nodes
+    if result.warnings:
+        aggregated = _parse_and_aggregate_warnings(result.warnings)
+        if aggregated['unassigned_nodes']:
+            suggestions.append(
+                format_suggestion(
+                    f"Add 'subsystem: <name>' to frontmatter for {len(aggregated['unassigned_nodes'])} unassigned nodes"
+                )
+            )
+
+    if suggestions:
         click.echo()
-        click.echo(click.style("Warnings:", fg="yellow", bold=True))
-        for warning in result.warnings:
-            click.echo(click.style("  ⚠ ", fg="yellow") + warning)
+        click.echo(click.style("Suggestions:", fg="cyan", bold=True))
+        for suggestion in suggestions:
+            click.echo(f"  {suggestion}")
 
     # Exit with appropriate code
     sys.exit(0 if result.valid else 1)
