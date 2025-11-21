@@ -1,4 +1,4 @@
-# @jig C-CLI-002 implements:S-JIG-002 subsystem:core interface:public
+# @jig C-CLI-002 implements:S-CLI-003,S-CLI-004,S-CLI-005 subsystem:cli interface:public
 """Initialize JIG directory structure in a project."""
 
 import sys
@@ -17,66 +17,90 @@ def init(path: str) -> None:
     """Initialize JIG structure in a project.
 
     Creates the directory structure and configuration files needed to start
-    using JIG for constraint-driven development.
+    using JIG for constraint-driven development. Idempotent - can be run
+    multiple times safely. Verifies existing structure and repairs any
+    missing components.
 
     Example:
         jigy init              # Initialize in current directory
         jigy init --path ./myproject  # Initialize in specific directory
+        jigy init              # Run again to verify/repair structure
     """
     project_path = Path(path).resolve()
     jig_dir = project_path / "jig"
     config_file = project_path / "jig.toml"
 
-    # Check if already initialized (idempotency)
-    if jig_dir.exists():
-        click.echo(f"Error: JIG already initialized in {project_path}", err=True)
-        click.echo(f"Found existing directory: {jig_dir}", err=True)
-        click.echo("\nTo reinitialize, remove the jig/ directory first.", err=True)
-        sys.exit(1)
+    # Check if already initialized
+    already_initialized = jig_dir.exists()
+    
+    if already_initialized:
+        click.echo(f"JIG already initialized in {project_path}")
+        click.echo("Checking structure...")
+    
+    # Track what was created vs repaired
+    created: list[str] = []
+    repaired: list[str] = []
 
     try:
-        # Create directory structure
-        ensure_dir(jig_dir / "outcomes")
-        ensure_dir(jig_dir / "specifications")
-        ensure_dir(jig_dir / "tests")
-        ensure_dir(jig_dir / "constraints")
+        # Create/verify directory structure
+        for dir_name in ["outcomes", "specifications", "tests", "constraints"]:
+            dir_path = jig_dir / dir_name
+            if not dir_path.exists():
+                ensure_dir(dir_path)
+                target_list = repaired if already_initialized else created
+                target_list.append(str(dir_path))
 
-        # Create graph-index.yaml
-        graph_index = {"version": "1.0", "nodes": []}
+        # Create/verify graph-index.yaml
         graph_index_path = jig_dir / "graph-index.yaml"
-        write_file(graph_index_path, yaml.dump(graph_index, sort_keys=False))
+        if not graph_index_path.exists():
+            graph_index = {"version": "1.0", "nodes": []}
+            write_file(graph_index_path, yaml.dump(graph_index, sort_keys=False))
+            target_list = repaired if already_initialized else created
+            target_list.append(str(graph_index_path))
 
-        # Create subsystems.yaml
-        subsystems = {"subsystems": [{"name": "core", "description": "Core subsystem"}]}
+        # Create/verify subsystems.yaml
         subsystems_path = jig_dir / "subsystems.yaml"
-        write_file(subsystems_path, yaml.dump(subsystems, sort_keys=False))
+        if not subsystems_path.exists():
+            subsystems = {"subsystems": [{"name": "core", "description": "Core subsystem"}]}
+            write_file(subsystems_path, yaml.dump(subsystems, sort_keys=False))
+            target_list = repaired if already_initialized else created
+            target_list.append(str(subsystems_path))
 
-        # Create jig.toml
-        config_data = {
-            "project": {
-                "name": project_path.name,
-                "intent_dir": "jig",
-                "delta_dir": "jig/deltas",
-                "templates_dir": "templates",
-                "graph_index_file": "jig/graph-index.yaml",
-                "subsystems_file": "jig/subsystems.yaml",
+        # Create/verify jig.toml (never overwrite if exists)
+        if not config_file.exists():
+            config_data = {
+                "project": {
+                    "name": project_path.name,
+                    "intent_dir": "jig",
+                    "delta_dir": "jig/deltas",
+                    "templates_dir": "templates",
+                    "graph_index_file": "jig/graph-index.yaml",
+                    "subsystems_file": "jig/subsystems.yaml",
+                }
             }
-        }
-        write_file(config_file, toml.dumps(config_data))
+            write_file(config_file, toml.dumps(config_data))
+            target_list = repaired if already_initialized else created
+            target_list.append(str(config_file))
 
-        # Success message
-        click.echo(f"✓ Initialized JIG in {project_path}")
-        click.echo("\nCreated:")
-        click.echo(f"  - {jig_dir / 'outcomes/'}")
-        click.echo(f"  - {jig_dir / 'specifications/'}")
-        click.echo(f"  - {jig_dir / 'tests/'}")
-        click.echo(f"  - {jig_dir / 'constraints/'}")
-        click.echo(f"  - {graph_index_path}")
-        click.echo(f"  - {subsystems_path}")
-        click.echo(f"  - {config_file}")
-        click.echo("\nNext steps:")
-        click.echo("  1. Create your first node: jigy node create --type outcome --id O-PROJ-001 --title \"Your outcome\"")
-        click.echo("  2. Validate your graph: jigy validate")
+        # Success message - three scenarios
+        if not already_initialized:
+            # Scenario 1: First-time initialization
+            click.echo(f"✓ Initialized JIG in {project_path}")
+            click.echo("\nCreated:")
+            for item in created:
+                click.echo(f"  - {item}")
+            click.echo("\nNext steps:")
+            click.echo("  1. Create your first node: jigy node create --type outcome --id O-PROJ-001 --title \"Your outcome\"")
+            click.echo("  2. Validate your graph: jigy validate")
+        elif repaired:
+            # Scenario 3: Repair (some missing)
+            click.echo("✓ Repaired JIG structure")
+            click.echo("\nRepaired:")
+            for item in repaired:
+                click.echo(f"  - {item}")
+        else:
+            # Scenario 2: Verification (all present)
+            click.echo("✓ JIG structure verified - all components present")
 
         sys.exit(0)
 

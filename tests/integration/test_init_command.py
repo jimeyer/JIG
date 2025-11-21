@@ -50,20 +50,47 @@ def test_jigy_init_creates_structure(tmp_path: Path) -> None:
     assert config.intent_dir == Path("jig")
 
 
-# @jig T-CLI-002 verifies:S-JIG-002 subsystem:core
+# @jig T-CLI-002 verifies:S-CLI-003,S-CLI-004,S-CLI-005 subsystem:cli
 def test_jigy_init_idempotent(tmp_path: Path) -> None:
-    """Verify jigy init fails gracefully if already initialized."""
+    """Verify jigy init is idempotent - can be run multiple times safely."""
+    runner = CliRunner()
+
+    # Run jigy init first time
+    result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
+    assert result.exit_code == 0
+    assert "✓ Initialized JIG" in result.output
+    assert "Created:" in result.output
+
+    # Run jigy init second time - should succeed and verify
+    result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
+    assert result.exit_code == 0
+    assert "JIG already initialized" in result.output
+    assert "✓ JIG structure verified - all components present" in result.output
+
+
+# @jig T-CLI-004 verifies:S-CLI-003,S-CLI-004 subsystem:cli
+def test_jigy_init_repairs_missing_components(tmp_path: Path) -> None:
+    """Verify jigy init repairs missing directories and files."""
     runner = CliRunner()
 
     # Run jigy init first time
     result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
     assert result.exit_code == 0
 
-    # Run jigy init second time - should fail
+    # Delete some components
+    import shutil
+    shutil.rmtree(tmp_path / "jig" / "constraints")
+    (tmp_path / "jig" / "graph-index.yaml").unlink()
+
+    # Run jigy init again - should repair
     result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
-    assert result.exit_code == 1
-    assert "Error: JIG already initialized" in result.output
-    assert "Found existing directory" in result.output
+    assert result.exit_code == 0
+    assert "✓ Repaired JIG structure" in result.output
+    assert "Repaired:" in result.output
+    
+    # Verify components were restored
+    assert (tmp_path / "jig" / "constraints").is_dir()
+    assert (tmp_path / "jig" / "graph-index.yaml").exists()
 
 
 # @jig T-CLI-003 verifies:S-JIG-001 subsystem:core
