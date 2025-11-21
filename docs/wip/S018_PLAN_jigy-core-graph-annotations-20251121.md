@@ -8,6 +8,7 @@ prompt: |
   Week 2: Graph navigation → explore relationships
   Week 4-5: Annotations → verify C/T linkage
   exclude(will do later): Week 3: Decomposability → measure coupling, Week 6-8: Deltas & harvest → capture future work
+  UPDATE: include construction of JIG OSTC artifacts as described in taskPlan.md - building JIG with JIG
 ---
 
 # PLAN: jigy v0.2-0.5 - Core Graph & Annotations
@@ -19,9 +20,61 @@ prompt: |
 - **Subsystem:** jigy-tool
 - **Context:** Updating jigy v0.1.0 to support JIG v6.1 spec for ASE-A project
 
-## Known Intent (Reference Existing)
+## Known Intent (Create Before Coding)
 
 This PLAN implements phases from the analysis document to make jigy tool read and interpret ASE-A's JIG artifacts.
+
+**Building JIG with JIG:** We create Intent nodes (O/S) BEFORE implementation to follow constraint-driven development.
+
+**Outcomes Created (jig/outcomes/):**
+- O-JIGY-001: "JIG graph accurately reflects all OSTC relationships" 
+  - Value: Developers see complete Intent alignment, no missing edges
+- O-JIGY-002: "Developers can navigate Intent graph efficiently"
+  - Value: Find related nodes, trace dependencies in <1 second
+- O-JIGY-003: "Code and Intent stay synchronized"
+  - Value: Annotations link code to Intent, validation catches drift
+
+**Specifications Created (jig/specifications/):**
+- S-JIGY-001: "Parse frontmatter relationship fields from markdown"
+- S-JIGY-002: "Load graph-index.yaml for complete node registry"
+- S-JIGY-003: "Unified node registry with O(1) lookup performance"
+- S-JIGY-004: "Edge validation with type-aware rules"
+- S-JIGY-005: "Graph query commands (node, edges, list)"
+- S-JIGY-006: "Path finding and graph traversal with depth limits"
+- S-JIGY-007: "Subsystem queries with internal/external edge classification"
+- S-JIGY-008: "Fast annotation scanner (<2s for 10k files)"
+- S-JIGY-009: "Index rebuild regenerates graph-index.yaml from sources"
+- S-JIGY-010: "Annotation validation checks all @jig references"
+
+**Rationale:** These constraints are known from S017 analysis and JIG v6.1 spec. Creating them upfront enables O→S→TDD flow.
+
+## JIG Workflow Integration
+
+**Building JIG with JIG:** This PLAN follows the JIG-aware taskPlan workflow:
+
+1. **WU0: Intent-First** (BEFORE any code)
+   - Extract known constraints from SCOPE → Create O/S nodes
+   - Commit Intent nodes before implementation
+   - Enables constraint-driven development (O→S→TDD)
+
+2. **WU1-12: TDD Implementation**
+   - Each unit references Intent nodes it implements
+   - Write tests first with @jig annotations (T nodes)
+   - Implement with @jig annotations (C nodes)
+   - Capture discoveries in Reflect blocks with markers
+
+3. **Markers for Discoveries** (use in Reflect blocks)
+   - `#DISCOVERY` - NEW constraints learned during work (not in WU0)
+   - `#DECISION` - Tradeoff choices with rationale
+   - `#LEARNED` - Reusable patterns discovered
+
+4. **Harvest After Completion**
+   - Run `jig ai-distill --branch orphaned-node-fixer`
+   - Review LLM synthesis proposals
+   - Integrate NEW insights into Intent Graph
+   - Archive delta
+
+**Key Principle:** Intent nodes (WU0) capture KNOWN constraints. Markers capture DISCOVERED constraints during implementation. Future you is smarter than present you.
 
 **Related Analysis:**
 - docs/wip/S017_ANALYSIS_jig-alignment-gap-20251121.md (comprehensive gap analysis)
@@ -42,6 +95,9 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - LLM synthesis features
 
 ## Work Unit Checklist
+
+### Phase 0: Intent Creation (BEFORE coding)
+- [x] WU0: Create known Intent nodes (O/S) — done ☑
 
 ### Phase 1: Core Plumbing (jigy v0.2.0)
 - [ ] WU1: Parse frontmatter relationships — tests ☐ / docs ☐ / reflect ☐
@@ -67,7 +123,169 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ## Work Units
 
+### Work Unit 0: Create Known Intent
+
+**Goal:** Capture all known Outcomes and Specifications from SCOPE (S017 analysis) as Intent nodes before coding
+
+**Planned Effort:** 90m
+
+**Acceptance Criteria:**
+- All known "why" statements → Outcome nodes in jig/outcomes/
+- All known "what" requirements → Specification nodes in jig/specifications/
+- All nodes have proper YAML frontmatter and markdown content
+- Relationships defined (S nodes implement O nodes)
+- `jig validate` passes (if jigy v0.1 supports it, otherwise manual check)
+
+**Created Nodes:**
+
+**Outcomes (jig/outcomes/):**
+1. **O-JIGY-001.md**: "JIG graph accurately reflects all OSTC relationships"
+   - Value: Developers see complete Intent alignment, no missing edges
+   - Acceptance: jigy reports accurate node/edge counts, matches reality
+   
+2. **O-JIGY-002.md**: "Developers can navigate Intent graph efficiently"
+   - Value: Find related nodes, trace dependencies in <1 second
+   - Acceptance: All query commands respond in <1 second on 1000-node graphs
+   
+3. **O-JIGY-003.md**: "Code and Intent stay synchronized"
+   - Value: Annotations link code to Intent, validation catches drift
+   - Acceptance: `jigy validate` detects broken references and orphans
+
+**Specifications (jig/specifications/):**
+
+**Phase 1 Specs (Core Plumbing):**
+1. **S-JIGY-001.md**: "Parse frontmatter relationship fields from markdown"
+   - Implements: O-JIGY-001
+   - Extracts: implements, satisfies, verifies, depends_on from YAML frontmatter
+   - Handles: single values and lists
+   
+2. **S-JIGY-002.md**: "Load graph-index.yaml for complete node registry"
+   - Implements: O-JIGY-001
+   - Discovers: C/T nodes from graph-index.yaml
+   - Supports: Both node-centric and edge-centric formats
+   
+3. **S-JIGY-003.md**: "Unified node registry with O(1) lookup performance"
+   - Implements: O-JIGY-002
+   - Data structures: Hash map for nodes, indexed edge lists
+   - Performance: <100ms queries on 1000-node graph
+   
+4. **S-JIGY-004.md**: "Edge validation with type-aware rules"
+   - Implements: O-JIGY-001, O-JIGY-003
+   - Validates: Target nodes exist, edge types valid for node types
+   - Reports: Missing targets, invalid edge types, orphaned nodes
+
+**Phase 2 Specs (Graph Navigation):**
+5. **S-JIGY-005.md**: "Graph query commands (node, edges, list)"
+   - Implements: O-JIGY-002
+   - Commands: jigy node <id>, jigy edges <id>, jigy list <type>
+   - Formats: Human-readable text, JSON, YAML
+   
+6. **S-JIGY-006.md**: "Path finding and graph traversal with depth limits"
+   - Implements: O-JIGY-002
+   - Commands: jigy trace <id>, jigy path <from> <to>
+   - Performance: <500ms for complex traces
+   
+7. **S-JIGY-007.md**: "Subsystem queries with internal/external edge classification"
+   - Implements: O-JIGY-002
+   - Commands: jigy subsystem <name>, jigy subsystems
+   - Classifies: Internal edges (within subsystem) vs external (cross-subsystem)
+
+**Phase 3 Specs (Annotations):**
+8. **S-JIGY-008.md**: "Fast annotation scanner (<2s for 10k files)"
+   - Implements: O-JIGY-003
+   - Scans: src/ and test/ directories for @jig annotations
+   - Extracts: Node ID, relationships, metadata, file path + line
+   
+9. **S-JIGY-009.md**: "Index rebuild regenerates graph-index.yaml from sources"
+   - Implements: O-JIGY-003
+   - Sources: Markdown frontmatter (O/S), @jig annotations (C/T)
+   - Validates: Before writing, warns on conflicts
+   
+10. **S-JIGY-010.md**: "Annotation validation checks all @jig references"
+    - Implements: O-JIGY-003
+    - Validates: Node IDs exist, relationships valid, no duplicates
+    - Reports: Broken references, orphaned Intent nodes, format errors
+
+**Implementation Notes:**
+- Create markdown files with YAML frontmatter following JIG v6.1 format
+- Each O node includes value proposition and acceptance criteria
+- Each S node includes rationale, constraints, and references to O nodes
+- Use subsystem: jigy-tool for all nodes
+- Status: active for all nodes
+
+**Test Plan:**
+- Manual: Review each file for completeness and clarity
+- Manual: Verify YAML frontmatter is valid
+- Manual: Check that S nodes properly reference O nodes
+- Tool: Run `jig validate` if available (may not work with jigy v0.1.0)
+
+**Docs to Update:**
+- None (Intent nodes are self-documenting)
+
+**Reflect (≤5 bullets; keep crisp)**
+
+- What was clear from SCOPE:
+  - S017 analysis provides complete feature breakdown [scope]
+  - JIG v6.1 spec defines clear OSTC model [spec]
+  - Known constraints: performance targets, formats, relationships [requirements]
+  - Phase structure (core plumbing → navigation → annotations) [architecture]
+
+- What was ambiguous:
+  - Exact subsystem naming (chose: jigy-tool for consistency) [naming]
+  - Outcome granularity (chose: 3 high-level outcomes covering tool capabilities) [scope]
+  - Spec granularity (chose: 10 specs, one per major feature) [architecture]
+
+- Next experiment:
+  - Evaluate if Intent-first reduces implementation ambiguity [process]
+  - Test if written acceptance criteria improve TDD flow [quality]
+
+- Discoveries:
+  - None yet (WU0 captures KNOWN constraints only) [learning]
+  - Discoveries will come during implementation (WU1-12) [expectation]
+
+- Risk watchlist:
+  - May need additional S nodes during implementation (discovered constraints) [scope]
+  - Performance targets are aggressive (<1s, <2s) - may need optimization [performance]
+  - ASE-A validation may reveal edge cases not in specs [integration]
+
+**Links:**
+- MR/PR: [To be created]
+- Commit(s): [To be filled]
+
+**Commit Message (Example):**
+```
+intent: define jigy core graph & annotations constraints
+
+Created Outcomes:
+- O-JIGY-001: JIG graph accurately reflects all OSTC relationships
+- O-JIGY-002: Developers can navigate Intent graph efficiently
+- O-JIGY-003: Code and Intent stay synchronized
+
+Created Specifications:
+- S-JIGY-001 through S-JIGY-004: Core plumbing (parse, load, registry, validate)
+- S-JIGY-005 through S-JIGY-007: Graph navigation (query, traverse, subsystems)
+- S-JIGY-008 through S-JIGY-010: Annotations (scan, rebuild, validate)
+
+Unit: 0
+See: jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU0
+```
+
+**Human Validation:**
+- Commands: 
+  ```bash
+  ls -la jig/outcomes/O-JIGY-*.md
+  ls -la jig/specifications/S-JIGY-*.md
+  # If jigy supports it:
+  jigy validate
+  jigy status
+  ```
+- Look for: All 3 O files and 10 S files created, valid YAML frontmatter, clear content
+
+---
+
 ### Work Unit 1: Parse Frontmatter Relationships
+
+**Implements:** S-JIGY-001
 
 **Goal:** Extract relationship fields (implements, satisfies, verifies, depends_on) from markdown frontmatter and build edge list
 
@@ -90,10 +308,24 @@ This PLAN implements phases from the analysis document to make jigy tool read an
   - `satisfies:` → `satisfies` edge  
   - `verifies:` → `verifies` edge
   - `depends_on:` → `depends_on` edge
+- Add @jig annotations to implementation code:
+  ```python
+  # @jig C-JIGY-001 implements:S-JIGY-001 subsystem:jigy-tool
+  def parse_frontmatter(file_path: str) -> Dict[str, Any]:
+      """Extract YAML frontmatter and relationships from markdown"""
+  ```
 
 **Test Plan:**
 - Unit: Test frontmatter parsing with various formats
+  ```python
+  # @jig T-JIGY-001 verifies:S-JIGY-001 subsystem:jigy-tool
+  def test_parse_frontmatter_implements_list():
+  ```
 - Unit: Test edge list building from relationships
+  ```python
+  # @jig T-JIGY-002 verifies:S-JIGY-001 subsystem:jigy-tool
+  def test_build_edges_from_relationships():
+  ```
 - Integration: Run against ASE-A jig/outcomes/ and jig/specifications/
 - Integration: Verify edge count matches expected (~113 edges from graph.json)
 
@@ -117,6 +349,19 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - MR/PR: 
 - Commit(s): 
 
+**Commit Message (Example):**
+```
+feat(jigy): parse frontmatter relationships from markdown
+
+Extracts implements, satisfies, verifies, depends_on fields.
+Builds edge list from YAML frontmatter in O/S markdown files.
+Handles both single values and lists.
+
+Unit: 1
+Implements: S-JIGY-001
+Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
+```
+
 **Human Validation:**
 - Commands: 
   ```bash
@@ -129,6 +374,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 2: Load graph-index.yaml
+
+**Implements:** S-JIGY-002
 
 **Goal:** Read graph-index.yaml as primary node registry to discover C/T nodes
 
@@ -191,6 +438,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 3: Unified Node Registry
+
+**Implements:** S-JIGY-003
 
 **Goal:** Create unified node lookup and query interface for all OSTC types
 
@@ -257,6 +506,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 4: Edge Validation & Orphan Detection
+
+**Implements:** S-JIGY-004
 
 **Goal:** Validate all edges point to existing nodes, detect orphans and broken references
 
@@ -333,6 +584,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 5: Graph Data Structure & Queries
+
+**Implements:** S-JIGY-005
 
 **Goal:** Build graph representation and implement basic query commands
 
@@ -413,6 +666,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ### Work Unit 6: Path Finding & Traversal
 
+**Implements:** S-JIGY-006
+
 **Goal:** Implement graph traversal queries (trace, path, dependencies)
 
 **Planned Effort:** 120m
@@ -482,6 +737,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 7: Subsystem Queries
+
+**Implements:** S-JIGY-007
 
 **Goal:** Enable subsystem-level queries and cross-subsystem edge detection
 
@@ -567,6 +824,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ### Work Unit 8: Fast Code Scanner for @jig Annotations
 
+**Implements:** S-JIGY-008
+
 **Goal:** Scan source/test files to discover @jig annotations and extract metadata
 
 **Planned Effort:** 120m
@@ -641,6 +900,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ### Work Unit 9: Index Rebuild from Sources
 
+**Implements:** S-JIGY-009
+
 **Goal:** Regenerate graph-index.yaml from markdown frontmatter + code annotations
 
 **Planned Effort:** 120m
@@ -714,6 +975,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 10: Annotation Validation
+
+**Implements:** S-JIGY-010
 
 **Goal:** Validate @jig annotations match Intent nodes and are properly formatted
 
@@ -796,6 +1059,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ### Work Unit 11: ASE-A Validation & Fixes
 
+**Validates:** O-JIGY-001, O-JIGY-002, O-JIGY-003 (all outcomes)
+
 **Goal:** Run jigy v0.5.0 against ASE-A project and fix any discovered issues
 
 **Planned Effort:** 120m
@@ -863,6 +1128,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 ---
 
 ### Work Unit 12: Documentation & Examples
+
+**Supports:** All O/S nodes (documentation for complete feature set)
 
 **Goal:** Complete user documentation and create example usage
 
@@ -949,13 +1216,41 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [To be filled during execution]
 
 ### Metrics
-- Units: 12
-- Estimated total effort: ~21 hours
+- Units: 13 (including WU0: Intent creation)
+- Estimated total effort: ~22.5 hours
 - Target velocity: 2-3 units per day
 - Expected duration: 5-7 days intensive work
+- Markers captured: [count] (#DISCOVERY, #DECISION, #LEARNED)
+- OSTC nodes created: 3 Outcomes, 10 Specifications
 
 ### Reflection Roll-up
-- [To be filled after completion]
+- Repeatable wins: [To be filled]
+- Systemic frictions (top 3): [To be filled]
+- Process changes adopted: [To be filled]
+- Open questions for next plan: [To be filled]
+
+### Harvest Preparation (JIG)
+
+**Intent Nodes Created (WU0):**
+- Outcomes: O-JIGY-001, O-JIGY-002, O-JIGY-003
+- Specifications: S-JIGY-001 through S-JIGY-010
+
+**Markers Summary:**
+- Discoveries: [count - NEW constraints learned during implementation]
+- Decisions: [count - tradeoff choices made]
+- Learned patterns: [count - reusable knowledge]
+
+**Recommended OSTC Nodes (from DISCOVERIES during execution):**
+[To be filled - only NEW insights discovered during work, not known constraints from WU0]
+- [ ] Example: S-JIGY-011: "NetworkX graph construction pattern" (if discovered)
+- [ ] Example: O-JIGY-004: "Graph queries support CI/CD validation" (if discovered)
+
+**Note:** Outcomes and Specifications created in WU0 were known from SCOPE.
+Harvest captures NEW insights discovered during implementation (WU1-12).
+
+**Subsystems Touched:** jigy-tool (primary), ASE-A (validation target)
+
+**Next Step:** `jig ai-distill --branch orphaned-node-fixer` (when harvest tooling exists)
 
 ### Next Steps
 After this PLAN completes, jigy v0.5.0 will support:
