@@ -1,56 +1,56 @@
-version: 1.0.0
+version: '1.0'
 created: 2025-11-18
 
 nodes:
-  O-JIG-001:
+  - id: O-JIG-001
     file: jig/outcomes/O-JIG-001.md
     type: outcome
     title: "JIG tools run in <1 second for most operations"
     subsystem: core
 
-  O-JIG-002:
+  - id: O-JIG-002
     file: jig/outcomes/O-JIG-002.md
     type: outcome
     title: "JIG uses simple text formats (YAML + Markdown)"
     subsystem: core
 
-  O-JIG-003:
+  - id: O-JIG-003
     file: jig/outcomes/O-JIG-003.md
     type: outcome
     title: "JIG is composable (pipes work)"
     subsystem: core
 
-  O-JIG-004:
+  - id: O-JIG-004
     file: jig/outcomes/O-JIG-004.md
     type: outcome
     title: "JIG requires no external services"
     subsystem: core
 
-  O-JIG-005:
+  - id: O-JIG-005
     file: jig/outcomes/O-JIG-005.md
     type: outcome
     title: "JIG demonstrates modularity >0.7"
     subsystem: core
 
-  S-JIG-001:
+  - id: S-JIG-001
     file: jig/specifications/S-JIG-001.md
     type: specification
     title: "Marker extraction processes 1000 files in <1s"
     subsystem: core
 
-  S-JIG-002:
+  - id: S-JIG-002
     file: jig/specifications/S-JIG-002.md
     type: specification
     title: "OSTC nodes use YAML frontmatter + Markdown"
     subsystem: core
 
-  S-JIG-003:
+  - id: S-JIG-003
     file: jig/specifications/S-JIG-003.md
     type: specification
     title: "Commands output valid YAML"
     subsystem: core
 
-  S-JIG-004:
+  - id: S-JIG-004
     file: jig/specifications/S-JIG-004.md
     type: specification
     title: "Subsystems export <5 interfaces"

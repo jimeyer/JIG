@@ -341,44 +341,22 @@ nodes:
     assert t_node.metadata.get("line") == 456
 
 
-def test_dict_mapping_format(tmp_path: Path) -> None:
-    """Test loading nodes from dict/mapping format (legacy format)."""
+def test_invalid_nodes_format_raises_error(tmp_path: Path) -> None:
+    """Test that dict/mapping format raises a helpful error."""
     jig_dir = tmp_path / "jig"
     jig_dir.mkdir()
     
-    # Create graph-index.yaml with dict/mapping format
+    # Create graph-index.yaml with invalid dict/mapping format
     graph_index = jig_dir / "graph-index.yaml"
     graph_index.write_text("""
 version: '1.0'
 nodes:
   C-TEST-001:
     type: code
-    title: Code from dict format
-    subsystem: test
-    file: src/code.py
-    line: 10
-  T-TEST-001:
-    type: test
-    title: Test from dict format
-    subsystem: test
-    file: tests/test_code.py
-    line: 20
+    title: Invalid dict format
 """)
     
-    graph = Graph.load_from_dir(jig_dir)
-    
-    # Should load both nodes
-    assert len(graph.nodes) == 2
-    assert "C-TEST-001" in graph.nodes
-    assert "T-TEST-001" in graph.nodes
-    
-    # Check node details
-    c_node = graph.nodes["C-TEST-001"]
-    assert c_node.type == "code"
-    assert c_node.title == "Code from dict format"
-    assert c_node.metadata.get("file") == "src/code.py"
-    
-    t_node = graph.nodes["T-TEST-001"]
-    assert t_node.type == "test"
-    assert t_node.title == "Test from dict format"
+    # Should raise ValueError with helpful message
+    with pytest.raises(ValueError, match="nodes.*must be a list"):
+        Graph.load_from_dir(jig_dir)
 

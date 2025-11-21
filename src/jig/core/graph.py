@@ -178,24 +178,21 @@ class Graph:
                 index_data = load_yaml(graph_index_path)
 
                 # Load nodes from graph-index (typically C/T nodes)
-                # Handle both list format and dict/mapping format
+                # Format: list of node dicts with 'id' field
                 nodes_data = index_data.get("nodes", [])
                 
-                # Check if nodes_data is a dict (mapping format) or list
-                if isinstance(nodes_data, dict):
-                    # Dict/mapping format: {"C-001": {...}, "T-001": {...}}
-                    node_items = [(node_id, node_dict) for node_id, node_dict in nodes_data.items()]
-                else:
-                    # List format: [{"id": "C-001", ...}, {"id": "T-001", ...}]
-                    node_items = [(node_dict.get("id"), node_dict) for node_dict in nodes_data]
+                if not isinstance(nodes_data, list):
+                    raise ValueError(
+                        f"graph-index.yaml 'nodes' must be a list, got {type(nodes_data).__name__}. "
+                        f"Expected format: nodes: [{{id: 'C-001', ...}}, ...]"
+                    )
                 
-                for node_id, node_dict in node_items:
-                    # Get type - may be in dict or need to extract from node_dict
-                    if isinstance(node_dict, dict):
-                        node_type = node_dict.get("type")
-                    else:
-                        # Handle edge case where node_dict is not a dict
+                for node_dict in nodes_data:
+                    if not isinstance(node_dict, dict):
                         continue
+                    
+                    node_id = node_dict.get("id")
+                    node_type = node_dict.get("type")
                     
                     # Skip if missing required fields
                     if not node_id or not node_type:
@@ -206,10 +203,6 @@ class Graph:
                         continue
                     
                     # Create OSTCNode from graph-index data (typically C/T nodes)
-                    # Build metadata dict with node_id included
-                    metadata = dict(node_dict) if isinstance(node_dict, dict) else {}
-                    metadata["id"] = node_id
-                    
                     node = OSTCNode(
                         id=node_id,
                         type=node_type,
@@ -217,7 +210,7 @@ class Graph:
                         subsystem=node_dict.get("subsystem"),
                         status=node_dict.get("status"),
                         body="",  # C/T nodes don't have markdown body
-                        metadata=metadata  # Preserve all fields including file, line
+                        metadata=node_dict  # Preserve all fields including file, line
                     )
                     graph.nodes[node_id] = node
                     
