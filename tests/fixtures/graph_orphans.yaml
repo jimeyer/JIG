@@ -1,0 +1,122 @@
+# Test fixture with known orphan patterns
+version: 1.0.0
+created: 2025-11-21
+
+nodes:
+  # Valid node with no issues
+  O-TEST-001:
+    file: jig/outcomes/O-TEST-001.md
+    type: outcome
+    title: "Valid root outcome"
+    subsystem: test
+
+  # Valid specification implementing outcome
+  S-TEST-001:
+    file: jig/specifications/S-TEST-001.md
+    type: specification
+    title: "Valid specification"
+    subsystem: test
+    implements: O-TEST-001
+
+  # DANGLING REFERENCE: References non-existent O-TEST-999
+  S-TEST-002:
+    file: jig/specifications/S-TEST-002.md
+    type: specification
+    title: "Spec with dangling reference"
+    subsystem: test
+    implements: O-TEST-999
+
+  # UNREFERENCED NODE: Nothing references this
+  S-TEST-003:
+    file: jig/specifications/S-TEST-003.md
+    type: specification
+    title: "Unreferenced spec"
+    subsystem: test
+
+  # MALFORMED: Null implements field
+  S-TEST-004:
+    file: jig/specifications/S-TEST-004.md
+    type: specification
+    title: "Spec with null field"
+    subsystem: test
+    implements: null
+
+  # MALFORMED: Empty list
+  S-TEST-005:
+    file: jig/specifications/S-TEST-005.md
+    type: specification
+    title: "Spec with empty list"
+    subsystem: test
+    implements: []
+
+  # MALFORMED: Invalid type (integer)
+  S-TEST-006:
+    file: jig/specifications/S-TEST-006.md
+    type: specification
+    title: "Spec with invalid type"
+    subsystem: test
+    implements: 123
+
+  # Valid node with list of references
+  S-TEST-007:
+    file: jig/specifications/S-TEST-007.md
+    type: specification
+    title: "Spec with list refs"
+    subsystem: test
+    implements:
+      - O-TEST-001
+      - S-TEST-001
+
+  # DANGLING REFERENCE in list
+  S-TEST-008:
+    file: jig/specifications/S-TEST-008.md
+    type: specification
+    title: "Spec with dangling in list"
+    subsystem: test
+    depends_on:
+      - S-TEST-001
+      - S-TEST-999
+
+  # Circular reference (valid, not an orphan)
+  S-TEST-009:
+    file: jig/specifications/S-TEST-009.md
+    type: specification
+    title: "Circular ref A"
+    subsystem: test
+    depends_on: S-TEST-010
+
+  S-TEST-010:
+    file: jig/specifications/S-TEST-010.md
+    type: specification
+    title: "Circular ref B"
+    subsystem: test
+    depends_on: S-TEST-009
+
+  # Self-reference (unusual but valid)
+  S-TEST-011:
+    file: jig/specifications/S-TEST-011.md
+    type: specification
+    title: "Self-referencing spec"
+    subsystem: test
+    depends_on: S-TEST-011
+
+edges:
+  - from: S-TEST-001
+    to: O-TEST-001
+    type: implements
+
+subsystems:
+  test:
+    nodes:
+      - O-TEST-001
+      - S-TEST-001
+      - S-TEST-002
+      - S-TEST-003
+      - S-TEST-004
+      - S-TEST-005
+      - S-TEST-006
+      - S-TEST-007
+      - S-TEST-008
+      - S-TEST-009
+      - S-TEST-010
+      - S-TEST-011
