@@ -100,7 +100,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [x] WU0: Create known Intent nodes (O/S) — done ☑
 
 ### Phase 1: Core Plumbing (jigy v0.2.0)
-- [ ] WU1: Parse frontmatter relationships — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Parse frontmatter relationships — tests ☑ / docs ☐ / reflect ☑
 - [ ] WU2: Load graph-index.yaml — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Unified node registry — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Edge validation & orphan detection — tests ☐ / docs ☐ / reflect ☐
@@ -336,14 +336,25 @@ See: jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU0
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - TDD approach caught circular import issue immediately [process]
+  - Existing metadata preservation in parser made extraction trivial [architecture]
+  - Simple dict normalization (single value → list) handled all cases [implementation]
+  - Tests passed on first run after fixing circular import [quality]
 
 - What could be better:
+  - Circular import Edge/relationships should have been anticipated [design]
+  - Could add integration test with real JIG project data [testing]
 
 - Next experiment:
+  - See if frontmatter-based edges integrate well with graph-index.yaml edges (WU2) [integration]
 
 - Discoveries:
+  #LEARNED "Import at function level (not module level) avoids circular dependencies"
+  #LEARNED "PyYAML frontmatter library already normalizes YAML - no extra work needed"
 
 - Risk watchlist:
+  - Edge deduplication may be needed when merging frontmatter + graph-index edges [data integrity]
+  - Performance with large graphs (1000+ nodes) needs profiling [performance]
 
 **Links:**
 - MR/PR: 

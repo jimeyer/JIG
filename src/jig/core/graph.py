@@ -12,6 +12,7 @@ from typing import Any
 import networkx as nx  # type: ignore[import-untyped]
 
 from jig.core.parser import OSTCNode, parse_ostc_node
+from jig.core.relationships import extract_edges_from_node
 from jig.utils.yaml_utils import load_yaml
 
 
@@ -161,6 +162,10 @@ class Graph:
                 try:
                     node = parse_ostc_node(md_file)
                     graph.nodes[node.id] = node
+                    
+                    # Extract edges from frontmatter relationships (WU1: S-JIGY-001)
+                    edges = extract_edges_from_node(node)
+                    graph.edges.extend(edges)
                 except (FileNotFoundError, ValueError) as e:
                     # Log warning but continue (could use logging in production)
                     # For now, we'll be strict and raise
