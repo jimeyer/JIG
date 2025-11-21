@@ -124,7 +124,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - 3e599fe - docs(jigy): validate path finding & traversal (WU6)
 - 9f63306 - docs(jigy): validate subsystem queries (WU7)
 - 3a7e6c1 - feat(jigy): fast annotation scanner for @jig annotations (WU8)
-- [pending] - feat(jigy): index rebuild from sources (WU9)
+- 1a6388c - feat(jigy): index rebuild from sources (WU9)
 
 ---
 
