@@ -709,14 +709,24 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
+  - Commands already implemented from previous work - WU5 focused on comprehensive testing
+  - 24 tests verify all query commands (show, list, deps, impact, path)
+  - Test fixtures with realistic graph structures caught edge cases
 
 - What could be better:
+  - Initially forgot that graph is undirected for path finding - all nodes were connected
+  - Needed isolated node to properly test "no path found" scenario
 
 - Next experiment:
+  #EXPERIMENT "Add --json output format for machine-readable graph queries"
 
 - Discoveries:
+  #LEARNED "Graph commands already existed - validation through testing confirms they work"
+  #LEARNED "Path finding treats graph as undirected - bidirectional traversal"
 
 - Risk watchlist:
+  - Output format might need refinement based on real usage [UX]
+  - Performance on very large graphs (1000+ nodes) not yet tested [scalability]
 
 **Links:**
 - MR/PR: 
@@ -726,12 +736,12 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 - Commands: 
   ```bash
   cd ~/Code/ASE-A
-  jigy node S-AIR-001
+  jigy graph show S-AIR-001
   # Should show full node details with relationships
-  jigy edges S-AIR-001
-  # Should list all edges
-  jigy list specification --subsystem airspace
+  jigy graph list --type specification --subsystem airspace
   # Should filter by subsystem
+  jigy graph path S-AIR-001 O-AIR-001
+  # Should find path between nodes
   ```
 - Look for: Clear, useful output; accurate relationship display
 
