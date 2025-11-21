@@ -198,7 +198,7 @@ user_prompt: |
 **Status:** Complete ✅
 
 **Links:**
-- Commit: (see below)
+- Commit: 2a889f0
 
 **Human Validation:**
 - Commands: `pytest tests/unit/cli/test_formatting.py -v`, `jig validate`
