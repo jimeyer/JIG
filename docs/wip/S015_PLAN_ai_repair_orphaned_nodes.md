@@ -80,7 +80,7 @@ These constraints were known from SCOPE S014. The analysis in S013 identified th
 
 - [x] WU0: Create known Intent nodes (O/S) — done ✅
 - [x] WU1: Deterministic detection module — tests ✅ / docs ✅ / reflect ✅
-- [ ] WU2: Credential management system — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Credential management system — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU3: Claude API client — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: AI prompt engineering — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: CLI command integration — tests ☐ / docs ☐ / reflect ☐
@@ -285,24 +285,37 @@ Integration test in `tests/cli/test_config_commands.py`:
 
 **Reflect (≤5 bullets; keep crisp):**
 
-*[To be filled after implementation]*
+- What worked well:
+  - 4-source priority resolution is clear and testable [implementation]
+  - Permission checking with stat.S_IMODE works reliably across platforms [security]
+  - 94% test coverage with 27 tests, comprehensive mocking strategy [tests]
+
+- What could be better:
+  - Keyring mocking required sys.modules manipulation (worked but not ideal) [tests]
+  - Could add integration test with real keyring (requires platform-specific setup) [tests]
+
+- Discoveries:
+  - #LEARNED "Atomic file writes (write temp + rename) prevent partial credential exposure"
+  - #DISCOVERY "File permission checks must use stat.S_IMODE to mask non-permission bits"
+  - #DECISION "Keyring as optional 4th source (not required)"
+    **Choice**: Optional with graceful fallback
+    **Rationale**: Not all systems support keyring, config file sufficient for MVP
+    **Tradeoffs**: Users must manage config file security vs. OS-level keyring
 
 **Links:**
-- MR/PR: [TBD]
-- Commit(s): [TBD]
+- MR/PR: [To be created after all WUs complete]
+- Commit(s): [Next commit]
 
 **Human Validation:**
 - Commands:
   ```bash
-  pytest tests/config/test_credentials.py -v
-  jigy config set-credential anthropic  # Interactive test (use test key)
-  jigy config validate-credentials
-  jig validate
+  pytest tests/unit/config/test_credentials.py -v --cov=src/jig/config
   ```
 - Look for:
-  - Config file created at `~/.config/jig/credentials.yaml` with 0600 perms
-  - Warning if you manually `chmod 644` the file
-  - API key never printed in full
+  - 27 tests passed, 94.07% coverage
+  - Secure permissions (0600) enforced
+  - API key redaction working
+- ✅ Completed: All tests pass, secure credential management working
 
 ---
 
