@@ -64,7 +64,7 @@ user_prompt: |
 - [x] WU1: Core formatting library — tests ✅ / docs ✅ / reflect ✅
 - [x] WU2: Update status command — tests ✅ / docs ✅ / reflect ✅
 - [x] WU3: Update validate command — tests ✅ / docs ✅ / reflect ✅
-- [ ] WU4: Update graph show command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU4: Update graph show command — tests ✅ / docs ✅ / reflect ✅
 - [ ] WU5: Add graph list --format compact — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: Update documentation & help text — tests ☐ / docs ☐ / reflect ☐
 
@@ -402,15 +402,35 @@ user_prompt: |
 
 **Reflect (≤5 bullets; keep crisp)**
 
-_(To be filled during implementation)_
+- What worked well:
+  - format_section_header() and format_node_list() integrate seamlessly [implementation]
+  - Conditional header formatting (count shown only when items exist) keeps output clean [ux]
+    #LEARNED "Show counts only when there are items - empty sections stay simple"
+  - All 6 integration tests pass after updating format assertions (3 tests needed updates) [tests]
+  - File path hint now shows full path (jig/outcomes/O-JIG-001.md) - easier to navigate [ux]
+
+- Implementation decisions:
+  - Use hasattr() to check for file_path attribute vs assuming it exists [implementation]
+    #DECISION "Fallback to constructed path if file_path attribute missing"
+    **Choice:** Check hasattr(node, 'file_path') before using it
+    **Rationale:** Node might not have file_path attribute in all contexts
+    **Tradeoffs:** More defensive code, but prevents AttributeError
+  - Comma-separated lists save vertical space (3 deps: 1 line vs 3 lines) [ux]
+
+- Discoveries:
+  - Dependencies/Dependents already had color styling (fg="cyan") - preserved in new format [implementation]
+  - Test assertions checking for "Dependencies:" still work with "Dependencies (N):" [tests]
+    #LEARNED "Substring matching in tests provides backward compatibility flexibility"
+
+**Status:** Complete ✅
 
 **Links:**
-- MR/PR: _TBD_
-- Commit(s): _TBD_
+- Commit: 2b82f6b
 
 **Human Validation:**
 - Commands: `jigy graph show <node-id>` on test repo, `pytest tests/integration/test_graph_show.py -v`
 - Look for: Output matches S011_EXAMPLES, counts visible, lists comma-separated
+- Result: ✅ All 6 integration tests pass, output format correct
 
 ---
 
