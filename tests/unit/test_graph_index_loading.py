@@ -1,6 +1,7 @@
 # @jig T-JIGY-004 verifies:S-JIGY-002 subsystem:jigy-tool
-"""Unit tests for graph-index.yaml loading (WU2)."""
+"""Unit tests for graph-index.json loading (WU2)."""
 
+import json
 from pathlib import Path
 
 import pytest
@@ -10,56 +11,30 @@ from jig.core.graph import Graph
 
 # @jig T-JIGY-005 verifies:S-JIGY-002 subsystem:jigy-tool
 def test_load_graph_index_with_ct_nodes(tmp_path: Path) -> None:
-    """Test loading C/T nodes from graph-index.yaml."""
-    # Create minimal jig directory structure
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create one O node in markdown
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    outcome_file = outcomes_dir / "O-TEST-001.md"
-    outcome_file.write_text("""---
-id: O-TEST-001
-type: outcome
-title: Test outcome
----
-# Outcome
-""")
-    
-    # Create graph-index.yaml with C/T nodes
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: C-TEST-001
-    type: code
-    title: Test code implementation
-    subsystem: test
-    file: src/test.py
-    line: 42
-  - id: T-TEST-001
-    type: test
-    title: Test case
-    subsystem: test
-    file: tests/test_test.py
-    line: 10
-""")
-    
+    """Test loading C/T nodes from graph-index.json."""
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with O node in markdown + C/T nodes in graph-index
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "O-TEST-001", "type": "outcome", "title": "Test outcome", "subsystem": "test"},
+        {"id": "C-TEST-001", "type": "code", "title": "Test code implementation", "subsystem": "test", "file": "src/test.py", "line": 42},
+        {"id": "T-TEST-001", "type": "test", "title": "Test case", "subsystem": "test", "file": "tests/test_test.py", "line": 10},
+    ], subsystems={"test": {"id": "test"}})
+
     graph = Graph.load_from_dir(jig_dir)
-    
+
     # Should have O node from markdown + C/T nodes from graph-index
     assert len(graph.nodes) == 3
     assert "O-TEST-001" in graph.nodes
     assert "C-TEST-001" in graph.nodes
     assert "T-TEST-001" in graph.nodes
-    
+
     # Check C node details
     c_node = graph.nodes["C-TEST-001"]
     assert c_node.type == "code"
     assert c_node.title == "Test code implementation"
     assert c_node.subsystem == "test"
-    
+
     # Check T node details
     t_node = graph.nodes["T-TEST-001"]
     assert t_node.type == "test"
@@ -68,39 +43,15 @@ nodes:
 
 # @jig T-JIGY-006 verifies:S-JIGY-002 subsystem:jigy-tool
 def test_load_node_centric_relationships(tmp_path: Path) -> None:
-    """Test extracting relationships from node-centric format in graph-index.yaml."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create O node in markdown (no relationships)
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    outcome_file = outcomes_dir / "O-TEST-001.md"
-    outcome_file.write_text("""---
-id: O-TEST-001
-type: outcome
-title: Test outcome
----
-""")
-    
-    # Create graph-index.yaml with node-centric relationships
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: S-TEST-001
-    type: specification
-    title: Test spec
-    subsystem: test
-    implements:
-      - O-TEST-001
-  - id: C-TEST-001
-    type: code
-    title: Test implementation
-    subsystem: test
-    implements:
-      - S-TEST-001
-""")
+    """Test extracting relationships from node-centric format in graph-index.json."""
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with O node in markdown + S/C nodes with relationships in graph-index
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "O-TEST-001", "type": "outcome", "title": "Test outcome", "subsystem": "test"},
+        {"id": "S-TEST-001", "type": "specification", "title": "Test spec", "subsystem": "test", "implements": ["O-TEST-001"]},
+        {"id": "C-TEST-001", "type": "code", "title": "Test implementation", "subsystem": "test", "implements": ["S-TEST-001"]},
+    ], subsystems={"test": {"id": "test"}})
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -124,7 +75,7 @@ def test_load_edge_centric_format(tmp_path: Path) -> None:
     """Test loading edges from edge-centric format (existing functionality)."""
     jig_dir = tmp_path / "jig"
     jig_dir.mkdir()
-    
+
     # Create nodes in markdown
     outcomes_dir = jig_dir / "outcomes"
     outcomes_dir.mkdir()
@@ -135,7 +86,7 @@ type: outcome
 title: Test outcome
 ---
 """)
-    
+
     specs_dir = jig_dir / "specifications"
     specs_dir.mkdir()
     s_file = specs_dir / "S-TEST-001.md"
@@ -145,16 +96,16 @@ type: specification
 title: Test spec
 ---
 """)
-    
-    # Create graph-index.yaml with edge-centric format
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-edges:
-  - from: S-TEST-001
-    to: O-TEST-001
-    type: implements
-""")
+
+    # Create graph-index.json with edge-centric format
+    graph_index = jig_dir / "graph-index.json"
+    graph_index.write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "edges": [
+            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"}
+        ]
+    }, indent=2))
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -166,53 +117,16 @@ edges:
 
 
 def test_merge_markdown_and_graph_index(tmp_path: Path) -> None:
-    """Test merging nodes from markdown and graph-index.yaml."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create O/S nodes in markdown with relationships
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    o_file = outcomes_dir / "O-TEST-001.md"
-    o_file.write_text("""---
-id: O-TEST-001
-type: outcome
-title: Outcome from markdown
-subsystem: test
----
-""")
-    
-    specs_dir = jig_dir / "specifications"
-    specs_dir.mkdir()
-    s_file = specs_dir / "S-TEST-001.md"
-    s_file.write_text("""---
-id: S-TEST-001
-type: specification
-title: Spec from markdown
-subsystem: test
-implements:
-  - O-TEST-001
----
-""")
-    
-    # Create graph-index.yaml with C/T nodes and their relationships
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: C-TEST-001
-    type: code
-    title: Code from graph-index
-    subsystem: test
-    implements:
-      - S-TEST-001
-  - id: T-TEST-001
-    type: test
-    title: Test from graph-index
-    subsystem: test
-    verifies:
-      - S-TEST-001
-""")
+    """Test merging nodes from markdown and graph-index.json."""
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with O/S nodes in markdown + C/T nodes in graph-index
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "O-TEST-001", "type": "outcome", "title": "Outcome from markdown", "subsystem": "test"},
+        {"id": "S-TEST-001", "type": "specification", "title": "Spec from markdown", "subsystem": "test", "implements": ["O-TEST-001"]},
+        {"id": "C-TEST-001", "type": "code", "title": "Code from graph-index", "subsystem": "test", "implements": ["S-TEST-001"]},
+        {"id": "T-TEST-001", "type": "test", "title": "Test from graph-index", "subsystem": "test", "verifies": ["S-TEST-001"]},
+    ], subsystems={"test": {"id": "test"}})
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -241,7 +155,7 @@ def test_markdown_takes_precedence_for_os_nodes(tmp_path: Path) -> None:
     """Test that markdown content takes precedence over graph-index for O/S nodes."""
     jig_dir = tmp_path / "jig"
     jig_dir.mkdir()
-    
+
     # Create S node in markdown with specific content
     specs_dir = jig_dir / "specifications"
     specs_dir.mkdir()
@@ -254,17 +168,22 @@ subsystem: markdown-subsystem
 ---
 # Body from markdown
 """)
-    
-    # Create graph-index.yaml with conflicting S node data
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: S-TEST-001
-    type: specification
-    title: Title from graph-index (should be ignored)
-    subsystem: graph-index-subsystem
-""")
+
+    # Create graph-index.json with conflicting S node data
+    graph_index = jig_dir / "graph-index.json"
+    graph_index.write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "nodes": [
+            {
+                "id": "S-TEST-001",
+                "type": "specification",
+                "title": "Title from graph-index (should be ignored)",
+                "subsystem": "graph-index-subsystem",
+                "status": "active"
+            }
+        ]
+    }, indent=2))
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -276,10 +195,10 @@ nodes:
 
 
 def test_graph_index_without_nodes_section(tmp_path: Path) -> None:
-    """Test graph-index.yaml with only edges section (no nodes)."""
+    """Test graph-index.json with only edges section (no nodes)."""
     jig_dir = tmp_path / "jig"
     jig_dir.mkdir()
-    
+
     outcomes_dir = jig_dir / "outcomes"
     outcomes_dir.mkdir()
     o_file = outcomes_dir / "O-TEST-001.md"
@@ -289,16 +208,16 @@ type: outcome
 title: Test
 ---
 """)
-    
+
     # graph-index with no nodes section
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-edges:
-  - from: S-TEST-001
-    to: O-TEST-001
-    type: implements
-""")
+    graph_index = jig_dir / "graph-index.json"
+    graph_index.write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "edges": [
+            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"}
+        ]
+    }, indent=2))
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -309,24 +228,13 @@ edges:
 
 def test_ct_nodes_with_file_and_line(tmp_path: Path) -> None:
     """Test C/T nodes preserve file path and line number metadata."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: C-TEST-001
-    type: code
-    title: Code implementation
-    file: src/impl.py
-    line: 123
-  - id: T-TEST-001
-    type: test
-    title: Test case
-    file: tests/test_impl.py
-    line: 456
-""")
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with C/T nodes that have file and line metadata
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "C-TEST-001", "type": "code", "title": "Code implementation", "subsystem": "test", "file": "src/impl.py", "line": 123},
+        {"id": "T-TEST-001", "type": "test", "title": "Test case", "subsystem": "test", "file": "tests/test_impl.py", "line": 456},
+    ], subsystems={"test": {"id": "test"}})
     
     graph = Graph.load_from_dir(jig_dir)
     
@@ -345,16 +253,19 @@ def test_invalid_nodes_format_raises_error(tmp_path: Path) -> None:
     """Test that dict/mapping format raises a helpful error."""
     jig_dir = tmp_path / "jig"
     jig_dir.mkdir()
-    
-    # Create graph-index.yaml with invalid dict/mapping format
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  C-TEST-001:
-    type: code
-    title: Invalid dict format
-""")
+
+    # Create graph-index.json with invalid dict/object format (should be array)
+    graph_index = jig_dir / "graph-index.json"
+    graph_index.write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "nodes": {
+            "C-TEST-001": {
+                "type": "code",
+                "title": "Invalid dict format"
+            }
+        }
+    }, indent=2))
     
     # Should raise ValueError with helpful message
     with pytest.raises(ValueError, match="nodes.*must be a list"):

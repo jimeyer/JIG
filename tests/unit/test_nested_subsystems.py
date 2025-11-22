@@ -1,6 +1,7 @@
 # @jig T-NESTED-001 verifies:S-NESTED-001 subsystem:core
 """Unit tests for nested subsystems functionality."""
 
+import json
 from pathlib import Path
 from textwrap import dedent
 
@@ -11,7 +12,7 @@ from jig.core.validator import validate_nested_subsystems
 
 
 def test_nested_subsystem_loading(tmp_path: Path) -> None:
-    """Verify Graph loads nested subsystems from YAML."""
+    """Verify Graph loads nested subsystems from JSON."""
     # Create test directory structure
     intent_dir = tmp_path / "jig"
     intent_dir.mkdir()
@@ -43,28 +44,31 @@ def test_nested_subsystem_loading(tmp_path: Path) -> None:
         """)
     )
 
-    # Create graph-index.yaml with nested subsystems
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          core:
-            description: Core subsystem
-            nodes:
-              - O-CORE-001
-          crdt:
-            description: CRDT subsystem (parent)
-            subsystems:
-              ser:
-                description: Serialization
-                nodes:
-                  - O-TEST-001
-              deser:
-                description: Deserialization
-                nodes:
-                  - S-TEST-001
-        edges: []
-        """)
-    )
+    # Create graph-index.json with nested subsystems
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "core": {
+                "description": "Core subsystem",
+                "nodes": ["O-CORE-001"]
+            },
+            "crdt": {
+                "description": "CRDT subsystem (parent)",
+                "subsystems": {
+                    "ser": {
+                        "description": "Serialization",
+                        "nodes": ["O-TEST-001"]
+                    },
+                    "deser": {
+                        "description": "Deserialization",
+                        "nodes": ["S-TEST-001"]
+                    }
+                }
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     # Load graph
     graph = Graph.load_from_dir(intent_dir)
@@ -102,26 +106,31 @@ def test_subsystem_path_resolution(tmp_path: Path) -> None:
     intent_dir.mkdir()
     (intent_dir / "outcomes").mkdir()
 
-    # Create graph-index.yaml with 3-level nesting
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          app:
-            subsystems:
-              backend:
-                subsystems:
-                  api:
-                    nodes:
-                      - O-API-001
-                  db:
-                    nodes:
-                      - O-DB-001
-              frontend:
-                nodes:
-                  - O-UI-001
-        edges: []
-        """)
-    )
+    # Create graph-index.json with 3-level nesting
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "app": {
+                "subsystems": {
+                    "backend": {
+                        "subsystems": {
+                            "api": {
+                                "nodes": ["O-API-001"]
+                            },
+                            "db": {
+                                "nodes": ["O-DB-001"]
+                            }
+                        }
+                    },
+                    "frontend": {
+                        "nodes": ["O-UI-001"]
+                    }
+                }
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
 
@@ -154,26 +163,28 @@ def test_recursive_node_collection(tmp_path: Path) -> None:
     intent_dir.mkdir()
     (intent_dir / "outcomes").mkdir()
 
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          parent:
-            subsystems:
-              child1:
-                nodes:
-                  - O-001
-                  - O-002
-              child2:
-                nodes:
-                  - O-003
-                subsystems:
-                  grandchild:
-                    nodes:
-                      - O-004
-                      - O-005
-        edges: []
-        """)
-    )
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "parent": {
+                "subsystems": {
+                    "child1": {
+                        "nodes": ["O-001", "O-002"]
+                    },
+                    "child2": {
+                        "nodes": ["O-003"],
+                        "subsystems": {
+                            "grandchild": {
+                                "nodes": ["O-004", "O-005"]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
     parent = graph.get_subsystem_by_path("parent")
@@ -232,20 +243,22 @@ def test_parent_with_nodes_validation(tmp_path: Path) -> None:
     intent_dir.mkdir()
     (intent_dir / "outcomes").mkdir()
 
-    # Create graph-index.yaml with parent that has both children AND nodes
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          parent:
-            nodes:
-              - O-PARENT-001
-            subsystems:
-              child:
-                nodes:
-                  - O-CHILD-001
-        edges: []
-        """)
-    )
+    # Create graph-index.json with parent that has both children AND nodes
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "parent": {
+                "nodes": ["O-PARENT-001"],
+                "subsystems": {
+                    "child": {
+                        "nodes": ["O-CHILD-001"]
+                    }
+                }
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
 
@@ -263,23 +276,23 @@ def test_backward_compatibility_flat(tmp_path: Path) -> None:
     intent_dir.mkdir()
     (intent_dir / "outcomes").mkdir()
 
-    # Create graph-index.yaml with flat subsystems (no nesting)
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          core:
-            nodes:
-              - O-CORE-001
-              - O-CORE-002
-          cli:
-            nodes:
-              - O-CLI-001
-          graph:
-            nodes:
-              - O-GRAPH-001
-        edges: []
-        """)
-    )
+    # Create graph-index.json with flat subsystems (no nesting)
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "core": {
+                "nodes": ["O-CORE-001", "O-CORE-002"]
+            },
+            "cli": {
+                "nodes": ["O-CLI-001"]
+            },
+            "graph": {
+                "nodes": ["O-GRAPH-001"]
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
 
@@ -310,23 +323,26 @@ def test_get_all_subsystem_paths(tmp_path: Path) -> None:
     intent_dir.mkdir()
     (intent_dir / "outcomes").mkdir()
 
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          core:
-            nodes:
-              - O-CORE-001
-          crdt:
-            subsystems:
-              ser:
-                nodes:
-                  - O-SER-001
-              deser:
-                nodes:
-                  - O-DESER-001
-        edges: []
-        """)
-    )
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "core": {
+                "nodes": ["O-CORE-001"]
+            },
+            "crdt": {
+                "subsystems": {
+                    "ser": {
+                        "nodes": ["O-SER-001"]
+                    },
+                    "deser": {
+                        "nodes": ["O-DESER-001"]
+                    }
+                }
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
 
@@ -409,15 +425,16 @@ def test_invalid_node_subsystem_path(tmp_path: Path) -> None:
         """)
     )
 
-    (intent_dir / "graph-index.yaml").write_text(
-        dedent("""
-        subsystems:
-          core:
-            nodes:
-              - O-CORE-001
-        edges: []
-        """)
-    )
+    (intent_dir / "graph-index.json").write_text(json.dumps({
+        "version": "1.0",
+        "generated": "2025-11-22T00:00:00Z",
+        "subsystems": {
+            "core": {
+                "nodes": ["O-CORE-001"]
+            }
+        },
+        "edges": []
+    }, indent=2))
 
     graph = Graph.load_from_dir(intent_dir)
 
