@@ -8,104 +8,65 @@ import pytest
 
 from jig.cli.graph import graph
 from jig.core.graph import Graph
+from tests.helpers.graph_fixtures import create_test_graph
 
 
 @pytest.fixture
 def setup_test_graph(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Create a test JIG directory with sample nodes."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create outcomes
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    (outcomes_dir / "O-TEST-001.md").write_text("""---
-id: O-TEST-001
-type: outcome
-title: First outcome
-subsystem: test
----
+    jig_dir = create_test_graph(
+        tmp_path,
+        nodes=[
+            {
+                "id": "O-TEST-001",
+                "type": "outcome",
+                "title": "First outcome",
+                "subsystem": "test",
+            },
+            {
+                "id": "O-TEST-002",
+                "type": "outcome",
+                "title": "Second outcome",
+                "subsystem": "test",
+            },
+            {
+                "id": "O-TEST-003",
+                "type": "outcome",
+                "title": "Isolated outcome",
+                "subsystem": "test",
+            },
+            {
+                "id": "S-TEST-001",
+                "type": "specification",
+                "title": "First spec",
+                "subsystem": "test",
+                "implements": ["O-TEST-001"],
+            },
+            {
+                "id": "S-TEST-002",
+                "type": "specification",
+                "title": "Second spec",
+                "subsystem": "test",
+                "implements": ["O-TEST-001", "O-TEST-002"],
+            },
+            {
+                "id": "C-TEST-001",
+                "type": "code",
+                "title": "Test code",
+                "subsystem": "test",
+                "implements": ["S-TEST-001"],
+            },
+            {
+                "id": "T-TEST-001",
+                "type": "test",
+                "title": "Test case",
+                "subsystem": "test",
+                "verifies": ["S-TEST-001"],
+            },
+        ],
+        subsystems={"test": {"id": "test"}},
+    )
 
-# First Outcome
-
-This is the first test outcome.
-""")
-    
-    (outcomes_dir / "O-TEST-002.md").write_text("""---
-id: O-TEST-002
-type: outcome
-title: Second outcome
-subsystem: test
----
-
-# Second Outcome
-
-This is the second test outcome.
-""")
-    
-    (outcomes_dir / "O-TEST-003.md").write_text("""---
-id: O-TEST-003
-type: outcome
-title: Isolated outcome
-subsystem: test
----
-
-# Isolated Outcome
-
-This outcome has no connections.
-""")
-    
-    # Create specifications
-    specs_dir = jig_dir / "specifications"
-    specs_dir.mkdir()
-    (specs_dir / "S-TEST-001.md").write_text("""---
-id: S-TEST-001
-type: specification
-title: First spec
-subsystem: test
-implements:
-  - O-TEST-001
----
-
-# First Specification
-
-This implements the first outcome.
-""")
-    
-    (specs_dir / "S-TEST-002.md").write_text("""---
-id: S-TEST-002
-type: specification
-title: Second spec
-subsystem: test
-implements:
-  - O-TEST-001
-  - O-TEST-002
----
-
-# Second Specification
-
-This implements both outcomes.
-""")
-    
-    # Create graph-index with C/T nodes
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: C-TEST-001
-    type: code
-    title: Test code
-    subsystem: test
-    implements:
-      - S-TEST-001
-  - id: T-TEST-001
-    type: test
-    title: Test case
-    subsystem: test
-    verifies:
-      - S-TEST-001
-""")
-    
     # Mock config to point to test directory
     from jig.core.config import JigConfig
     config = JigConfig(
@@ -113,11 +74,11 @@ nodes:
         intent_dir=jig_dir,
         delta_dir=tmp_path / "deltas",
         templates_dir=tmp_path / "templates",
-        graph_index_file=jig_dir / "graph-index.yaml",
+        graph_index_file=jig_dir / "graph-index.json",
         subsystems_file=jig_dir / "subsystems.yaml"
     )
     monkeypatch.setattr("jig.cli.graph.load_config", lambda: config)
-    
+
     return jig_dir
 
 
