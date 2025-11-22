@@ -53,7 +53,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict)
     return graph_index_path
 
 
-# @jig T-STATUS-001 verifies:S-GRAPH-001 subsystem:core
 def test_calculate_status_with_valid_graph():
     """Verify status calculation with valid graph."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -199,9 +198,12 @@ def test_status_data_dataclass():
     """Verify StatusData dataclass works correctly."""
     status = StatusData(
         total_nodes=10,
+        total_edges=5,
+        subsystem_count=1,
         node_counts={"outcome": 5, "specification": 5},
         subsystems={"core": ["O-001", "S-001"]},
         orphaned_nodes=["O-002"],
+        unassigned_nodes=["O-003"],
         validation_errors=["Warning: something"],
     )
 
@@ -216,9 +218,12 @@ def test_status_data_default_validation_errors():
     """Verify StatusData has default empty validation_errors."""
     status = StatusData(
         total_nodes=0,
+        total_edges=0,
+        subsystem_count=0,
         node_counts={},
         subsystems={},
         orphaned_nodes=[],
+        unassigned_nodes=[],
     )
 
     assert status.validation_errors == []

@@ -36,9 +36,9 @@ class TestIndexBuilder:
         specs_dir.mkdir(parents=True)
 
         # Create outcome
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test outcome
             subsystem: test
@@ -49,15 +49,15 @@ class TestIndexBuilder:
         """))
 
         # Create specification
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test spec
             subsystem: test
             status: active
             implements:
-              - O-TEST-001
+              - O-AUTH-001
             ---
             
             # Spec
@@ -68,7 +68,7 @@ class TestIndexBuilder:
 
         assert len(nodes) == 2
         ids = {n.id for n in nodes}
-        assert ids == {"O-TEST-001", "S-TEST-001"}
+        assert ids == {"O-AUTH-001", "S-AUTH-001"}
 
     def test_discover_annotation_nodes(self, tmp_path: Path) -> None:
         """Discover C/T nodes from code annotations."""
@@ -79,14 +79,14 @@ class TestIndexBuilder:
 
         # Create code file with annotation
         (src_dir / "code.py").write_text(dedent("""
-            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test
             class TestClass:
                 pass
         """))
 
         # Create test file with annotation
         (test_dir / "test_code.py").write_text(dedent("""
-            # @jig T-TEST-001 verifies:S-TEST-001 subsystem:test
+            # @jig T-AUTH-001 verifies:S-AUTH-001 subsystem:test
             def test_something():
                 pass
         """))
@@ -96,7 +96,7 @@ class TestIndexBuilder:
 
         assert len(nodes) == 2
         ids = {n.id for n in nodes}
-        assert ids == {"C-TEST-001", "T-TEST-001"}
+        assert ids == {"C-AUTH-001", "T-AUTH-001"}
 
     def test_build_complete_registry(self, tmp_path: Path) -> None:
         """Build complete node registry from all sources."""
@@ -105,9 +105,9 @@ class TestIndexBuilder:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
         
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test outcome
             subsystem: test
@@ -119,15 +119,15 @@ class TestIndexBuilder:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:O-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:O-AUTH-001 subsystem:test")
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
 
         assert result.success
         assert len(result.nodes) == 2
-        assert "O-TEST-001" in result.nodes
-        assert "C-TEST-001" in result.nodes
+        assert "O-AUTH-001" in result.nodes
+        assert "C-AUTH-001" in result.nodes
 
 
 class TestConflictDetection:
@@ -139,17 +139,17 @@ class TestConflictDetection:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: First
             ---
         """))
 
-        (outcomes_dir / "O-TEST-002.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-002.md").write_text(dedent("""
             ---
-            id: O-TEST-002
+            id: O-AUTH-002
             type: outcome
             title: Second
             ---
@@ -167,17 +167,17 @@ class TestConflictDetection:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: First
             ---
         """))
 
-        (outcomes_dir / "O-TEST-001-copy.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001-copy.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Duplicate
             ---
@@ -188,15 +188,15 @@ class TestConflictDetection:
 
         assert not result.success
         assert len(result.conflicts) > 0
-        assert "O-TEST-001" in str(result.conflicts[0])
+        assert "O-AUTH-001" in str(result.conflicts[0])
 
     def test_detect_duplicate_in_annotations(self, tmp_path: Path) -> None:
         """Detect duplicate ID in code annotations."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
 
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-001 implements:S-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-001 implements:S-002 subsystem:test")
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
@@ -206,23 +206,23 @@ class TestConflictDetection:
 
     def test_detect_cross_source_conflict(self, tmp_path: Path) -> None:
         """Detect conflict between markdown and annotation (type mismatch)."""
-        # O-TEST-001 in markdown (outcome)
+        # O-AUTH-001 in markdown (outcome)
         jig_dir = tmp_path / "jig"
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
         
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---
         """))
 
-        # O-TEST-001 in annotation (code) - WRONG! O prefix should be outcome
+        # O-AUTH-001 in annotation (code) - WRONG! O prefix should be outcome
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig O-TEST-001 implements:S-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig O-AUTH-001 implements:S-001 subsystem:test")
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
@@ -242,9 +242,9 @@ class TestYAMLGeneration:
         outcomes_dir.mkdir(parents=True)
         specs_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test outcome
             subsystem: test
@@ -252,15 +252,15 @@ class TestYAMLGeneration:
             ---
         """))
 
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test spec
             subsystem: test
             status: active
             implements:
-              - O-TEST-001
+              - O-AUTH-001
             ---
         """))
 
@@ -281,9 +281,9 @@ class TestYAMLGeneration:
         assert len(data["nodes"]) == 2
         
         # Find S node and verify relationships
-        s_node = next(n for n in data["nodes"] if n["id"] == "S-TEST-001")
+        s_node = next(n for n in data["nodes"] if n["id"] == "S-AUTH-001")
         assert "implements" in s_node
-        assert s_node["implements"] == ["O-TEST-001"]
+        assert s_node["implements"] == ["O-AUTH-001"]
 
     def test_yaml_includes_metadata(self, tmp_path: Path) -> None:
         """Generated YAML includes version and timestamp."""
@@ -291,9 +291,9 @@ class TestYAMLGeneration:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---
@@ -316,7 +316,7 @@ class TestYAMLGeneration:
 
         (src_dir / "code.py").write_text(dedent("""
             # Some comment
-            # @jig C-TEST-001 implements:S-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-001 subsystem:test
             class TestClass:
                 pass
         """))
@@ -328,7 +328,7 @@ class TestYAMLGeneration:
         builder.write_yaml(result, output_file)
 
         data = load_yaml(output_file)
-        c_node = next(n for n in data["nodes"] if n["id"] == "C-TEST-001")
+        c_node = next(n for n in data["nodes"] if n["id"] == "C-AUTH-001")
         
         assert "file" in c_node
         assert "line" in c_node
@@ -349,9 +349,9 @@ class TestBackupStrategy:
         existing_file.write_text("nodes: []\n")
 
         # Create outcome for rebuild
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---
@@ -375,9 +375,9 @@ class TestBackupStrategy:
         existing_file = jig_dir / "graph-index.yaml"
         existing_file.write_text("nodes: []\n")
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---
@@ -400,9 +400,9 @@ class TestIdempotence:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test outcome
             subsystem: test
@@ -440,9 +440,9 @@ class TestValidationBeforeWrite:
         outcomes_dir.mkdir(parents=True)
 
         # Valid ID
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Valid
             ---
@@ -461,9 +461,9 @@ class TestValidationBeforeWrite:
         specs_dir.mkdir(parents=True)
 
         # Spec references non-existent outcome
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Spec
             implements:
@@ -500,7 +500,7 @@ class TestRebuildResult:
         result = RebuildResult(
             success=False,
             nodes={},
-            conflicts=["Duplicate ID: C-TEST-001"],
+            conflicts=["Duplicate ID: C-AUTH-001"],
             warnings=[],
             validation_errors=[],
         )
@@ -518,9 +518,9 @@ class TestHelperFunctions:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---
@@ -609,9 +609,9 @@ class TestEdgeCases:
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
 
-        (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
             ---
-            id: O-TEST-001
+            id: O-AUTH-001
             type: outcome
             title: Test
             ---

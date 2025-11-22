@@ -102,19 +102,19 @@ class TestAnnotationParsing:
     def test_annotation_dataclass_attributes(self) -> None:
         """Verify Annotation dataclass has correct attributes."""
         annotation = Annotation(
-            id="C-TEST-001",
+            id="C-AUTH-001",
             type="code",
             file="test.py",
             line=42,
-            relationships={"implements": ["S-TEST-001"]},
+            relationships={"implements": ["S-AUTH-001"]},
             metadata={"subsystem": "test"},
         )
 
-        assert annotation.id == "C-TEST-001"
+        assert annotation.id == "C-AUTH-001"
         assert annotation.type == "code"
         assert annotation.file == "test.py"
         assert annotation.line == 42
-        assert annotation.relationships["implements"] == ["S-TEST-001"]
+        assert annotation.relationships["implements"] == ["S-AUTH-001"]
         assert annotation.metadata["subsystem"] == "test"
 
 
@@ -125,7 +125,7 @@ class TestFileScanning:
         """Scan file containing one annotation."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
-            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:auth
             def some_function():
                 pass
         """))
@@ -134,7 +134,7 @@ class TestFileScanning:
         annotations = scanner.scan_file(test_file)
 
         assert len(annotations) == 1
-        assert annotations[0].id == "C-TEST-001"
+        assert annotations[0].id == "C-AUTH-001"
         assert annotations[0].file == str(test_file)
         assert annotations[0].line == 2  # Second line (after newline)
 
@@ -142,15 +142,15 @@ class TestFileScanning:
         """Scan file containing multiple annotations."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
-            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test
             class TestClass:
                 pass
             
-            # @jig C-TEST-002 implements:S-TEST-002 subsystem:test
+            # @jig C-AUTH-002 implements:S-AUTH-002 subsystem:test
             def test_function():
                 pass
             
-            # @jig T-TEST-001 verifies:S-TEST-001 subsystem:test
+            # @jig T-AUTH-001 verifies:S-AUTH-001 subsystem:test
             def test_validation():
                 pass
         """))
@@ -159,9 +159,9 @@ class TestFileScanning:
         annotations = scanner.scan_file(test_file)
 
         assert len(annotations) == 3
-        assert annotations[0].id == "C-TEST-001"
-        assert annotations[1].id == "C-TEST-002"
-        assert annotations[2].id == "T-TEST-001"
+        assert annotations[0].id == "C-AUTH-001"
+        assert annotations[1].id == "C-AUTH-002"
+        assert annotations[2].id == "T-AUTH-001"
 
     def test_scan_file_with_no_annotations(self, tmp_path: Path) -> None:
         """Scan file with no annotations."""
@@ -183,7 +183,7 @@ class TestFileScanning:
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
             # @jig INVALID-FORMAT
-            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test
             # @jig ANOTHER-INVALID
         """))
 
@@ -191,7 +191,7 @@ class TestFileScanning:
         annotations = scanner.scan_file(test_file)
 
         assert len(annotations) == 1
-        assert annotations[0].id == "C-TEST-001"
+        assert annotations[0].id == "C-AUTH-001"
 
     def test_scan_nonexistent_file(self, tmp_path: Path) -> None:
         """Scan non-existent file returns empty list."""
@@ -209,8 +209,8 @@ class TestDirectoryScanning:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
 
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-002 implements:S-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-002 implements:S-002 subsystem:test")
         (src_dir / "file3.py").write_text("# No annotation")
 
         scanner = AnnotationScanner()
@@ -218,7 +218,7 @@ class TestDirectoryScanning:
 
         assert len(annotations) == 2
         ids = {a.id for a in annotations}
-        assert ids == {"C-TEST-001", "C-TEST-002"}
+        assert ids == {"C-AUTH-001", "C-AUTH-002"}
 
     def test_scan_directory_recursively(self, tmp_path: Path) -> None:
         """Scan directory recursively for annotations."""
@@ -227,8 +227,8 @@ class TestDirectoryScanning:
         subdir = src_dir / "subdir"
         subdir.mkdir()
 
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (subdir / "file2.py").write_text("# @jig C-TEST-002 implements:S-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (subdir / "file2.py").write_text("# @jig C-AUTH-002 implements:S-002 subsystem:test")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_directory(src_dir)
@@ -240,15 +240,15 @@ class TestDirectoryScanning:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
 
-        (src_dir / "file.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (src_dir / "file.txt").write_text("# @jig C-TEST-002 implements:S-002 subsystem:test")
-        (src_dir / "file.md").write_text("# @jig C-TEST-003 implements:S-003 subsystem:test")
+        (src_dir / "file.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (src_dir / "file.txt").write_text("# @jig C-AUTH-002 implements:S-002 subsystem:test")
+        (src_dir / "file.md").write_text("# @jig C-AUTH-003 implements:S-003 subsystem:test")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_directory(src_dir)
 
         assert len(annotations) == 1
-        assert annotations[0].id == "C-TEST-001"
+        assert annotations[0].id == "C-AUTH-001"
 
     def test_scan_multiple_directories(self, tmp_path: Path) -> None:
         """Scan multiple directories."""
@@ -257,15 +257,15 @@ class TestDirectoryScanning:
         src_dir.mkdir()
         test_dir.mkdir()
 
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (test_dir / "test.py").write_text("# @jig T-TEST-001 verifies:S-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (test_dir / "test.py").write_text("# @jig T-AUTH-001 verifies:S-001 subsystem:test")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan([src_dir, test_dir])
 
         assert len(annotations) == 2
         ids = {a.id for a in annotations}
-        assert ids == {"C-TEST-001", "T-TEST-001"}
+        assert ids == {"C-AUTH-001", "T-AUTH-001"}
 
     def test_scan_empty_directory(self, tmp_path: Path) -> None:
         """Scan empty directory returns no annotations."""
@@ -285,11 +285,11 @@ class TestDuplicateDetection:
         """Detect duplicate annotation IDs in same file."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
-            # @jig C-TEST-001 implements:S-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-001 subsystem:test
             class A:
                 pass
             
-            # @jig C-TEST-001 implements:S-002 subsystem:test
+            # @jig C-AUTH-001 implements:S-002 subsystem:test
             class B:
                 pass
         """))
@@ -299,31 +299,31 @@ class TestDuplicateDetection:
         duplicates = scanner.find_duplicates(annotations)
 
         assert len(duplicates) > 0
-        assert "C-TEST-001" in duplicates
+        assert "C-AUTH-001" in duplicates
 
     def test_detect_duplicate_across_files(self, tmp_path: Path) -> None:
         """Detect duplicate annotation IDs across multiple files."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
 
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-001 implements:S-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-001 implements:S-002 subsystem:test")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_directory(src_dir)
         duplicates = scanner.find_duplicates(annotations)
 
         assert len(duplicates) > 0
-        assert "C-TEST-001" in duplicates
-        assert len(duplicates["C-TEST-001"]) == 2
+        assert "C-AUTH-001" in duplicates
+        assert len(duplicates["C-AUTH-001"]) == 2
 
     def test_no_duplicates_when_unique(self, tmp_path: Path) -> None:
         """Return empty dict when all annotations are unique."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
 
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-002 implements:S-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-002 implements:S-002 subsystem:test")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_directory(src_dir)
@@ -343,7 +343,7 @@ class TestPerformance:
         # Create 100 files with annotations
         for i in range(100):
             file_path = src_dir / f"file{i}.py"
-            file_path.write_text(f"# @jig C-TEST-{i:03d} implements:S-001 subsystem:test\npass\n")
+            file_path.write_text(f"# @jig C-AUTH-{i:03d} implements:S-001 subsystem:test\npass\n")
 
         scanner = AnnotationScanner()
         start = time.time()
@@ -369,11 +369,11 @@ class TestPerformance:
             subdir.mkdir(exist_ok=True)
             file_path = subdir / f"file{i}.py"
             
-            content = f"""# @jig C-TEST-{i:05d} implements:S-001 subsystem:test
+            content = f"""# @jig C-AUTH-{i:05d} implements:S-001 subsystem:test
 def func_{i}():
     pass
 
-# @jig T-TEST-{i:05d} verifies:S-001 subsystem:test
+# @jig T-AUTH-{i:05d} verifies:S-001 subsystem:test
 def test_func_{i}():
     pass
 """
@@ -395,7 +395,7 @@ class TestEdgeCases:
         """Handle files with unicode content."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
-            # @jig C-TEST-001 implements:S-001 subsystem:test
+            # @jig C-AUTH-001 implements:S-001 subsystem:test
             def greet():
                 return "Hello 世界 🌍"
         """), encoding="utf-8")
@@ -404,13 +404,13 @@ class TestEdgeCases:
         annotations = scanner.scan_file(test_file)
 
         assert len(annotations) == 1
-        assert annotations[0].id == "C-TEST-001"
+        assert annotations[0].id == "C-AUTH-001"
 
     def test_scan_with_very_long_lines(self, tmp_path: Path) -> None:
         """Handle files with very long lines."""
         test_file = tmp_path / "test.py"
         long_comment = "# " + "x" * 10000 + "\n"
-        content = "# @jig C-TEST-001 implements:S-001 subsystem:test\n" + long_comment
+        content = "# @jig C-AUTH-001 implements:S-001 subsystem:test\n" + long_comment
         test_file.write_text(content)
 
         scanner = AnnotationScanner()
@@ -433,7 +433,7 @@ class TestEdgeCases:
         """Handle files with permission errors gracefully."""
         # This test might not work on all platforms
         test_file = tmp_path / "test.py"
-        test_file.write_text("# @jig C-TEST-001 implements:S-001 subsystem:test")
+        test_file.write_text("# @jig C-AUTH-001 implements:S-001 subsystem:test")
         
         # Make file unreadable (may not work on Windows)
         import os
@@ -469,7 +469,7 @@ class TestFixturePatternDetection:
 
         assert _is_test_fixture("C-TEST-001")
         assert _is_test_fixture("C-TEST-999")
-        assert not _is_test_fixture("C-AUTH-001")
+        assert not _is_test_fixture("C-REAL-001")
 
     def test_excludes_t_test_pattern(self) -> None:
         """Test that T-TEST-* patterns are excluded."""
@@ -477,7 +477,7 @@ class TestFixturePatternDetection:
 
         assert _is_test_fixture("T-TEST-001")
         assert _is_test_fixture("T-TEST-999")
-        assert not _is_test_fixture("T-AUTH-001")
+        assert not _is_test_fixture("T-REAL-001")
 
     def test_excludes_c_mock_pattern(self) -> None:
         """Test that C-MOCK-* patterns are excluded."""
@@ -485,7 +485,7 @@ class TestFixturePatternDetection:
 
         assert _is_test_fixture("C-MOCK-001")
         assert _is_test_fixture("C-MOCK-999")
-        assert not _is_test_fixture("C-AUTH-001")
+        assert not _is_test_fixture("C-REAL-001")
 
     def test_excludes_c_fixture_pattern(self) -> None:
         """Test that C-FIXTURE-* patterns are excluded."""
@@ -493,7 +493,7 @@ class TestFixturePatternDetection:
 
         assert _is_test_fixture("C-FIXTURE-001")
         assert _is_test_fixture("C-FIXTURE-999")
-        assert not _is_test_fixture("C-AUTH-001")
+        assert not _is_test_fixture("C-REAL-001")
 
     def test_excludes_c_example_pattern(self) -> None:
         """Test that C-EXAMPLE-* patterns are excluded."""
@@ -501,7 +501,7 @@ class TestFixturePatternDetection:
 
         assert _is_test_fixture("C-EXAMPLE-001")
         assert _is_test_fixture("C-EXAMPLE-999")
-        assert not _is_test_fixture("C-AUTH-001")
+        assert not _is_test_fixture("C-REAL-001")
 
     def test_parse_annotation_line_skips_fixtures(self) -> None:
         """Test that parse_annotation_line returns None for fixture patterns."""
@@ -513,38 +513,38 @@ class TestFixturePatternDetection:
         assert parse_annotation_line("# @jig C-EXAMPLE-001 implements:S-001") is None
 
         # Real annotations should parse normally
-        result = parse_annotation_line("# @jig C-AUTH-001 implements:S-001")
+        result = parse_annotation_line("# @jig C-REAL-001 implements:S-001")
         assert result is not None
-        assert result.id == "C-AUTH-001"
+        assert result.id == "C-REAL-001"
 
     def test_scanner_excludes_fixture_annotations(self, tmp_path: Path) -> None:
         """Test that scanner excludes fixture annotations from files."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
             # This file contains both real and fixture annotations
-            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:auth
+            # @jig C-REAL-001 implements:S-REAL-001 subsystem:core
             # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
             # @jig T-TEST-001 verifies:S-TEST-001 subsystem:test
             # @jig C-MOCK-001 implements:S-MOCK-001 subsystem:mock
-            # @jig C-AUTH-002 implements:S-AUTH-002 subsystem:auth
+            # @jig C-REAL-002 implements:S-REAL-002 subsystem:core
         """))
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_file(test_file)
 
-        # Should only find C-AUTH-001 and C-AUTH-002 (real annotations)
+        # Should only find C-REAL-001 and C-REAL-002 (real annotations)
         assert len(annotations) == 2
         node_ids = {ann.id for ann in annotations}
-        assert node_ids == {"C-AUTH-001", "C-AUTH-002"}
+        assert node_ids == {"C-REAL-001", "C-REAL-002"}
 
     def test_scanner_no_false_positives(self, tmp_path: Path) -> None:
         """Test that scanner doesn't exclude valid node IDs that look similar."""
         test_file = tmp_path / "test.py"
         test_file.write_text(dedent("""
             # Real nodes that might look similar to fixtures
-            # @jig C-TESTING-001 implements:S-001 subsystem:testing
-            # @jig C-MOCKING-001 implements:S-001 subsystem:mocking
-            # @jig T-TESTABLE-001 verifies:S-001 subsystem:test
+            # @jig C-TESTING-001 implements:S-REAL-001 subsystem:testing
+            # @jig C-MOCKING-001 implements:S-REAL-001 subsystem:mocking
+            # @jig T-TESTABLE-001 verifies:S-REAL-001 subsystem:test
         """))
 
         scanner = AnnotationScanner()

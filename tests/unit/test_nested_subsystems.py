@@ -10,7 +10,6 @@ from jig.core.graph import Graph, Subsystem
 from jig.core.validator import validate_nested_subsystems
 
 
-# @jig T-NESTED-001 verifies:S-NESTED-001 subsystem:core
 def test_nested_subsystem_loading(tmp_path: Path) -> None:
     """Verify Graph loads nested subsystems from YAML."""
     # Create test directory structure

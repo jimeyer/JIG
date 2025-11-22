@@ -60,7 +60,6 @@ def create_test_graph_index(
     return graph_index_path
 
 
-# @jig T-GRAPH-020 verifies:S-GRAPH-003 subsystem:core
 def test_graph_path_finds_route() -> None:
     """Verify path command finds route between nodes."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -579,7 +578,7 @@ def test_graph_list_compact_format() -> None:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 
 
-# @jig T-CLI-015 verifies:S-CLI-009 subsystem:cli
+# @jig T-CLI-011 verifies:S-CLI-009 subsystem:cli
 def test_graph_list_compact_with_subsystem_filter() -> None:
     """Verify compact format shows subsystem name in header."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -631,7 +630,7 @@ def test_graph_list_compact_with_subsystem_filter() -> None:
             jig.cli.graph.load_config = original_load_config  # type: ignore[attr-defined]
 
 
-# @jig T-CLI-016 verifies:S-CLI-009 subsystem:cli
+# @jig T-CLI-012 verifies:S-CLI-009 subsystem:cli
 def test_graph_list_default_format_is_table() -> None:
     """Verify default format is still table (backward compatibility)."""
     with tempfile.TemporaryDirectory() as tmpdir:

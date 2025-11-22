@@ -65,7 +65,6 @@ def mock_config(tmp_path: Path):
     )
 
 
-# @jig T-NESTED-007 verifies:S-NESTED-003 subsystem:core
 def test_status_hierarchical_view():
     """Verify status displays tree view for nested subsystems."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -215,7 +214,6 @@ def test_graph_list_recursive():
             jig.cli.graph.load_config = original_load_config
 
 
-# @jig T-NESTED-009 verifies:S-NESTED-002 subsystem:core
 def test_graph_list_leaf_subsystem():
     """Verify list --subsystem shows only leaf nodes when no --recursive."""
     with tempfile.TemporaryDirectory() as tmpdir:

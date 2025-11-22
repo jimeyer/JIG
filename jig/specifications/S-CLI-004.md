@@ -3,7 +3,9 @@ id: S-CLI-004
 type: specification
 title: jigy init verifies and repairs missing config files
 subsystem: cli
-implements: O-CLI-001, O-CLI-002
+implements:
+  - O-CLI-001
+  - O-CLI-002
 created: 2025-11-21
 ---
 

@@ -52,7 +52,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict)
     return graph_index_path
 
 
-# @jig T-STATUS-004 verifies:S-GRAPH-001 subsystem:core
 def test_status_performance():
     """Verify status completes in <100ms for 100 nodes."""
     with tempfile.TemporaryDirectory() as tmpdir:

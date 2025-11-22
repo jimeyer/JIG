@@ -3,7 +3,9 @@ id: S-CLI-005
 type: specification
 title: jigy init reports created vs repaired components
 subsystem: cli
-implements: O-CLI-001, O-CLI-002
+implements:
+  - O-CLI-001
+  - O-CLI-002
 created: 2025-11-21
 ---
 

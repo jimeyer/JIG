@@ -3,7 +3,9 @@ id: S-CLI-003
 type: specification
 title: jigy init verifies and repairs missing directories
 subsystem: cli
-implements: O-CLI-001, O-CLI-002
+implements:
+  - O-CLI-001
+  - O-CLI-002
 created: 2025-11-21
 ---
 

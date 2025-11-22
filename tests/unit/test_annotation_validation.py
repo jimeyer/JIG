@@ -32,9 +32,9 @@ class TestAnnotationValidator:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test spec
             subsystem: test
@@ -45,7 +45,7 @@ class TestAnnotationValidator:
         # Setup code with valid annotation
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -65,7 +65,7 @@ class TestBrokenReferences:
         # Code references non-existent spec
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-NONEXISTENT-999 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-NONEXISTENT-999 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -82,8 +82,8 @@ class TestBrokenReferences:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-MISSING-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-002 implements:S-MISSING-002 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-MISSING-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-002 implements:S-MISSING-002 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -101,9 +101,9 @@ class TestDuplicateAnnotations:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -112,8 +112,8 @@ class TestDuplicateAnnotations:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         
-        (src_dir / "file1.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
-        (src_dir / "file2.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "file1.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
+        (src_dir / "file2.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -127,9 +127,9 @@ class TestDuplicateAnnotations:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -137,7 +137,7 @@ class TestDuplicateAnnotations:
 
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -155,9 +155,9 @@ class TestOrphanedIntentNodes:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test spec
             subsystem: test
@@ -174,7 +174,7 @@ class TestOrphanedIntentNodes:
 
         # Should have warning about orphaned spec
         assert len(result.warnings) > 0
-        assert any("S-TEST-001" in str(warn) for warn in result.warnings)
+        assert any("S-AUTH-001" in str(warn) for warn in result.warnings)
 
     def test_detect_spec_without_tests(self, tmp_path: Path) -> None:
         """Detect spec with implementation but no tests."""
@@ -182,9 +182,9 @@ class TestOrphanedIntentNodes:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test spec
             status: active
@@ -194,7 +194,7 @@ class TestOrphanedIntentNodes:
         # Has implementation but no tests
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -209,9 +209,9 @@ class TestOrphanedIntentNodes:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Deprecated spec
             status: deprecated
@@ -222,7 +222,7 @@ class TestOrphanedIntentNodes:
         result = validator.validate()
 
         # Should not warn about deprecated spec
-        assert not any("S-TEST-001" in str(warn) for warn in result.warnings)
+        assert not any("S-AUTH-001" in str(warn) for warn in result.warnings)
 
 
 class TestEdgeTypeValidation:
@@ -234,9 +234,9 @@ class TestEdgeTypeValidation:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -245,7 +245,7 @@ class TestEdgeTypeValidation:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         # Code using "verifies" is invalid
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 verifies:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 verifies:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -261,9 +261,9 @@ class TestEdgeTypeValidation:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -272,7 +272,7 @@ class TestEdgeTypeValidation:
         test_dir = tmp_path / "test"
         test_dir.mkdir()
         # Test using "implements" is invalid
-        (test_dir / "test_code.py").write_text("# @jig T-TEST-001 implements:S-TEST-001 subsystem:test")
+        (test_dir / "test_code.py").write_text("# @jig T-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -292,9 +292,9 @@ class TestNodeIDFormat:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -302,7 +302,7 @@ class TestNodeIDFormat:
 
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
@@ -364,9 +364,9 @@ class TestHelperFunctions:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             ---
@@ -374,7 +374,7 @@ class TestHelperFunctions:
 
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         result = validate_annotations(tmp_path)
 
@@ -391,25 +391,25 @@ class TestCoverageMetrics:
         specs_dir.mkdir(parents=True)
         
         # 3 specs, 2 implemented
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Implemented
             status: active
             ---
         """))
-        (specs_dir / "S-TEST-002.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-002.md").write_text(dedent("""
             ---
-            id: S-TEST-002
+            id: S-AUTH-002
             type: specification
             title: Also implemented
             status: active
             ---
         """))
-        (specs_dir / "S-TEST-003.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-003.md").write_text(dedent("""
             ---
-            id: S-TEST-003
+            id: S-AUTH-003
             type: specification
             title: Not implemented
             status: active
@@ -419,8 +419,8 @@ class TestCoverageMetrics:
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         (src_dir / "code.py").write_text(dedent("""
-            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
-            # @jig C-TEST-002 implements:S-TEST-002 subsystem:test
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test
+            # @jig C-AUTH-002 implements:S-AUTH-002 subsystem:test
         """))
 
         validator = AnnotationValidator(tmp_path)
@@ -451,12 +451,12 @@ class TestEdgeCases:
         """Annotations without Intent nodes should error."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "code.py").write_text("# @jig C-TEST-001 implements:S-TEST-001 subsystem:test")
+        (src_dir / "code.py").write_text("# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:test")
 
         validator = AnnotationValidator(tmp_path)
         result = validator.validate()
 
-        # Should error - S-TEST-001 doesn't exist
+        # Should error - S-AUTH-001 doesn't exist
         assert not result.valid
 
     def test_validate_intent_only_no_annotations(self, tmp_path: Path) -> None:
@@ -465,9 +465,9 @@ class TestEdgeCases:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             status: active
@@ -486,23 +486,23 @@ class TestEdgeCases:
         specs_dir = jig_dir / "specifications"
         specs_dir.mkdir(parents=True)
         
-        (specs_dir / "S-TEST-001.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-001.md").write_text(dedent("""
             ---
-            id: S-TEST-001
+            id: S-AUTH-001
             type: specification
             title: Test
             depends_on:
-              - S-TEST-002
+              - S-AUTH-002
             ---
         """))
         
-        (specs_dir / "S-TEST-002.md").write_text(dedent("""
+        (specs_dir / "S-AUTH-002.md").write_text(dedent("""
             ---
-            id: S-TEST-002
+            id: S-AUTH-002
             type: specification
             title: Test 2
             depends_on:
-              - S-TEST-001
+              - S-AUTH-001
             ---
         """))
 

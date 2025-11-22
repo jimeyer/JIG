@@ -69,7 +69,6 @@ def mock_config(tmp_path: Path):
     )
 
 
-# @jig T-NESTED-011 verifies:S-NESTED-004 subsystem:decompose
 def test_decompose_metrics_overall() -> None:
     """Test decompose metrics command with overall graph."""
     with tempfile.TemporaryDirectory() as tmpdir:

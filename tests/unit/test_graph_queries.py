@@ -51,7 +51,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict[str, str]], subsyst
     return graph_index_path
 
 
-# @jig T-GRAPH-009 verifies:S-GRAPH-003 subsystem:core
 def test_filter_by_type_outcome() -> None:
     """Verify filtering by outcome type."""
     with tempfile.TemporaryDirectory() as tmpdir:

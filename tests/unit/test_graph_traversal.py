@@ -52,7 +52,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict)
     return graph_index_path
 
 
-# @jig T-GRAPH-004 verifies:S-GRAPH-003 subsystem:core
 def test_get_dependencies():
     """Verify dependency detection for implements edges."""
     with tempfile.TemporaryDirectory() as tmpdir:

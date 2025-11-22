@@ -60,7 +60,6 @@ def create_test_graph_index(
     return graph_index_path
 
 
-# @jig T-GRAPH-016 verifies:S-GRAPH-003 subsystem:core
 def test_graph_deps_shows_tree() -> None:
     """Verify deps shows dependency tree."""
     with tempfile.TemporaryDirectory() as tmpdir:

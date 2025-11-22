@@ -16,7 +16,6 @@ from jig.decompose.metrics import (
 )
 
 
-# @jig T-DECOMP-001 verifies:S-DECOMP-001 subsystem:decompose
 def test_modularity_calculation_known_graph(tmp_path: Path) -> None:
     """Verify modularity score for known graph structure."""
     # Create a graph with clear subsystem structure

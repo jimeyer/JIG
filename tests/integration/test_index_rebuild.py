@@ -36,9 +36,9 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
 
     # Create nodes with subsystem metadata
     outcomes_dir = jig_dir / "outcomes"
-    (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+    (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
         ---
-        id: O-TEST-001
+        id: O-AUTH-001
         type: outcome
         title: "Auth Outcome"
         subsystem: auth
@@ -47,9 +47,9 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
         Content
     """).lstrip())
 
-    (outcomes_dir / "O-TEST-002.md").write_text(dedent("""
+    (outcomes_dir / "O-AUTH-002.md").write_text(dedent("""
         ---
-        id: O-TEST-002
+        id: O-AUTH-002
         type: outcome
         title: "Core Outcome"
         subsystem: core
@@ -59,15 +59,15 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
     """).lstrip())
 
     specs_dir = jig_dir / "specifications"
-    (specs_dir / "S-TEST-001.md").write_text(dedent("""
+    (specs_dir / "S-AUTH-001.md").write_text(dedent("""
         ---
-        id: S-TEST-001
+        id: S-AUTH-001
         type: specification
         title: "Auth Spec"
         subsystem: auth
         status: active
         implements:
-          - O-TEST-001
+          - O-AUTH-001
         ---
         Content
     """).lstrip())
@@ -75,9 +75,9 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
     #  Create a nested subsystem using a constraint node
     constraints_dir = jig_dir / "constraints"
     constraints_dir.mkdir(parents=True, exist_ok=True)
-    (constraints_dir / "C-TEST-001.md").write_text(dedent("""
+    (constraints_dir / "C-AUTH-001.md").write_text(dedent("""
         ---
-        id: C-TEST-001
+        id: C-AUTH-001
         type: constraint
         title: "CRDT Serialization Constraint"
         subsystem: crdt.ser
@@ -107,17 +107,17 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
 
     # Verify nodes assigned to subsystems
     auth_nodes = set(index_data["subsystems"]["auth"]["nodes"])
-    assert "O-TEST-001" in auth_nodes
-    assert "S-TEST-001" in auth_nodes
+    assert "O-AUTH-001" in auth_nodes
+    assert "S-AUTH-001" in auth_nodes
 
     core_nodes = index_data["subsystems"]["core"]["nodes"]
-    assert "O-TEST-002" in core_nodes
+    assert "O-AUTH-002" in core_nodes
 
     # Verify nested subsystem
     assert "crdt" in index_data["subsystems"]
     assert "subsystems" in index_data["subsystems"]["crdt"]
     assert "ser" in index_data["subsystems"]["crdt"]["subsystems"]
-    assert "C-TEST-001" in index_data["subsystems"]["crdt"]["subsystems"]["ser"]["nodes"]
+    assert "C-AUTH-001" in index_data["subsystems"]["crdt"]["subsystems"]["ser"]["nodes"]
 
 
 def test_status_shows_correct_subsystem_count(tmp_path: Path) -> None:
@@ -132,9 +132,9 @@ def test_status_shows_correct_subsystem_count(tmp_path: Path) -> None:
 
     # Create nodes with subsystems
     outcomes_dir = jig_dir / "outcomes"
-    (outcomes_dir / "O-TEST-001.md").write_text(dedent("""
+    (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
         ---
-        id: O-TEST-001
+        id: O-AUTH-001
         type: outcome
         title: "Test Outcome"
         subsystem: auth
@@ -143,9 +143,9 @@ def test_status_shows_correct_subsystem_count(tmp_path: Path) -> None:
         Content
     """).lstrip())
 
-    (outcomes_dir / "O-TEST-002.md").write_text(dedent("""
+    (outcomes_dir / "O-AUTH-002.md").write_text(dedent("""
         ---
-        id: O-TEST-002
+        id: O-AUTH-002
         type: outcome
         title: "Test Outcome 2"
         subsystem: core

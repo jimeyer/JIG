@@ -67,7 +67,7 @@ def test_jigy_init_idempotent(tmp_path: Path) -> None:
     assert "✓ JIG structure verified - all components present" in result.output
 
 
-# @jig T-CLI-004 verifies:S-CLI-003,S-CLI-004 subsystem:cli
+# @jig T-CLI-010 verifies:S-CLI-003,S-CLI-004 subsystem:cli
 def test_jigy_init_repairs_missing_components(tmp_path: Path) -> None:
     """Verify jigy init repairs missing directories and files."""
     runner = CliRunner()

@@ -76,7 +76,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict)
     return graph_index_path
 
 
-# @jig T-GRAPH-001 verifies:S-GRAPH-002 subsystem:core
 def test_load_from_dir_success():
     """Verify Graph loads from jig/ directory with valid nodes."""
     with tempfile.TemporaryDirectory() as tmpdir:

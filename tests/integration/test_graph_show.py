@@ -57,7 +57,6 @@ def create_test_graph_index(tmp_path: Path, edges: list[dict[str, str]], subsyst
     return graph_index_path
 
 
-# @jig T-GRAPH-013 verifies:S-GRAPH-003 subsystem:core
 def test_graph_show_displays_node() -> None:
     """Verify show command displays node details."""
     with tempfile.TemporaryDirectory() as tmpdir:
