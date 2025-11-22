@@ -152,7 +152,7 @@ def test_validate_status_index_consistency(tmp_path: Path) -> None:
     """).lstrip())
 
     # Run index rebuild
-    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--no-backup", "--project-dir", str(tmp_path)])
+    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--project-dir", str(tmp_path)])
     assert rebuild_result.exit_code == 0, f"rebuild failed: {rebuild_result.output}"
 
     # Run status
@@ -254,7 +254,7 @@ def test_consistency_with_code_annotations(tmp_path: Path) -> None:
     """).lstrip())
 
     # Run index rebuild
-    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--no-backup", "--project-dir", str(tmp_path)])
+    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--project-dir", str(tmp_path)])
     assert rebuild_result.exit_code == 0
 
     # Run status
@@ -319,7 +319,7 @@ def test_consistency_handles_template_filtering(tmp_path: Path) -> None:
     """).lstrip())
 
     # Run index rebuild
-    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--no-backup", "--project-dir", str(tmp_path)])
+    rebuild_result = runner.invoke(cli, ["index", "rebuild", "--project-dir", str(tmp_path)])
     assert rebuild_result.exit_code == 0
 
     # Parse rebuild count

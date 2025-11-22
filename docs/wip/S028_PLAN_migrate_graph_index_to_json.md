@@ -38,7 +38,7 @@ Following taskCleanBreak.md principles - we're burning the ships. No backward co
 ## Work Unit Checklist
 
 - [x] WU1: Update IndexBuilder and Graph loader for JSON-only — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU2: Update CLI commands and delete YAML — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Update CLI commands and delete YAML — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU3: Migrate jig project's own index — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Performance benchmarking and validation — tests ☐ / docs ☐ / reflect ☐
 
@@ -267,22 +267,22 @@ jigy validate
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
-  - [implementation]
+  - YAML deletion logic is simple - just unlink() with conditional message [implementation]
+  - Migration message is clear and informative about clean break [ux]
 
 - What could be better:
-  - [messaging]
+  - Could have added a --force flag for paranoid users, but YAGNI applies [scope]
 
 - Clean break benefits:
-  - [learned]
+  - No backup file clutter in jig/ directory [simplicity]
+  - Git is the backup - old YAML still in history [trust-git]
 
 - Discoveries:
-  - [discovery]
-
-- Risk watchlist:
-  - User expectations (may expect backup) [risk]
+  - Conditional message (only when YAML exists) provides better UX [ux]
+  - Test updates were minimal - most tests already adapted in WU1 [efficiency]
 
 **Links**
-- Commit(s): <to be filled>
+- Commit(s): <to be filled in commit step>
 
 **Human Validation**
 ```bash

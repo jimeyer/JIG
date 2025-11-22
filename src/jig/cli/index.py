@@ -120,6 +120,16 @@ def rebuild(dry_run: bool, project_dir: Path) -> None:
 
         builder.save(result, output_file)
         click.echo(f"  ✓ Wrote {len(result.nodes)} nodes")
+
+        # Delete legacy YAML file (clean break - no backup)
+        legacy_yaml_path = project_dir / "jig" / "graph-index.yaml"
+        if legacy_yaml_path.exists():
+            legacy_yaml_path.unlink()
+            click.echo()
+            click.echo("ℹ️  Deleted legacy YAML format (clean break)")
+            click.echo(f"  Format: JSON (3-5x faster parsing)")
+            click.echo(f"  Old YAML available in git history if needed")
+
         click.echo()
         click.echo("✅ Done!")
 
@@ -143,8 +153,8 @@ def diff(project_dir: Path) -> None:
     # Build what the index should be
     builder = IndexBuilder(project_dir)
     result = builder.build()
-    
-    # TODO: Load existing graph-index.yaml and compare
+
+    # TODO: Load existing graph-index.json and compare
     # For now, just show what would be rebuilt
     
     click.echo("Note: Full diff functionality not yet implemented")
