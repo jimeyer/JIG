@@ -166,7 +166,7 @@ mv jig/graph-index.json.tmp jig/graph-index.json
   - Fail-loud error messages guide users clearly ("Run: jigy index rebuild") [ux]
 
 **Links**
-- Commit(s): <to be filled in commit step>
+- Commit(s): a485b1504f7c1383c628d1ecadc37ba70f81a112
 
 **Human Validation**
 ```bash
