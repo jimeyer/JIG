@@ -286,46 +286,32 @@ def test_validate_edge_type_unknown() -> None:
 
 def test_validate_edges_integration(tmp_path: Path) -> None:
     """Test edge validation with real graph loading."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create outcomes
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    (outcomes_dir / "O-TEST-001.md").write_text("""---
-id: O-TEST-001
-type: outcome
-title: Test outcome
----
-""")
-    
-    # Create specifications with valid and invalid edges
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with valid and invalid edges
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "O-TEST-001", "type": "outcome", "title": "Test outcome", "subsystem": "test"},
+        {"id": "S-TEST-001", "type": "specification", "title": "Valid spec", "subsystem": "test", "implements": ["O-TEST-001"]},
+    ], subsystems={"test": {"id": "test"}})
+
+    # Create spec with broken reference (manually add after graph creation)
     specs_dir = jig_dir / "specifications"
-    specs_dir.mkdir()
-    (specs_dir / "S-TEST-001.md").write_text("""---
-id: S-TEST-001
-type: specification
-title: Valid spec
-implements:
-  - O-TEST-001
----
-""")
-    
     (specs_dir / "S-TEST-002.md").write_text("""---
 id: S-TEST-002
 type: specification
 title: Spec with broken reference
+subsystem: test
 implements:
   - O-MISSING-999
 ---
 """)
-    
+
     # Load graph
     graph = Graph.load_from_dir(jig_dir)
-    
+
     # Validate edges
     result = validate_edges(graph)
-    
+
     assert not result.valid
     assert len(result.errors) == 1
     assert "O-MISSING-999" in result.errors[0]

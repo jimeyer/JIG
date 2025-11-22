@@ -5,50 +5,7 @@ import tempfile
 from pathlib import Path
 
 from jig.core.graph import Graph
-from jig.utils.yaml_utils import dump_yaml
-
-
-def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
-    """Helper to create a test OSTC node file."""
-    type_to_dir = {
-        "outcome": "outcomes",
-        "specification": "specifications",
-        "constraint": "constraints",
-        "test": "tests",
-    }
-    node_dir = tmp_path / type_to_dir.get(node_type, "outcomes")
-    node_dir.mkdir(parents=True, exist_ok=True)
-
-    node_file = node_dir / f"{node_id}.md"
-    lines = [
-        "---",
-        f"id: {node_id}",
-        f"type: {node_type}",
-        f'title: "{title}"',
-        f"subsystem: {subsystem}",
-        "status: active",
-        "---",
-        "",
-        f"# {title}",
-        "",
-        f"This is a test node for {node_id}.",
-        ""
-    ]
-    content = "\n".join(lines)
-    node_file.write_text(content)
-    return node_file
-
-
-def create_test_graph_index(tmp_path: Path, edges: list[dict[str, str]], subsystems: dict[str, dict[str, list[str]]]) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
-    data = {
-        "version": "1.0.0",
-        "edges": edges,
-        "subsystems": subsystems,
-    }
-    dump_yaml(data, graph_index_path)
-    return graph_index_path
+from tests.helpers.graph_fixtures import create_test_graph
 
 
 def test_filter_by_type_outcome() -> None:
@@ -57,15 +14,15 @@ def test_filter_by_type_outcome() -> None:
         tmp_path = Path(tmpdir)
 
         # Create mixed nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
-        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
-        create_test_node(tmp_path, "T-TEST-001", "test", "Test 1", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "core"},
+            {"id": "O-TEST-002", "type": "outcome", "title": "Outcome 2", "subsystem": "core"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "core"},
+            {"id": "T-TEST-001", "type": "test", "title": "Test 1", "subsystem": "core", "file": "test.py", "line": 1},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by outcome
         outcomes = graph.filter_by_type("outcome")
@@ -82,13 +39,13 @@ def test_filter_by_type_case_insensitive() -> None:
         tmp_path = Path(tmpdir)
 
         # Create nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
-        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "core"},
+            {"id": "O-TEST-002", "type": "outcome", "title": "Outcome 2", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Test different cases
         outcomes_lower = graph.filter_by_type("outcome")
@@ -107,14 +64,14 @@ def test_filter_by_type_specification() -> None:
         tmp_path = Path(tmpdir)
 
         # Create mixed nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
-        create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "core"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "core"},
+            {"id": "S-TEST-002", "type": "specification", "title": "Spec 2", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by specification
         specs = graph.filter_by_type("specification")
@@ -128,12 +85,12 @@ def test_filter_by_type_empty() -> None:
         tmp_path = Path(tmpdir)
 
         # Create only outcomes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by constraint (no constraints exist)
         constraints = graph.filter_by_type("constraint")
@@ -147,15 +104,15 @@ def test_filter_by_subsystem() -> None:
         tmp_path = Path(tmpdir)
 
         # Create nodes in different subsystems
-        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
-        create_test_node(tmp_path, "S-CORE-001", "specification", "Core Spec", "core")
-        create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI Outcome", "cli")
-        create_test_node(tmp_path, "S-API-001", "specification", "API Spec", "api")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-CORE-001", "type": "outcome", "title": "Core Outcome", "subsystem": "core"},
+            {"id": "S-CORE-001", "type": "specification", "title": "Core Spec", "subsystem": "core"},
+            {"id": "O-CLI-001", "type": "outcome", "title": "CLI Outcome", "subsystem": "cli"},
+            {"id": "S-API-001", "type": "specification", "title": "API Spec", "subsystem": "api"},
+        ], subsystems={"core": {"id": "core"}, "cli": {"id": "cli"}, "api": {"id": "api"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by core subsystem
         core_nodes = graph.filter_by_subsystem("core")
@@ -176,13 +133,13 @@ def test_filter_by_subsystem_case_insensitive() -> None:
         tmp_path = Path(tmpdir)
 
         # Create nodes
-        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
-        create_test_node(tmp_path, "S-CORE-001", "specification", "Core Spec", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-CORE-001", "type": "outcome", "title": "Core Outcome", "subsystem": "core"},
+            {"id": "S-CORE-001", "type": "specification", "title": "Core Spec", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Test different cases
         core_lower = graph.filter_by_subsystem("core")
@@ -201,12 +158,12 @@ def test_filter_by_subsystem_empty() -> None:
         tmp_path = Path(tmpdir)
 
         # Create nodes in core subsystem
-        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-CORE-001", "type": "outcome", "title": "Core Outcome", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by nonexistent subsystem
         api_nodes = graph.filter_by_subsystem("api")
@@ -218,13 +175,13 @@ def test_filter_by_subsystem_handles_none() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create node with subsystem
-        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
+        # Create test graph with one node with subsystem
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-CORE-001", "type": "outcome", "title": "Core Outcome", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Create node without subsystem (manually)
-        node_dir = tmp_path / "outcomes"
-        node_dir.mkdir(parents=True, exist_ok=True)
-        node_file = node_dir / "O-NONE-001.md"
+        node_file = jig_dir / "outcomes" / "O-NONE-001.md"
         content = """---
 id: O-NONE-001
 type: outcome
@@ -238,10 +195,8 @@ This node has no subsystem field.
 """
         node_file.write_text(content)
 
-        create_test_graph_index(tmp_path, [], {})
-
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by core - should only get node with subsystem
         core_nodes = graph.filter_by_subsystem("core")
@@ -256,14 +211,14 @@ def test_filter_returns_sorted() -> None:
         tmp_path = Path(tmpdir)
 
         # Create nodes in non-alphabetical order
-        create_test_node(tmp_path, "O-TEST-003", "outcome", "Outcome 3", "core")
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
-        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-003", "type": "outcome", "title": "Outcome 3", "subsystem": "core"},
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "core"},
+            {"id": "O-TEST-002", "type": "outcome", "title": "Outcome 2", "subsystem": "core"},
+        ], subsystems={"core": {"id": "core"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Filter by outcome - should be sorted
         outcomes = graph.filter_by_type("outcome")
@@ -286,15 +241,15 @@ def test_filter_combined_operations() -> None:
         tmp_path = Path(tmpdir)
 
         # Create diverse node set
-        create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
-        create_test_node(tmp_path, "O-CORE-002", "outcome", "Core Outcome 2", "core")
-        create_test_node(tmp_path, "S-CORE-001", "specification", "Core Spec", "core")
-        create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI Outcome", "cli")
-
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-CORE-001", "type": "outcome", "title": "Core Outcome", "subsystem": "core"},
+            {"id": "O-CORE-002", "type": "outcome", "title": "Core Outcome 2", "subsystem": "core"},
+            {"id": "S-CORE-001", "type": "specification", "title": "Core Spec", "subsystem": "core"},
+            {"id": "O-CLI-001", "type": "outcome", "title": "CLI Outcome", "subsystem": "cli"},
+        ], subsystems={"core": {"id": "core"}, "cli": {"id": "cli"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Get all outcomes in core subsystem by combining filters
         all_outcomes = graph.filter_by_type("outcome")

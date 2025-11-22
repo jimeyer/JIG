@@ -138,69 +138,31 @@ def test_get_all_edges() -> None:
 
 def test_node_registry_integration(tmp_path: Path) -> None:
     """Test complete node registry with real file loading."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    
-    # Create outcomes
-    outcomes_dir = jig_dir / "outcomes"
-    outcomes_dir.mkdir()
-    o_file = outcomes_dir / "O-TEST-001.md"
-    o_file.write_text("""---
-id: O-TEST-001
-type: outcome
-title: Test outcome
-subsystem: test
----
-""")
-    
-    # Create specifications
-    specs_dir = jig_dir / "specifications"
-    specs_dir.mkdir()
-    s_file = specs_dir / "S-TEST-001.md"
-    s_file.write_text("""---
-id: S-TEST-001
-type: specification
-title: Test spec
-subsystem: test
-implements:
-  - O-TEST-001
----
-""")
-    
-    # Create graph-index with C/T nodes
-    graph_index = jig_dir / "graph-index.yaml"
-    graph_index.write_text("""
-version: '1.0'
-nodes:
-  - id: C-TEST-001
-    type: code
-    title: Test code
-    subsystem: test
-    implements:
-      - S-TEST-001
-  - id: T-TEST-001
-    type: test
-    title: Test case
-    subsystem: test
-    verifies:
-      - S-TEST-001
-""")
-    
+    from tests.helpers.graph_fixtures import create_test_graph
+
+    # Create graph with O/S nodes and C/T nodes
+    jig_dir = create_test_graph(tmp_path, [
+        {"id": "O-TEST-001", "type": "outcome", "title": "Test outcome", "subsystem": "test"},
+        {"id": "S-TEST-001", "type": "specification", "title": "Test spec", "subsystem": "test", "implements": ["O-TEST-001"]},
+        {"id": "C-TEST-001", "type": "code", "title": "Test code", "subsystem": "test", "file": "test.py", "line": 1, "implements": ["S-TEST-001"]},
+        {"id": "T-TEST-001", "type": "test", "title": "Test case", "subsystem": "test", "file": "test_test.py", "line": 5, "verifies": ["S-TEST-001"]},
+    ], subsystems={"test": {"id": "test"}})
+
     # Load graph
     graph = Graph.load_from_dir(jig_dir)
-    
+
     # Verify all nodes loaded
     assert len(graph.nodes) == 4
     assert "O-TEST-001" in graph.nodes
     assert "S-TEST-001" in graph.nodes
     assert "C-TEST-001" in graph.nodes
     assert "T-TEST-001" in graph.nodes
-    
+
     # Verify node lookups work
     outcome = graph.nodes["O-TEST-001"]
     assert outcome.type == "outcome"
     assert outcome.subsystem == "test"
-    
+
     # Verify type filtering
     outcomes = graph.filter_by_type("outcome")
     specs = graph.filter_by_type("specification")
@@ -210,16 +172,16 @@ nodes:
     assert len(specs) == 1
     assert len(code) == 1
     assert len(tests) == 1
-    
+
     # Verify subsystem filtering
     test_nodes = graph.filter_by_subsystem("test")
     assert len(test_nodes) == 4
-    
+
     # Verify edge queries
     assert len(graph.edges) == 3
     s_deps = graph.get_dependencies("S-TEST-001")
     assert "O-TEST-001" in s_deps
-    
+
     o_dependents = graph.get_dependents("O-TEST-001")
     assert "S-TEST-001" in o_dependents
 

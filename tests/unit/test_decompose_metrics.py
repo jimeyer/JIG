@@ -18,71 +18,41 @@ from jig.decompose.metrics import (
 
 def test_modularity_calculation_known_graph(tmp_path: Path) -> None:
     """Verify modularity score for known graph structure."""
+    from tests.helpers.graph_fixtures import create_test_graph
+
     # Create a graph with clear subsystem structure
     # Two subsystems with strong internal connections, weak cross connections
-    intent_dir = tmp_path / "jig"
-    intent_dir.mkdir()
-    (intent_dir / "outcomes").mkdir()
+    nodes = []
 
-    # Create nodes
+    # Create nodes for subsystem_a
     for i in range(4):
-        node_file = intent_dir / "outcomes" / f"O-A-{i:03d}.md"
-        node_file.write_text(
-            dedent(f"""
-            ---
-            id: O-A-{i:03d}
-            type: outcome
-            title: Node A{i}
-            subsystem: subsystem_a
-            ---
-            Content.
-            """)
-        )
+        nodes.append({
+            "id": f"O-A-{i:03d}",
+            "type": "outcome",
+            "title": f"Node A{i}",
+            "subsystem": "subsystem_a",
+            "depends_on": [f"O-A-{i+1:03d}"] if i < 3 else ["O-B-000"],  # Chain within, cross at end
+        })
 
+    # Create nodes for subsystem_b
     for i in range(4):
-        node_file = intent_dir / "outcomes" / f"O-B-{i:03d}.md"
-        node_file.write_text(
-            dedent(f"""
-            ---
-            id: O-B-{i:03d}
-            type: outcome
-            title: Node B{i}
-            subsystem: subsystem_b
-            ---
-            Content.
-            """)
-        )
+        depends_on = [f"O-B-{i+1:03d}"] if i < 3 else []
+        nodes.append({
+            "id": f"O-B-{i:03d}",
+            "type": "outcome",
+            "title": f"Node B{i}",
+            "subsystem": "subsystem_b",
+            "depends_on": depends_on if depends_on else None,
+        })
 
-    # Create graph-index.yaml with subsystems and edges
-    # Strong internal connections, one weak cross connection
-    from jig.utils.yaml_utils import dump_yaml
-
-    graph_data = {
-        "subsystems": {
-            "subsystem_a": {
-                "nodes": ["O-A-000", "O-A-001", "O-A-002", "O-A-003"]
-            },
-            "subsystem_b": {
-                "nodes": ["O-B-000", "O-B-001", "O-B-002", "O-B-003"]
-            },
-        },
-        "edges": [
-            # Internal edges in subsystem_a (3 edges)
-            {"from": "O-A-000", "to": "O-A-001", "type": "depends_on"},
-            {"from": "O-A-001", "to": "O-A-002", "type": "depends_on"},
-            {"from": "O-A-002", "to": "O-A-003", "type": "depends_on"},
-            # Internal edges in subsystem_b (3 edges)
-            {"from": "O-B-000", "to": "O-B-001", "type": "depends_on"},
-            {"from": "O-B-001", "to": "O-B-002", "type": "depends_on"},
-            {"from": "O-B-002", "to": "O-B-003", "type": "depends_on"},
-            # One cross-subsystem edge (weak coupling)
-            {"from": "O-A-003", "to": "O-B-000", "type": "depends_on"},
-        ],
-    }
-    dump_yaml(graph_data, intent_dir / "graph-index.yaml")
+    # Create graph with subsystems
+    jig_dir = create_test_graph(tmp_path, nodes, subsystems={
+        "subsystem_a": {"id": "subsystem_a"},
+        "subsystem_b": {"id": "subsystem_b"},
+    })
 
     # Load graph and calculate modularity
-    graph = Graph.load_from_dir(intent_dir)
+    graph = Graph.load_from_dir(jig_dir)
     modularity = calculate_modularity(graph)
 
     # With strong internal connections and one weak cross connection,
