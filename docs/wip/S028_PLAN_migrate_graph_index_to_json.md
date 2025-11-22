@@ -527,7 +527,7 @@ git show HEAD  # Should show clean YAML deletion + JSON addition
   - File size difference (24KB vs 17KB) is negligible for modern systems [pragmatic]
 
 **Links**
-- Commit: <to be filled in commit step>
+- Commit: bb7711ec58c61047f4fbbcc59da2995a076b793b
 - Performance Results:
   ```
   JSON parse time: 0.07 ms
