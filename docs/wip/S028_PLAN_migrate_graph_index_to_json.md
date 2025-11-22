@@ -39,7 +39,7 @@ Following taskCleanBreak.md principles - we're burning the ships. No backward co
 
 - [x] WU1: Update IndexBuilder and Graph loader for JSON-only — tests ☑ / docs ☑ / reflect ☑
 - [x] WU2: Update CLI commands and delete YAML — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU3: Migrate jig project's own index — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Migrate jig project's own index — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU4: Performance benchmarking and validation — tests ☐ / docs ☐ / reflect ☐
 
 ---
@@ -364,22 +364,22 @@ Clean break = committed. If issues found, revert the commit. Old YAML is in git 
 **Reflect (≤5 bullets; keep crisp)**
 
 - What worked well:
-  - [migration]
+  - Migration was already mostly done in WU1 - just needed to formalize YAML deletion [execution]
+  - Git diff shows clean migration: -744 lines YAML, +1 line JSON timestamp [clarity]
 
 - What could be better:
-  - [process]
+  - Could have done git rm in WU1, but separating WU2/WU3 was cleaner [process]
 
 - Clean break experience:
-  - [learned]
+  - No rollback needed - migration went smoothly [confidence]
+  - Git is the safety net - old YAML still in history (commit before WU1) [trust-git]
 
 - Discoveries:
-  - [discovery]
-
-- Risk watchlist:
-  - Data loss during migration [risk]
+  - Status shows 92 nodes (all markdown) but index has 88 (filtered) - design working correctly [validation]
+  - File size: 24KB JSON (vs ~23KB YAML estimated from analysis) [measurement]
 
 **Links**
-- Commit: <to be filled after execution>
+- Commit: <to be filled in commit step>
 
 **Human Validation**
 ```bash
