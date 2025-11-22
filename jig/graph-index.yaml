@@ -1,87 +1,2055 @@
 version: '1.0'
-created: 2025-11-18
-
+generated: '2025-11-22T03:38:46.961336+00:00'
 nodes:
-  - id: O-JIG-001
-    file: jig/outcomes/O-JIG-001.md
-    type: outcome
-    title: "JIG tools run in <1 second for most operations"
-    subsystem: core
-
-  - id: O-JIG-002
-    file: jig/outcomes/O-JIG-002.md
-    type: outcome
-    title: "JIG uses simple text formats (YAML + Markdown)"
-    subsystem: core
-
-  - id: O-JIG-003
-    file: jig/outcomes/O-JIG-003.md
-    type: outcome
-    title: "JIG is composable (pipes work)"
-    subsystem: core
-
-  - id: O-JIG-004
-    file: jig/outcomes/O-JIG-004.md
-    type: outcome
-    title: "JIG requires no external services"
-    subsystem: core
-
-  - id: O-JIG-005
-    file: jig/outcomes/O-JIG-005.md
-    type: outcome
-    title: "JIG demonstrates modularity >0.7"
-    subsystem: core
-
-  - id: S-JIG-001
-    file: jig/specifications/S-JIG-001.md
-    type: specification
-    title: "Marker extraction processes 1000 files in <1s"
-    subsystem: core
-
-  - id: S-JIG-002
-    file: jig/specifications/S-JIG-002.md
-    type: specification
-    title: "OSTC nodes use YAML frontmatter + Markdown"
-    subsystem: core
-
-  - id: S-JIG-003
-    file: jig/specifications/S-JIG-003.md
-    type: specification
-    title: "Commands output valid YAML"
-    subsystem: core
-
-  - id: S-JIG-004
-    file: jig/specifications/S-JIG-004.md
-    type: specification
-    title: "Subsystems export <5 interfaces"
-    subsystem: core
-
-edges:
-  - from: S-JIG-001
-    to: O-JIG-001
-    type: implements
-
-  - from: S-JIG-002
-    to: O-JIG-002
-    type: implements
-
-  - from: S-JIG-003
-    to: O-JIG-003
-    type: implements
-
-  - from: S-JIG-004
-    to: O-JIG-005
-    type: implements
-
+- id: C-AUTH-001
+  type: code
+  title: C-AUTH-001
+  subsystem: auth
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 525
+  implements:
+  - S-AUTH-001
+- id: C-AUTH-002
+  type: code
+  title: C-AUTH-002
+  subsystem: auth
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 529
+  implements:
+  - S-AUTH-002
+- id: C-CLI-001
+  type: code
+  title: C-CLI-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/main.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-CLI-002
+  type: code
+  title: C-CLI-002
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/init.py
+  line: 1
+  implements:
+  - S-CLI-003
+  - S-CLI-004
+  - S-CLI-005
+- id: C-CLI-003
+  type: code
+  title: C-CLI-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/node.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-CLI-004
+  type: code
+  title: C-CLI-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/validate.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-CLI-009
+  type: code
+  title: C-CLI-009
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/index.py
+  line: 1
+  implements:
+  - S-JIGY-009
+- id: C-CLI-010
+  type: code
+  title: C-CLI-010
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/status.py
+  line: 2
+  implements:
+  - S-CLI-007
+- id: C-CLI-011
+  type: code
+  title: C-CLI-011
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/validate.py
+  line: 2
+  implements:
+  - S-CLI-008
+- id: C-CLI-012
+  type: code
+  title: C-CLI-012
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/graph.py
+  line: 2
+  implements:
+  - S-CLI-009
+- id: C-CLI-013
+  type: code
+  title: C-CLI-013
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/graph.py
+  line: 264
+  implements:
+  - S-CLI-009
+- id: C-CLI-014
+  type: code
+  title: C-CLI-014
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/formatting.py
+  line: 15
+  implements:
+  - S-CLI-006
+- id: C-CORE-001
+  type: code
+  title: C-CORE-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/config.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-CORE-002
+  type: code
+  title: C-CORE-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/parser.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-CORE-003
+  type: code
+  title: C-CORE-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/validator.py
+  line: 1
+  implements:
+  - S-JIG-002
+- id: C-DECOMP-001
+  type: code
+  title: C-DECOMP-001
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/decompose/metrics.py
+  line: 1
+  implements:
+  - S-DECOMP-001
+  - S-DECOMP-003
+- id: C-GRAPH-001
+  type: code
+  title: C-GRAPH-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/graph.py
+  line: 1
+  implements:
+  - S-GRAPH-002
+- id: C-GRAPH-004
+  type: code
+  title: C-GRAPH-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/graph.py
+  line: 1
+  implements:
+  - S-GRAPH-003
+- id: C-JIGY-001
+  type: code
+  title: C-JIGY-001
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/relationships.py
+  line: 1
+  implements:
+  - S-JIGY-001
+- id: C-JIGY-008
+  type: code
+  title: C-JIGY-008
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/scanner.py
+  line: 1
+  implements:
+  - S-JIGY-008
+- id: C-JIGY-009
+  type: code
+  title: C-JIGY-009
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/index_builder.py
+  line: 1
+  implements:
+  - S-JIGY-009
+- id: C-JIGY-010
+  type: code
+  title: C-JIGY-010
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/annotation_validator.py
+  line: 1
+  implements:
+  - S-JIGY-010
+- id: C-JIGY-011
+  type: code
+  title: C-JIGY-011
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/validator.py
+  line: 253
+  implements:
+  - S-JIGY-004
+- id: C-JIGY-030
+  type: code
+  title: C-JIGY-030
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/ignore_filter.py
+  line: 1
+  implements:
+  - S-JIGY-011
+- id: C-JIGY-031
+  type: code
+  title: C-JIGY-031
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/scanner.py
+  line: 2
+  implements:
+  - S-JIGY-011
+- id: C-JIGY-032
+  type: code
+  title: C-JIGY-032
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/index_builder.py
+  line: 2
+  implements:
+  - S-JIGY-011
+- id: C-MOCKING-001
+  type: code
+  title: C-MOCKING-001
+  subsystem: mocking
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 546
+  implements:
+  - S-TEST-001
+- id: C-NESTED-001
+  type: code
+  title: C-NESTED-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/graph.py
+  line: 34
+  implements:
+  - S-NESTED-001
+- id: C-NESTED-002
+  type: code
+  title: C-NESTED-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/graph.py
+  line: 438
+  implements:
+  - S-NESTED-002
+- id: C-NESTED-003
+  type: code
+  title: C-NESTED-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/core/validator.py
+  line: 342
+  implements:
+  - S-NESTED-005
+- id: C-NESTED-004
+  type: code
+  title: C-NESTED-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/status.py
+  line: 21
+  implements:
+  - S-NESTED-003
+- id: C-NESTED-005
+  type: code
+  title: C-NESTED-005
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/graph.py
+  line: 263
+  implements:
+  - S-NESTED-002
+- id: C-NESTED-007
+  type: code
+  title: C-NESTED-007
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/decompose.py
+  line: 1
+  implements:
+  - S-NESTED-004
+- id: C-STATUS-001
+  type: code
+  title: C-STATUS-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/cli/status.py
+  line: 1
+  implements:
+  - S-GRAPH-001
+- id: C-TESTING-001
+  type: code
+  title: C-TESTING-001
+  subsystem: testing
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 545
+  implements:
+  - S-TEST-001
+- id: C-UTIL-001
+  type: code
+  title: C-UTIL-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/utils/io.py
+  line: 6
+  implements:
+  - S-JIG-002
+- id: C-UTIL-002
+  type: code
+  title: C-UTIL-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/src/jig/utils/yaml_utils.py
+  line: 6
+  implements:
+  - S-JIG-002
+- id: O-CLI-001
+  type: outcome
+  title: Users can safely run jigy init multiple times
+  subsystem: cli
+  file: jig/outcomes/O-CLI-001.md
+- id: O-CLI-002
+  type: outcome
+  title: Missing JIG structure components are automatically repaired
+  subsystem: cli
+  file: jig/outcomes/O-CLI-002.md
+- id: O-CLI-003
+  type: outcome
+  title: Consistent CLI Output Formatting
+  subsystem: cli
+  file: jig/outcomes/O-CLI-003.md
+- id: O-CLI-004
+  type: outcome
+  title: Actionable Error Messages
+  subsystem: cli
+  file: jig/outcomes/O-CLI-004.md
+- id: O-CLI-005
+  type: outcome
+  title: Progressive Disclosure of Information
+  subsystem: cli
+  file: jig/outcomes/O-CLI-005.md
+- id: O-JIG-001
+  type: outcome
+  title: JIG tools run in <1 second for most operations
+  subsystem: core
+  file: jig/outcomes/O-JIG-001.md
+- id: O-JIG-002
+  type: outcome
+  title: JIG uses simple text formats (YAML + Markdown)
+  subsystem: core
+  file: jig/outcomes/O-JIG-002.md
+- id: O-JIG-003
+  type: outcome
+  title: JIG is composable (pipes work)
+  subsystem: core
+  file: jig/outcomes/O-JIG-003.md
+- id: O-JIG-004
+  type: outcome
+  title: JIG requires no external services
+  subsystem: core
+  file: jig/outcomes/O-JIG-004.md
+- id: O-JIG-005
+  type: outcome
+  title: JIG demonstrates modularity >0.7
+  subsystem: core
+  file: jig/outcomes/O-JIG-005.md
+- id: O-JIGY-001
+  type: outcome
+  title: JIG graph accurately reflects all OSTC relationships
+  subsystem: jigy-tool
+  status: active
+  file: jig/outcomes/O-JIGY-001.md
+- id: O-JIGY-002
+  type: outcome
+  title: Developers can navigate Intent graph efficiently
+  subsystem: jigy-tool
+  status: active
+  file: jig/outcomes/O-JIGY-002.md
+- id: O-JIGY-003
+  type: outcome
+  title: Code and Intent stay synchronized
+  subsystem: jigy-tool
+  status: active
+  file: jig/outcomes/O-JIGY-003.md
+- id: O-JIGY-004
+  type: outcome
+  title: JIG scanning excludes test fixtures and template files
+  subsystem: jigy-tool
+  status: active
+  file: jig/outcomes/O-JIGY-004.md
+- id: S-AUTH-001
+  type: specification
+  title: JWT token authentication (test fixture)
+  subsystem: test-fixtures
+  status: test-fixture
+  file: jig/specifications/S-AUTH-001.md
+- id: S-AUTH-002
+  type: specification
+  title: JWT token refresh mechanism (test fixture)
+  subsystem: test-fixtures
+  status: test-fixture
+  file: jig/specifications/S-AUTH-002.md
+- id: S-CLI-003
+  type: specification
+  title: jigy init verifies and repairs missing directories
+  subsystem: cli
+  file: jig/specifications/S-CLI-003.md
+  implements:
+  - O-CLI-001
+  - O-CLI-002
+- id: S-CLI-004
+  type: specification
+  title: jigy init verifies and repairs missing config files
+  subsystem: cli
+  file: jig/specifications/S-CLI-004.md
+  implements:
+  - O-CLI-001
+  - O-CLI-002
+- id: S-CLI-005
+  type: specification
+  title: jigy init reports created vs repaired components
+  subsystem: cli
+  file: jig/specifications/S-CLI-005.md
+  implements:
+  - O-CLI-001
+  - O-CLI-002
+- id: S-CLI-006
+  type: specification
+  title: Standard Formatting Library for CLI Output
+  subsystem: cli
+  file: jig/specifications/S-CLI-006.md
+- id: S-CLI-007
+  type: specification
+  title: Status Command Output Format
+  subsystem: cli
+  file: jig/specifications/S-CLI-007.md
+- id: S-CLI-008
+  type: specification
+  title: Validate Command Output Format
+  subsystem: cli
+  file: jig/specifications/S-CLI-008.md
+- id: S-CLI-009
+  type: specification
+  title: Graph Command Output Format
+  subsystem: cli
+  file: jig/specifications/S-CLI-009.md
+- id: S-DECOMP-001
+  type: specification
+  title: Newman modularity calculation for subsystem boundary analysis
+  subsystem: decompose
+  status: active
+  file: jig/specifications/S-DECOMP-001.md
+- id: S-DECOMP-003
+  type: specification
+  title: Coupling ratio calculation for subsystem boundary quality
+  subsystem: decompose
+  status: active
+  file: jig/specifications/S-DECOMP-003.md
+- id: S-GRAPH-001
+  type: specification
+  title: Status calculation logic for Intent Graph health
+  subsystem: core
+  status: active
+  file: jig/specifications/S-GRAPH-001.md
+- id: S-GRAPH-002
+  type: specification
+  title: Core graph data structures and operations
+  subsystem: core
+  status: active
+  file: jig/specifications/S-GRAPH-002.md
+- id: S-GRAPH-003
+  type: specification
+  title: Graph traversal, query, and path-finding operations
+  subsystem: core
+  status: active
+  file: jig/specifications/S-GRAPH-003.md
+- id: S-JIG-001
+  type: specification
+  title: Marker extraction processes 1000 files in <1s
+  subsystem: core
+  file: jig/specifications/S-JIG-001.md
+- id: S-JIG-002
+  type: specification
+  title: OSTC nodes use YAML frontmatter + Markdown
+  subsystem: core
+  file: jig/specifications/S-JIG-002.md
+- id: S-JIG-003
+  type: specification
+  title: Commands output valid YAML
+  subsystem: core
+  file: jig/specifications/S-JIG-003.md
+- id: S-JIG-004
+  type: specification
+  title: Subsystems export <5 interfaces
+  subsystem: core
+  file: jig/specifications/S-JIG-004.md
+- id: S-JIG-005
+  type: specification
+  title: Test nodes discovered via @jig annotations
+  subsystem: core
+  file: jig/specifications/S-JIG-005.md
+- id: S-JIG-006
+  type: specification
+  title: Graph loads O/S/X markdown nodes only
+  subsystem: core
+  file: jig/specifications/S-JIG-006.md
+- id: S-JIGY-001
+  type: specification
+  title: Parse frontmatter relationship fields from markdown
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-001.md
+  implements:
+  - O-JIGY-001
+- id: S-JIGY-002
+  type: specification
+  title: Load graph-index.yaml for complete node registry
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-002.md
+  implements:
+  - O-JIGY-001
+- id: S-JIGY-003
+  type: specification
+  title: Unified node registry with O(1) lookup performance
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-003.md
+  implements:
+  - O-JIGY-002
+- id: S-JIGY-004
+  type: specification
+  title: Edge validation with type-aware rules
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-004.md
+  implements:
+  - O-JIGY-001
+  - O-JIGY-003
+- id: S-JIGY-005
+  type: specification
+  title: Graph query commands (node, edges, list)
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-005.md
+  implements:
+  - O-JIGY-002
+- id: S-JIGY-006
+  type: specification
+  title: Path finding and graph traversal with depth limits
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-006.md
+  implements:
+  - O-JIGY-002
+- id: S-JIGY-007
+  type: specification
+  title: Subsystem queries with internal/external edge classification
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-007.md
+  implements:
+  - O-JIGY-002
+- id: S-JIGY-008
+  type: specification
+  title: Fast annotation scanner (<2s for 10k files)
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-008.md
+  implements:
+  - O-JIGY-003
+- id: S-JIGY-009
+  type: specification
+  title: Index rebuild regenerates graph-index.yaml from sources
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-009.md
+  implements:
+  - O-JIGY-003
+- id: S-JIGY-010
+  type: specification
+  title: Annotation validation checks all @jig references
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-010.md
+  implements:
+  - O-JIGY-003
+- id: S-JIGY-011
+  type: specification
+  title: Exclusion filtering prevents test fixture pollution
+  subsystem: jigy-tool
+  status: active
+  file: jig/specifications/S-JIGY-011.md
+  implements:
+  - O-JIGY-004
+- id: S-JIGY-012
+  type: specification
+  title: Validator uses unified graph loading for all node types
+  subsystem: jigy-tool
+  file: jig/specifications/S-JIGY-012.md
+  implements:
+  - O-JIGY-001
+- id: S-JIGY-013
+  type: specification
+  title: Index rebuild exports subsystems to graph-index.yaml
+  subsystem: jigy-tool
+  file: jig/specifications/S-JIGY-013.md
+  implements:
+  - O-JIGY-002
+- id: S-JIGY-014
+  type: specification
+  title: Commands report consistent node and edge counts
+  subsystem: jigy-tool
+  file: jig/specifications/S-JIGY-014.md
+  implements:
+  - O-JIGY-001
+- id: S-NESTED-001
+  type: specification
+  title: Nested subsystem data structure with hierarchical organization
+  subsystem: core
+  status: active
+  file: jig/specifications/S-NESTED-001.md
+- id: S-NESTED-002
+  type: specification
+  title: Subsystem path resolution and recursive node queries
+  subsystem: core
+  status: active
+  file: jig/specifications/S-NESTED-002.md
+- id: S-NESTED-003
+  type: specification
+  title: Display nested subsystems in status and graph commands
+  subsystem: core
+  status: active
+  file: jig/specifications/S-NESTED-003.md
+- id: S-NESTED-004
+  type: specification
+  title: Nested subsystem metrics and hierarchical coupling analysis
+  subsystem: decompose
+  status: active
+  file: jig/specifications/S-NESTED-004.md
+- id: S-NESTED-005
+  type: specification
+  title: Nested subsystem validation rules and constraint checking
+  subsystem: core
+  status: active
+  file: jig/specifications/S-NESTED-005.md
+- id: S-NESTED-006
+  type: specification
+  title: Constraint scopes with nested subsystem paths
+  subsystem: core
+  status: active
+  file: jig/specifications/S-NESTED-006.md
+- id: S-TEST-001
+  type: specification
+  title: Generic test specification for fixtures and examples
+  subsystem: test-fixtures
+  status: test-fixture
+  file: jig/specifications/S-TEST-001.md
+- id: T-CLI-001
+  type: test
+  title: T-CLI-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_init_command.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CLI-002
+  type: test
+  title: T-CLI-002
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_init_command.py
+  line: 52
+  verifies:
+  - S-CLI-003
+  - S-CLI-004
+  - S-CLI-005
+- id: T-CLI-003
+  type: test
+  title: T-CLI-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_init_command.py
+  line: 95
+  verifies:
+  - S-JIG-001
+- id: T-CLI-004
+  type: test
+  title: T-CLI-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_node_create.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CLI-005
+  type: test
+  title: T-CLI-005
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_node_create.py
+  line: 135
+  verifies:
+  - S-JIG-002
+- id: T-CLI-006
+  type: test
+  title: T-CLI-006
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_node_create.py
+  line: 284
+  verifies:
+  - S-JIG-001
+- id: T-CLI-007
+  type: test
+  title: T-CLI-007
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_validate_command.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CLI-008
+  type: test
+  title: T-CLI-008
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_validate_command.py
+  line: 81
+  verifies:
+  - S-JIG-002
+- id: T-CLI-009
+  type: test
+  title: T-CLI-009
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_validate_command.py
+  line: 272
+  verifies:
+  - S-JIG-001
+- id: T-CLI-010
+  type: test
+  title: T-CLI-010
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_init_command.py
+  line: 70
+  verifies:
+  - S-CLI-003
+  - S-CLI-004
+- id: T-CLI-011
+  type: test
+  title: T-CLI-011
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 581
+  verifies:
+  - S-CLI-009
+- id: T-CLI-012
+  type: test
+  title: T-CLI-012
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 633
+  verifies:
+  - S-CLI-009
+- id: T-CLI-014
+  type: test
+  title: T-CLI-014
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 527
+  verifies:
+  - S-CLI-009
+- id: T-CLI-015
+  type: test
+  title: T-CLI-015
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 7
+  verifies:
+  - S-CLI-006
+- id: T-CLI-016
+  type: test
+  title: T-CLI-016
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 24
+  verifies:
+  - S-CLI-006
+- id: T-CLI-017
+  type: test
+  title: T-CLI-017
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 29
+  verifies:
+  - S-CLI-006
+- id: T-CLI-018
+  type: test
+  title: T-CLI-018
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 34
+  verifies:
+  - S-CLI-006
+- id: T-CLI-019
+  type: test
+  title: T-CLI-019
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 41
+  verifies:
+  - S-CLI-006
+- id: T-CLI-020
+  type: test
+  title: T-CLI-020
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 53
+  verifies:
+  - S-CLI-006
+- id: T-CLI-021
+  type: test
+  title: T-CLI-021
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 65
+  verifies:
+  - S-CLI-006
+- id: T-CLI-022
+  type: test
+  title: T-CLI-022
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 82
+  verifies:
+  - S-CLI-006
+- id: T-CLI-023
+  type: test
+  title: T-CLI-023
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 91
+  verifies:
+  - S-CLI-006
+- id: T-CLI-024
+  type: test
+  title: T-CLI-024
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 100
+  verifies:
+  - S-CLI-006
+- id: T-CLI-025
+  type: test
+  title: T-CLI-025
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 114
+  verifies:
+  - S-CLI-006
+- id: T-CLI-026
+  type: test
+  title: T-CLI-026
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 120
+  verifies:
+  - S-CLI-006
+- id: T-CLI-027
+  type: test
+  title: T-CLI-027
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 126
+  verifies:
+  - S-CLI-006
+- id: T-CLI-028
+  type: test
+  title: T-CLI-028
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 135
+  verifies:
+  - S-CLI-006
+- id: T-CLI-029
+  type: test
+  title: T-CLI-029
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 142
+  verifies:
+  - S-CLI-006
+- id: T-CLI-030
+  type: test
+  title: T-CLI-030
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 149
+  verifies:
+  - S-CLI-006
+- id: T-CLI-031
+  type: test
+  title: T-CLI-031
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 166
+  verifies:
+  - S-CLI-006
+- id: T-CLI-032
+  type: test
+  title: T-CLI-032
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 180
+  verifies:
+  - S-CLI-006
+- id: T-CLI-033
+  type: test
+  title: T-CLI-033
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 190
+  verifies:
+  - S-CLI-006
+- id: T-CLI-034
+  type: test
+  title: T-CLI-034
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 196
+  verifies:
+  - S-CLI-006
+- id: T-CLI-035
+  type: test
+  title: T-CLI-035
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 203
+  verifies:
+  - S-CLI-006
+- id: T-CLI-036
+  type: test
+  title: T-CLI-036
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 209
+  verifies:
+  - S-CLI-006
+- id: T-CLI-037
+  type: test
+  title: T-CLI-037
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 223
+  verifies:
+  - S-CLI-006
+- id: T-CLI-038
+  type: test
+  title: T-CLI-038
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 233
+  verifies:
+  - S-CLI-006
+- id: T-CLI-039
+  type: test
+  title: T-CLI-039
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 239
+  verifies:
+  - S-CLI-006
+- id: T-CLI-040
+  type: test
+  title: T-CLI-040
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 246
+  verifies:
+  - S-CLI-006
+- id: T-CLI-041
+  type: test
+  title: T-CLI-041
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 257
+  verifies:
+  - S-CLI-006
+- id: T-CLI-042
+  type: test
+  title: T-CLI-042
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 274
+  verifies:
+  - S-CLI-006
+- id: T-CLI-043
+  type: test
+  title: T-CLI-043
+  subsystem: cli
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/cli/test_formatting.py
+  line: 288
+  verifies:
+  - S-CLI-006
+- id: T-CORE-001
+  type: test
+  title: T-CORE-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_config.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CORE-002
+  type: test
+  title: T-CORE-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_config.py
+  line: 37
+  verifies:
+  - S-JIG-002
+- id: T-CORE-003
+  type: test
+  title: T-CORE-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_parser.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CORE-004
+  type: test
+  title: T-CORE-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_parser.py
+  line: 76
+  verifies:
+  - S-JIG-002
+- id: T-CORE-005
+  type: test
+  title: T-CORE-005
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-CORE-006
+  type: test
+  title: T-CORE-006
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 28
+  verifies:
+  - S-JIG-002
+- id: T-CORE-007
+  type: test
+  title: T-CORE-007
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 71
+  verifies:
+  - S-JIG-002
+- id: T-CORE-008
+  type: test
+  title: T-CORE-008
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 114
+  verifies:
+  - S-JIG-002
+- id: T-CORE-009
+  type: test
+  title: T-CORE-009
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 208
+  verifies:
+  - S-JIG-002
+- id: T-CORE-010
+  type: test
+  title: T-CORE-010
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 241
+  verifies:
+  - S-JIG-002
+- id: T-DECOMP-001
+  type: test
+  title: T-DECOMP-001
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_decompose_metrics.py
+  line: 1
+  verifies:
+  - S-DECOMP-001
+- id: T-DECOMP-002
+  type: test
+  title: T-DECOMP-002
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_decompose_metrics.py
+  line: 94
+  verifies:
+  - S-DECOMP-003
+- id: T-DECOMP-003
+  type: test
+  title: T-DECOMP-003
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_decompose_metrics.py
+  line: 124
+  verifies:
+  - S-DECOMP-001
+- id: T-DECOMP-004
+  type: test
+  title: T-DECOMP-004
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_decompose_metrics.py
+  line: 144
+  verifies:
+  - S-DECOMP-003
+- id: T-GRAPH-001
+  type: test
+  title: T-GRAPH-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph.py
+  line: 1
+  verifies:
+  - S-GRAPH-002
+- id: T-GRAPH-002
+  type: test
+  title: T-GRAPH-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph.py
+  line: 119
+  verifies:
+  - S-GRAPH-002
+- id: T-GRAPH-003
+  type: test
+  title: T-GRAPH-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph.py
+  line: 143
+  verifies:
+  - S-GRAPH-002
+- id: T-GRAPH-004
+  type: test
+  title: T-GRAPH-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_traversal.py
+  line: 1
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-005
+  type: test
+  title: T-GRAPH-005
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_traversal.py
+  line: 82
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-006
+  type: test
+  title: T-GRAPH-006
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_traversal.py
+  line: 113
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-007
+  type: test
+  title: T-GRAPH-007
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_traversal.py
+  line: 142
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-008
+  type: test
+  title: T-GRAPH-008
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_traversal.py
+  line: 264
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-009
+  type: test
+  title: T-GRAPH-009
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_queries.py
+  line: 1
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-010
+  type: test
+  title: T-GRAPH-010
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_queries.py
+  line: 78
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-011
+  type: test
+  title: T-GRAPH-011
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_queries.py
+  line: 143
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-012
+  type: test
+  title: T-GRAPH-012
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_queries.py
+  line: 252
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-013
+  type: test
+  title: T-GRAPH-013
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_show.py
+  line: 1
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-014
+  type: test
+  title: T-GRAPH-014
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_show.py
+  line: 105
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-015
+  type: test
+  title: T-GRAPH-015
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_show.py
+  line: 185
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-016
+  type: test
+  title: T-GRAPH-016
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_deps.py
+  line: 1
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-017
+  type: test
+  title: T-GRAPH-017
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_deps.py
+  line: 115
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-018
+  type: test
+  title: T-GRAPH-018
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_deps.py
+  line: 163
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-019
+  type: test
+  title: T-GRAPH-019
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_deps.py
+  line: 220
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-020
+  type: test
+  title: T-GRAPH-020
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 1
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-021
+  type: test
+  title: T-GRAPH-021
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 111
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-022
+  type: test
+  title: T-GRAPH-022
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 155
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-023
+  type: test
+  title: T-GRAPH-023
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 207
+  verifies:
+  - S-GRAPH-003
+- id: T-GRAPH-024
+  type: test
+  title: T-GRAPH-024
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_graph_path_list.py
+  line: 298
+  verifies:
+  - S-GRAPH-003
+- id: T-JIGY-001
+  type: test
+  title: T-JIGY-001
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_relationship_parsing.py
+  line: 1
+  verifies:
+  - S-JIGY-001
+- id: T-JIGY-002
+  type: test
+  title: T-JIGY-002
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_relationship_parsing.py
+  line: 13
+  verifies:
+  - S-JIGY-001
+- id: T-JIGY-003
+  type: test
+  title: T-JIGY-003
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_relationship_parsing.py
+  line: 36
+  verifies:
+  - S-JIGY-001
+- id: T-JIGY-004
+  type: test
+  title: T-JIGY-004
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_index_loading.py
+  line: 1
+  verifies:
+  - S-JIGY-002
+- id: T-JIGY-005
+  type: test
+  title: T-JIGY-005
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_index_loading.py
+  line: 11
+  verifies:
+  - S-JIGY-002
+- id: T-JIGY-006
+  type: test
+  title: T-JIGY-006
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_index_loading.py
+  line: 69
+  verifies:
+  - S-JIGY-002
+- id: T-JIGY-007
+  type: test
+  title: T-JIGY-007
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_node_registry.py
+  line: 1
+  verifies:
+  - S-JIGY-003
+- id: T-JIGY-008
+  type: test
+  title: T-JIGY-008
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_node_registry.py
+  line: 12
+  verifies:
+  - S-JIGY-003
+- id: T-JIGY-009
+  type: test
+  title: T-JIGY-009
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_edge_validation.py
+  line: 1
+  verifies:
+  - S-JIGY-004
+- id: T-JIGY-010
+  type: test
+  title: T-JIGY-010
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_edge_validation.py
+  line: 13
+  verifies:
+  - S-JIGY-004
+- id: T-JIGY-012
+  type: test
+  title: T-JIGY-012
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_commands.py
+  line: 1
+  verifies:
+  - S-JIGY-005
+- id: T-JIGY-013
+  type: test
+  title: T-JIGY-013
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_graph_commands.py
+  line: 124
+  verifies:
+  - S-JIGY-005
+- id: T-JIGY-021
+  type: test
+  title: T-JIGY-021
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 1
+  verifies:
+  - S-JIGY-008
+- id: T-JIGY-024
+  type: test
+  title: T-JIGY-024
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_index_rebuild.py
+  line: 1
+  verifies:
+  - S-JIGY-009
+- id: T-JIGY-027
+  type: test
+  title: T-JIGY-027
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_validation.py
+  line: 1
+  verifies:
+  - S-JIGY-010
+- id: T-JIGY-030
+  type: test
+  title: T-JIGY-030
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_ignore_filter.py
+  line: 1
+  verifies:
+  - S-JIGY-011
+- id: T-JIGY-031
+  type: test
+  title: T-JIGY-031
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 462
+  verifies:
+  - S-JIGY-011
+- id: T-JIGY-032
+  type: test
+  title: T-JIGY-032
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_index_rebuild.py
+  line: 629
+  verifies:
+  - S-JIGY-011
+- id: T-JIGY-040
+  type: test
+  title: T-JIGY-040
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_validator.py
+  line: 496
+  verifies:
+  - S-JIGY-012
+- id: T-JIGY-041
+  type: test
+  title: T-JIGY-041
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_validate_command.py
+  line: 426
+  verifies:
+  - S-JIGY-012
+- id: T-JIGY-042
+  type: test
+  title: T-JIGY-042
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_index_rebuild.py
+  line: 862
+  verifies:
+  - S-JIGY-013
+- id: T-JIGY-043
+  type: test
+  title: T-JIGY-043
+  subsystem: jigy-tool
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_index_rebuild.py
+  line: 1
+  verifies:
+  - S-JIGY-013
+- id: T-NESTED-001
+  type: test
+  title: T-NESTED-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 1
+  verifies:
+  - S-NESTED-001
+- id: T-NESTED-002
+  type: test
+  title: T-NESTED-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 98
+  verifies:
+  - S-NESTED-002
+- id: T-NESTED-003
+  type: test
+  title: T-NESTED-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 150
+  verifies:
+  - S-NESTED-001
+- id: T-NESTED-004
+  type: test
+  title: T-NESTED-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 202
+  verifies:
+  - S-NESTED-005
+- id: T-NESTED-005
+  type: test
+  title: T-NESTED-005
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 228
+  verifies:
+  - S-NESTED-005
+- id: T-NESTED-006
+  type: test
+  title: T-NESTED-006
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_nested_subsystems.py
+  line: 259
+  verifies:
+  - S-NESTED-001
+- id: T-NESTED-007
+  type: test
+  title: T-NESTED-007
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_nested_status.py
+  line: 1
+  verifies:
+  - S-NESTED-003
+- id: T-NESTED-008
+  type: test
+  title: T-NESTED-008
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_nested_status.py
+  line: 124
+  verifies:
+  - S-NESTED-003
+- id: T-NESTED-009
+  type: test
+  title: T-NESTED-009
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_nested_status.py
+  line: 168
+  verifies:
+  - S-NESTED-002
+- id: T-NESTED-010
+  type: test
+  title: T-NESTED-010
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_nested_status.py
+  line: 259
+  verifies:
+  - S-NESTED-006
+- id: T-NESTED-011
+  type: test
+  title: T-NESTED-011
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_decompose_commands.py
+  line: 1
+  verifies:
+  - S-NESTED-004
+- id: T-NESTED-012
+  type: test
+  title: T-NESTED-012
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_decompose_commands.py
+  line: 117
+  verifies:
+  - S-NESTED-004
+- id: T-NESTED-013
+  type: test
+  title: T-NESTED-013
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_decompose_commands.py
+  line: 165
+  verifies:
+  - S-NESTED-004
+- id: T-NESTED-014
+  type: test
+  title: T-NESTED-014
+  subsystem: decompose
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_decompose_commands.py
+  line: 217
+  verifies:
+  - S-NESTED-004
+- id: T-STATUS-001
+  type: test
+  title: T-STATUS-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_status_logic.py
+  line: 1
+  verifies:
+  - S-GRAPH-001
+- id: T-STATUS-002
+  type: test
+  title: T-STATUS-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_status_logic.py
+  line: 88
+  verifies:
+  - S-GRAPH-001
+- id: T-STATUS-003
+  type: test
+  title: T-STATUS-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_status_logic.py
+  line: 111
+  verifies:
+  - S-GRAPH-001
+- id: T-STATUS-004
+  type: test
+  title: T-STATUS-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/integration/test_status_command.py
+  line: 1
+  verifies:
+  - S-GRAPH-001
+- id: T-TESTABLE-001
+  type: test
+  title: T-TESTABLE-001
+  subsystem: test
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_annotation_scanner.py
+  line: 547
+  verifies:
+  - S-TEST-001
+- id: T-TPL-001
+  type: test
+  title: T-TPL-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_templates.py
+  line: 1
+  verifies:
+  - S-JIG-002
+- id: T-UTIL-001
+  type: test
+  title: T-UTIL-001
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_io.py
+  line: 3
+  verifies:
+  - S-JIG-002
+- id: T-UTIL-002
+  type: test
+  title: T-UTIL-002
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_io.py
+  line: 4
+  verifies:
+  - S-JIG-002
+- id: T-UTIL-003
+  type: test
+  title: T-UTIL-003
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_yaml_utils.py
+  line: 3
+  verifies:
+  - S-JIG-002
+- id: T-UTIL-004
+  type: test
+  title: T-UTIL-004
+  subsystem: core
+  status: active
+  file: /Users/jamesmeyer/Code/jig/tests/unit/test_yaml_utils.py
+  line: 4
+  verifies:
+  - S-JIG-002
 subsystems:
+  auth:
+    nodes:
+    - C-AUTH-001
+    - C-AUTH-002
   core:
     nodes:
-      - O-JIG-001
-      - O-JIG-002
-      - O-JIG-003
-      - O-JIG-004
-      - O-JIG-005
-      - S-JIG-001
-      - S-JIG-002
-      - S-JIG-003
-      - S-JIG-004
+    - C-CLI-001
+    - C-CLI-003
+    - C-CLI-004
+    - C-CORE-001
+    - C-CORE-002
+    - C-CORE-003
+    - C-GRAPH-001
+    - C-GRAPH-004
+    - C-NESTED-001
+    - C-NESTED-002
+    - C-NESTED-003
+    - C-NESTED-004
+    - C-NESTED-005
+    - C-STATUS-001
+    - C-UTIL-001
+    - C-UTIL-002
+    - O-JIG-001
+    - O-JIG-002
+    - O-JIG-003
+    - O-JIG-004
+    - O-JIG-005
+    - S-GRAPH-001
+    - S-GRAPH-002
+    - S-GRAPH-003
+    - S-JIG-001
+    - S-JIG-002
+    - S-JIG-003
+    - S-JIG-004
+    - S-JIG-005
+    - S-JIG-006
+    - S-NESTED-001
+    - S-NESTED-002
+    - S-NESTED-003
+    - S-NESTED-005
+    - S-NESTED-006
+    - T-CLI-001
+    - T-CLI-003
+    - T-CLI-004
+    - T-CLI-005
+    - T-CLI-006
+    - T-CLI-007
+    - T-CLI-008
+    - T-CLI-009
+    - T-CORE-001
+    - T-CORE-002
+    - T-CORE-003
+    - T-CORE-004
+    - T-CORE-005
+    - T-CORE-006
+    - T-CORE-007
+    - T-CORE-008
+    - T-CORE-009
+    - T-CORE-010
+    - T-GRAPH-001
+    - T-GRAPH-002
+    - T-GRAPH-003
+    - T-GRAPH-004
+    - T-GRAPH-005
+    - T-GRAPH-006
+    - T-GRAPH-007
+    - T-GRAPH-008
+    - T-GRAPH-009
+    - T-GRAPH-010
+    - T-GRAPH-011
+    - T-GRAPH-012
+    - T-GRAPH-013
+    - T-GRAPH-014
+    - T-GRAPH-015
+    - T-GRAPH-016
+    - T-GRAPH-017
+    - T-GRAPH-018
+    - T-GRAPH-019
+    - T-GRAPH-020
+    - T-GRAPH-021
+    - T-GRAPH-022
+    - T-GRAPH-023
+    - T-GRAPH-024
+    - T-NESTED-001
+    - T-NESTED-002
+    - T-NESTED-003
+    - T-NESTED-004
+    - T-NESTED-005
+    - T-NESTED-006
+    - T-NESTED-007
+    - T-NESTED-008
+    - T-NESTED-009
+    - T-NESTED-010
+    - T-STATUS-001
+    - T-STATUS-002
+    - T-STATUS-003
+    - T-STATUS-004
+    - T-TPL-001
+    - T-UTIL-001
+    - T-UTIL-002
+    - T-UTIL-003
+    - T-UTIL-004
+  cli:
+    nodes:
+    - C-CLI-002
+    - C-CLI-010
+    - C-CLI-011
+    - C-CLI-012
+    - C-CLI-013
+    - C-CLI-014
+    - O-CLI-001
+    - O-CLI-002
+    - O-CLI-003
+    - O-CLI-004
+    - O-CLI-005
+    - S-CLI-003
+    - S-CLI-004
+    - S-CLI-005
+    - S-CLI-006
+    - S-CLI-007
+    - S-CLI-008
+    - S-CLI-009
+    - T-CLI-002
+    - T-CLI-010
+    - T-CLI-011
+    - T-CLI-012
+    - T-CLI-014
+    - T-CLI-015
+    - T-CLI-016
+    - T-CLI-017
+    - T-CLI-018
+    - T-CLI-019
+    - T-CLI-020
+    - T-CLI-021
+    - T-CLI-022
+    - T-CLI-023
+    - T-CLI-024
+    - T-CLI-025
+    - T-CLI-026
+    - T-CLI-027
+    - T-CLI-028
+    - T-CLI-029
+    - T-CLI-030
+    - T-CLI-031
+    - T-CLI-032
+    - T-CLI-033
+    - T-CLI-034
+    - T-CLI-035
+    - T-CLI-036
+    - T-CLI-037
+    - T-CLI-038
+    - T-CLI-039
+    - T-CLI-040
+    - T-CLI-041
+    - T-CLI-042
+    - T-CLI-043
+  jigy-tool:
+    nodes:
+    - C-CLI-009
+    - C-JIGY-001
+    - C-JIGY-008
+    - C-JIGY-009
+    - C-JIGY-010
+    - C-JIGY-011
+    - C-JIGY-030
+    - C-JIGY-031
+    - C-JIGY-032
+    - O-JIGY-001
+    - O-JIGY-002
+    - O-JIGY-003
+    - O-JIGY-004
+    - S-JIGY-001
+    - S-JIGY-002
+    - S-JIGY-003
+    - S-JIGY-004
+    - S-JIGY-005
+    - S-JIGY-006
+    - S-JIGY-007
+    - S-JIGY-008
+    - S-JIGY-009
+    - S-JIGY-010
+    - S-JIGY-011
+    - S-JIGY-012
+    - S-JIGY-013
+    - S-JIGY-014
+    - T-JIGY-001
+    - T-JIGY-002
+    - T-JIGY-003
+    - T-JIGY-004
+    - T-JIGY-005
+    - T-JIGY-006
+    - T-JIGY-007
+    - T-JIGY-008
+    - T-JIGY-009
+    - T-JIGY-010
+    - T-JIGY-012
+    - T-JIGY-013
+    - T-JIGY-021
+    - T-JIGY-024
+    - T-JIGY-027
+    - T-JIGY-030
+    - T-JIGY-031
+    - T-JIGY-032
+    - T-JIGY-040
+    - T-JIGY-041
+    - T-JIGY-042
+    - T-JIGY-043
+  decompose:
+    nodes:
+    - C-DECOMP-001
+    - C-NESTED-007
+    - S-DECOMP-001
+    - S-DECOMP-003
+    - S-NESTED-004
+    - T-DECOMP-001
+    - T-DECOMP-002
+    - T-DECOMP-003
+    - T-DECOMP-004
+    - T-NESTED-011
+    - T-NESTED-012
+    - T-NESTED-013
+    - T-NESTED-014
+  mocking:
+    nodes:
+    - C-MOCKING-001
+  testing:
+    nodes:
+    - C-TESTING-001
+  test-fixtures:
+    nodes:
+    - S-AUTH-001
+    - S-AUTH-002
+    - S-TEST-001
+  test:
+    nodes:
+    - T-TESTABLE-001

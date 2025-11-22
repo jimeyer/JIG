@@ -84,7 +84,7 @@ All constraints are known from SCOPE. Creating specifications upfront enables TD
 
 - [x] WU0: Create known Intent nodes (S-JIGY-012, S-JIGY-013, S-JIGY-014) — intent ✅ / validate ✅ / reflect ✅
 - [x] WU1: Refactor validator to use Graph.load_from_dir() — tests ✅ / docs N/A / reflect ✅
-- [ ] WU2: Add subsystem export to index rebuild — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Add subsystem export to index rebuild — tests ✅ / docs N/A / reflect ✅
 - [ ] WU3: Fix edge deduplication and counting — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Fix node counting in index rebuild — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Integration test for command consistency — tests ☐ / docs ☐ / reflect ☐
@@ -691,13 +691,27 @@ def test_index_rebuild_exports_subsystems():
 - None (internal change, user-visible via status command)
 
 **Reflect:**
-- What worked well: …
-- Discoveries: …
-- Decisions: …
+- What worked well:
+  - TDD approach - wrote tests first, implementation followed naturally
+  - S-JIGY-013 spec provided clear implementation guidance
+  - build_subsystems_from_nodes() function cleanly separated from write_yaml()
+
+- What could be better:
+  - Initial integration test had issues with test setup (directory paths, markdown formatting)
+  - Had to iterate on test to use --project-dir flag correctly
+
+- Discoveries:
+  - #LEARNED: Click CliRunner doesn't respect `chdir()` for commands with --project-dir option
+  - #LEARNED: dedent() preserves leading newline, need .lstrip() for YAML frontmatter
+  - #DECISION: Support multi-level nesting (a.b.c) even though spec only shows 2-level (future-proof)
+
+- Decisions:
+  - Only write subsystems section if subsystems_data is non-empty
+  - Used constraint node (markdown) in integration test instead of code annotation (simpler, more reliable)
 
 **Links:**
 - PR: (to be filled)
-- Commit: (to be filled)
+- Commit: <pending> (WU2)
 
 **Human Validation:**
 ```bash

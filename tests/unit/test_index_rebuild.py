@@ -858,3 +858,94 @@ class TestStatusBasedFiltering:
         node_ids = {node.id for node in nodes}
         assert node_ids == {"O-ACTIVE-001", "O-PLANNED-001"}
 
+
+# @jig T-JIGY-042 verifies:S-JIGY-013 subsystem:jigy-tool
+class TestSubsystemBuilding:
+    """Test subsystem hierarchy building from node metadata."""
+
+    def test_build_flat_subsystems(self) -> None:
+        """Build subsystems from flat (non-nested) node assignments."""
+        from jig.core.index_builder import build_subsystems_from_nodes
+
+        nodes = [
+            {"id": "C-001", "type": "code", "subsystem": "auth"},
+            {"id": "C-002", "type": "code", "subsystem": "auth"},
+            {"id": "C-003", "type": "code", "subsystem": "core"},
+            {"id": "T-001", "type": "test", "subsystem": "auth"},
+        ]
+
+        subsystems = build_subsystems_from_nodes(nodes)
+
+        assert "auth" in subsystems
+        assert "core" in subsystems
+        assert set(subsystems["auth"]["nodes"]) == {"C-001", "C-002", "T-001"}
+        assert subsystems["core"]["nodes"] == ["C-003"]
+
+    def test_build_nested_subsystems(self) -> None:
+        """Build nested subsystem hierarchy from dot-notation paths."""
+        from jig.core.index_builder import build_subsystems_from_nodes
+
+        nodes = [
+            {"id": "C-001", "type": "code", "subsystem": "crdt.ser"},
+            {"id": "C-002", "type": "code", "subsystem": "crdt.ser"},
+            {"id": "C-003", "type": "code", "subsystem": "crdt.merge"},
+            {"id": "C-004", "type": "code", "subsystem": "auth"},
+        ]
+
+        subsystems = build_subsystems_from_nodes(nodes)
+
+        assert "crdt" in subsystems
+        assert "auth" in subsystems
+        assert "subsystems" in subsystems["crdt"]
+        assert "ser" in subsystems["crdt"]["subsystems"]
+        assert "merge" in subsystems["crdt"]["subsystems"]
+        assert set(subsystems["crdt"]["subsystems"]["ser"]["nodes"]) == {"C-001", "C-002"}
+        assert subsystems["crdt"]["subsystems"]["merge"]["nodes"] == ["C-003"]
+
+    def test_build_mixed_flat_and_nested(self) -> None:
+        """Handle mix of flat and nested subsystem paths."""
+        from jig.core.index_builder import build_subsystems_from_nodes
+
+        nodes = [
+            {"id": "C-001", "type": "code", "subsystem": "auth"},
+            {"id": "C-002", "type": "code", "subsystem": "core.graph"},
+            {"id": "C-003", "type": "code", "subsystem": "core.parser"},
+            {"id": "T-001", "type": "test", "subsystem": "auth"},
+        ]
+
+        subsystems = build_subsystems_from_nodes(nodes)
+
+        # Flat subsystem
+        assert "auth" in subsystems
+        assert set(subsystems["auth"]["nodes"]) == {"C-001", "T-001"}
+
+        # Nested subsystem
+        assert "core" in subsystems
+        assert "subsystems" in subsystems["core"]
+        assert "graph" in subsystems["core"]["subsystems"]
+        assert "parser" in subsystems["core"]["subsystems"]
+
+    def test_build_ignores_nodes_without_subsystem(self) -> None:
+        """Skip nodes that don't have subsystem field."""
+        from jig.core.index_builder import build_subsystems_from_nodes
+
+        nodes = [
+            {"id": "C-001", "type": "code", "subsystem": "auth"},
+            {"id": "C-002", "type": "code"},  # No subsystem
+            {"id": "C-003", "type": "code", "subsystem": None},  # None subsystem
+        ]
+
+        subsystems = build_subsystems_from_nodes(nodes)
+
+        assert "auth" in subsystems
+        assert subsystems["auth"]["nodes"] == ["C-001"]
+        # Only one subsystem created
+
+    def test_build_empty_list_returns_empty_dict(self) -> None:
+        """Handle empty node list."""
+        from jig.core.index_builder import build_subsystems_from_nodes
+
+        subsystems = build_subsystems_from_nodes([])
+
+        assert subsystems == {}
+

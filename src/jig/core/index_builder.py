@@ -270,9 +270,10 @@ class IndexBuilder:
         }
 
         # Convert nodes to YAML format (node-centric with relationships on nodes)
+        node_dicts: list[dict[str, Any]] = []
         for node_id in sorted(result.nodes.keys()):  # Sort for deterministic output
             node = result.nodes[node_id]
-            
+
             node_dict: dict[str, Any] = {
                 "id": node.id,
                 "type": node.type,
@@ -312,7 +313,14 @@ class IndexBuilder:
                         if value:  # Only add if not empty
                             node_dict[rel_type] = sorted(value)  # Sort for deterministic output
 
-            yaml_data["nodes"].append(node_dict)
+            node_dicts.append(node_dict)
+
+        yaml_data["nodes"] = node_dicts
+
+        # Build and add subsystems section (S-JIGY-013)
+        subsystems_data = build_subsystems_from_nodes(node_dicts)
+        if subsystems_data:
+            yaml_data["subsystems"] = subsystems_data
 
         # Write YAML file
         dump_yaml(yaml_data, output_file)
@@ -409,4 +417,96 @@ def merge_nodes(nodes: list[OSTCNode]) -> tuple[dict[str, OSTCNode], list[str]]:
             merged[node.id] = node
 
     return merged, conflicts
+
+
+def build_subsystems_from_nodes(nodes: list[dict[str, Any]]) -> dict[str, Any]:
+    """Build subsystem hierarchy from node metadata.
+
+    Groups nodes by their subsystem field, supporting both flat and nested
+    subsystem paths (dot-notation like "crdt.ser").
+
+    Args:
+        nodes: List of node dicts with optional 'subsystem' field
+
+    Returns:
+        Subsystems dict for graph-index.yaml with nested structure
+
+    Example:
+        >>> nodes = [
+        ...     {"id": "C-001", "subsystem": "auth"},
+        ...     {"id": "C-002", "subsystem": "crdt.ser"},
+        ... ]
+        >>> subsystems = build_subsystems_from_nodes(nodes)
+        >>> subsystems["auth"]["nodes"]
+        ['C-001']
+        >>> subsystems["crdt"]["subsystems"]["ser"]["nodes"]
+        ['C-002']
+    """
+    subsystems: dict[str, Any] = {}
+
+    for node in nodes:
+        subsystem_path = node.get("subsystem")
+
+        # Skip nodes without subsystem
+        if not subsystem_path:
+            continue
+
+        node_id = node.get("id")
+        if not node_id:
+            continue
+
+        # Handle nested paths (e.g., "crdt.ser")
+        if "." in subsystem_path:
+            parts = subsystem_path.split(".", 1)  # Split on first dot only
+            parent = parts[0]
+            child = parts[1]
+
+            # Ensure parent subsystem exists
+            if parent not in subsystems:
+                subsystems[parent] = {"subsystems": {}}
+            elif "subsystems" not in subsystems[parent]:
+                subsystems[parent]["subsystems"] = {}
+
+            # Handle multi-level nesting (e.g., "a.b.c")
+            if "." in child:
+                # Recursive case: more levels to process
+                # For now, only support 2-level nesting as per spec
+                # But let's handle it generically
+                current = subsystems[parent]["subsystems"]
+                child_parts = child.split(".")
+
+                # Navigate to second-to-last level
+                for part in child_parts[:-1]:
+                    if part not in current:
+                        current[part] = {"subsystems": {}}
+                    elif "subsystems" not in current[part]:
+                        current[part]["subsystems"] = {}
+                    current = current[part]["subsystems"]
+
+                # Add node to leaf level
+                leaf = child_parts[-1]
+                if leaf not in current:
+                    current[leaf] = {"nodes": []}
+                elif "nodes" not in current[leaf]:
+                    current[leaf]["nodes"] = []
+
+                current[leaf]["nodes"].append(node_id)
+            else:
+                # Simple 2-level nesting (parent.child)
+                if child not in subsystems[parent]["subsystems"]:
+                    subsystems[parent]["subsystems"][child] = {"nodes": []}
+                elif "nodes" not in subsystems[parent]["subsystems"][child]:
+                    subsystems[parent]["subsystems"][child]["nodes"] = []
+
+                subsystems[parent]["subsystems"][child]["nodes"].append(node_id)
+        else:
+            # Top-level subsystem (flat)
+            if subsystem_path not in subsystems:
+                subsystems[subsystem_path] = {"nodes": []}
+            elif "nodes" not in subsystems[subsystem_path]:
+                subsystems[subsystem_path]["nodes"] = []
+
+            subsystems[subsystem_path]["nodes"].append(node_id)
+
+    return subsystems
 
