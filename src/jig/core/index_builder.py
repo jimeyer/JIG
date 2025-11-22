@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from jig.core.graph import Edge
 from jig.core.ignore_filter import IgnoreFilter
 from jig.core.parser import OSTCNode, parse_ostc_node
 from jig.core.relationships import extract_edges_from_node
@@ -37,6 +38,7 @@ class RebuildResult:
     Attributes:
         success: True if rebuild completed without errors
         nodes: Dictionary mapping node ID to OSTCNode
+        edges: List of Edge objects (deduplicated)
         conflicts: List of conflict messages (duplicate IDs)
         warnings: List of warning messages (non-fatal issues)
         validation_errors: List of validation error messages
@@ -44,6 +46,7 @@ class RebuildResult:
 
     success: bool
     nodes: dict[str, OSTCNode]
+    edges: list[Edge] = field(default_factory=list)
     conflicts: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     validation_errors: list[str] = field(default_factory=list)
@@ -160,10 +163,11 @@ class IndexBuilder:
         1. Discovers all nodes (markdown + annotations)
         2. Detects conflicts (duplicate IDs)
         3. Validates nodes and relationships
-        4. Returns result with merged nodes
+        4. Extracts and deduplicates edges
+        5. Returns result with merged nodes and edges
 
         Returns:
-            RebuildResult with success status, nodes, and any errors/warnings
+            RebuildResult with success status, nodes, edges, and any errors/warnings
         """
         # 1. Discover all nodes
         markdown_nodes = self.discover_markdown_nodes()
@@ -178,10 +182,23 @@ class IndexBuilder:
         merged_nodes, merge_conflicts = merge_nodes(all_nodes)
         conflicts.extend(merge_conflicts)
 
-        # 4. Validate
+        # 4. Extract and deduplicate edges from all nodes
+        all_edges: list[Edge] = []
+        for node in merged_nodes.values():
+            node_edges = extract_edges_from_node(node)
+            all_edges.extend(node_edges)
+
+        # Deduplicate edges using (from, to, type) tuple
+        unique_edge_tuples = {(e.from_node, e.to_node, e.type) for e in all_edges}
+        deduplicated_edges = [
+            Edge(from_node=from_node, to_node=to_node, type=edge_type)
+            for from_node, to_node, edge_type in sorted(unique_edge_tuples)
+        ]
+
+        # 5. Validate
         validation_errors = self._validate_nodes(merged_nodes)
         warnings = self._generate_warnings(merged_nodes)
-        
+
         # Add parse errors to warnings
         warnings.extend(self.parse_errors)
 
@@ -191,6 +208,7 @@ class IndexBuilder:
         return RebuildResult(
             success=success,
             nodes=merged_nodes,
+            edges=deduplicated_edges,
             conflicts=conflicts,
             warnings=warnings,
             validation_errors=validation_errors,

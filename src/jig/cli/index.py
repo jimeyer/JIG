@@ -76,10 +76,10 @@ def rebuild(dry_run: bool, backup: bool, project_dir: Path) -> None:
     
     click.echo()
     click.echo(f"Total nodes: {len(result.nodes)} ({outcomes} O, {specs} S, {code} C, {tests} T)")
-    
-    # Count edges
-    edge_count = len(result.nodes) * 2  # Rough estimate, we'd need to count actual edges
-    click.echo(f"Total edges: ~{edge_count}")
+
+    # Count edges (deduplicated)
+    edge_count = len(result.edges)
+    click.echo(f"Total edges: {edge_count} (after deduplication)")
     click.echo()
     
     # Check for issues

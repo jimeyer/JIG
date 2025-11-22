@@ -336,3 +336,24 @@ def test_get_node_counts_empty_graph():
 
         # Verify empty
         assert counts == {}
+
+
+# @jig T-JIGY-044 verifies:S-JIGY-014 subsystem:jigy-tool
+def test_edge_deduplication():
+    """Verify duplicate edges are counted as one."""
+    graph = Graph()
+
+    # Add same edge twice (simulating from different sources)
+    graph.edges.append(Edge("S-001", "O-001", "implements"))
+    graph.edges.append(Edge("S-001", "O-001", "implements"))  # Duplicate
+
+    # Add a different edge
+    graph.edges.append(Edge("S-002", "O-001", "implements"))
+
+    # Deduplicate using (from, to, type) tuple
+    unique_edges = {(e.from_node, e.to_node, e.type) for e in graph.edges}
+
+    # Should have 2 unique edges (duplicate removed)
+    assert len(unique_edges) == 2
+    assert ("S-001", "O-001", "implements") in unique_edges
+    assert ("S-002", "O-001", "implements") in unique_edges

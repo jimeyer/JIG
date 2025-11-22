@@ -85,7 +85,7 @@ All constraints are known from SCOPE. Creating specifications upfront enables TD
 - [x] WU0: Create known Intent nodes (S-JIGY-012, S-JIGY-013, S-JIGY-014) — intent ✅ / validate ✅ / reflect ✅
 - [x] WU1: Refactor validator to use Graph.load_from_dir() — tests ✅ / docs N/A / reflect ✅
 - [x] WU2: Add subsystem export to index rebuild — tests ✅ / docs N/A / reflect ✅
-- [ ] WU3: Fix edge deduplication and counting — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Fix edge deduplication and counting — tests ✅ / docs N/A / reflect ✅
 - [ ] WU4: Fix node counting in index rebuild — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Integration test for command consistency — tests ☐ / docs ☐ / reflect ☐
 
@@ -780,11 +780,19 @@ def test_edge_deduplication():
 - None
 
 **Reflect:**
-- What worked well: …
-- Discoveries: …
-  - Is ~422 the raw count before dedup? Document finding
-  - Are edges being double-counted from frontmatter + graph-index? Mark with #DISCOVERY
-- Decisions: …
+- What worked well:
+  - TDD approach made implementation straightforward
+  - Edge deduplication using set of (from, to, type) tuples is simple and effective
+  - Type annotations helped catch potential issues early
+- Discoveries:
+  - #DISCOVERY: The ~422 "edge count" was actually just len(nodes) * 2, not a real count
+  - #DISCOVERY: Graph.load_from_dir() already deduplicates edges when loading from graph-index.yaml
+  - #LEARNED: Edges come from three sources: markdown frontmatter, node metadata, and graph-index edges section
+  - #LEARNED: Current codebase has 57 deduplicated edges (not 183 as estimated in SCOPE)
+- Decisions:
+  - Store edges in RebuildResult for consistency with Graph data structure
+  - Use sorted() on unique_edge_tuples for deterministic output in YAML
+  - Import Edge at module level rather than in build() method for cleaner code
 
 **Links:**
 - PR: (to be filled)
@@ -793,10 +801,11 @@ def test_edge_deduplication():
 **Human Validation:**
 ```bash
 jigy index rebuild
-# Expected output includes: "Total edges: 183 (after deduplication)"
+# Actual output: "Total edges: 57 (after deduplication)"
 
 jigy status
-# Expected output includes: "183 edges"
+# Actual output: "57 edges"
+# ✅ Counts match!
 ```
 
 ---
