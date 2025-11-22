@@ -1,0 +1,461 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.10, pytest-9.0.1, pluggy-1.6.0 -- /Users/jamesmeyer/Code/jig/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/jamesmeyer/Code/jig
+configfile: pyproject.toml
+plugins: cov-7.0.0
+collecting ... collected 365 items
+
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_empty_list PASSED [  0%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_single_item PASSED [  0%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_small_list_single_line PASSED [  0%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_small_list_wraps_if_long PASSED [  1%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_large_list_wraps PASSED [  1%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_wrapping_preserves_ids PASSED [  1%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_respects_max_width PASSED [  1%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_no_trailing_comma_on_last_line PASSED [  2%]
+tests/unit/cli/test_formatting.py::TestFormatNodeList::test_intermediate_lines_have_trailing_comma PASSED [  2%]
+tests/unit/cli/test_formatting.py::TestFormatSectionHeader::test_header_without_count PASSED [  2%]
+tests/unit/cli/test_formatting.py::TestFormatSectionHeader::test_header_with_count PASSED [  3%]
+tests/unit/cli/test_formatting.py::TestFormatSectionHeader::test_header_with_zero_count PASSED [  3%]
+tests/unit/cli/test_formatting.py::TestFormatNodeSummary::test_empty_summary PASSED [  3%]
+tests/unit/cli/test_formatting.py::TestFormatNodeSummary::test_single_type PASSED [  3%]
+tests/unit/cli/test_formatting.py::TestFormatNodeSummary::test_multiple_types PASSED [  4%]
+tests/unit/cli/test_formatting.py::TestFormatNodeSummary::test_types_sorted_alphabetically PASSED [  4%]
+tests/unit/cli/test_formatting.py::TestFormatNodeSummary::test_unknown_type_pluralization PASSED [  4%]
+tests/unit/cli/test_formatting.py::TestFormatWarning::test_warning_without_nodes PASSED [  4%]
+tests/unit/cli/test_formatting.py::TestFormatWarning::test_warning_with_empty_node_list PASSED [  5%]
+tests/unit/cli/test_formatting.py::TestFormatWarning::test_warning_with_few_nodes PASSED [  5%]
+tests/unit/cli/test_formatting.py::TestFormatWarning::test_warning_with_many_nodes_wraps PASSED [  5%]
+tests/unit/cli/test_formatting.py::TestFormatWarning::test_warning_shows_count PASSED [  6%]
+tests/unit/cli/test_formatting.py::TestFormatSuggestion::test_simple_suggestion PASSED [  6%]
+tests/unit/cli/test_formatting.py::TestFormatSuggestion::test_long_suggestion PASSED [  6%]
+tests/unit/cli/test_formatting.py::TestFormatSuggestion::test_empty_suggestion PASSED [  6%]
+tests/unit/cli/test_formatting.py::TestFormattingIntegration::test_status_output_pattern PASSED [  7%]
+tests/unit/cli/test_formatting.py::TestFormattingIntegration::test_validate_output_pattern PASSED [  7%]
+tests/unit/cli/test_formatting.py::TestFormattingIntegration::test_graph_show_pattern PASSED [  7%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_simple_annotation PASSED [  7%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_with_multiple_relationships PASSED [  8%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_with_multiple_metadata PASSED [  8%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_test_annotation PASSED [  8%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_with_depends PASSED [  9%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_extra_whitespace PASSED [  9%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_invalid_format PASSED [  9%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_annotation_missing_node_id PASSED [  9%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_parse_non_annotation_line PASSED [ 10%]
+tests/unit/test_annotation_scanner.py::TestAnnotationParsing::test_annotation_dataclass_attributes PASSED [ 10%]
+tests/unit/test_annotation_scanner.py::TestFileScanning::test_scan_single_file_with_annotation PASSED [ 10%]
+tests/unit/test_annotation_scanner.py::TestFileScanning::test_scan_file_with_multiple_annotations PASSED [ 10%]
+tests/unit/test_annotation_scanner.py::TestFileScanning::test_scan_file_with_no_annotations PASSED [ 11%]
+tests/unit/test_annotation_scanner.py::TestFileScanning::test_scan_file_with_invalid_annotations PASSED [ 11%]
+tests/unit/test_annotation_scanner.py::TestFileScanning::test_scan_nonexistent_file PASSED [ 11%]
+tests/unit/test_annotation_scanner.py::TestDirectoryScanning::test_scan_directory_with_python_files PASSED [ 12%]
+tests/unit/test_annotation_scanner.py::TestDirectoryScanning::test_scan_directory_recursively PASSED [ 12%]
+tests/unit/test_annotation_scanner.py::TestDirectoryScanning::test_scan_directory_filters_by_extension PASSED [ 12%]
+tests/unit/test_annotation_scanner.py::TestDirectoryScanning::test_scan_multiple_directories PASSED [ 12%]
+tests/unit/test_annotation_scanner.py::TestDirectoryScanning::test_scan_empty_directory PASSED [ 13%]
+tests/unit/test_annotation_scanner.py::TestDuplicateDetection::test_detect_duplicate_in_same_file PASSED [ 13%]
+tests/unit/test_annotation_scanner.py::TestDuplicateDetection::test_detect_duplicate_across_files PASSED [ 13%]
+tests/unit/test_annotation_scanner.py::TestDuplicateDetection::test_no_duplicates_when_unique PASSED [ 13%]
+tests/unit/test_annotation_scanner.py::TestPerformance::test_scan_performance_small_codebase PASSED [ 14%]
+tests/unit/test_annotation_scanner.py::TestPerformance::test_scan_performance_large_codebase PASSED [ 14%]
+tests/unit/test_annotation_scanner.py::TestEdgeCases::test_scan_with_unicode_content PASSED [ 14%]
+tests/unit/test_annotation_scanner.py::TestEdgeCases::test_scan_with_very_long_lines PASSED [ 15%]
+tests/unit/test_annotation_scanner.py::TestEdgeCases::test_scan_binary_file_skip PASSED [ 15%]
+tests/unit/test_annotation_scanner.py::TestEdgeCases::test_scan_file_permission_error PASSED [ 15%]
+tests/unit/test_annotation_scanner.py::TestEdgeCases::test_annotation_with_special_characters_in_metadata PASSED [ 15%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_excludes_c_test_pattern PASSED [ 16%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_excludes_t_test_pattern PASSED [ 16%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_excludes_c_mock_pattern PASSED [ 16%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_excludes_c_fixture_pattern PASSED [ 16%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_excludes_c_example_pattern PASSED [ 17%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_parse_annotation_line_skips_fixtures PASSED [ 17%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_scanner_excludes_fixture_annotations PASSED [ 17%]
+tests/unit/test_annotation_scanner.py::TestFixturePatternDetection::test_scanner_no_false_positives PASSED [ 18%]
+tests/unit/test_annotation_validation.py::TestAnnotationValidator::test_initialize_validator PASSED [ 18%]
+tests/unit/test_annotation_validation.py::TestAnnotationValidator::test_validate_all_valid_annotations FAILED [ 18%]
+tests/unit/test_annotation_validation.py::TestBrokenReferences::test_detect_missing_target PASSED [ 18%]
+tests/unit/test_annotation_validation.py::TestBrokenReferences::test_detect_multiple_broken_references PASSED [ 19%]
+tests/unit/test_annotation_validation.py::TestDuplicateAnnotations::test_detect_duplicate_in_different_files PASSED [ 19%]
+tests/unit/test_annotation_validation.py::TestDuplicateAnnotations::test_allow_same_id_if_same_file_and_line FAILED [ 19%]
+tests/unit/test_annotation_validation.py::TestOrphanedIntentNodes::test_detect_spec_without_implementation FAILED [ 20%]
+tests/unit/test_annotation_validation.py::TestOrphanedIntentNodes::test_detect_spec_without_tests FAILED [ 20%]
+tests/unit/test_annotation_validation.py::TestOrphanedIntentNodes::test_ignore_orphaned_deprecated_specs PASSED [ 20%]
+tests/unit/test_annotation_validation.py::TestEdgeTypeValidation::test_code_should_implement_not_verify PASSED [ 20%]
+tests/unit/test_annotation_validation.py::TestEdgeTypeValidation::test_test_should_verify_not_implement PASSED [ 21%]
+tests/unit/test_annotation_validation.py::TestNodeIDFormat::test_valid_code_node_id FAILED [ 21%]
+tests/unit/test_annotation_validation.py::TestNodeIDFormat::test_invalid_node_id_format PASSED [ 21%]
+tests/unit/test_annotation_validation.py::TestValidationResult::test_validation_result_success PASSED [ 21%]
+tests/unit/test_annotation_validation.py::TestValidationResult::test_validation_result_with_errors PASSED [ 22%]
+tests/unit/test_annotation_validation.py::TestHelperFunctions::test_validate_annotations_function FAILED [ 22%]
+tests/unit/test_annotation_validation.py::TestCoverageMetrics::test_calculate_implementation_coverage FAILED [ 22%]
+tests/unit/test_annotation_validation.py::TestEdgeCases::test_validate_empty_project PASSED [ 23%]
+tests/unit/test_annotation_validation.py::TestEdgeCases::test_validate_annotations_only_no_intent PASSED [ 23%]
+tests/unit/test_annotation_validation.py::TestEdgeCases::test_validate_intent_only_no_annotations FAILED [ 23%]
+tests/unit/test_annotation_validation.py::TestEdgeCases::test_validate_with_circular_references PASSED [ 23%]
+tests/unit/test_config.py::test_load_config_valid PASSED                 [ 24%]
+tests/unit/test_config.py::test_load_config_defaults PASSED              [ 24%]
+tests/unit/test_config.py::test_load_config_partial PASSED               [ 24%]
+tests/unit/test_config.py::test_load_config_empty_project_section PASSED [ 24%]
+tests/unit/test_config.py::test_load_config_invalid_toml PASSED          [ 25%]
+tests/unit/test_config.py::test_load_config_no_project_section PASSED    [ 25%]
+tests/unit/test_config.py::test_jig_config_dataclass PASSED              [ 25%]
+tests/unit/test_decompose_metrics.py::test_modularity_calculation_known_graph FAILED [ 26%]
+tests/unit/test_decompose_metrics.py::test_coupling_ratio_calculation PASSED [ 26%]
+tests/unit/test_decompose_metrics.py::test_modularity_single_subsystem PASSED [ 26%]
+tests/unit/test_decompose_metrics.py::test_coupling_ratio_no_external_edges PASSED [ 26%]
+tests/unit/test_decompose_metrics.py::test_coupling_ratio_excludes_constraint_edges PASSED [ 27%]
+tests/unit/test_decompose_metrics.py::test_calculate_all_metrics PASSED  [ 27%]
+tests/unit/test_decompose_metrics.py::test_modularity_no_subsystems PASSED [ 27%]
+tests/unit/test_decompose_metrics.py::test_modularity_no_edges PASSED    [ 27%]
+tests/unit/test_decompose_metrics.py::test_coupling_ratio_subsystem_not_found PASSED [ 28%]
+tests/unit/test_decompose_metrics.py::test_nested_subsystem_metrics PASSED [ 28%]
+tests/unit/test_decompose_metrics.py::test_calculate_all_metrics_with_nested_subsystems PASSED [ 28%]
+tests/unit/test_edge_validation.py::test_validate_edge_target_exists PASSED [ 29%]
+tests/unit/test_edge_validation.py::test_validate_edge_source_exists PASSED [ 29%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_implements_s_to_o PASSED [ 29%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_implements_c_to_s PASSED [ 29%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_implements_invalid PASSED [ 30%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_verifies_t_to_s PASSED [ 30%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_verifies_t_to_o PASSED [ 30%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_verifies_invalid PASSED [ 30%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_satisfies_s_to_o PASSED [ 31%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_depends_on_any_to_any PASSED [ 31%]
+tests/unit/test_edge_validation.py::test_validate_no_self_loops PASSED   [ 31%]
+tests/unit/test_edge_validation.py::test_find_orphaned_nodes_basic PASSED [ 32%]
+tests/unit/test_edge_validation.py::test_find_orphaned_nodes_all_connected PASSED [ 32%]
+tests/unit/test_edge_validation.py::test_find_orphaned_nodes_empty_graph PASSED [ 32%]
+tests/unit/test_edge_validation.py::test_validate_edges_multiple_errors PASSED [ 32%]
+tests/unit/test_edge_validation.py::test_validate_edges_with_warnings PASSED [ 33%]
+tests/unit/test_edge_validation.py::test_validate_edges_empty_graph PASSED [ 33%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_unknown PASSED [ 33%]
+tests/unit/test_edge_validation.py::test_validate_edges_integration FAILED [ 33%]
+tests/unit/test_edge_validation.py::test_validate_edge_type_c_to_o_invalid PASSED [ 34%]
+tests/unit/test_edge_validation.py::test_validate_edges_performance PASSED [ 34%]
+tests/unit/test_graph.py::test_load_from_dir_success PASSED              [ 34%]
+tests/unit/test_graph.py::test_get_node_counts_by_type PASSED            [ 35%]
+tests/unit/test_graph.py::test_find_orphaned_nodes PASSED                [ 35%]
+tests/unit/test_graph.py::test_load_from_dir_missing_directory PASSED    [ 35%]
+tests/unit/test_graph.py::test_load_from_dir_without_graph_index PASSED  [ 35%]
+tests/unit/test_graph.py::test_get_nodes_by_subsystem PASSED             [ 36%]
+tests/unit/test_graph.py::test_to_networkx PASSED                        [ 36%]
+tests/unit/test_graph.py::test_edge_dataclass PASSED                     [ 36%]
+tests/unit/test_graph.py::test_subsystem_dataclass PASSED                [ 36%]
+tests/unit/test_graph.py::test_graph_dataclass_defaults PASSED           [ 37%]
+tests/unit/test_graph.py::test_load_from_dir_with_multiple_node_types PASSED [ 37%]
+tests/unit/test_graph.py::test_find_orphaned_nodes_all_connected PASSED  [ 37%]
+tests/unit/test_graph.py::test_get_node_counts_empty_graph PASSED        [ 38%]
+tests/unit/test_graph.py::test_edge_deduplication PASSED                 [ 38%]
+tests/unit/test_graph_commands.py::test_graph_show_displays_node_details FAILED [ 38%]
+tests/unit/test_graph_commands.py::test_graph_show_displays_dependencies FAILED [ 38%]
+tests/unit/test_graph_commands.py::test_graph_show_displays_dependents FAILED [ 39%]
+tests/unit/test_graph_commands.py::test_graph_show_node_not_found FAILED [ 39%]
+tests/unit/test_graph_commands.py::test_graph_show_displays_body_content FAILED [ 39%]
+tests/unit/test_graph_commands.py::test_graph_list_all_nodes FAILED      [ 40%]
+tests/unit/test_graph_commands.py::test_graph_list_filter_by_type FAILED [ 40%]
+tests/unit/test_graph_commands.py::test_graph_list_filter_by_subsystem FAILED [ 40%]
+tests/unit/test_graph_commands.py::test_graph_list_compact_format FAILED [ 40%]
+tests/unit/test_graph_commands.py::test_graph_list_yaml_format FAILED    [ 41%]
+tests/unit/test_graph_commands.py::test_graph_deps_shows_dependency_tree FAILED [ 41%]
+tests/unit/test_graph_commands.py::test_graph_deps_node_not_found FAILED [ 41%]
+tests/unit/test_graph_commands.py::test_graph_impact_shows_impact_tree FAILED [ 41%]
+tests/unit/test_graph_commands.py::test_graph_impact_node_not_found FAILED [ 42%]
+tests/unit/test_graph_commands.py::test_graph_path_finds_shortest_path FAILED [ 42%]
+tests/unit/test_graph_commands.py::test_graph_path_no_path_exists FAILED [ 42%]
+tests/unit/test_graph_commands.py::test_graph_path_start_node_not_found FAILED [ 43%]
+tests/unit/test_graph_commands.py::test_graph_path_end_node_not_found FAILED [ 43%]
+tests/unit/test_graph_commands.py::test_graph_show_with_multiple_dependencies FAILED [ 43%]
+tests/unit/test_graph_commands.py::test_graph_commands_performance FAILED [ 43%]
+tests/unit/test_graph_commands.py::test_graph_list_empty_result FAILED   [ 44%]
+tests/unit/test_graph_commands.py::test_graph_show_node_with_no_dependencies FAILED [ 44%]
+tests/unit/test_graph_commands.py::test_graph_commands_with_code_and_test_nodes FAILED [ 44%]
+tests/unit/test_graph_commands.py::test_graph_list_combined_filters FAILED [ 44%]
+tests/unit/test_graph_index_loading.py::test_load_graph_index_with_ct_nodes FAILED [ 45%]
+tests/unit/test_graph_index_loading.py::test_load_node_centric_relationships FAILED [ 45%]
+tests/unit/test_graph_index_loading.py::test_load_edge_centric_format FAILED [ 45%]
+tests/unit/test_graph_index_loading.py::test_merge_markdown_and_graph_index FAILED [ 46%]
+tests/unit/test_graph_index_loading.py::test_markdown_takes_precedence_for_os_nodes FAILED [ 46%]
+tests/unit/test_graph_index_loading.py::test_graph_index_without_nodes_section FAILED [ 46%]
+tests/unit/test_graph_index_loading.py::test_ct_nodes_with_file_and_line FAILED [ 46%]
+tests/unit/test_graph_index_loading.py::test_invalid_nodes_format_raises_error FAILED [ 47%]
+tests/unit/test_graph_queries.py::test_filter_by_type_outcome FAILED     [ 47%]
+tests/unit/test_graph_queries.py::test_filter_by_type_case_insensitive FAILED [ 47%]
+tests/unit/test_graph_queries.py::test_filter_by_type_specification FAILED [ 47%]
+tests/unit/test_graph_queries.py::test_filter_by_type_empty FAILED       [ 48%]
+tests/unit/test_graph_queries.py::test_filter_by_subsystem FAILED        [ 48%]
+tests/unit/test_graph_queries.py::test_filter_by_subsystem_case_insensitive FAILED [ 48%]
+tests/unit/test_graph_queries.py::test_filter_by_subsystem_empty FAILED  [ 49%]
+tests/unit/test_graph_queries.py::test_filter_by_subsystem_handles_none FAILED [ 49%]
+tests/unit/test_graph_queries.py::test_filter_returns_sorted FAILED      [ 49%]
+tests/unit/test_graph_queries.py::test_filter_combined_operations FAILED [ 49%]
+tests/unit/test_graph_traversal.py::test_get_dependencies FAILED         [ 50%]
+tests/unit/test_graph_traversal.py::test_get_dependents FAILED           [ 50%]
+tests/unit/test_graph_traversal.py::test_find_path_exists FAILED         [ 50%]
+tests/unit/test_graph_traversal.py::test_find_path_no_path FAILED        [ 50%]
+tests/unit/test_graph_traversal.py::test_find_path_same_node FAILED      [ 51%]
+tests/unit/test_graph_traversal.py::test_find_path_missing_nodes FAILED  [ 51%]
+tests/unit/test_graph_traversal.py::test_get_dependencies_multiple FAILED [ 51%]
+tests/unit/test_graph_traversal.py::test_get_dependencies_missing_node FAILED [ 52%]
+tests/unit/test_graph_traversal.py::test_get_dependents_missing_node FAILED [ 52%]
+tests/unit/test_graph_traversal.py::test_traversal_performance FAILED    [ 52%]
+tests/unit/test_graph_traversal.py::test_find_path_shortest FAILED       [ 52%]
+tests/unit/test_ignore_filter.py::TestIgnoreFilterBasics::test_default_patterns_exclude_pycache PASSED [ 53%]
+tests/unit/test_ignore_filter.py::TestIgnoreFilterBasics::test_default_patterns_exclude_pyc_files PASSED [ 53%]
+tests/unit/test_ignore_filter.py::TestIgnoreFilterBasics::test_default_patterns_exclude_venv PASSED [ 53%]
+tests/unit/test_ignore_filter.py::TestIgnoreFilterBasics::test_default_patterns_allow_python_source PASSED [ 53%]
+tests/unit/test_ignore_filter.py::TestIgnoreFilterBasics::test_paths_outside_project_not_excluded PASSED [ 54%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_loads_custom_jigignore_file PASSED [ 54%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_excludes_test_files_with_custom_pattern PASSED [ 54%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_allows_non_test_files_with_custom_pattern PASSED [ 55%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_ignores_comments_in_jigignore PASSED [ 55%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_ignores_empty_lines_in_jigignore PASSED [ 55%]
+tests/unit/test_ignore_filter.py::TestCustomIgnorePatterns::test_handles_missing_jigignore_gracefully PASSED [ 55%]
+tests/unit/test_ignore_filter.py::TestPatternMatching::test_glob_pattern_with_double_star PASSED [ 56%]
+tests/unit/test_ignore_filter.py::TestPatternMatching::test_simple_pattern_without_double_star PASSED [ 56%]
+tests/unit/test_ignore_filter.py::TestPatternMatching::test_pattern_with_directory_slash PASSED [ 56%]
+tests/unit/test_ignore_filter.py::TestPatternMatching::test_can_add_pattern_at_runtime PASSED [ 56%]
+tests/unit/test_ignore_filter.py::TestIntegrationWithScanner::test_scanner_respects_ignore_filter PASSED [ 57%]
+tests/unit/test_index_rebuild.py::TestIndexBuilder::test_initialize_builder PASSED [ 57%]
+tests/unit/test_index_rebuild.py::TestIndexBuilder::test_discover_markdown_nodes PASSED [ 57%]
+tests/unit/test_index_rebuild.py::TestIndexBuilder::test_discover_annotation_nodes PASSED [ 58%]
+tests/unit/test_index_rebuild.py::TestIndexBuilder::test_build_complete_registry PASSED [ 58%]
+tests/unit/test_index_rebuild.py::TestConflictDetection::test_detect_no_conflicts PASSED [ 58%]
+tests/unit/test_index_rebuild.py::TestConflictDetection::test_detect_duplicate_in_markdown PASSED [ 58%]
+tests/unit/test_index_rebuild.py::TestConflictDetection::test_detect_duplicate_in_annotations PASSED [ 59%]
+tests/unit/test_index_rebuild.py::TestConflictDetection::test_detect_cross_source_conflict PASSED [ 59%]
+tests/unit/test_index_rebuild.py::TestJSONGeneration::test_generate_json_format PASSED [ 59%]
+tests/unit/test_index_rebuild.py::TestJSONGeneration::test_json_includes_metadata PASSED [ 60%]
+tests/unit/test_index_rebuild.py::TestJSONGeneration::test_json_includes_code_node_line_numbers PASSED [ 60%]
+tests/unit/test_index_rebuild.py::TestIdempotence::test_rebuild_twice_produces_same_output PASSED [ 60%]
+tests/unit/test_index_rebuild.py::TestValidationBeforeWrite::test_validate_node_ids PASSED [ 60%]
+tests/unit/test_index_rebuild.py::TestValidationBeforeWrite::test_validate_edge_targets_exist PASSED [ 61%]
+tests/unit/test_index_rebuild.py::TestRebuildResult::test_rebuild_result_success PASSED [ 61%]
+tests/unit/test_index_rebuild.py::TestRebuildResult::test_rebuild_result_with_conflicts PASSED [ 61%]
+tests/unit/test_index_rebuild.py::TestHelperFunctions::test_build_graph_index_function PASSED [ 61%]
+tests/unit/test_index_rebuild.py::TestHelperFunctions::test_detect_conflicts_function PASSED [ 62%]
+tests/unit/test_index_rebuild.py::TestHelperFunctions::test_merge_nodes_deduplicates PASSED [ 62%]
+tests/unit/test_index_rebuild.py::TestEdgeCases::test_rebuild_empty_project PASSED [ 62%]
+tests/unit/test_index_rebuild.py::TestEdgeCases::test_rebuild_missing_jig_directory PASSED [ 63%]
+tests/unit/test_index_rebuild.py::TestEdgeCases::test_rebuild_with_malformed_markdown PASSED [ 63%]
+tests/unit/test_index_rebuild.py::TestEdgeCases::test_rebuild_with_missing_source_files PASSED [ 63%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_excludes_template_status PASSED [ 63%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_excludes_deprecated_status PASSED [ 64%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_excludes_draft_status PASSED [ 64%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_includes_planned_status PASSED [ 64%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_includes_missing_status_defaults_to_active PASSED [ 64%]
+tests/unit/test_index_rebuild.py::TestStatusBasedFiltering::test_mixed_statuses PASSED [ 65%]
+tests/unit/test_index_rebuild.py::TestSubsystemBuilding::test_build_flat_subsystems PASSED [ 65%]
+tests/unit/test_index_rebuild.py::TestSubsystemBuilding::test_build_nested_subsystems PASSED [ 65%]
+tests/unit/test_index_rebuild.py::TestSubsystemBuilding::test_build_mixed_flat_and_nested PASSED [ 66%]
+tests/unit/test_index_rebuild.py::TestSubsystemBuilding::test_build_ignores_nodes_without_subsystem PASSED [ 66%]
+tests/unit/test_index_rebuild.py::TestSubsystemBuilding::test_build_empty_list_returns_empty_dict PASSED [ 66%]
+tests/unit/test_io.py::test_read_file_success PASSED                     [ 66%]
+tests/unit/test_io.py::test_read_file_missing PASSED                     [ 67%]
+tests/unit/test_io.py::test_read_file_empty PASSED                       [ 67%]
+tests/unit/test_io.py::test_write_file_success PASSED                    [ 67%]
+tests/unit/test_io.py::test_write_file_creates_parent_dirs PASSED        [ 67%]
+tests/unit/test_io.py::test_write_file_overwrites_existing PASSED        [ 68%]
+tests/unit/test_io.py::test_ensure_dir_creates_directory PASSED          [ 68%]
+tests/unit/test_io.py::test_ensure_dir_creates_nested_directories PASSED [ 68%]
+tests/unit/test_io.py::test_ensure_dir_idempotent PASSED                 [ 69%]
+tests/unit/test_io.py::test_read_file_preserves_unicode PASSED           [ 69%]
+tests/unit/test_io.py::test_write_file_preserves_unicode PASSED          [ 69%]
+tests/unit/test_nested_subsystems.py::test_nested_subsystem_loading FAILED [ 69%]
+tests/unit/test_nested_subsystems.py::test_subsystem_path_resolution FAILED [ 70%]
+tests/unit/test_nested_subsystems.py::test_recursive_node_collection FAILED [ 70%]
+tests/unit/test_nested_subsystems.py::test_cycle_detection PASSED        [ 70%]
+tests/unit/test_nested_subsystems.py::test_parent_with_nodes_validation FAILED [ 70%]
+tests/unit/test_nested_subsystems.py::test_backward_compatibility_flat FAILED [ 71%]
+tests/unit/test_nested_subsystems.py::test_get_all_subsystem_paths FAILED [ 71%]
+tests/unit/test_nested_subsystems.py::test_is_leaf PASSED                [ 71%]
+tests/unit/test_nested_subsystems.py::test_full_path PASSED              [ 72%]
+tests/unit/test_nested_subsystems.py::test_find_subsystem PASSED         [ 72%]
+tests/unit/test_nested_subsystems.py::test_invalid_node_subsystem_path FAILED [ 72%]
+tests/unit/test_node_registry.py::test_node_lookup_o1_performance PASSED [ 72%]
+tests/unit/test_node_registry.py::test_get_nodes_by_type PASSED          [ 73%]
+tests/unit/test_node_registry.py::test_get_nodes_by_subsystem PASSED     [ 73%]
+tests/unit/test_node_registry.py::test_get_edges_from_node PASSED        [ 73%]
+tests/unit/test_node_registry.py::test_get_edges_to_node PASSED          [ 73%]
+tests/unit/test_node_registry.py::test_get_all_edges PASSED              [ 74%]
+tests/unit/test_node_registry.py::test_node_registry_integration FAILED  [ 74%]
+tests/unit/test_node_registry.py::test_node_counts_by_type PASSED        [ 74%]
+tests/unit/test_node_registry.py::test_nodes_by_subsystem_grouping PASSED [ 75%]
+tests/unit/test_node_registry.py::test_empty_graph PASSED                [ 75%]
+tests/unit/test_parser.py::test_parse_outcome_node PASSED                [ 75%]
+tests/unit/test_parser.py::test_parse_specification_node PASSED          [ 75%]
+tests/unit/test_parser.py::test_parse_node_missing_required_field PASSED [ 76%]
+tests/unit/test_parser.py::test_parse_node_missing_id PASSED             [ 76%]
+tests/unit/test_parser.py::test_parse_node_missing_type PASSED           [ 76%]
+tests/unit/test_parser.py::test_parse_node_file_not_found PASSED         [ 76%]
+tests/unit/test_parser.py::test_parse_node_invalid_yaml PASSED           [ 77%]
+tests/unit/test_parser.py::test_parse_node_minimal PASSED                [ 77%]
+tests/unit/test_parser.py::test_parse_node_date_formats PASSED           [ 77%]
+tests/unit/test_parser.py::test_parse_node_invalid_date_format PASSED    [ 78%]
+tests/unit/test_parser.py::test_parse_node_metadata_preserved PASSED     [ 78%]
+tests/unit/test_parser.py::test_ostc_node_dataclass PASSED               [ 78%]
+tests/unit/test_relationship_parsing.py::test_parse_frontmatter_single_implements PASSED [ 78%]
+tests/unit/test_relationship_parsing.py::test_parse_frontmatter_list_implements PASSED [ 79%]
+tests/unit/test_relationship_parsing.py::test_extract_relationships_single_value PASSED [ 79%]
+tests/unit/test_relationship_parsing.py::test_extract_relationships_list_values PASSED [ 79%]
+tests/unit/test_relationship_parsing.py::test_extract_multiple_relationship_types PASSED [ 80%]
+tests/unit/test_relationship_parsing.py::test_extract_relationships_no_relationships PASSED [ 80%]
+tests/unit/test_relationship_parsing.py::test_extract_relationships_verifies PASSED [ 80%]
+tests/unit/test_relationship_parsing.py::test_build_edges_from_relationships PASSED [ 80%]
+tests/unit/test_relationship_parsing.py::test_build_edges_from_empty_relationships PASSED [ 81%]
+tests/unit/test_relationship_parsing.py::test_parse_inline_list_format PASSED [ 81%]
+tests/unit/test_relationship_parsing.py::test_extract_all_relationship_types PASSED [ 81%]
+tests/unit/test_relationship_parsing.py::test_build_edges_preserves_edge_type PASSED [ 81%]
+tests/unit/test_status_logic.py::test_calculate_status_with_valid_graph FAILED [ 82%]
+tests/unit/test_status_logic.py::test_calculate_status_identifies_orphans FAILED [ 82%]
+tests/unit/test_status_logic.py::test_status_handles_missing_directory PASSED [ 82%]
+tests/unit/test_status_logic.py::test_calculate_status_handles_missing_graph_index FAILED [ 83%]
+tests/unit/test_status_logic.py::test_calculate_status_empty_directory FAILED [ 83%]
+tests/unit/test_status_logic.py::test_calculate_status_multiple_subsystems FAILED [ 83%]
+tests/unit/test_status_logic.py::test_calculate_status_all_node_types FAILED [ 83%]
+tests/unit/test_status_logic.py::test_status_data_dataclass PASSED       [ 84%]
+tests/unit/test_status_logic.py::test_status_data_default_validation_errors PASSED [ 84%]
+tests/unit/test_status_logic.py::test_calculate_status_no_orphans_when_connected FAILED [ 84%]
+tests/unit/test_templates.py::test_outcome_template_parses PASSED        [ 84%]
+tests/unit/test_templates.py::test_specification_template_parses PASSED  [ 85%]
+tests/unit/test_templates.py::test_constraint_template_parses PASSED     [ 85%]
+tests/unit/test_templates.py::test_all_templates_exist PASSED            [ 85%]
+tests/unit/test_templates.py::test_templates_have_required_sections PASSED [ 86%]
+tests/unit/test_templates.py::test_templates_have_yaml_frontmatter PASSED [ 86%]
+tests/unit/test_templates.py::test_templates_consistent_formatting PASSED [ 86%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_valid_graph PASSED [ 86%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_with_edge_errors PASSED [ 87%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_with_self_loop PASSED [ 87%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_with_warnings PASSED [ 87%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_orphaned_nodes PASSED [ 87%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_invalid_edge_type PASSED [ 88%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_empty_graph PASSED [ 88%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_result_structure PASSED [ 88%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_multiple_errors PASSED [ 89%]
+tests/unit/test_validation_core.py::test_validate_graph_comprehensive_checks_passed PASSED [ 89%]
+tests/unit/test_validator.py::test_validate_node_valid PASSED            [ 89%]
+tests/unit/test_validator.py::test_validate_node_missing_required_field PASSED [ 89%]
+tests/unit/test_validator.py::test_validate_node_missing_id PASSED       [ 90%]
+tests/unit/test_validator.py::test_validate_node_missing_type PASSED     [ 90%]
+tests/unit/test_validator.py::test_validate_node_invalid_id_format PASSED [ 90%]
+tests/unit/test_validator.py::test_validate_node_invalid_id_lowercase PASSED [ 90%]
+tests/unit/test_validator.py::test_validate_node_invalid_id_no_number PASSED [ 91%]
+tests/unit/test_validator.py::test_validate_node_type_mismatch PASSED    [ 91%]
+tests/unit/test_validator.py::test_validate_node_invalid_type_value PASSED [ 91%]
+tests/unit/test_validator.py::test_validate_node_warnings_for_optional_fields PASSED [ 92%]
+tests/unit/test_validator.py::test_validate_node_all_types_with_correct_prefixes PASSED [ 92%]
+tests/unit/test_validator.py::test_validate_node_test_type_rejected_with_helpful_error PASSED [ 92%]
+tests/unit/test_validator.py::test_validate_graph_duplicate_ids FAILED   [ 92%]
+tests/unit/test_validator.py::test_validate_graph_orphaned_references PASSED [ 93%]
+tests/unit/test_validator.py::test_validate_graph_missing_intent_dir PASSED [ 93%]
+tests/unit/test_validator.py::test_validate_graph_empty_directory FAILED [ 93%]
+tests/unit/test_validator.py::test_validate_graph_with_valid_nodes FAILED [ 93%]
+tests/unit/test_validator.py::test_validate_graph_with_invalid_node FAILED [ 94%]
+tests/unit/test_validator.py::test_validate_graph_with_malformed_yaml PASSED [ 94%]
+tests/unit/test_validator.py::test_validate_graph_index_nonexistent_node FAILED [ 94%]
+tests/unit/test_validator.py::test_validate_graph_orphaned_nodes_warning FAILED [ 95%]
+tests/unit/test_validator.py::test_validate_node_file_success PASSED     [ 95%]
+tests/unit/test_validator.py::test_validate_node_file_not_found PASSED   [ 95%]
+tests/unit/test_validator.py::test_validate_node_file_invalid_content PASSED [ 95%]
+tests/unit/test_validator.py::test_validation_result_dataclass PASSED    [ 96%]
+tests/unit/test_validator.py::test_validate_graph_with_ct_nodes FAILED   [ 96%]
+tests/unit/test_yaml_utils.py::test_load_yaml_valid PASSED               [ 96%]
+tests/unit/test_yaml_utils.py::test_load_yaml_invalid PASSED             [ 96%]
+tests/unit/test_yaml_utils.py::test_load_yaml_empty_file PASSED          [ 97%]
+tests/unit/test_yaml_utils.py::test_load_yaml_nested_structure PASSED    [ 97%]
+tests/unit/test_yaml_utils.py::test_load_yaml_non_dict_root PASSED       [ 97%]
+tests/unit/test_yaml_utils.py::test_load_yaml_missing_file PASSED        [ 98%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_simple_dict PASSED         [ 98%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_nested_structure PASSED    [ 98%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_preserves_order PASSED     [ 98%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_unicode_characters PASSED  [ 99%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_creates_parent_dirs PASSED [ 99%]
+tests/unit/test_yaml_utils.py::test_dump_yaml_block_style PASSED         [ 99%]
+tests/unit/test_yaml_utils.py::test_load_yaml_with_special_types PASSED  [100%]
+
+=========================== short test summary info ============================
+FAILED tests/unit/test_annotation_validation.py::TestAnnotationValidator::test_validate_all_valid_annotations
+FAILED tests/unit/test_annotation_validation.py::TestDuplicateAnnotations::test_allow_same_id_if_same_file_and_line
+FAILED tests/unit/test_annotation_validation.py::TestOrphanedIntentNodes::test_detect_spec_without_implementation
+FAILED tests/unit/test_annotation_validation.py::TestOrphanedIntentNodes::test_detect_spec_without_tests
+FAILED tests/unit/test_annotation_validation.py::TestNodeIDFormat::test_valid_code_node_id
+FAILED tests/unit/test_annotation_validation.py::TestHelperFunctions::test_validate_annotations_function
+FAILED tests/unit/test_annotation_validation.py::TestCoverageMetrics::test_calculate_implementation_coverage
+FAILED tests/unit/test_annotation_validation.py::TestEdgeCases::test_validate_intent_only_no_annotations
+FAILED tests/unit/test_decompose_metrics.py::test_modularity_calculation_known_graph
+FAILED tests/unit/test_edge_validation.py::test_validate_edges_integration - ...
+FAILED tests/unit/test_graph_commands.py::test_graph_show_displays_node_details
+FAILED tests/unit/test_graph_commands.py::test_graph_show_displays_dependencies
+FAILED tests/unit/test_graph_commands.py::test_graph_show_displays_dependents
+FAILED tests/unit/test_graph_commands.py::test_graph_show_node_not_found - as...
+FAILED tests/unit/test_graph_commands.py::test_graph_show_displays_body_content
+FAILED tests/unit/test_graph_commands.py::test_graph_list_all_nodes - assert ...
+FAILED tests/unit/test_graph_commands.py::test_graph_list_filter_by_type - as...
+FAILED tests/unit/test_graph_commands.py::test_graph_list_filter_by_subsystem
+FAILED tests/unit/test_graph_commands.py::test_graph_list_compact_format - as...
+FAILED tests/unit/test_graph_commands.py::test_graph_list_yaml_format - asser...
+FAILED tests/unit/test_graph_commands.py::test_graph_deps_shows_dependency_tree
+FAILED tests/unit/test_graph_commands.py::test_graph_deps_node_not_found - as...
+FAILED tests/unit/test_graph_commands.py::test_graph_impact_shows_impact_tree
+FAILED tests/unit/test_graph_commands.py::test_graph_impact_node_not_found - ...
+FAILED tests/unit/test_graph_commands.py::test_graph_path_finds_shortest_path
+FAILED tests/unit/test_graph_commands.py::test_graph_path_no_path_exists - as...
+FAILED tests/unit/test_graph_commands.py::test_graph_path_start_node_not_found
+FAILED tests/unit/test_graph_commands.py::test_graph_path_end_node_not_found
+FAILED tests/unit/test_graph_commands.py::test_graph_show_with_multiple_dependencies
+FAILED tests/unit/test_graph_commands.py::test_graph_commands_performance - a...
+FAILED tests/unit/test_graph_commands.py::test_graph_list_empty_result - asse...
+FAILED tests/unit/test_graph_commands.py::test_graph_show_node_with_no_dependencies
+FAILED tests/unit/test_graph_commands.py::test_graph_commands_with_code_and_test_nodes
+FAILED tests/unit/test_graph_commands.py::test_graph_list_combined_filters - ...
+FAILED tests/unit/test_graph_index_loading.py::test_load_graph_index_with_ct_nodes
+FAILED tests/unit/test_graph_index_loading.py::test_load_node_centric_relationships
+FAILED tests/unit/test_graph_index_loading.py::test_load_edge_centric_format
+FAILED tests/unit/test_graph_index_loading.py::test_merge_markdown_and_graph_index
+FAILED tests/unit/test_graph_index_loading.py::test_markdown_takes_precedence_for_os_nodes
+FAILED tests/unit/test_graph_index_loading.py::test_graph_index_without_nodes_section
+FAILED tests/unit/test_graph_index_loading.py::test_ct_nodes_with_file_and_line
+FAILED tests/unit/test_graph_index_loading.py::test_invalid_nodes_format_raises_error
+FAILED tests/unit/test_graph_queries.py::test_filter_by_type_outcome - FileNo...
+FAILED tests/unit/test_graph_queries.py::test_filter_by_type_case_insensitive
+FAILED tests/unit/test_graph_queries.py::test_filter_by_type_specification - ...
+FAILED tests/unit/test_graph_queries.py::test_filter_by_type_empty - FileNotF...
+FAILED tests/unit/test_graph_queries.py::test_filter_by_subsystem - FileNotFo...
+FAILED tests/unit/test_graph_queries.py::test_filter_by_subsystem_case_insensitive
+FAILED tests/unit/test_graph_queries.py::test_filter_by_subsystem_empty - Fil...
+FAILED tests/unit/test_graph_queries.py::test_filter_by_subsystem_handles_none
+FAILED tests/unit/test_graph_queries.py::test_filter_returns_sorted - FileNot...
+FAILED tests/unit/test_graph_queries.py::test_filter_combined_operations - Fi...
+FAILED tests/unit/test_graph_traversal.py::test_get_dependencies - FileNotFou...
+FAILED tests/unit/test_graph_traversal.py::test_get_dependents - FileNotFound...
+FAILED tests/unit/test_graph_traversal.py::test_find_path_exists - FileNotFou...
+FAILED tests/unit/test_graph_traversal.py::test_find_path_no_path - FileNotFo...
+FAILED tests/unit/test_graph_traversal.py::test_find_path_same_node - FileNot...
+FAILED tests/unit/test_graph_traversal.py::test_find_path_missing_nodes - Fil...
+FAILED tests/unit/test_graph_traversal.py::test_get_dependencies_multiple - F...
+FAILED tests/unit/test_graph_traversal.py::test_get_dependencies_missing_node
+FAILED tests/unit/test_graph_traversal.py::test_get_dependents_missing_node
+FAILED tests/unit/test_graph_traversal.py::test_traversal_performance - FileN...
+FAILED tests/unit/test_graph_traversal.py::test_find_path_shortest - FileNotF...
+FAILED tests/unit/test_nested_subsystems.py::test_nested_subsystem_loading - ...
+FAILED tests/unit/test_nested_subsystems.py::test_subsystem_path_resolution
+FAILED tests/unit/test_nested_subsystems.py::test_recursive_node_collection
+FAILED tests/unit/test_nested_subsystems.py::test_parent_with_nodes_validation
+FAILED tests/unit/test_nested_subsystems.py::test_backward_compatibility_flat
+FAILED tests/unit/test_nested_subsystems.py::test_get_all_subsystem_paths - F...
+FAILED tests/unit/test_nested_subsystems.py::test_invalid_node_subsystem_path
+FAILED tests/unit/test_node_registry.py::test_node_registry_integration - Fil...
+FAILED tests/unit/test_status_logic.py::test_calculate_status_with_valid_graph
+FAILED tests/unit/test_status_logic.py::test_calculate_status_identifies_orphans
+FAILED tests/unit/test_status_logic.py::test_calculate_status_handles_missing_graph_index
+FAILED tests/unit/test_status_logic.py::test_calculate_status_empty_directory
+FAILED tests/unit/test_status_logic.py::test_calculate_status_multiple_subsystems
+FAILED tests/unit/test_status_logic.py::test_calculate_status_all_node_types
+FAILED tests/unit/test_status_logic.py::test_calculate_status_no_orphans_when_connected
+FAILED tests/unit/test_validator.py::test_validate_graph_duplicate_ids - asse...
+FAILED tests/unit/test_validator.py::test_validate_graph_empty_directory - As...
+FAILED tests/unit/test_validator.py::test_validate_graph_with_valid_nodes - A...
+FAILED tests/unit/test_validator.py::test_validate_graph_with_invalid_node - ...
+FAILED tests/unit/test_validator.py::test_validate_graph_index_nonexistent_node
+FAILED tests/unit/test_validator.py::test_validate_graph_orphaned_nodes_warning
+FAILED tests/unit/test_validator.py::test_validate_graph_with_ct_nodes - Asse...
+======================== 85 failed, 280 passed in 1.81s ========================
