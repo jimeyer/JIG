@@ -16,6 +16,11 @@ from jig.core.parser import OSTCNode, parse_ostc_node
 from jig.core.relationships import extract_edges_from_node
 
 
+# Tier 2: Status-based filtering - excluded statuses for markdown nodes
+# Same as IndexBuilder to ensure consistency between index and graph loading
+EXCLUDED_STATUSES = {'template', 'deprecated', 'draft'}
+
+
 @dataclass
 class Edge:
     """Represents a directed edge in the Intent Graph.
@@ -161,6 +166,11 @@ class Graph:
             for md_file in dir_path.glob("*.md"):
                 try:
                     node = parse_ostc_node(md_file)
+
+                    # Tier 2: Skip nodes with excluded statuses (same as IndexBuilder)
+                    if node.status in EXCLUDED_STATUSES:
+                        continue
+
                     graph.nodes[node.id] = node
 
                     # Extract edges from frontmatter relationships (WU1: S-JIGY-001)
