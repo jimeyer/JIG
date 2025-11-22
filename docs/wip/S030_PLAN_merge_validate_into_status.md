@@ -87,7 +87,7 @@ Simplify JIG's command interface by consolidating validation functionality into 
 
 - [x] WU0: Create known Intent nodes (O/S) — done ✓
 - [x] WU1: Extract validation core logic — tests ✓ / docs ✓ / reflect ☐
-- [ ] WU2: Merge validation into status command — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Merge validation into status command — tests ✓ / docs ✓ / reflect ☐
 - [ ] WU3: Add CLI flags for exit code control — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Remove validate command completely — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Update documentation — tests ☐ / docs ☐ / reflect ☐

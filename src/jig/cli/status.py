@@ -1,5 +1,6 @@
 # @jig C-STATUS-001 implements:S-GRAPH-001 subsystem:core interface:public
 # @jig C-CLI-010 implements:S-CLI-007 subsystem:cli interface:public
+# @jig C-CLI-012 implements:S-CLI-022 subsystem:cli interface:public
 """Status command for JIG graph health monitoring."""
 
 import sys
@@ -16,6 +17,7 @@ from jig.cli.formatting import (
 )
 from jig.core.config import load_config
 from jig.core.graph import Graph, Subsystem
+from jig.core.validation import ComprehensiveValidationResult, validate_graph_comprehensive
 
 
 # @jig C-NESTED-004 implements:S-NESTED-003 subsystem:core interface:public
@@ -66,6 +68,7 @@ class StatusData:
         orphaned_nodes: List of node IDs without edges
         unassigned_nodes: List of node IDs without subsystem assignment
         validation_errors: List of validation error messages
+        validation_result: Comprehensive validation result (semantic checks)
     """
 
     total_nodes: int
@@ -76,6 +79,7 @@ class StatusData:
     orphaned_nodes: list[str]
     unassigned_nodes: list[str]
     validation_errors: list[str] = field(default_factory=list)
+    validation_result: ComprehensiveValidationResult | None = None
 
 
 def calculate_status(intent_dir: Path) -> StatusData:
@@ -116,6 +120,7 @@ def calculate_status(intent_dir: Path) -> StatusData:
             orphaned_nodes=[],
             unassigned_nodes=[],
             validation_errors=[str(e)],
+            validation_result=None,
         )
 
     # Calculate metrics
@@ -144,6 +149,9 @@ def calculate_status(intent_dir: Path) -> StatusData:
             "Run 'jigy validate' to generate it."
         )
 
+    # Run comprehensive semantic validation
+    validation_result = validate_graph_comprehensive(graph)
+
     return StatusData(
         total_nodes=total_nodes,
         total_edges=total_edges,
@@ -153,7 +161,85 @@ def calculate_status(intent_dir: Path) -> StatusData:
         orphaned_nodes=orphaned_nodes,
         unassigned_nodes=unassigned_nodes,
         validation_errors=validation_errors,
+        validation_result=validation_result,
     )
+
+
+def format_validation_output(result: ComprehensiveValidationResult) -> list[str]:
+    """Format validation results for terminal output.
+
+    Args:
+        result: ComprehensiveValidationResult from validate_graph_comprehensive
+
+    Returns:
+        List of formatted output lines
+    """
+    output = []
+
+    output.append(click.style("Validation Results:", bold=True))
+    output.append("")
+
+    # Schema checks
+    if result.checks_passed.get("no_duplicate_ids", True):
+        output.append(click.style("✓ ", fg="green") + "Schema Checks")
+        output.append(f"  {click.style('✓', fg='green')} All node IDs valid ({result.node_count} nodes)")
+        output.append(f"  {click.style('✓', fg='green')} No duplicate IDs")
+    else:
+        output.append(click.style("✗ ", fg="red") + "Schema Checks")
+        output.append(f"  {click.style('✗', fg='red')} Duplicate node IDs detected")
+
+    # Graph consistency
+    output.append("")
+    if result.checks_passed.get("edge_validation", True):
+        output.append(click.style("✓ ", fg="green") + "Graph Consistency")
+        output.append(f"  {click.style('✓', fg='green')} All edge targets exist ({result.edge_count} edges)")
+        output.append(f"  {click.style('✓', fg='green')} No self-loops")
+        output.append(f"  {click.style('✓', fg='green')} Edge type rules valid")
+    else:
+        output.append(click.style("✗ ", fg="red") + "Graph Consistency")
+        # Show which checks failed
+        if any("does not exist" in error for error in result.errors):
+            output.append(f"  {click.style('✗', fg='red')} Missing edge targets detected")
+        if any("self-loop" in error.lower() for error in result.errors):
+            output.append(f"  {click.style('✗', fg='red')} Self-loops detected")
+        if any("invalid edge type" in error.lower() for error in result.errors):
+            output.append(f"  {click.style('✗', fg='red')} Invalid edge types detected")
+
+    # Subsystem hierarchy
+    output.append("")
+    if result.checks_passed.get("subsystem_hierarchy", True):
+        output.append(click.style("✓ ", fg="green") + "Subsystem Hierarchy")
+        output.append(f"  {click.style('✓', fg='green')} No cycles detected")
+    else:
+        output.append(click.style("✗ ", fg="red") + "Subsystem Hierarchy")
+        output.append(f"  {click.style('✗', fg='red')} Cycles or invalid paths detected")
+
+    # Show errors if any
+    if result.errors:
+        output.append("")
+        output.append(click.style("Errors:", fg="red", bold=True))
+        for error in result.errors[:10]:  # Limit to first 10
+            output.append(click.style("  ✗ ", fg="red") + error)
+        if len(result.errors) > 10:
+            output.append(click.style(f"  ... and {len(result.errors) - 10} more errors", fg="red"))
+
+    # Show warnings if any
+    if result.warnings:
+        output.append("")
+        output.append(click.style("Warnings:", fg="yellow", bold=True))
+        for warning in result.warnings[:5]:  # Limit to first 5
+            output.append(click.style("  ⚠ ", fg="yellow") + warning)
+        if len(result.warnings) > 5:
+            output.append(click.style(f"  ... and {len(result.warnings) - 5} more warnings", fg="yellow"))
+
+    # Final verdict
+    output.append("")
+    if result.valid:
+        output.append(click.style("✅ Graph is valid", fg="green", bold=True))
+    else:
+        output.append(click.style("✗ Graph is INVALID", fg="red", bold=True))
+
+    return output
 
 
 def format_status_output(status_data: StatusData, verbose: bool, flat: bool = False, graph: Graph | None = None) -> str:
@@ -282,8 +368,14 @@ def format_status_output(status_data: StatusData, verbose: bool, flat: bool = Fa
         output.append(click.style("Suggestions:", fg="cyan", bold=True))
         for suggestion in suggestions:
             output.append(f"  {suggestion}")
-    else:
-        # Graph is healthy - show success message
+
+    # Add validation results section
+    if status_data.validation_result:
+        output.append("")
+        validation_lines = format_validation_output(status_data.validation_result)
+        output.extend(validation_lines)
+    elif not suggestions:
+        # Graph is healthy - show success message (only if no validation results shown)
         output.append("")
         output.append(click.style("✓ Graph looks healthy!", fg="green"))
 
@@ -301,10 +393,12 @@ def status(verbose: bool, flat: bool) -> None:
     - Node counts by type (outcome, specification, test, constraint)
     - Subsystem breakdown (hierarchical tree by default, --flat for legacy view)
     - Orphaned nodes (nodes without relationships)
+    - Validation results (semantic checks)
     - Actionable suggestions for improving graph health
 
     Exit codes:
-    - 0: Success
+    - 0: Graph is valid (no semantic errors)
+    - 1: Graph has semantic errors
     - 3: Directory not initialized (jig/ doesn't exist)
     """
     config = load_config()
@@ -327,3 +421,8 @@ def status(verbose: bool, flat: bool) -> None:
     # Format and display status
     output = format_status_output(status_data, verbose, flat, graph)
     click.echo(output)
+
+    # Exit with appropriate code based on validation
+    # Exit 1 if validation found errors (warnings are OK)
+    if status_data.validation_result and not status_data.validation_result.valid:
+        sys.exit(1)
