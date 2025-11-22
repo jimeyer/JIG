@@ -6,50 +6,7 @@ import time
 from pathlib import Path
 
 from jig.core.graph import Graph
-from jig.utils.yaml_utils import dump_yaml
-
-
-def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
-    """Helper to create a test OSTC node file."""
-    type_to_dir = {
-        "outcome": "outcomes",
-        "specification": "specifications",
-        "constraint": "constraints",
-        "test": "tests",
-    }
-    node_dir = tmp_path / type_to_dir.get(node_type, "outcomes")
-    node_dir.mkdir(parents=True, exist_ok=True)
-
-    node_file = node_dir / f"{node_id}.md"
-    lines = [
-        "---",
-        f"id: {node_id}",
-        f"type: {node_type}",
-        f'title: "{title}"',
-        f"subsystem: {subsystem}",
-        "status: active",
-        "---",
-        "",
-        f"# {title}",
-        "",
-        f"This is a test node for {node_id}.",
-        ""
-    ]
-    content = "\n".join(lines)
-    node_file.write_text(content)
-    return node_file
-
-
-def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
-    data = {
-        "version": "1.0.0",
-        "edges": edges,
-        "subsystems": subsystems,
-    }
-    dump_yaml(data, graph_index_path)
-    return graph_index_path
+from tests.helpers.graph_fixtures import create_test_graph
 
 
 def test_get_dependencies():
@@ -57,18 +14,14 @@ def test_get_dependencies():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-
         # S-001 implements O-001 → O-001 is dependency of S-001
-        edges = [
-            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-        ]
-        create_test_graph_index(tmp_path, edges, {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "test", "implements": ["O-TEST-001"]},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Verify dependencies
         deps = graph.get_dependencies("S-TEST-001")
@@ -85,21 +38,16 @@ def test_get_dependents():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-        create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2")
-
         # S-001 implements O-001 → S-001 is dependent of O-001
         # S-002 implements O-001 → S-002 is dependent of O-001
-        edges = [
-            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "S-TEST-002", "to": "O-TEST-001", "type": "implements"},
-        ]
-        create_test_graph_index(tmp_path, edges, {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "test", "implements": ["O-TEST-001"]},
+            {"id": "S-TEST-002", "type": "specification", "title": "Spec 2", "subsystem": "test", "implements": ["O-TEST-001"]},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Verify dependents
         dependents = graph.get_dependents("O-TEST-001")
@@ -117,18 +65,14 @@ def test_find_path_exists():
         tmp_path = Path(tmpdir)
 
         # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1")
-
-        edges = [
-            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
-        ]
-        create_test_graph_index(tmp_path, edges, {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "test", "implements": ["O-TEST-001"]},
+            {"id": "C-TEST-001", "type": "constraint", "title": "Constraint 1", "subsystem": "test", "satisfies": ["S-TEST-001"]},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Find path from C-001 to O-001
         path = graph.find_path("C-TEST-001", "O-TEST-001")
@@ -145,15 +89,14 @@ def test_find_path_no_path():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create disconnected nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2")
-
-        # No edges between them
-        create_test_graph_index(tmp_path, [], {})
+        # Create disconnected nodes (no edges between them)
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+            {"id": "O-TEST-002", "type": "outcome", "title": "Outcome 2", "subsystem": "test"},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # No path exists
         path = graph.find_path("O-TEST-001", "O-TEST-002")
@@ -166,11 +109,12 @@ def test_find_path_same_node():
         tmp_path = Path(tmpdir)
 
         # Create single node
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Path from node to itself
         path = graph.find_path("O-TEST-001", "O-TEST-001")
@@ -183,11 +127,12 @@ def test_find_path_missing_nodes():
         tmp_path = Path(tmpdir)
 
         # Create single node
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Start node missing
         path = graph.find_path("INVALID-001", "O-TEST-001")
@@ -207,20 +152,15 @@ def test_get_dependencies_multiple():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-
         # S-001 implements both outcomes
-        edges = [
-            {"from": "S-TEST-001", "to": "O-TEST-002", "type": "implements"},
-            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-        ]
-        create_test_graph_index(tmp_path, edges, {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+            {"id": "O-TEST-002", "type": "outcome", "title": "Outcome 2", "subsystem": "test"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "test", "implements": ["O-TEST-001", "O-TEST-002"]},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Verify dependencies are sorted
         deps = graph.get_dependencies("S-TEST-001")
@@ -233,11 +173,12 @@ def test_get_dependencies_missing_node():
         tmp_path = Path(tmpdir)
 
         # Create single node
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Missing node returns empty list
         deps = graph.get_dependencies("INVALID-001")
@@ -250,11 +191,12 @@ def test_get_dependents_missing_node():
         tmp_path = Path(tmpdir)
 
         # Create single node
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_graph_index(tmp_path, [], {})
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Missing node returns empty list
         dependents = graph.get_dependents("INVALID-001")
@@ -267,28 +209,29 @@ def test_traversal_performance():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create 100 nodes in a chain
-        edges = []
+        # Create 100 nodes in a chain (50 outcomes + 50 specs)
+        nodes = []
         for i in range(50):
             # Create outcome
-            outcome_id = f"O-PERF-{i:03d}"
-            create_test_node(tmp_path, outcome_id, "outcome", f"Outcome {i}")
-
-            # Create specification
-            spec_id = f"S-PERF-{i:03d}"
-            create_test_node(tmp_path, spec_id, "specification", f"Spec {i}")
-
-            # Add edge: S implements O
-            edges.append({
-                "from": spec_id,
-                "to": outcome_id,
-                "type": "implements"
+            nodes.append({
+                "id": f"O-PERF-{i:03d}",
+                "type": "outcome",
+                "title": f"Outcome {i}",
+                "subsystem": "test"
+            })
+            # Create specification that implements the outcome
+            nodes.append({
+                "id": f"S-PERF-{i:03d}",
+                "type": "specification",
+                "title": f"Spec {i}",
+                "subsystem": "test",
+                "implements": [f"O-PERF-{i:03d}"]
             })
 
-        create_test_graph_index(tmp_path, edges, {})
+        jig_dir = create_test_graph(tmp_path, nodes, subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Test get_dependencies performance
         start = time.time()
@@ -318,28 +261,22 @@ def test_find_path_shortest():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create a graph with multiple paths (using O/S/C nodes):
+        # Create a graph with multiple paths:
         # O-001 <- S-001 <- C-001 (short path)
         # O-001 <- S-002 <- S-003 <- C-001 (longer path)
-        create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1")
-        create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1")
-        create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2")
-        create_test_node(tmp_path, "S-TEST-003", "specification", "Spec 3")
-        create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1")
-
-        edges = [
+        jig_dir = create_test_graph(tmp_path, [
+            {"id": "O-TEST-001", "type": "outcome", "title": "Outcome 1", "subsystem": "test"},
             # Short path
-            {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
-            {"from": "C-TEST-001", "to": "S-TEST-001", "type": "constrains"},
+            {"id": "S-TEST-001", "type": "specification", "title": "Spec 1", "subsystem": "test", "implements": ["O-TEST-001"]},
             # Longer path
-            {"from": "S-TEST-002", "to": "O-TEST-001", "type": "implements"},
-            {"from": "S-TEST-003", "to": "S-TEST-002", "type": "depends_on"},
-            {"from": "C-TEST-001", "to": "S-TEST-003", "type": "constrains"},
-        ]
-        create_test_graph_index(tmp_path, edges, {})
+            {"id": "S-TEST-002", "type": "specification", "title": "Spec 2", "subsystem": "test", "implements": ["O-TEST-001"]},
+            {"id": "S-TEST-003", "type": "specification", "title": "Spec 3", "subsystem": "test", "depends_on": ["S-TEST-002"]},
+            # Constraint connects to both paths
+            {"id": "C-TEST-001", "type": "constraint", "title": "Constraint 1", "subsystem": "test", "satisfies": ["S-TEST-001", "S-TEST-003"]},
+        ], subsystems={"test": {"id": "test"}})
 
         # Load graph
-        graph = Graph.load_from_dir(tmp_path)
+        graph = Graph.load_from_dir(jig_dir)
 
         # Find path - should return shortest
         path = graph.find_path("C-TEST-001", "O-TEST-001")

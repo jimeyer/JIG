@@ -1202,18 +1202,21 @@ pytest tests/unit/ -v
 - Update CONTRIBUTING.md with fixture usage examples (if needed)
 
 **Reflect:**
-- Groups fixed: **Phase 0 complete**, Phase 1 partial (24/55 tests - 1/7 files complete)
-- Tests passing: 24/55 in Group 1 (44% - test_graph_commands.py ✓)
+- Groups fixed: **Phase 0 complete**, Phase 1 partial (35/55 tests - 2/7 files complete)
+- Tests passing: 35/55 in Group 1 (64%)
+  - test_graph_commands.py (24/24 ✓)
+  - test_graph_traversal.py (11/11 ✓)
 - Fixture helpers created: `tests/helpers/graph_fixtures.py::create_test_graph()`
 - Challenges encountered:
   - Helper successfully fixed all 24 tests in test_graph_commands.py
   - Fixed subsystem filtering by generating proper subsystems dict with node lists
-  - Remaining 6 files need different approach:
-    * test_graph_traversal.py uses edge-centric format (edges list separate from nodes)
-    * Other files (31 tests) need similar conversions
-  - Estimated 2-3 hours remaining to complete Group 1
+  - test_graph_traversal.py converted from edge-centric to node-centric format
+  - Edge type conversions: "constrains" → "satisfies", embedded in node specs
+  - Created missing __init__.py files in tests/ and tests/unit/ for proper imports
+  - Remaining 5 files (20 tests) need similar conversions
+  - Estimated 1-2 hours remaining to complete Group 1
 - Status: **IN PROGRESS** - WU2.5.1 partial, requires continuation
-- Progress: test_graph_commands.py (24/24 ✓), 6 files remaining (31 tests pending)
+- Progress: 2/7 files complete (35/55 tests passing - 64%)
 
 ---
 
