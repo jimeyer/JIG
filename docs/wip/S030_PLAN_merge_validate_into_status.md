@@ -1202,16 +1202,16 @@ pytest tests/unit/ -v
 - Update CONTRIBUTING.md with fixture usage examples (if needed)
 
 **Reflect:**
-- Groups fixed: **All Phases complete (0-5)** - 85/85 tests passing
+- Groups fixed: **All Phases complete (0-5)** - 163/163 tests passing ✓
 - **Phase 0** (Foundational): `tests/helpers/graph_fixtures.py::create_test_graph()` ✓
-- **Phase 1** (Group 1): 55/55 tests - Graph Index Fixtures ✓
+- **Phase 1** (Group 1): 114/114 tests - Graph Index Fixtures ✓
   - test_graph_commands.py (24/24 ✓)
   - test_graph_traversal.py (11/11 ✓)
   - test_graph_queries.py (10/10 ✓)
-  - test_validator.py (7/7 ✓)
-  - test_edge_validation.py (1/1 ✓)
-  - test_node_registry.py (1/1 ✓)
-  - test_decompose_metrics.py (1/1 ✓)
+  - test_validator.py (27/27 ✓)
+  - test_edge_validation.py (21/21 ✓)
+  - test_node_registry.py (10/10 ✓)
+  - test_decompose_metrics.py (11/11 ✓)
 - **Phase 2** (Group 2): 8/8 tests - Format Migration (YAML→JSON) ✓
   - test_graph_index_loading.py (8/8 ✓)
 - **Phase 3** (Group 3): 21/21 tests - Annotation Validation Fixtures ✓
@@ -1221,6 +1221,12 @@ pytest tests/unit/ -v
 - **Phase 5** (Group 5): 11/11 tests - Nested Subsystems Fixtures ✓
   - test_nested_subsystems.py (11/11 ✓) - YAML→JSON subsystem structures
 - Fixture helpers created: `tests/helpers/graph_fixtures.py::create_test_graph()`
+- Test count discrepancy: Original estimate was 85 tests, actual count is **163 tests**
+  - Group 1 had 114 tests (not 55 as estimated)
+  - test_validator.py: 27 tests (not 7)
+  - test_edge_validation.py: 21 tests (not 1)
+  - test_node_registry.py: 10 tests (not 1)
+  - test_decompose_metrics.py: 11 tests (not 1)
 - Challenges encountered:
   - **Group 1**: Helper successfully fixed all tests using node-centric format
   - **Group 1**: Converted edge-centric to node-centric, edge type conversions (constrains→satisfies)
@@ -1234,9 +1240,10 @@ pytest tests/unit/ -v
   - **Group 4**: test_calculate_status_handles_missing_graph_index now expects FileNotFoundError
   - **Group 5**: 11 tests (not 7 as estimated) - converted nested subsystem YAML to JSON dicts
   - **Group 5**: JSON format handles nested subsystems naturally with nested objects
-  - Total effort: ~4 hours for all 85 tests (Groups 1-5)
+  - Total effort: ~4 hours for all 163 tests (Groups 1-5)
 - Status: **COMPLETE** - All 5 Repair Groups finished
-- Progress: **100% complete (85/85 tests passing)**
+- Progress: **100% complete (163/163 tests passing)**
+- Verification: All 163 tests pass ✓ (pytest output confirmed)
 - Next: WU2.6 Validation & Integration
 
 ---
