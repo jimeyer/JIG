@@ -1,8 +1,13 @@
 # @jig C-JIGY-008 implements:S-JIGY-008 subsystem:jigy-tool interface:public
+# @jig C-JIGY-031 implements:S-JIGY-011 subsystem:jigy-tool interface:public
 """Fast scanner for @jig annotations in source files.
 
 Scans source and test directories for @jig annotations that mark Code (C-*)
 and Test (T-*) nodes. Extracts node metadata, relationships, and file locations.
+
+Implements exclusion filtering (Tier 1 and Tier 3):
+- Tier 1: .jigignore pattern matching
+- Tier 3: Fixture pattern detection (C-TEST-*, T-TEST-*, etc.)
 
 Performance target: <2 seconds for 10,000 files.
 """
@@ -11,6 +16,39 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from .ignore_filter import IgnoreFilter
+
+
+# Tier 3: Fixture pattern detection - reserved patterns for test fixtures
+# These node IDs are used in test files as fixtures and should be excluded from index
+FIXTURE_PATTERNS = [
+    r'^[CT]-TEST-\d+$',      # C-TEST-001, T-TEST-001
+    r'^[CT]-MOCK-\d+$',      # C-MOCK-001
+    r'^[CT]-FIXTURE-\d+$',   # C-FIXTURE-001
+    r'^[CT]-EXAMPLE-\d+$',   # C-EXAMPLE-001
+]
+
+
+def _is_test_fixture(node_id: str) -> bool:
+    """Check if node ID looks like a test fixture (Tier 3 filtering).
+
+    Args:
+        node_id: Node ID to check (e.g., C-TEST-001)
+
+    Returns:
+        True if ID matches fixture pattern, False otherwise
+
+    Example:
+        >>> _is_test_fixture("C-TEST-001")
+        True
+        >>> _is_test_fixture("C-AUTH-001")
+        False
+    """
+    for pattern in FIXTURE_PATTERNS:
+        if re.match(pattern, node_id):
+            return True
+    return False
 
 
 @dataclass
@@ -68,10 +106,14 @@ def parse_annotation_line(line: str) -> Annotation | None:
     match = pattern.match(line)
     if not match:
         return None
-    
+
     node_id = match.group(1)
     rest = match.group(2).strip()
-    
+
+    # Tier 3: Skip test fixture patterns
+    if _is_test_fixture(node_id):
+        return None
+
     # Infer type from prefix
     node_type = "code" if node_id.startswith("C-") else "test"
     
@@ -127,9 +169,14 @@ class AnnotationScanner:
         'C-AUTH-001'
     """
 
-    def __init__(self) -> None:
-        """Initialize annotation scanner."""
+    def __init__(self, ignore_filter: IgnoreFilter | None = None) -> None:
+        """Initialize annotation scanner.
+
+        Args:
+            ignore_filter: Optional IgnoreFilter for path-based exclusions (Tier 1)
+        """
         self.file_extensions = [".py"]  # Supported file extensions
+        self.ignore_filter = ignore_filter
 
     def scan_file(self, file_path: Path) -> list[Annotation]:
         """Scan a single file for @jig annotations.
@@ -168,6 +215,7 @@ class AnnotationScanner:
         """Scan a directory recursively for @jig annotations.
 
         Only processes files with supported extensions (.py by default).
+        Applies Tier 1 filtering if ignore_filter is set.
 
         Args:
             directory: Root directory to scan
@@ -187,6 +235,10 @@ class AnnotationScanner:
         # Recursively find all Python files
         for ext in self.file_extensions:
             for file_path in directory.rglob(f"*{ext}"):
+                # Tier 1: Skip if matches .jigignore patterns
+                if self.ignore_filter and self.ignore_filter.should_exclude(file_path):
+                    continue
+
                 if file_path.is_file():
                     file_annotations = self.scan_file(file_path)
                     annotations.extend(file_annotations)

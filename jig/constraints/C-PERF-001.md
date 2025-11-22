@@ -3,6 +3,7 @@ id: C-PERF-001
 type: constraint
 title: "Performance Constraint"
 subsystem: null
+status: template
 created: 2025-11-19
 ---
 

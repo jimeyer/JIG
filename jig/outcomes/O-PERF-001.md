@@ -3,6 +3,7 @@ id: O-PERF-001
 type: outcome
 title: "Performance Test"
 subsystem: null
+status: template
 created: 2025-11-19
 ---
 

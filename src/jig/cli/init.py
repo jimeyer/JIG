@@ -66,6 +66,37 @@ def init(path: str) -> None:
             target_list = repaired if already_initialized else created
             target_list.append(str(subsystems_path))
 
+        # Create/verify .jigignore (Tier 1 exclusion filtering)
+        jigignore_path = project_path / ".jigignore"
+        if not jigignore_path.exists():
+            jigignore_content = """# .jigignore - JIG scanning exclusions
+# Syntax: gitignore-style patterns (supports *, **, ?)
+
+# Test files (contain fixtures that pollute node index)
+**/test_*.py
+**/conftest.py
+
+# Build artifacts
+**/__pycache__/
+**/*.pyc
+.venv/
+.pytest_cache/
+.tox/
+*.egg-info/
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Add project-specific exclusions below
+"""
+            write_file(jigignore_path, jigignore_content)
+            target_list = repaired if already_initialized else created
+            target_list.append(str(jigignore_path))
+
         # Create/verify jig.toml (never overwrite if exists)
         if not config_file.exists():
             config_data = {

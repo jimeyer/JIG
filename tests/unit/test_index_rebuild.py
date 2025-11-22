@@ -625,3 +625,236 @@ class TestEdgeCases:
         assert result.success
         assert len(result.nodes) == 1
 
+
+# @jig T-JIGY-032 verifies:S-JIGY-011 subsystem:jigy-tool
+class TestStatusBasedFiltering:
+    """Test Tier 2: Status-based filtering to exclude template/deprecated nodes."""
+
+    def test_excludes_template_status(self, tmp_path: Path) -> None:
+        """Test that nodes with status: template are excluded."""
+        jig_dir = tmp_path / "jig"
+        outcomes_dir = jig_dir / "outcomes"
+        outcomes_dir.mkdir(parents=True)
+
+        # Create template outcome
+        (outcomes_dir / "O-TEMPLATE-001.md").write_text(dedent("""
+            ---
+            id: O-TEMPLATE-001
+            type: outcome
+            title: Template Outcome
+            subsystem: test
+            status: template
+            ---
+
+            # Template
+        """))
+
+        # Create active outcome
+        (outcomes_dir / "O-REAL-001.md").write_text(dedent("""
+            ---
+            id: O-REAL-001
+            type: outcome
+            title: Real Outcome
+            subsystem: test
+            status: active
+            ---
+
+            # Real
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should only discover the active node
+        assert len(nodes) == 1
+        assert nodes[0].id == "O-REAL-001"
+
+    def test_excludes_deprecated_status(self, tmp_path: Path) -> None:
+        """Test that nodes with status: deprecated are excluded."""
+        jig_dir = tmp_path / "jig"
+        specs_dir = jig_dir / "specifications"
+        specs_dir.mkdir(parents=True)
+
+        # Create deprecated spec
+        (specs_dir / "S-OLD-001.md").write_text(dedent("""
+            ---
+            id: S-OLD-001
+            type: specification
+            title: Old Spec
+            subsystem: test
+            status: deprecated
+            ---
+
+            # Deprecated
+        """))
+
+        # Create active spec
+        (specs_dir / "S-NEW-001.md").write_text(dedent("""
+            ---
+            id: S-NEW-001
+            type: specification
+            title: New Spec
+            subsystem: test
+            status: active
+            ---
+
+            # Active
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should only discover the active node
+        assert len(nodes) == 1
+        assert nodes[0].id == "S-NEW-001"
+
+    def test_excludes_draft_status(self, tmp_path: Path) -> None:
+        """Test that nodes with status: draft are excluded."""
+        jig_dir = tmp_path / "jig"
+        outcomes_dir = jig_dir / "outcomes"
+        outcomes_dir.mkdir(parents=True)
+
+        # Create draft outcome
+        (outcomes_dir / "O-DRAFT-001.md").write_text(dedent("""
+            ---
+            id: O-DRAFT-001
+            type: outcome
+            title: Draft Outcome
+            subsystem: test
+            status: draft
+            ---
+
+            # Draft
+        """))
+
+        # Create active outcome
+        (outcomes_dir / "O-ACTIVE-001.md").write_text(dedent("""
+            ---
+            id: O-ACTIVE-001
+            type: outcome
+            title: Active Outcome
+            subsystem: test
+            status: active
+            ---
+
+            # Active
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should only discover the active node
+        assert len(nodes) == 1
+        assert nodes[0].id == "O-ACTIVE-001"
+
+    def test_includes_planned_status(self, tmp_path: Path) -> None:
+        """Test that nodes with status: planned are included."""
+        jig_dir = tmp_path / "jig"
+        outcomes_dir = jig_dir / "outcomes"
+        outcomes_dir.mkdir(parents=True)
+
+        # Create planned outcome
+        (outcomes_dir / "O-PLANNED-001.md").write_text(dedent("""
+            ---
+            id: O-PLANNED-001
+            type: outcome
+            title: Planned Outcome
+            subsystem: test
+            status: planned
+            ---
+
+            # Planned
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should discover the planned node
+        assert len(nodes) == 1
+        assert nodes[0].id == "O-PLANNED-001"
+
+    def test_includes_missing_status_defaults_to_active(self, tmp_path: Path) -> None:
+        """Test that nodes with missing status field are included (default: active)."""
+        jig_dir = tmp_path / "jig"
+        outcomes_dir = jig_dir / "outcomes"
+        outcomes_dir.mkdir(parents=True)
+
+        # Create outcome without status field
+        (outcomes_dir / "O-NO-STATUS-001.md").write_text(dedent("""
+            ---
+            id: O-NO-STATUS-001
+            type: outcome
+            title: No Status Outcome
+            subsystem: test
+            ---
+
+            # No status field
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should discover the node (defaults to active)
+        assert len(nodes) == 1
+        assert nodes[0].id == "O-NO-STATUS-001"
+
+    def test_mixed_statuses(self, tmp_path: Path) -> None:
+        """Test filtering with mixed statuses."""
+        jig_dir = tmp_path / "jig"
+        outcomes_dir = jig_dir / "outcomes"
+        outcomes_dir.mkdir(parents=True)
+
+        # Create nodes with various statuses
+        (outcomes_dir / "O-TEMPLATE-001.md").write_text(dedent("""
+            ---
+            id: O-TEMPLATE-001
+            type: outcome
+            title: Template
+            status: template
+            ---
+        """))
+
+        (outcomes_dir / "O-DEPRECATED-001.md").write_text(dedent("""
+            ---
+            id: O-DEPRECATED-001
+            type: outcome
+            title: Deprecated
+            status: deprecated
+            ---
+        """))
+
+        (outcomes_dir / "O-DRAFT-001.md").write_text(dedent("""
+            ---
+            id: O-DRAFT-001
+            type: outcome
+            title: Draft
+            status: draft
+            ---
+        """))
+
+        (outcomes_dir / "O-ACTIVE-001.md").write_text(dedent("""
+            ---
+            id: O-ACTIVE-001
+            type: outcome
+            title: Active
+            status: active
+            ---
+        """))
+
+        (outcomes_dir / "O-PLANNED-001.md").write_text(dedent("""
+            ---
+            id: O-PLANNED-001
+            type: outcome
+            title: Planned
+            status: planned
+            ---
+        """))
+
+        builder = IndexBuilder(tmp_path)
+        nodes = builder.discover_markdown_nodes()
+
+        # Should only discover active and planned nodes
+        assert len(nodes) == 2
+        node_ids = {node.id for node in nodes}
+        assert node_ids == {"O-ACTIVE-001", "O-PLANNED-001"}
+

@@ -3,6 +3,7 @@ id: S-API-001
 type: specification
 title: "API Specification"
 subsystem: null
+status: template
 created: 2025-11-19
 ---
 

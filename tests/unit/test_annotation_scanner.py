@@ -450,11 +450,108 @@ class TestEdgeCases:
         """Parse annotations with special characters in metadata values."""
         # Note: This tests current behavior - may need adjustment based on spec
         test_file = tmp_path / "test.py"
-        test_file.write_text("# @jig C-TEST-001 implements:S-001 subsystem:test-core")
+        test_file.write_text("# @jig C-REAL-001 implements:S-001 subsystem:test-core")
 
         scanner = AnnotationScanner()
         annotations = scanner.scan_file(test_file)
 
         assert len(annotations) == 1
         assert annotations[0].metadata["subsystem"] == "test-core"
+
+
+# @jig T-JIGY-031 verifies:S-JIGY-011 subsystem:jigy-tool
+class TestFixturePatternDetection:
+    """Test Tier 3: Fixture pattern detection to exclude test fixtures."""
+
+    def test_excludes_c_test_pattern(self) -> None:
+        """Test that C-TEST-* patterns are excluded."""
+        from jig.core.scanner import _is_test_fixture
+
+        assert _is_test_fixture("C-TEST-001")
+        assert _is_test_fixture("C-TEST-999")
+        assert not _is_test_fixture("C-AUTH-001")
+
+    def test_excludes_t_test_pattern(self) -> None:
+        """Test that T-TEST-* patterns are excluded."""
+        from jig.core.scanner import _is_test_fixture
+
+        assert _is_test_fixture("T-TEST-001")
+        assert _is_test_fixture("T-TEST-999")
+        assert not _is_test_fixture("T-AUTH-001")
+
+    def test_excludes_c_mock_pattern(self) -> None:
+        """Test that C-MOCK-* patterns are excluded."""
+        from jig.core.scanner import _is_test_fixture
+
+        assert _is_test_fixture("C-MOCK-001")
+        assert _is_test_fixture("C-MOCK-999")
+        assert not _is_test_fixture("C-AUTH-001")
+
+    def test_excludes_c_fixture_pattern(self) -> None:
+        """Test that C-FIXTURE-* patterns are excluded."""
+        from jig.core.scanner import _is_test_fixture
+
+        assert _is_test_fixture("C-FIXTURE-001")
+        assert _is_test_fixture("C-FIXTURE-999")
+        assert not _is_test_fixture("C-AUTH-001")
+
+    def test_excludes_c_example_pattern(self) -> None:
+        """Test that C-EXAMPLE-* patterns are excluded."""
+        from jig.core.scanner import _is_test_fixture
+
+        assert _is_test_fixture("C-EXAMPLE-001")
+        assert _is_test_fixture("C-EXAMPLE-999")
+        assert not _is_test_fixture("C-AUTH-001")
+
+    def test_parse_annotation_line_skips_fixtures(self) -> None:
+        """Test that parse_annotation_line returns None for fixture patterns."""
+        # Test fixture annotations should return None
+        assert parse_annotation_line("# @jig C-TEST-001 implements:S-001") is None
+        assert parse_annotation_line("# @jig T-TEST-001 verifies:S-001") is None
+        assert parse_annotation_line("# @jig C-MOCK-001 implements:S-001") is None
+        assert parse_annotation_line("# @jig C-FIXTURE-001 implements:S-001") is None
+        assert parse_annotation_line("# @jig C-EXAMPLE-001 implements:S-001") is None
+
+        # Real annotations should parse normally
+        result = parse_annotation_line("# @jig C-AUTH-001 implements:S-001")
+        assert result is not None
+        assert result.id == "C-AUTH-001"
+
+    def test_scanner_excludes_fixture_annotations(self, tmp_path: Path) -> None:
+        """Test that scanner excludes fixture annotations from files."""
+        test_file = tmp_path / "test.py"
+        test_file.write_text(dedent("""
+            # This file contains both real and fixture annotations
+            # @jig C-AUTH-001 implements:S-AUTH-001 subsystem:auth
+            # @jig C-TEST-001 implements:S-TEST-001 subsystem:test
+            # @jig T-TEST-001 verifies:S-TEST-001 subsystem:test
+            # @jig C-MOCK-001 implements:S-MOCK-001 subsystem:mock
+            # @jig C-AUTH-002 implements:S-AUTH-002 subsystem:auth
+        """))
+
+        scanner = AnnotationScanner()
+        annotations = scanner.scan_file(test_file)
+
+        # Should only find C-AUTH-001 and C-AUTH-002 (real annotations)
+        assert len(annotations) == 2
+        node_ids = {ann.id for ann in annotations}
+        assert node_ids == {"C-AUTH-001", "C-AUTH-002"}
+
+    def test_scanner_no_false_positives(self, tmp_path: Path) -> None:
+        """Test that scanner doesn't exclude valid node IDs that look similar."""
+        test_file = tmp_path / "test.py"
+        test_file.write_text(dedent("""
+            # Real nodes that might look similar to fixtures
+            # @jig C-TESTING-001 implements:S-001 subsystem:testing
+            # @jig C-MOCKING-001 implements:S-001 subsystem:mocking
+            # @jig T-TESTABLE-001 verifies:S-001 subsystem:test
+        """))
+
+        scanner = AnnotationScanner()
+        annotations = scanner.scan_file(test_file)
+
+        # All should be included (they don't match the exact fixture patterns)
+        assert len(annotations) == 3
+        node_ids = {ann.id for ann in annotations}
+        assert node_ids == {"C-TESTING-001", "C-MOCKING-001", "T-TESTABLE-001"}
 

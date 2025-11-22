@@ -3,6 +3,7 @@ id: O-TEST-001
 type: outcome
 title: "Test Outcome"
 subsystem: core
+status: template
 created: 2025-11-19
 ---
 

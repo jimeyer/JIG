@@ -33,6 +33,8 @@ This PLAN implements phases from the analysis document to make jigy tool read an
   - Value: Find related nodes, trace dependencies in <1 second
 - O-JIGY-003: "Code and Intent stay synchronized"
   - Value: Annotations link code to Intent, validation catches drift
+- O-JIGY-004: "JIG scanning excludes test fixtures and template files" (discovered WU8-10)
+  - Value: Clean node index without pollution from mock data
 
 **Specifications Created (jig/specifications/):**
 - S-JIGY-001: "Parse frontmatter relationship fields from markdown"
@@ -45,6 +47,7 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - S-JIGY-008: "Fast annotation scanner (<2s for 10k files)"
 - S-JIGY-009: "Index rebuild regenerates graph-index.yaml from sources"
 - S-JIGY-010: "Annotation validation checks all @jig references"
+- S-JIGY-011: "Exclusion filtering prevents test fixture pollution" (discovered WU8-10)
 
 **Rationale:** These constraints are known from S017 analysis and JIG v6.1 spec. Creating them upfront enables O→S→TDD flow.
 
@@ -96,20 +99,24 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 
 ## Progress Summary
 
-**Overall Status:** Phase 0, 1, 2, & 3 Complete (10/12 work units done)
+**Overall Status:** Phase 0, 1, 2, 3, & 3.5 Complete (11/13 work units done)
 
 **Completed:**
 - ✅ Phase 0: Intent Creation (WU0)
 - ✅ Phase 1: Core Plumbing (WU1-4) — All tests passing, reflections documented
 - ✅ Phase 2: Graph Navigation (WU5-7) — All tests passing, reflections documented
 - ✅ Phase 3: Annotations (WU8-10) — All tests passing, reflections documented
+- ✅ Phase 3.5: Filtering & Exclusions (WU10.5) — All tests passing, three-tier filtering implemented
+
+**Blocked:**
+- None
 
 **In Progress:** None
 
-**Next Up:** WU11: ASE-A Validation & Fixes, WU12: Documentation & Examples
+**Next Up:** WU11: ASE-A Validation & Fixes (ready to proceed)
 
 **Key Metrics:**
-- Tests: 197 passing (21 annotation validation + 25 index rebuild + 30 annotation scanner + 24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
+- Tests: 227 passing (30 exclusion filtering + 21 annotation validation + 25 index rebuild + 30 annotation scanner + 24 graph commands + 22 subsystem + 11 traversal + 21 edge validation + 12 relationship + 8 graph-index + 10 registry + 13 existing)
 - Performance: Graph loads in 14ms, validates 1000 nodes in <1s, queries <100ms, annotation scan 10k files in ~3.9s, index rebuild <1s, annotation validation <1s
 - Real validation: 40 jig nodes, 18 edges, zero errors
 
@@ -148,6 +155,9 @@ This PLAN implements phases from the analysis document to make jigy tool read an
 - [x] WU8: Fast code scanner for @jig annotations — tests ☑ / docs ☐ / reflect ☑
 - [x] WU9: Index rebuild from sources — tests ☑ / docs ☐ / reflect ☑
 - [x] WU10: Annotation validation — tests ☑ / docs ☐ / reflect ☑
+
+### Phase 3.5: Filtering & Exclusions (discovered during WU8-10)
+- [x] WU10.5: Exclusion filtering (.jigignore, status, fixtures) — tests ☑ / docs ☐ / reflect ☑
 
 ### Integration & Polish
 - [ ] WU11: ASE-A validation & fixes — tests ☐ / docs ☐ / reflect ☐
@@ -239,6 +249,11 @@ This PLAN implements phases from the analysis document to make jigy tool read an
     - Implements: O-JIGY-003
     - Validates: Node IDs exist, relationships valid, no duplicates
     - Reports: Broken references, orphaned Intent nodes, format errors
+
+11. **S-JIGY-011.md**: "Exclusion filtering prevents test fixture pollution" (discovered WU8-10)
+    - Implements: O-JIGY-004
+    - Three-tier filtering: .jigignore patterns, status-based, fixture patterns
+    - Prevents: Test fixtures, templates, build artifacts from polluting index
 
 **Implementation Notes:**
 - Create markdown files with YAML frontmatter following JIG v6.1 format
@@ -1175,6 +1190,475 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 
 ---
 
+### Work Unit 10.5: Exclusion Filtering (.jigignore, status, fixtures)
+
+**Implements:** S-JIGY-011 (to be created)
+
+**Supports:** O-JIGY-004 (to be created)
+
+**Goal:** Prevent test fixtures and template files from polluting the node index during scanning and rebuild
+
+**Discovery Context:**
+Running `jigy index rebuild` on the jig project itself revealed two critical issues:
+1. **Test fixture pollution**: Test files contain @jig annotations in string literals (test fixtures) that are being scanned as real nodes (e.g., `C-TEST-001` appears in 9 different test files)
+2. **Template file inclusion**: Template/example markdown files (e.g., `O-PERF-001.md` with `subsystem: null`, `C-PERF-001.md` which is actually a Constraint markdown not Code) are included in the index
+
+This WU implements a three-tier exclusion strategy discovered during WU8-10 implementation.
+
+**Planned Effort:** 150m (includes Intent node creation + implementation + testing)
+
+**Acceptance Criteria:**
+
+**Intent Nodes Created:**
+- O-JIGY-004.md: "JIG scanning excludes test fixtures and template files"
+  - Value: Clean node index reflects only real Intent and implementation
+  - Acceptance: `jigy index rebuild` produces zero duplicate warnings from test fixtures
+- S-JIGY-011.md: "Exclusion filtering prevents test fixture pollution"
+  - Implements: O-JIGY-004
+  - Three-tier approach: .jigignore, status filtering, fixture patterns
+  - Details: gitignore-style syntax, respects `status: template`, skips *-TEST-* IDs
+
+**Implementation Complete:**
+- `.jigignore` file support (Tier 1: path-based exclusions)
+  - Gitignore-style pattern matching (`**/test_*.py`, `**/__pycache__/`)
+  - IgnoreFilter class integrated into AnnotationScanner
+  - Default `.jigignore` generated by `jig init`
+- Status-based filtering (Tier 2: metadata exclusions)
+  - Markdown discovery skips `status: template`, `deprecated`, `draft`
+  - Self-documenting approach (files declare themselves as non-active)
+- Fixture pattern detection (Tier 3: smart scanning)
+  - Skip annotations matching: `C-TEST-*`, `T-TEST-*`, `C-MOCK-*`, `C-FIXTURE-*`
+  - Prevents test fixture pollution at parse time
+- `jigy index rebuild` produces clean output with zero test fixture duplicates
+
+**Implementation Notes:**
+
+**Step 1: Create Intent Nodes (30m)**
+Create two new nodes following JIG workflow:
+
+1. **O-JIGY-004.md** (jig/outcomes/):
+```yaml
+---
+id: O-JIGY-004
+type: outcome
+title: JIG scanning excludes test fixtures and template files
+subsystem: jigy-tool
+status: active
+created: 2025-11-22
+---
+
+# Outcome: JIG Scanning Excludes Test Fixtures and Template Files
+
+## Value
+
+Clean node index that reflects only real Intent (O/S) and implementation (C/T) nodes, without pollution from:
+- Test fixture annotations (mock @jig tags in test string literals)
+- Template markdown files (examples, placeholders)
+- Build artifacts and generated files
+
+Developers trust the index as source of truth for "what actually exists."
+
+## Success Metrics
+
+- Zero duplicate node warnings from test fixtures in `jigy index rebuild`
+- Zero template files included in active node counts
+- <5% false negatives (real nodes incorrectly excluded)
+
+## Acceptance Criteria
+
+- `jigy index rebuild` on jig project shows zero `C-TEST-*` duplicates
+- Template files with `status: template` not included in index
+- `.jigignore` patterns exclude specified paths
+- Real implementation nodes still discovered correctly
+```
+
+2. **S-JIGY-011.md** (jig/specifications/):
+```yaml
+---
+id: S-JIGY-011
+type: specification
+title: Exclusion filtering prevents test fixture pollution
+subsystem: jigy-tool
+implements: O-JIGY-004
+status: active
+created: 2025-11-22
+---
+
+# S-JIGY-011: Exclusion Filtering
+
+## Specification
+
+The jigy scanner and index builder SHALL exclude non-real nodes using a three-tier filtering approach.
+
+## Tier 1: Path-Based Exclusions (.jigignore)
+
+**File:** `.jigignore` in project root (gitignore syntax)
+
+**Behavior:**
+- Load patterns from `.jigignore` if exists, else use defaults
+- Pattern matching uses fnmatch/glob syntax
+- Patterns apply to both markdown discovery and annotation scanning
+
+**Default patterns:**
+```
+**/test_*.py          # Test files (fixtures)
+**/conftest.py        # Pytest config
+**/__pycache__/       # Python cache
+**/*.pyc
+.venv/
+dist/
+build/
+```
+
+**Implementation:** `IgnoreFilter` class checks paths before scanning
+
+## Tier 2: Status-Based Filtering
+
+**Markdown frontmatter field:** `status`
+
+**Excluded statuses:**
+- `template` - Template/example files
+- `deprecated` - Old nodes kept for history
+- `draft` - Work in progress
+
+**Included statuses:**
+- `active` - Real, current nodes
+- `planned` - Future work (valid Intent)
+- `null` / missing - Defaults to active
+
+**Implementation:** Filter in `IndexBuilder.discover_markdown_nodes()`
+
+## Tier 3: Fixture Pattern Detection
+
+**Annotation IDs to skip:**
+- `C-TEST-*` - Code test fixtures
+- `T-TEST-*` - Test test fixtures
+- `C-MOCK-*` - Mock objects
+- `C-FIXTURE-*` - Explicit fixtures
+- `C-EXAMPLE-*` - Example code
+
+**Implementation:** `_is_test_fixture()` in `parse_annotation_line()`
+
+## Configuration
+
+Optional `jig.toml` settings:
+```toml
+[jig.scanning]
+exclude_statuses = ["template", "deprecated", "draft"]
+fixture_patterns = ["*-TEST-*", "*-MOCK-*", "*-FIXTURE-*"]
+```
+
+## Rationale
+
+Layered defense prevents pollution at multiple levels:
+- User control (.jigignore) for project-specific exclusions
+- Metadata-driven (status) for self-documenting intent
+- Pattern-based (fixtures) as safety net
+
+## References
+
+- Issue discovered: WU8-10 implementation, `jigy index rebuild` output
+- Related: S-JIGY-008 (scanner), S-JIGY-009 (index rebuild)
+```
+
+**Step 2: Implement Tier 1 - .jigignore Support (40m)**
+
+Create `src/jig/core/ignore_filter.py`:
+```python
+# @jig C-JIGY-011 implements:S-JIGY-011 subsystem:jigy-tool interface:internal
+"""Ignore pattern filtering for JIG scanning."""
+
+from pathlib import Path
+import fnmatch
+
+class IgnoreFilter:
+    """Handles .jigignore file parsing and path filtering."""
+    
+    def __init__(self, project_root: Path):
+        self.project_root = project_root
+        self.patterns = self._load_ignore_patterns()
+    
+    def _load_ignore_patterns(self) -> list[str]:
+        """Load patterns from .jigignore file."""
+        ignore_file = self.project_root / ".jigignore"
+        if not ignore_file.exists():
+            return self._default_patterns()
+        
+        patterns = []
+        with open(ignore_file, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                # Skip comments and empty lines
+                if line and not line.startswith('#'):
+                    patterns.append(line)
+        return patterns
+    
+    def _default_patterns(self) -> list[str]:
+        """Default patterns when .jigignore doesn't exist."""
+        return [
+            "**/__pycache__/",
+            "**/*.pyc",
+            ".venv/",
+            "dist/",
+            "build/",
+        ]
+    
+    def should_exclude(self, path: Path) -> bool:
+        """Check if path matches any ignore pattern."""
+        try:
+            relative = path.relative_to(self.project_root)
+        except ValueError:
+            # Path is outside project root
+            return False
+        
+        path_str = str(relative)
+        
+        for pattern in self.patterns:
+            # Support both glob patterns and simple matches
+            if fnmatch.fnmatch(path_str, pattern):
+                return True
+            # Also check if pattern matches directory component
+            if fnmatch.fnmatch(path_str, f"**/{pattern}"):
+                return True
+        
+        return False
+```
+
+Integrate into `AnnotationScanner`:
+```python
+# In scanner.py
+def scan_directory(self, directory: Path, ignore_filter: IgnoreFilter | None = None) -> list[Annotation]:
+    """Scan directory with optional ignore filter."""
+    annotations: list[Annotation] = []
+    
+    for ext in self.file_extensions:
+        for file_path in directory.rglob(f"*{ext}"):
+            # Skip if matches .jigignore
+            if ignore_filter and ignore_filter.should_exclude(file_path):
+                continue
+                
+            if file_path.is_file():
+                annotations.extend(self.scan_file(file_path))
+    
+    return annotations
+```
+
+**Step 3: Implement Tier 2 - Status Filtering (20m)**
+
+Modify `IndexBuilder.discover_markdown_nodes()`:
+```python
+# In index_builder.py
+EXCLUDED_STATUSES = {'template', 'deprecated', 'draft'}
+
+def discover_markdown_nodes(self) -> list[OSTCNode]:
+    """Discover O/S/C nodes, excluding templates/deprecated."""
+    nodes: list[OSTCNode] = []
+    
+    for md_file in dir_path.glob("*.md"):
+        try:
+            node = parse_ostc_node(md_file)
+            
+            # Skip template/deprecated/draft nodes
+            if node.status in EXCLUDED_STATUSES:
+                continue
+            
+            nodes.append(node)
+        except Exception as e:
+            self.parse_errors.append(f"Failed to parse {md_file}: {str(e)}")
+    
+    return nodes
+```
+
+**Step 4: Implement Tier 3 - Fixture Pattern Detection (20m)**
+
+Add to `scanner.py`:
+```python
+# In scanner.py
+import re
+
+FIXTURE_PATTERNS = [
+    r'^[CT]-TEST-\d+$',      # C-TEST-001, T-TEST-001
+    r'^[CT]-MOCK-\d+$',      # C-MOCK-001
+    r'^[CT]-FIXTURE-\d+$',   # C-FIXTURE-001
+    r'^[CT]-EXAMPLE-\d+$',   # C-EXAMPLE-001
+]
+
+def _is_test_fixture(node_id: str) -> bool:
+    """Check if node ID looks like a test fixture."""
+    for pattern in FIXTURE_PATTERNS:
+        if re.match(pattern, node_id):
+            return True
+    return False
+
+def parse_annotation_line(line: str) -> Annotation | None:
+    """Parse @jig annotation, skipping test fixtures."""
+    match = re.search(r'@jig\s+([A-Z]-[A-Z]+-\d+)', line)
+    if not match:
+        return None
+    
+    node_id = match.group(1)
+    
+    # Skip test fixture patterns
+    if _is_test_fixture(node_id):
+        return None
+    
+    # ... rest of parsing ...
+```
+
+**Step 5: Generate Default .jigignore (20m)**
+
+Update `jig init` to create `.jigignore`:
+```python
+# In cli/init.py
+def create_default_jigignore(project_root: Path) -> None:
+    """Create default .jigignore file if it doesn't exist."""
+    ignore_file = project_root / ".jigignore"
+    if ignore_file.exists():
+        return
+    
+    content = """# .jigignore - JIG scanning exclusions
+# Syntax: gitignore-style patterns (supports *, **, ?)
+
+# Test files (contain fixtures that pollute node index)
+**/test_*.py
+**/conftest.py
+
+# Build artifacts
+**/__pycache__/
+**/*.pyc
+.venv/
+.pytest_cache/
+.tox/
+*.egg-info/
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Add project-specific exclusions below
+"""
+    ignore_file.write_text(content)
+```
+
+**Step 6: Mark Template Files (10m)**
+
+Update existing template files:
+```yaml
+# jig/outcomes/O-PERF-001.md
+status: template  # ← Add this
+
+# jig/constraints/C-PERF-001.md
+status: template  # ← Add this
+```
+
+**Test Plan:**
+
+Unit tests (create `tests/unit/test_ignore_filter.py`):
+```python
+# @jig T-JIGY-011 verifies:S-JIGY-011 subsystem:jigy-tool
+def test_ignore_filter_loads_patterns():
+    """Test .jigignore file parsing."""
+
+def test_ignore_filter_matches_patterns():
+    """Test pattern matching logic."""
+
+def test_ignore_filter_excludes_test_files():
+    """Test that test_*.py files are excluded."""
+
+def test_fixture_pattern_detection():
+    """Test _is_test_fixture() patterns."""
+
+def test_status_based_filtering():
+    """Test template/deprecated status exclusion."""
+```
+
+Integration test:
+```python
+# @jig T-JIGY-012 verifies:S-JIGY-011 subsystem:jigy-tool
+def test_index_rebuild_excludes_fixtures(tmp_path):
+    """Test full rebuild with exclusions."""
+    # Create .jigignore
+    # Create template markdown with status: template
+    # Create test files with C-TEST-* fixtures
+    # Run rebuild
+    # Assert: zero duplicates, templates excluded
+```
+
+Validation test:
+```bash
+cd ~/Code/jig
+jigy index rebuild
+# Should show: zero C-TEST-* duplicates, zero template warnings
+```
+
+**Docs to Update:**
+- README: Add .jigignore section
+- User guide: Explain three-tier filtering
+- Migration guide: How to add .jigignore to existing projects
+
+**Reflect (≤5 bullets; keep crisp)**
+
+- What worked well:
+
+- What could be better:
+
+- Next experiment:
+
+- Discoveries:
+
+- Risk watchlist:
+
+**Links:**
+- MR/PR: 
+- Commit(s): 
+
+**Commit Message (Example):**
+```
+feat(jigy): add exclusion filtering (.jigignore, status, fixtures)
+
+Three-tier filtering prevents test fixture pollution:
+- Tier 1: .jigignore file (path-based exclusions)
+- Tier 2: status field (template/deprecated filtering)
+- Tier 3: fixture patterns (skip *-TEST-*, *-MOCK-*)
+
+Intent nodes created:
+- O-JIGY-004: JIG scanning excludes test fixtures and template files
+- S-JIGY-011: Exclusion filtering prevents test fixture pollution
+
+Fixes: Test fixtures polluting index, template files included
+
+Unit: 10.5
+Implements: S-JIGY-011
+Discovery: WU8-10 implementation revealed issue
+Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU10.5
+```
+
+**Human Validation:**
+- Commands: 
+  ```bash
+  cd ~/Code/jig
+  # Check Intent nodes created
+  cat jig/outcomes/O-JIGY-004.md
+  cat jig/specifications/S-JIGY-011.md
+  
+  # Check .jigignore created
+  cat .jigignore
+  
+  # Run rebuild - should be clean
+  jigy index rebuild
+  # Should show: zero duplicate warnings from C-TEST-* fixtures
+  
+  # Verify filtering works
+  grep -r "C-TEST-001" tests/  # Should find fixtures
+  jigy index rebuild --dry-run | grep "C-TEST-001"  # Should NOT appear
+  ```
+- Look for: Clean rebuild output, Intent nodes properly linked, templates excluded
+
+---
+
 ### Work Unit 11: ASE-A Validation & Fixes
 
 **Validates:** O-JIGY-001, O-JIGY-002, O-JIGY-003 (all outcomes)
@@ -1334,12 +1818,12 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 - [To be filled during execution]
 
 ### Metrics
-- Units: 13 (including WU0: Intent creation)
-- Estimated total effort: ~22.5 hours
+- Units: 14 (including WU0: Intent creation, WU10.5: discovered requirement)
+- Estimated total effort: ~25 hours
 - Target velocity: 2-3 units per day
 - Expected duration: 5-7 days intensive work
 - Markers captured: [count] (#DISCOVERY, #DECISION, #LEARNED)
-- OSTC nodes created: 3 Outcomes, 10 Specifications
+- OSTC nodes created: 4 Outcomes, 11 Specifications (1 O + 1 S discovered during implementation)
 
 ### Reflection Roll-up
 - Repeatable wins: [To be filled]
@@ -1349,9 +1833,9 @@ Reflection: see jig/deltas/active/orphaned-node-fixer/S018_PLAN.md → WU1
 
 ### Harvest Preparation (JIG)
 
-**Intent Nodes Created (WU0):**
-- Outcomes: O-JIGY-001, O-JIGY-002, O-JIGY-003
-- Specifications: S-JIGY-001 through S-JIGY-010
+**Intent Nodes Created:**
+- WU0 (Known from SCOPE): O-JIGY-001, O-JIGY-002, O-JIGY-003, S-JIGY-001 through S-JIGY-010
+- WU10.5 (Discovered during WU8-10): O-JIGY-004, S-JIGY-011
 
 **Markers Summary:**
 - Discoveries: [count - NEW constraints learned during implementation]

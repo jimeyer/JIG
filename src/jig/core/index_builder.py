@@ -1,9 +1,14 @@
 # @jig C-JIGY-009 implements:S-JIGY-009 subsystem:jigy-tool interface:public
+# @jig C-JIGY-032 implements:S-JIGY-011 subsystem:jigy-tool interface:public
 """Graph index builder - regenerate graph-index.yaml from sources.
 
 Scans markdown files (O/S nodes) and code annotations (C/T nodes) to rebuild
 the complete graph-index.yaml file. This establishes markdown and annotations
 as the source of truth for the Intent Graph.
+
+Implements exclusion filtering (Tier 1 and Tier 2):
+- Tier 1: .jigignore pattern matching (via AnnotationScanner)
+- Tier 2: Status-based filtering (template/deprecated/draft excluded)
 
 Performance target: <3 seconds for 1000-node graph.
 """
@@ -14,10 +19,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from jig.core.ignore_filter import IgnoreFilter
 from jig.core.parser import OSTCNode, parse_ostc_node
 from jig.core.relationships import extract_edges_from_node
 from jig.core.scanner import AnnotationScanner
 from jig.utils.yaml_utils import dump_yaml
+
+
+# Tier 2: Status-based filtering - excluded statuses for markdown nodes
+EXCLUDED_STATUSES = {'template', 'deprecated', 'draft'}
 
 
 @dataclass
@@ -66,8 +76,11 @@ class IndexBuilder:
         Scans jig/outcomes/, jig/specifications/, and jig/constraints/ for
         markdown files with YAML frontmatter.
 
+        Applies Tier 2 filtering: excludes nodes with status in EXCLUDED_STATUSES
+        (template, deprecated, draft).
+
         Returns:
-            List of parsed OSTCNode objects from markdown files
+            List of parsed OSTCNode objects from markdown files (active/planned only)
         """
         nodes: list[OSTCNode] = []
 
@@ -84,6 +97,11 @@ class IndexBuilder:
             for md_file in dir_path.glob("*.md"):
                 try:
                     node = parse_ostc_node(md_file)
+
+                    # Tier 2: Skip nodes with excluded statuses
+                    if node.status in EXCLUDED_STATUSES:
+                        continue
+
                     nodes.append(node)
                 except Exception as e:
                     # Track parse error but continue (non-fatal)
@@ -96,19 +114,22 @@ class IndexBuilder:
         """Discover C/T nodes from @jig annotations in source files.
 
         Scans src/, test/, and tests/ directories for @jig annotations.
+        Applies Tier 1 and Tier 3 filtering via AnnotationScanner.
 
         Returns:
             List of OSTCNode objects created from annotations
         """
         nodes: list[OSTCNode] = []
 
-        # Scan for annotations
-        scanner = AnnotationScanner()
+        # Scan for annotations with ignore filter (Tier 1)
+        ignore_filter = IgnoreFilter(self.project_root)
+        scanner = AnnotationScanner(ignore_filter=ignore_filter)
         existing_dirs = [d for d in self.src_dirs if d.exists()]
 
         if not existing_dirs:
             return nodes
 
+        # Annotations are already filtered by Tier 1 (.jigignore) and Tier 3 (fixtures)
         annotations = scanner.scan(existing_dirs)
 
         # Convert annotations to OSTCNode objects
