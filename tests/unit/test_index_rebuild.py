@@ -1,6 +1,7 @@
 # @jig T-JIGY-024 verifies:S-JIGY-009 subsystem:jigy-tool
-"""Unit tests for graph-index.yaml rebuild functionality."""
+"""Unit tests for graph-index.json rebuild functionality."""
 
+import json
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
@@ -14,7 +15,6 @@ from jig.core.index_builder import (
     detect_conflicts,
     merge_nodes,
 )
-from jig.utils.yaml_utils import load_yaml
 
 
 class TestIndexBuilder:
@@ -231,11 +231,11 @@ class TestConflictDetection:
         assert not result.success or len(result.warnings) > 0
 
 
-class TestYAMLGeneration:
-    """Test graph-index.yaml generation."""
+class TestJSONGeneration:
+    """Test graph-index.json generation."""
 
-    def test_generate_yaml_format(self, tmp_path: Path) -> None:
-        """Generate node-centric YAML format."""
+    def test_generate_json_format(self, tmp_path: Path) -> None:
+        """Generate node-centric JSON format."""
         jig_dir = tmp_path / "jig"
         outcomes_dir = jig_dir / "outcomes"
         specs_dir = jig_dir / "specifications"
@@ -266,27 +266,28 @@ class TestYAMLGeneration:
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
-        
+
         assert result.success
-        
+
         # Write to file
-        output_file = tmp_path / "graph-index.yaml"
-        builder.write_yaml(result, output_file)
+        output_file = tmp_path / "graph-index.json"
+        builder.save(result, output_file)
 
         assert output_file.exists()
-        
+
         # Load and verify structure
-        data = load_yaml(output_file)
+        with open(output_file, 'r') as f:
+            data = json.load(f)
         assert "nodes" in data
         assert len(data["nodes"]) == 2
-        
+
         # Find S node and verify relationships
         s_node = next(n for n in data["nodes"] if n["id"] == "S-AUTH-001")
         assert "implements" in s_node
         assert s_node["implements"] == ["O-AUTH-001"]
 
-    def test_yaml_includes_metadata(self, tmp_path: Path) -> None:
-        """Generated YAML includes version and timestamp."""
+    def test_json_includes_metadata(self, tmp_path: Path) -> None:
+        """Generated JSON includes version and timestamp."""
         jig_dir = tmp_path / "jig"
         outcomes_dir = jig_dir / "outcomes"
         outcomes_dir.mkdir(parents=True)
@@ -301,15 +302,16 @@ class TestYAMLGeneration:
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
-        
-        output_file = tmp_path / "graph-index.yaml"
-        builder.write_yaml(result, output_file)
 
-        data = load_yaml(output_file)
+        output_file = tmp_path / "graph-index.json"
+        builder.save(result, output_file)
+
+        with open(output_file, 'r') as f:
+            data = json.load(f)
         assert "version" in data
         assert "generated" in data
 
-    def test_yaml_includes_code_node_line_numbers(self, tmp_path: Path) -> None:
+    def test_json_includes_code_node_line_numbers(self, tmp_path: Path) -> None:
         """C/T nodes include file path and line number."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
@@ -323,72 +325,17 @@ class TestYAMLGeneration:
 
         builder = IndexBuilder(tmp_path)
         result = builder.build()
-        
-        output_file = tmp_path / "graph-index.yaml"
-        builder.write_yaml(result, output_file)
 
-        data = load_yaml(output_file)
+        output_file = tmp_path / "graph-index.json"
+        builder.save(result, output_file)
+
+        with open(output_file, 'r') as f:
+            data = json.load(f)
         c_node = next(n for n in data["nodes"] if n["id"] == "C-AUTH-001")
-        
+
         assert "file" in c_node
         assert "line" in c_node
         assert c_node["line"] == 3  # Second line (annotation line)
-
-
-class TestBackupStrategy:
-    """Test backup of existing graph-index.yaml."""
-
-    def test_backup_existing_file(self, tmp_path: Path) -> None:
-        """Backup existing graph-index.yaml before overwriting."""
-        jig_dir = tmp_path / "jig"
-        outcomes_dir = jig_dir / "outcomes"
-        outcomes_dir.mkdir(parents=True)
-
-        # Create existing graph-index.yaml
-        existing_file = jig_dir / "graph-index.yaml"
-        existing_file.write_text("nodes: []\n")
-
-        # Create outcome for rebuild
-        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
-            ---
-            id: O-AUTH-001
-            type: outcome
-            title: Test
-            ---
-        """))
-
-        builder = IndexBuilder(tmp_path)
-        result = builder.build()
-        builder.write_yaml(result, existing_file, backup=True)
-
-        # Verify backup exists
-        backup_file = jig_dir / "graph-index.yaml.bak"
-        assert backup_file.exists()
-        assert backup_file.read_text() == "nodes: []\n"
-
-    def test_no_backup_when_disabled(self, tmp_path: Path) -> None:
-        """Don't create backup when backup=False."""
-        jig_dir = tmp_path / "jig"
-        outcomes_dir = jig_dir / "outcomes"
-        outcomes_dir.mkdir(parents=True)
-
-        existing_file = jig_dir / "graph-index.yaml"
-        existing_file.write_text("nodes: []\n")
-
-        (outcomes_dir / "O-AUTH-001.md").write_text(dedent("""
-            ---
-            id: O-AUTH-001
-            type: outcome
-            title: Test
-            ---
-        """))
-
-        builder = IndexBuilder(tmp_path)
-        result = builder.build()
-        builder.write_yaml(result, existing_file, backup=False)
-
-        backup_file = jig_dir / "graph-index.yaml.bak"
-        assert not backup_file.exists()
 
 
 class TestIdempotence:
@@ -413,25 +360,25 @@ class TestIdempotence:
         # First rebuild
         builder1 = IndexBuilder(tmp_path)
         result1 = builder1.build()
-        output_file = jig_dir / "graph-index.yaml"
-        builder1.write_yaml(result1, output_file)
+        output_file = jig_dir / "graph-index.json"
+        builder1.save(result1, output_file)
         content1 = output_file.read_text()
 
         # Second rebuild
         builder2 = IndexBuilder(tmp_path)
         result2 = builder2.build()
-        builder2.write_yaml(result2, output_file)
+        builder2.save(result2, output_file)
         content2 = output_file.read_text()
 
         # Compare (excluding timestamp which may differ)
-        lines1 = [line for line in content1.split('\n') if not line.startswith('generated:')]
-        lines2 = [line for line in content2.split('\n') if not line.startswith('generated:')]
-        
+        lines1 = [line for line in content1.split('\n') if not line.startswith('  "generated":')]
+        lines2 = [line for line in content2.split('\n') if not line.startswith('  "generated":')]
+
         assert lines1 == lines2
 
 
 class TestValidationBeforeWrite:
-    """Test validation before writing YAML."""
+    """Test validation before writing JSON."""
 
     def test_validate_node_ids(self, tmp_path: Path) -> None:
         """Validate all node IDs match expected format."""

@@ -1,6 +1,7 @@
 # @jig T-JIGY-043 verifies:S-JIGY-013 subsystem:jigy-tool
 """Integration tests for jigy index rebuild command."""
 
+import json
 import os
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -10,7 +11,6 @@ from textwrap import dedent
 from click.testing import CliRunner
 
 from jig.cli.main import cli
-from jig.utils.yaml_utils import load_yaml
 
 
 @contextmanager
@@ -25,7 +25,7 @@ def chdir(path: Path) -> Iterator[None]:
 
 
 def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
-    """Verify index rebuild writes subsystems section to graph-index.yaml."""
+    """Verify index rebuild writes subsystems section to graph-index.json."""
     runner = CliRunner()
 
     # Initialize JIG
@@ -87,18 +87,19 @@ def test_index_rebuild_exports_subsystems(tmp_path: Path) -> None:
     """).lstrip())
 
     # Run index rebuild
-    result = runner.invoke(cli, ["index", "rebuild", "--no-backup", "--project-dir", str(tmp_path)])
+    result = runner.invoke(cli, ["index", "rebuild", "--project-dir", str(tmp_path)])
 
     assert result.exit_code == 0, f"rebuild failed: {result.output}"
 
-    # Check graph-index.yaml
-    index_file = jig_dir / "graph-index.yaml"
+    # Check graph-index.json
+    index_file = jig_dir / "graph-index.json"
     assert index_file.exists()
 
-    index_data = load_yaml(index_file)
+    with open(index_file, 'r', encoding='utf-8') as f:
+        index_data = json.load(f)
 
     # Verify subsystems section exists
-    assert "subsystems" in index_data, "subsystems section missing from graph-index.yaml"
+    assert "subsystems" in index_data, "subsystems section missing from graph-index.json"
     assert len(index_data["subsystems"]) > 0, "subsystems section is empty"
 
     # Verify flat subsystems
@@ -155,7 +156,7 @@ def test_status_shows_correct_subsystem_count(tmp_path: Path) -> None:
     """).lstrip())
 
     # Run index rebuild
-    result = runner.invoke(cli, ["index", "rebuild", "--no-backup", "--project-dir", str(tmp_path)])
+    result = runner.invoke(cli, ["index", "rebuild", "--project-dir", str(tmp_path)])
     assert result.exit_code == 0
 
     # Run status

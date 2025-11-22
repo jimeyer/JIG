@@ -1,9 +1,9 @@
 # @jig C-JIGY-009 implements:S-JIGY-009 subsystem:jigy-tool interface:public
 # @jig C-JIGY-032 implements:S-JIGY-011 subsystem:jigy-tool interface:public
-"""Graph index builder - regenerate graph-index.yaml from sources.
+"""Graph index builder - regenerate graph-index.json from sources.
 
 Scans markdown files (O/S nodes) and code annotations (C/T nodes) to rebuild
-the complete graph-index.yaml file. This establishes markdown and annotations
+the complete graph-index.json file. This establishes markdown and annotations
 as the source of truth for the Intent Graph.
 
 Implements exclusion filtering (Tier 1 and Tier 2):
@@ -13,7 +13,7 @@ Implements exclusion filtering (Tier 1 and Tier 2):
 Performance target: <3 seconds for 1000-node graph.
 """
 
-import shutil
+import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,7 +24,6 @@ from jig.core.ignore_filter import IgnoreFilter
 from jig.core.parser import OSTCNode, parse_ostc_node
 from jig.core.relationships import extract_edges_from_node
 from jig.core.scanner import AnnotationScanner
-from jig.utils.yaml_utils import dump_yaml
 
 
 # Tier 2: Status-based filtering - excluded statuses for markdown nodes
@@ -53,13 +52,13 @@ class RebuildResult:
 
 
 class IndexBuilder:
-    """Builds graph-index.yaml from markdown and annotation sources.
+    """Builds graph-index.json from markdown and annotation sources.
 
     Example:
         >>> builder = IndexBuilder(Path("/path/to/project"))
         >>> result = builder.build()
         >>> if result.success:
-        ...     builder.write_yaml(result, Path("jig/graph-index.yaml"))
+        ...     builder.save(result, Path("jig/graph-index.json"))
     """
 
     def __init__(self, project_root: Path) -> None:
@@ -267,27 +266,21 @@ class IndexBuilder:
 
         return warnings
 
-    def write_yaml(self, result: RebuildResult, output_file: Path, backup: bool = True) -> None:
-        """Write graph index to YAML file.
+    def save(self, result: RebuildResult, output_file: Path) -> None:
+        """Save graph index to JSON file.
 
         Args:
             result: RebuildResult with nodes to write
-            output_file: Path to output file (typically jig/graph-index.yaml)
-            backup: If True and file exists, create .bak backup before overwriting
+            output_file: Path to output file (typically jig/graph-index.json)
         """
-        # Backup existing file if requested
-        if backup and output_file.exists():
-            backup_file = output_file.parent / f"{output_file.name}.bak"
-            shutil.copy(output_file, backup_file)
-
-        # Build YAML structure
-        yaml_data: dict[str, Any] = {
+        # Build JSON structure
+        json_data: dict[str, Any] = {
             "version": "1.0",
             "generated": datetime.now(timezone.utc).isoformat(),
             "nodes": [],
         }
 
-        # Convert nodes to YAML format (node-centric with relationships on nodes)
+        # Convert nodes to JSON format (node-centric with relationships on nodes)
         node_dicts: list[dict[str, Any]] = []
         for node_id in sorted(result.nodes.keys()):  # Sort for deterministic output
             node = result.nodes[node_id]
@@ -333,15 +326,22 @@ class IndexBuilder:
 
             node_dicts.append(node_dict)
 
-        yaml_data["nodes"] = node_dicts
+        json_data["nodes"] = node_dicts
 
         # Build and add subsystems section (S-JIGY-013)
         subsystems_data = build_subsystems_from_nodes(node_dicts)
         if subsystems_data:
-            yaml_data["subsystems"] = subsystems_data
+            json_data["subsystems"] = subsystems_data
 
-        # Write YAML file
-        dump_yaml(yaml_data, output_file)
+        # Write JSON file with pretty-printing
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(
+                json_data,
+                f,
+                indent=2,
+                ensure_ascii=False,
+                sort_keys=False
+            )
 
 
 def build_graph_index(project_root: Path) -> RebuildResult:

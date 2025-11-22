@@ -10,7 +10,7 @@ from jig.core.index_builder import IndexBuilder
 
 @click.group()
 def index() -> None:
-    """Manage graph index (graph-index.yaml)."""
+    """Manage graph index (graph-index.json)."""
     pass
 
 
@@ -21,28 +21,23 @@ def index() -> None:
     help="Show what would be rebuilt without writing",
 )
 @click.option(
-    "--backup/--no-backup",
-    default=True,
-    help="Backup existing graph-index.yaml before overwriting",
-)
-@click.option(
     "--project-dir",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
     default=Path.cwd(),
     help="Project root directory (default: current directory)",
 )
-def rebuild(dry_run: bool, backup: bool, project_dir: Path) -> None:
-    """Rebuild graph-index.yaml from markdown files and code annotations.
+def rebuild(dry_run: bool, project_dir: Path) -> None:
+    """Rebuild graph-index.json from markdown files and code annotations.
     
     Scans:
     - jig/outcomes/*.md for Outcome nodes
     - jig/specifications/*.md for Specification nodes
     - jig/constraints/*.md for Constraint nodes
     - src/ and test/ for @jig annotations (Code and Test nodes)
-    
-    Generates graph-index.yaml with all nodes and their relationships.
+
+    Generates graph-index.json with all nodes and their relationships.
     """
-    click.echo("Rebuilding graph-index.yaml from sources...")
+    click.echo("Rebuilding graph-index.json from sources...")
     click.echo()
     
     # Build the index
@@ -113,21 +108,17 @@ def rebuild(dry_run: bool, backup: bool, project_dir: Path) -> None:
     # Write file
     if dry_run:
         click.echo("🔍 Dry-run mode: No changes written")
-        click.echo(f"Would write to: {project_dir / 'jig' / 'graph-index.yaml'}")
+        click.echo(f"Would write to: {project_dir / 'jig' / 'graph-index.json'}")
     elif not result.success:
         click.echo("❌ Rebuild failed due to errors", err=True)
         click.echo("Fix the errors above and try again", err=True)
         raise click.Abort()
     else:
-        output_file = project_dir / "jig" / "graph-index.yaml"
-        
-        if backup and output_file.exists():
-            click.echo(f"Writing jig/graph-index.yaml...")
-            click.echo(f"  ✓ Backed up to jig/graph-index.yaml.bak")
-        else:
-            click.echo(f"Writing jig/graph-index.yaml...")
-        
-        builder.write_yaml(result, output_file, backup=backup)
+        output_file = project_dir / "jig" / "graph-index.json"
+
+        click.echo(f"Writing jig/graph-index.json...")
+
+        builder.save(result, output_file)
         click.echo(f"  ✓ Wrote {len(result.nodes)} nodes")
         click.echo()
         click.echo("✅ Done!")
@@ -142,11 +133,11 @@ def rebuild(dry_run: bool, backup: bool, project_dir: Path) -> None:
 )
 def diff(project_dir: Path) -> None:
     """Show differences between current index and sources.
-    
-    Compares graph-index.yaml with what would be generated from
+
+    Compares graph-index.json with what would be generated from
     markdown files and code annotations.
     """
-    click.echo("Comparing current graph-index.yaml with sources...")
+    click.echo("Comparing current graph-index.json with sources...")
     click.echo()
     
     # Build what the index should be

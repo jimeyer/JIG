@@ -5,6 +5,7 @@ This module provides the core Graph class and related data structures for
 loading, querying, and analyzing the Intent Graph.
 """
 
+import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,6 @@ import networkx as nx  # type: ignore[import-untyped]
 
 from jig.core.parser import OSTCNode, parse_ostc_node
 from jig.core.relationships import extract_edges_from_node
-from jig.utils.yaml_utils import load_yaml
 
 
 @dataclass
@@ -124,8 +124,8 @@ class Graph:
 
         This loads:
         1. All O/S/X markdown nodes from outcomes/, specifications/, constraints/
-        2. Edges and subsystems from graph-index.yaml
-        
+        2. Edges and subsystems from graph-index.json
+
         Note: T/C nodes will be discovered via @jig annotations (future feature)
 
         Args:
@@ -135,8 +135,8 @@ class Graph:
             Graph object with all loaded nodes, edges, and subsystems
 
         Raises:
-            FileNotFoundError: If intent_dir doesn't exist
-            ValueError: If graph-index.yaml is malformed or nodes are invalid
+            FileNotFoundError: If intent_dir doesn't exist or graph-index.json not found
+            ValueError: If graph-index.json is malformed or nodes are invalid
 
         Example:
             >>> graph = Graph.load_from_dir(Path("jig/"))
@@ -162,7 +162,7 @@ class Graph:
                 try:
                     node = parse_ostc_node(md_file)
                     graph.nodes[node.id] = node
-                    
+
                     # Extract edges from frontmatter relationships (WU1: S-JIGY-001)
                     edges = extract_edges_from_node(node)
                     graph.edges.extend(edges)
@@ -171,89 +171,98 @@ class Graph:
                     # For now, we'll be strict and raise
                     raise ValueError(f"Failed to parse {md_file}: {e}") from e
 
-        # Load graph-index.yaml if it exists (WU2: S-JIGY-002)
-        graph_index_path = intent_dir / "graph-index.yaml"
-        if graph_index_path.exists():
-            try:
-                index_data = load_yaml(graph_index_path)
+        # Load graph-index.json (JSON format only - clean break, no YAML fallback)
+        graph_index_path = intent_dir / "graph-index.json"
 
-                # Load nodes from graph-index (typically C/T nodes)
-                # Format: list of node dicts with 'id' field
-                nodes_data = index_data.get("nodes", [])
-                
-                if not isinstance(nodes_data, list):
-                    raise ValueError(
-                        f"graph-index.yaml 'nodes' must be a list, got {type(nodes_data).__name__}. "
-                        f"Expected format: nodes: [{{id: 'C-001', ...}}, ...]"
-                    )
-                
-                for node_dict in nodes_data:
-                    if not isinstance(node_dict, dict):
-                        continue
-                    
-                    node_id = node_dict.get("id")
-                    node_type = node_dict.get("type")
-                    
-                    # Skip if missing required fields
-                    if not node_id or not node_type:
-                        continue
-                    
-                    # For O/S nodes: markdown takes precedence, skip if already loaded
-                    if node_type in ["outcome", "specification", "constraint"] and node_id in graph.nodes:
-                        continue
-                    
-                    # Create OSTCNode from graph-index data (typically C/T nodes)
-                    node = OSTCNode(
-                        id=node_id,
-                        type=node_type,
-                        title=node_dict.get("title", ""),
-                        subsystem=node_dict.get("subsystem"),
-                        status=node_dict.get("status"),
-                        body="",  # C/T nodes don't have markdown body
-                        metadata=node_dict  # Preserve all fields including file, line
-                    )
-                    graph.nodes[node_id] = node
-                    
-                    # Extract edges from node-centric relationships (WU2: S-JIGY-002)
-                    node_edges = extract_edges_from_node(node)
-                    graph.edges.extend(node_edges)
+        if not graph_index_path.exists():
+            raise FileNotFoundError(
+                f"Graph index not found: {graph_index_path}\n"
+                f"Run: jigy index rebuild"
+            )
 
-                # Load edges from edge-centric format (existing functionality)
-                edges_data = index_data.get("edges", [])
-                for edge_dict in edges_data:
-                    edge = Edge(
-                        from_node=edge_dict["from"],
-                        to_node=edge_dict["to"],
-                        type=edge_dict["type"],
-                    )
-                    graph.edges.append(edge)
+        try:
+            with open(graph_index_path, 'r', encoding='utf-8') as f:
+                index_data = json.load(f)
 
-                # Load subsystems (supports nested hierarchy)
-                subsystems_data = index_data.get("subsystems", {})
+            # Load nodes from graph-index (typically C/T nodes)
+            # Format: list of node dicts with 'id' field
+            nodes_data = index_data.get("nodes", [])
 
-                def parse_subsystem(name: str, data: dict[str, Any], parent_path: str = "") -> Subsystem:
-                    """Recursively parse subsystem and its children."""
-                    subsystem = Subsystem(
-                        name=name,
-                        nodes=data.get("nodes", []),
-                        description=data.get("description", ""),
-                        parent_path=parent_path,
-                    )
+            if not isinstance(nodes_data, list):
+                raise ValueError(
+                    f"graph-index.json 'nodes' must be a list, got {type(nodes_data).__name__}. "
+                    f"Expected format: nodes: [{{id: 'C-001', ...}}, ...]"
+                )
 
-                    # Parse child subsystems
-                    child_subsystems = data.get("subsystems", {})
-                    for child_name, child_data in child_subsystems.items():
-                        child = parse_subsystem(child_name, child_data, subsystem.full_path)
-                        subsystem.subsystems[child_name] = child
+            for node_dict in nodes_data:
+                if not isinstance(node_dict, dict):
+                    continue
 
-                    return subsystem
+                node_id = node_dict.get("id")
+                node_type = node_dict.get("type")
 
-                for subsystem_name, subsystem_dict in subsystems_data.items():
-                    subsystem = parse_subsystem(subsystem_name, subsystem_dict)
-                    graph.subsystems[subsystem_name] = subsystem
+                # Skip if missing required fields
+                if not node_id or not node_type:
+                    continue
 
-            except Exception as e:
-                raise ValueError(f"Failed to load graph-index.yaml: {e}") from e
+                # For O/S nodes: markdown takes precedence, skip if already loaded
+                if node_type in ["outcome", "specification", "constraint"] and node_id in graph.nodes:
+                    continue
+
+                # Create OSTCNode from graph-index data (typically C/T nodes)
+                node = OSTCNode(
+                    id=node_id,
+                    type=node_type,
+                    title=node_dict.get("title", ""),
+                    subsystem=node_dict.get("subsystem"),
+                    status=node_dict.get("status"),
+                    body="",  # C/T nodes don't have markdown body
+                    metadata=node_dict  # Preserve all fields including file, line
+                )
+                graph.nodes[node_id] = node
+
+                # Extract edges from node-centric relationships (WU2: S-JIGY-002)
+                node_edges = extract_edges_from_node(node)
+                graph.edges.extend(node_edges)
+
+            # Load edges from edge-centric format (existing functionality)
+            edges_data = index_data.get("edges", [])
+            for edge_dict in edges_data:
+                edge = Edge(
+                    from_node=edge_dict["from"],
+                    to_node=edge_dict["to"],
+                    type=edge_dict["type"],
+                )
+                graph.edges.append(edge)
+
+            # Load subsystems (supports nested hierarchy)
+            subsystems_data = index_data.get("subsystems", {})
+
+            def parse_subsystem(name: str, data: dict[str, Any], parent_path: str = "") -> Subsystem:
+                """Recursively parse subsystem and its children."""
+                subsystem = Subsystem(
+                    name=name,
+                    nodes=data.get("nodes", []),
+                    description=data.get("description", ""),
+                    parent_path=parent_path,
+                )
+
+                # Parse child subsystems
+                child_subsystems = data.get("subsystems", {})
+                for child_name, child_data in child_subsystems.items():
+                    child = parse_subsystem(child_name, child_data, subsystem.full_path)
+                    subsystem.subsystems[child_name] = child
+
+                return subsystem
+
+            for subsystem_name, subsystem_dict in subsystems_data.items():
+                subsystem = parse_subsystem(subsystem_name, subsystem_dict)
+                graph.subsystems[subsystem_name] = subsystem
+
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to parse graph-index.json: {e}") from e
+        except Exception as e:
+            raise ValueError(f"Failed to load graph-index.json: {e}") from e
 
         return graph
 

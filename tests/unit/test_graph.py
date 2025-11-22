@@ -1,13 +1,13 @@
 # @jig T-GRAPH-001 verifies:S-GRAPH-002 subsystem:core
 """Unit tests for graph data structures and operations."""
 
+import json
 import tempfile
 from pathlib import Path
 
 import pytest
 
 from jig.core.graph import Edge, Graph, Subsystem
-from jig.utils.yaml_utils import dump_yaml
 
 
 def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
@@ -55,24 +55,28 @@ def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, s
     return node_file
 
 
-def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict) -> Path:
-    """Helper to create a test graph-index.yaml file.
+def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict, nodes: list[dict] = None) -> Path:
+    """Helper to create a test graph-index.json file.
 
     Args:
         tmp_path: Temporary directory
         edges: List of edge dictionaries with from, to, type
         subsystems: Dictionary of subsystems with nodes lists
+        nodes: Optional list of node dictionaries (for C/T nodes)
 
     Returns:
-        Path to created graph-index.yaml
+        Path to created graph-index.json
     """
-    graph_index_path = tmp_path / "graph-index.yaml"
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "generated": "2025-01-01T00:00:00+00:00",
+        "nodes": nodes if nodes is not None else [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    with open(graph_index_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
     return graph_index_path
 
 
@@ -129,6 +133,9 @@ def test_get_node_counts_by_type():
         create_test_node(tmp_path, "S-TEST-002", "specification", "Spec 2")
         create_test_node(tmp_path, "S-TEST-003", "specification", "Spec 3")
 
+        # Create empty graph-index.json (required for clean break)
+        create_test_graph_index(tmp_path, [], {})
+
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
 
@@ -175,20 +182,16 @@ def test_load_from_dir_missing_directory():
 
 
 def test_load_from_dir_without_graph_index():
-    """Verify graph loads even without graph-index.yaml."""
+    """Verify graph fails loudly without graph-index.json (clean break)."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
-        # Create nodes but no graph-index.yaml
+        # Create nodes but no graph-index.json
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Test outcome")
 
-        # Load graph
-        graph = Graph.load_from_dir(tmp_path)
-
-        # Verify nodes loaded, no edges/subsystems
-        assert len(graph.nodes) == 1
-        assert len(graph.edges) == 0
-        assert len(graph.subsystems) == 0
+        # Load graph should fail with clear error message
+        with pytest.raises(FileNotFoundError, match="Graph index not found"):
+            Graph.load_from_dir(tmp_path)
 
 
 def test_get_nodes_by_subsystem():
@@ -200,6 +203,9 @@ def test_get_nodes_by_subsystem():
         create_test_node(tmp_path, "O-CORE-001", "outcome", "Core outcome", "core")
         create_test_node(tmp_path, "O-CORE-002", "outcome", "Core outcome 2", "core")
         create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI outcome", "cli")
+
+        # Create empty graph-index.json (required for clean break)
+        create_test_graph_index(tmp_path, [], {})
 
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
@@ -287,6 +293,9 @@ def test_load_from_dir_with_multiple_node_types():
         # Test nodes (T) are NOT loaded from markdown files (annotation-based)
         create_test_node(tmp_path, "T-TEST-001", "test", "Test")
 
+        # Create empty graph-index.json (required for clean break)
+        create_test_graph_index(tmp_path, [], {})
+
         # Load graph
         graph = Graph.load_from_dir(tmp_path)
 
@@ -327,6 +336,9 @@ def test_get_node_counts_empty_graph():
     """Verify node counts for empty graph."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+
+        # Create empty graph-index.json (required for clean break)
+        create_test_graph_index(tmp_path, [], {})
 
         # Load empty graph
         graph = Graph.load_from_dir(tmp_path)
