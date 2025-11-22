@@ -92,7 +92,7 @@ Simplify JIG's command interface by consolidating validation functionality into 
 - [x] WU1: Extract validation core logic — tests ✓ / docs ✓ / reflect ☐
 - [x] WU2: Merge validation into status command — tests ✓ / docs ✓ / reflect ☐
 - [x] **WU2.1: Stop Bleeding - Fix critical blockers** — tests ✓ / docs n/a / reflect ✓
-- [ ] **WU2.2: SPEC Audit - Classify all failures** — tests ☐ / docs ☐ / reflect ☐
+- [x] **WU2.2: SPEC Audit - Classify all failures** — tests n/a / docs ✓ / reflect ✓
 - [ ] **WU2.3: Create Missing SPECs (if needed)** — tests ☐ / docs ☐ / reflect ☐
 - [ ] **WU2.4: Root Cause Grouping** — tests ☐ / docs ☐ / reflect ☐
 - [ ] **WU2.5: Execute Repairs (batch fixes)** — tests ☐ / docs ☐ / reflect ☐
@@ -422,9 +422,174 @@ Tests assumed lenient validation, now validation is comprehensive.
 - Update S032_RETROSPECTIVE with classification insights
 
 **Reflect:**
-- Bucket distribution: (counts)
-- Surprises: (anything unexpected)
-- Strategy clarity: (was classification clear?)
+- Bucket distribution:
+  - **Bucket A (Align):** 85 tests (100%)
+  - **Bucket B (Missing SPEC):** 0 tests
+  - **Bucket C (Obsolete):** 0 tests
+  - **Bucket D (TDD - CODE missing):** 0 tests
+  - **Bucket E (CODE bug):** 0 tests
+- Surprises: **ZERO tests in buckets B/C/D/E!** All 85 failures have same root cause (missing graph-index.json). All SPECs are valid and active.
+- Strategy clarity: **Crystal clear** - 100% FIX strategy. All tests verify valid SPECs, just need proper fixtures.
+
+## SPEC Audit Results (WU2.2)
+
+**Summary:** All 85 failing tests classified into **Bucket A** (SPEC valid, test needs alignment). Zero tests in other buckets.
+
+**Root Cause:** Graph.load_from_dir() now requires graph-index.json (WU4 format migration). Test fixtures create markdown nodes but don't create graph-index.json.
+
+**Strategy:** **FIX** (mechanical) - Create test fixture helpers to generate graph-index.json for all tests.
+
+### Bucket A: Existing SPEC (align test) - 85 tests
+
+**Group 1: Graph Commands (24 tests)** - `tests/unit/test_graph_commands.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_graph_show_displays_node_details | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_displays_dependencies | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_displays_dependents | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_node_not_found | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_displays_body_content | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_all_nodes | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_filter_by_type | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_filter_by_subsystem | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_compact_format | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_yaml_format | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_deps_shows_dependency_tree | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_deps_node_not_found | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_impact_shows_impact_tree | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_impact_node_not_found | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_path_finds_shortest_path | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_path_no_path_exists | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_path_start_node_not_found | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_path_end_node_not_found | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_with_multiple_dependencies | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_commands_performance | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_empty_result | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_show_node_with_no_dependencies | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_commands_with_code_and_test_nodes | S-JIGY-005 | Missing graph-index.json | FIX |
+| test_graph_list_combined_filters | S-JIGY-005 | Missing graph-index.json | FIX |
+
+**Group 2: Graph Traversal (11 tests)** - `tests/unit/test_graph_traversal.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_get_dependencies | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_get_dependents | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_find_path_exists | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_find_path_no_path | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_find_path_same_node | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_find_path_missing_nodes | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_get_dependencies_multiple | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_get_dependencies_missing_node | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_get_dependents_missing_node | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_traversal_performance | S-GRAPH-003 | Missing graph-index.json | FIX |
+| test_find_path_shortest | S-GRAPH-003 | Missing graph-index.json | FIX |
+
+**Group 3: Graph Queries (10 tests)** - `tests/unit/test_graph_queries.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_filter_by_type_outcome | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_type_case_insensitive | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_type_specification | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_type_empty | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_subsystem | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_subsystem_case_insensitive | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_subsystem_empty | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_by_subsystem_handles_none | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_returns_sorted | S-GRAPH-002 | Missing graph-index.json | FIX |
+| test_filter_combined_operations | S-GRAPH-002 | Missing graph-index.json | FIX |
+
+**Group 4: Graph Index Loading (8 tests)** - `tests/unit/test_graph_index_loading.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_load_graph_index_with_ct_nodes | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_load_node_centric_relationships | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_load_edge_centric_format | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_merge_markdown_and_graph_index | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_markdown_takes_precedence_for_os_nodes | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_graph_index_without_nodes_section | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_ct_nodes_with_file_and_line | S-INDEX-002 | Tests expect YAML format | FIX |
+| test_invalid_nodes_format_raises_error | S-INDEX-002 | Tests expect YAML format | FIX |
+
+**Group 5: Annotation Validation (8 tests)** - `tests/unit/test_annotation_validation.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_validate_all_valid_annotations | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_allow_same_id_if_same_file_and_line | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_detect_spec_without_implementation | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_detect_spec_without_tests | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_valid_code_node_id | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_validate_annotations_function | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_calculate_implementation_coverage | S-ANNO-002 | Validation expects complete graph | FIX |
+| test_validate_intent_only_no_annotations | S-ANNO-002 | Validation expects complete graph | FIX |
+
+**Group 6: Validator Tests (7 tests)** - `tests/unit/test_validator.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_validate_graph_duplicate_ids | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_empty_directory | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_with_valid_nodes | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_with_invalid_node | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_index_nonexistent_node | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_orphaned_nodes_warning | S-VAL-001 | Missing graph-index.json | FIX |
+| test_validate_graph_with_ct_nodes | S-VAL-001 | Missing graph-index.json | FIX |
+
+**Group 7: Status Logic (7 tests)** - `tests/unit/test_status_logic.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_calculate_status_with_valid_graph | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_identifies_orphans | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_handles_missing_graph_index | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_empty_directory | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_multiple_subsystems | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_all_node_types | S-CLI-022 | Missing graph-index.json + validation | FIX |
+| test_calculate_status_no_orphans_when_connected | S-CLI-022 | Missing graph-index.json + validation | FIX |
+
+**Group 8: Nested Subsystems (7 tests)** - `tests/unit/test_nested_subsystems.py`
+| Test | Verifies SPEC | Root Cause | Strategy |
+|------|---------------|------------|----------|
+| test_nested_subsystem_loading | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_subsystem_path_resolution | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_recursive_node_collection | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_parent_with_nodes_validation | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_backward_compatibility_flat | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_get_all_subsystem_paths | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+| test_invalid_node_subsystem_path | S-SUBSYS-001 | Missing graph-index.json + subsystem defs | FIX |
+
+**Group 9: Other Tests (3 tests)**
+| Test | File | Verifies SPEC | Root Cause | Strategy |
+|------|------|---------------|------------|----------|
+| test_validate_edges_integration | test_edge_validation.py | S-VAL-003 | Missing graph-index.json | FIX |
+| test_node_registry_integration | test_node_registry.py | S-GRAPH-001 | Missing graph-index.json | FIX |
+| test_modularity_calculation_known_graph | test_decompose_metrics.py | S-METRICS-001 | Missing graph-index.json | FIX |
+
+### Bucket B: Missing SPEC - 0 tests
+**Result:** All tests have valid, traceable SPECs. No SPEC creation needed.
+
+### Bucket C: Obsolete SPEC - 0 tests
+**Result:** All SPECs are active and relevant. No test deletion needed.
+
+### Bucket D: CODE Missing (TDD) - 0 tests
+**Result:** All CODE exists. Tests fail due to stricter validation, not missing functionality.
+
+### Bucket E: CODE Bug Detected - 0 tests
+**Result:** No CODE bugs detected. All failures are fixture-related (mechanical fixes).
+
+## Classification Insights
+
+**#DISCOVERY "100% Bucket A classification - unprecedented test repair clarity"**
+All 85 failures stem from a single architectural change (graph-index format migration). Every test verifies a valid, active SPEC. Zero tests need deletion, SPEC creation, or CODE debugging. This is a textbook example of clean architectural evolution requiring systematic fixture updates.
+
+**#DISCOVERY "Graph-index.json requirement is pervasive"**
+Graph.load_from_dir() now requires graph-index.json (enforced in WU4). This touches every test that creates graph fixtures. The format migration (YAML→JSON) was intentionally a clean break, with zero fallback to YAML. This forced all tests to adapt to the new format.
+
+**#LEARNED "Clean breaks create clean failure patterns"**
+By removing YAML support completely (no fallback, no migration path), the failure pattern is crystal clear: missing graph-index.json. If we had kept YAML fallback, we'd have inconsistent failures and harder classification. Clean architectural decisions enable clean test repairs.
+
+**#DECISION "FIX all 85 tests with fixture helpers (no REWRITE)"**
+**Choice:** Mechanical FIX strategy for all tests
+**Rationale:** SPECs unchanged, test intent unchanged, only fixture format changed
+**Implementation:** Create `tests/helpers/graph_fixtures.py` with `create_test_graph()` helper
+**Tradeoffs:** More helper code, but maintainable and reusable across all tests
 
 ---
 
