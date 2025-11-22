@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2025-11-22T14:11:53.581819+00:00",
+  "generated": "2025-11-22T15:47:18.044153+00:00",
   "nodes": [
     {
       "id": "C-CLI-001",
@@ -300,7 +300,7 @@
       "subsystem": "core",
       "status": "active",
       "file": "/Users/jamesmeyer/Code/jig/src/jig/core/graph.py",
-      "line": 34,
+      "line": 39,
       "implements": [
         "S-NESTED-001"
       ]
@@ -312,7 +312,7 @@
       "subsystem": "core",
       "status": "active",
       "file": "/Users/jamesmeyer/Code/jig/src/jig/core/graph.py",
-      "line": 447,
+      "line": 457,
       "implements": [
         "S-NESTED-002"
       ]
@@ -435,6 +435,20 @@
       "title": "Progressive Disclosure of Information",
       "subsystem": "cli",
       "file": "jig/outcomes/O-CLI-005.md"
+    },
+    {
+      "id": "O-CLI-006",
+      "type": "outcome",
+      "title": "Developers understand graph health with single command",
+      "subsystem": "cli",
+      "file": "jig/outcomes/O-CLI-006.md"
+    },
+    {
+      "id": "O-CLI-007",
+      "type": "outcome",
+      "title": "CI pipelines use consistent validation strategy",
+      "subsystem": "cli",
+      "file": "jig/outcomes/O-CLI-007.md"
     },
     {
       "id": "O-JIG-001",
@@ -579,6 +593,48 @@
       "title": "Graph Command Output Format",
       "subsystem": "cli",
       "file": "jig/specifications/S-CLI-009.md"
+    },
+    {
+      "id": "S-CLI-022",
+      "type": "specification",
+      "title": "Status command validates graph semantics and shows health metrics",
+      "subsystem": "cli",
+      "file": "jig/specifications/S-CLI-022.md",
+      "implements": [
+        "O-CLI-006",
+        "O-CLI-007"
+      ]
+    },
+    {
+      "id": "S-CLI-023",
+      "type": "specification",
+      "title": "Status exit codes configurable via flags",
+      "subsystem": "cli",
+      "file": "jig/specifications/S-CLI-023.md",
+      "implements": [
+        "O-CLI-007"
+      ]
+    },
+    {
+      "id": "S-CLI-024",
+      "type": "specification",
+      "title": "Validate command removed completely",
+      "subsystem": "cli",
+      "file": "jig/specifications/S-CLI-024.md",
+      "implements": [
+        "O-CLI-006",
+        "O-CLI-007"
+      ]
+    },
+    {
+      "id": "S-CLI-025",
+      "type": "specification",
+      "title": "Validation distinguishes structural vs semantic errors",
+      "subsystem": "cli",
+      "file": "jig/specifications/S-CLI-025.md",
+      "implements": [
+        "O-CLI-006"
+      ]
     },
     {
       "id": "S-DECOMP-001",
@@ -924,13 +980,19 @@
         "O-CLI-003",
         "O-CLI-004",
         "O-CLI-005",
+        "O-CLI-006",
+        "O-CLI-007",
         "S-CLI-003",
         "S-CLI-004",
         "S-CLI-005",
         "S-CLI-006",
         "S-CLI-007",
         "S-CLI-008",
-        "S-CLI-009"
+        "S-CLI-009",
+        "S-CLI-022",
+        "S-CLI-023",
+        "S-CLI-024",
+        "S-CLI-025"
       ]
     },
     "jigy-tool": {
