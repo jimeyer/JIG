@@ -2,7 +2,8 @@
 delta_type: plan
 created: 2025-11-22
 branch: merge-validate-status
-status: draft
+status: test-recovery
+updated: 2025-11-22
 ---
 
 # PLAN: Merge `jigy validate` into `jigy status`
@@ -10,8 +11,10 @@ status: draft
 - **SCOPE:** docs/wip/S029_PROPOSAL_merge_validate_into_status.md
 - **Start:** 2025-11-22
 - **Owner:** Jim Meyer
-- **Status:** Draft
+- **Status:** Test Recovery (WU2.1-2.6 in progress)
 - **Subsystem:** cli
+
+> **NOTE:** WU2 implementation broke 85 tests. Test recovery work units (WU2.1-2.6) added following taskTestRepair.md protocol. See docs/wip/S032_RETROSPECTIVE_wu2_test_failures.md for analysis.
 
 ## Overview
 
@@ -88,6 +91,12 @@ Simplify JIG's command interface by consolidating validation functionality into 
 - [x] WU0: Create known Intent nodes (O/S) — done ✓
 - [x] WU1: Extract validation core logic — tests ✓ / docs ✓ / reflect ☐
 - [x] WU2: Merge validation into status command — tests ✓ / docs ✓ / reflect ☐
+- [x] **WU2.1: Stop Bleeding - Fix critical blockers** — tests ✓ / docs n/a / reflect ✓
+- [ ] **WU2.2: SPEC Audit - Classify all failures** — tests ☐ / docs ☐ / reflect ☐
+- [ ] **WU2.3: Create Missing SPECs (if needed)** — tests ☐ / docs ☐ / reflect ☐
+- [ ] **WU2.4: Root Cause Grouping** — tests ☐ / docs ☐ / reflect ☐
+- [ ] **WU2.5: Execute Repairs (batch fixes)** — tests ☐ / docs ☐ / reflect ☐
+- [ ] **WU2.6: Validation & Integration** — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Add CLI flags for exit code control — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Remove validate command completely — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: Update documentation — tests ☐ / docs ☐ / reflect ☐
@@ -252,6 +261,632 @@ Simplify JIG's command interface by consolidating validation functionality into 
 
 **Reflect:**
 - (To be filled after implementation)
+
+---
+
+## TEST RECOVERY WORK UNITS (Following taskTestRepair.md)
+
+**Context:** WU2 implementation broke 85 tests (23% failure rate). Following SPEC-driven test recovery protocol to restore test suite health before proceeding to WU3.
+
+**See:** docs/wip/S032_RETROSPECTIVE_wu2_test_failures.md for detailed analysis.
+
+**Protocol:** agents/taskTestRepair.md (5-bucket classification, 5-phase recovery)
+
+---
+
+### Work Unit 2.1: Stop Bleeding - Fix Critical Blockers
+
+**Goal:** Get clean failure counts by fixing obvious blockers that cascade into many test failures.
+
+**Planned Effort:** 30-45 minutes
+
+**Acceptance Criteria:**
+- All import errors resolved (e.g., missing modules, moved functions)
+- Obvious constructor signature changes fixed (mechanical changes only)
+- Full test suite runs without crashes
+- Clean baseline established: X tests failing out of Y total
+- Failure categories documented
+
+**Implementation Notes:**
+- Run `pytest tests/unit/ -v` to get initial failure count
+- Fix critical import errors first (these block many tests)
+- Fix obvious constructor signature mismatches (e.g., missing required params)
+- **Do NOT fix logic errors yet** - only blockers that prevent tests from running
+- Document baseline in this work unit's Reflect section
+
+**Failure Categories (from S032_RETROSPECTIVE):**
+1. Graph Index Format Errors (~30 failures) - Tests expect YAML, now JSON
+2. Status Logic Tests (~7 failures) - Tests create minimal fixtures, validation expects complete graph
+3. Validator Tests (~6 failures) - Tests call validate_graph() without proper index
+4. Subsystem Path Validation (~20+ failures) - Tests create nodes with subsystem="core" but no subsystem defined
+
+**Test Plan:**
+```bash
+# Initial baseline
+pytest tests/unit/ -v --tb=no -q | tee test-baseline-before.txt
+
+# After fixing blockers
+pytest tests/unit/ -v --tb=no -q | tee test-baseline-after.txt
+
+# Document counts
+grep -c FAILED test-baseline-before.txt
+grep -c FAILED test-baseline-after.txt
+```
+
+**Docs to Update:**
+- Add baseline metrics to S032_RETROSPECTIVE (if needed)
+- Document any discoveries about failure root causes
+
+**Reflect:**
+- Baseline before: 365 tests total, 85 failed (23.3%), 280 passed (76.7%)
+- Baseline after: Same (no blockers to fix - test suite runs clean)
+- Critical blockers fixed: **NONE** - No import errors or constructor mismatches found
+- Remaining failures: 85 tests, all due to graph-index.json format migration
+  - Graph commands: 24 failures (missing graph-index.json in fixtures)
+  - Graph traversal: 11 failures (missing graph-index.json in fixtures)
+  - Graph queries: 10 failures (missing graph-index.json in fixtures)
+  - Graph index loading: 8 failures (tests expect YAML, code uses JSON)
+  - Annotation validation: 8 failures (validation expects complete graph structure)
+  - Validator tests: 7 failures (missing graph-index.json in fixtures)
+  - Status logic: 7 failures (calculate_status now runs comprehensive validation)
+  - Nested subsystems: 7 failures (missing graph-index.json + subsystem definitions)
+  - Other: 3 failures (edge validation, node registry, decompose metrics)
+
+**Discovery:** All 85 failures are logic errors (missing graph-index.json or stricter validation), NOT import/constructor blockers. Test suite runs without crashes. Ready for WU2.2 classification.
+
+---
+
+### Work Unit 2.2: SPEC Audit - Classify All Failures
+
+**Goal:** Classify every failing test into one of 5 buckets (A/B/C/D/E) per taskTestRepair.md protocol.
+
+**Planned Effort:** 2-3 hours
+
+**Acceptance Criteria:**
+- All failing tests classified into buckets:
+  - **Bucket A:** SPEC valid, test needs alignment (FIX or REWRITE)
+  - **Bucket B:** SPEC missing, requirement real (create SPEC first)
+  - **Bucket C:** SPEC obsolete or redundant (DELETE test)
+  - **Bucket D:** O-S-T aligned, CODE missing (SKIP - TDD scenario)
+  - **Bucket E:** CODE bug detected (DEBUG workflow)
+- Audit table created with test name, file:line, SPEC, bucket, notes
+- For each test, documented: What SPEC does this verify? Is SPEC still valid?
+- Initial strategy assigned (FIX/REWRITE/DELETE/SKIP/DEBUG)
+
+**Implementation Notes:**
+- Create audit spreadsheet/table in this PLAN document or separate file
+- For each failing test:
+  1. Read test function and docstring
+  2. Determine: What requirement does this verify?
+  3. Search for SPEC in jig/specifications/ or test annotations
+  4. Classify using decision tree from taskTestRepair.md
+  5. Document bucket and rationale
+
+**Expected Distribution (based on S032_RETROSPECTIVE):**
+- **Bucket A (Align):** ~70-80 tests - Tests need to adapt to stricter validation
+- **Bucket B (Create SPEC):** ~0-5 tests - Most tests likely have implicit SPECs
+- **Bucket C (Delete):** ~0-2 tests - Minimal obsolete tests expected
+- **Bucket D (Skip - TDD):** ~0 tests - CODE exists, just stricter
+- **Bucket E (Debug):** ~0-2 tests - May discover actual bugs
+
+**Audit Template:**
+```markdown
+## SPEC Audit Results
+
+### Bucket A: Existing SPEC (align test) - N tests
+| Test | File:Line | Verifies SPEC | Strategy | Root Cause |
+|------|-----------|---------------|----------|------------|
+| test_graph_traversal_basic | test_graph_traversal.py:42 | S-CORE-001 | FIX | Needs graph-index.json fixture |
+
+### Bucket B: Missing SPEC - N tests
+| Test | File:Line | Needs SPEC | Subsystem | Rationale |
+|------|-----------|------------|-----------|-----------|
+| (Expected: 0-5 tests) |
+
+### Bucket C: Obsolete SPEC - N tests
+| Test | File:Line | Obsolete Feature | Decision |
+|------|-----------|------------------|----------|
+| (Expected: 0-2 tests) |
+
+### Bucket D: CODE Missing (TDD) - N tests
+| Test | File:Line | Verifies SPEC | CODE Status | SCOPE Doc |
+|------|-----------|---------------|-------------|-----------|
+| (Expected: 0 tests) |
+
+### Bucket E: CODE Bug Detected - N tests
+| Test | File:Line | Verifies SPEC | Bug Description | DEBUG Delta |
+|------|-----------|---------------|-----------------|-------------|
+| (Expected: 0-2 tests) |
+```
+
+**JIG Markers:**
+```markdown
+#DISCOVERY "Found N tests with no traceable SPEC (Bucket B)"
+(Document any SPEC gaps discovered)
+
+#DISCOVERY "Found N tests where stricter validation breaks minimal fixtures (Bucket A)"
+Tests assumed lenient validation, now validation is comprehensive.
+
+#DECISION "Classify tests by SPEC validity before fixing"
+**Rationale:** SPEC-first approach ensures fixes are durable
+**Tradeoffs:** More upfront analysis, but prevents re-breakage
+```
+
+**Test Plan:**
+- No code changes in this phase
+- Pure audit and classification
+- Verify every test has a bucket assignment
+
+**Docs to Update:**
+- Add audit results to this PLAN document (create section after WU2.6)
+- Update S032_RETROSPECTIVE with classification insights
+
+**Reflect:**
+- Bucket distribution: (counts)
+- Surprises: (anything unexpected)
+- Strategy clarity: (was classification clear?)
+
+---
+
+### Work Unit 2.3: Create Missing SPECs (If Needed)
+
+**Goal:** For every Bucket B test, create the missing Specification before fixing the test.
+
+**Planned Effort:** 0-2 hours (depends on Bucket B count from WU2.2)
+
+**Acceptance Criteria:**
+- All Bucket B tests have corresponding SPECs created
+- SPECs have proper YAML frontmatter (id, type, title, subsystem, implements)
+- SPECs describe "what", not "how"
+- SPECs link to at least one Outcome (business value)
+- `jigy validate` passes on new SPECs
+- SPECs committed before test fixes
+
+**Implementation Notes:**
+- **If Bucket B is empty:** Skip this work unit entirely (likely scenario)
+- **If Bucket B has tests:**
+  1. For each Bucket B test, extract the requirement (the "what")
+  2. Determine which Outcome this supports (or create new Outcome)
+  3. Create `jig/specifications/S-<SUBSYSTEM>-NNN.md`
+  4. Run `jigy validate` to check format
+  5. Commit SPECs before proceeding to WU2.4
+
+**SPEC Template:**
+```yaml
+---
+id: S-XXX-NNN
+type: specification
+title: "[Clear, testable requirement]"
+subsystem: [subsystem]
+created: 2025-11-22
+implements: O-XXX-NNN
+---
+
+# Specification: [Title]
+
+[Clear statement of requirement]
+
+## Rationale
+[Why this requirement exists]
+
+## Acceptance Criteria
+- [Testable criterion 1]
+- [Testable criterion 2]
+
+## Related
+- implements: O-XXX-NNN
+- tested_by: T-XXX-NNN
+- code: C-XXX-NNN
+```
+
+**Expected Outcome:**
+- Based on S032_RETROSPECTIVE analysis, expect 0-5 missing SPECs
+- Most tests verify existing SPECs, just need fixture updates
+
+**Test Plan:**
+```bash
+# Validate new SPECs
+jigy validate
+
+# Verify SPECs in graph
+jigy status | grep "specifications"
+```
+
+**Docs to Update:**
+- Document any new SPECs created in Reflect section
+
+**Reflect:**
+- SPECs created: (count and IDs)
+- Rationale: (why these were missing)
+- Or: "Bucket B empty, no SPECs needed" (likely)
+
+---
+
+### Work Unit 2.4: Root Cause Grouping
+
+**Goal:** Group Bucket A tests by root cause and assign repair strategy (FIX vs REWRITE).
+
+**Planned Effort:** 1 hour
+
+**Acceptance Criteria:**
+- All Bucket A tests grouped by common root cause
+- Each group assigned strategy: FIX or REWRITE
+- Strategy rationale documented for each group
+- Bucket C (delete) and D/E handled separately
+- Batch repair plan created (one commit per group)
+
+**Implementation Notes:**
+- Analyze failure messages to identify common patterns
+- Group tests by (root cause, strategy) tuple
+- Assign strategy using decision matrix:
+  - **FIX:** Change is mechanical, result is "as good as new"
+  - **REWRITE:** Architecture changed, SPEC semantics evolved
+
+**Expected Groups (from S032_RETROSPECTIVE):**
+
+**Group 1: Graph Index Fixture (FIX) - ~30 tests**
+- **Root Cause:** Tests create markdown nodes but no graph-index.json
+- **Strategy:** FIX (create test fixture helper that generates index)
+- **Files:** tests/unit/test_graph_*.py, test_nested_subsystems.py
+- **Action:** Create `tests/helpers/graph_fixtures.py` with builder functions
+
+**Group 2: Status Logic Fixtures (FIX) - ~7 tests**
+- **Root Cause:** Tests create temp dirs but validation expects complete graph structure
+- **Strategy:** FIX (update fixtures to create valid graph structures)
+- **Files:** tests/unit/test_status_logic.py
+- **Action:** Use fixture helpers from Group 1
+
+**Group 3: Validator Fixtures (FIX) - ~6 tests**
+- **Root Cause:** Tests call validate_graph() without proper index
+- **Strategy:** FIX (create graph-index.json in test setup)
+- **Files:** tests/unit/test_validator.py
+- **Action:** Use fixture helpers from Group 1
+
+**Group 4: Subsystem Path Validation (FIX) - ~20+ tests**
+- **Root Cause:** Tests create nodes with subsystem="core" but no subsystem definition
+- **Strategy:** FIX (create subsystem nodes in test fixtures)
+- **Files:** Multiple test files
+- **Action:** Update fixtures to create subsystem hierarchy
+
+**Group 5: Bucket C - Obsolete Tests (DELETE) - ~0-2 tests**
+- **Root Cause:** Test verifies obsolete SPEC or duplicate coverage
+- **Strategy:** DELETE
+- **Files:** TBD from audit
+- **Action:** Delete file, update graph index
+
+**Decision Criteria:**
+- FIX: Would you write the same test today? (Yes → FIX)
+- REWRITE: Does the SPEC match old test intent? (No → REWRITE)
+- DELETE: Should this SPEC exist? (No → DELETE)
+
+**JIG Markers:**
+```markdown
+#DECISION "FIX test fixtures vs REWRITE tests from scratch"
+**Choice:** FIX (create test fixture helpers)
+**Rationale:** SPECs unchanged, tests just need stricter fixtures
+**Tradeoffs:** Helper functions add code, but make tests maintainable
+
+#LEARNED "Stricter validation requires stricter test fixtures"
+Validation now comprehensive - tests need complete graph structures.
+Cannot use minimal fixtures anymore (subsystems required, index required).
+```
+
+**Test Plan:**
+- No code changes yet (planning only)
+- Verify all tests assigned to a group
+- Verify each group has clear strategy
+
+**Docs to Update:**
+- Document grouping results in this PLAN
+
+**Reflect:**
+- Groups identified: (count)
+- FIX vs REWRITE ratio: (distribution)
+- Surprises: (unexpected patterns)
+
+---
+
+### Work Unit 2.5: Execute Repairs (Batch Fixes)
+
+**Goal:** Apply FIX/REWRITE/DELETE strategy to each group, one commit per group.
+
+**Planned Effort:** 3-5 hours
+
+**Acceptance Criteria:**
+- All test groups repaired using assigned strategy
+- Test fixture helpers created (if needed)
+- All repaired tests have `@jig T-XXX verifies:S-YYY` annotations
+- One commit per group with clear strategy in message
+- No shims, no adapters, no backwards compatibility code
+- All tests in each group pass after repair
+- Running test count maintained (accounting for deletes)
+
+**Implementation Notes:**
+
+**Phase 1: Create Test Fixture Helpers (foundational)**
+```python
+# tests/helpers/graph_fixtures.py
+
+def create_test_graph(tmp_path, nodes_spec, subsystems=None):
+    """Create a complete valid graph structure for testing.
+
+    Args:
+        tmp_path: pytest tmp_path fixture
+        nodes_spec: List of (id, type, title, subsystem, edges) tuples
+        subsystems: List of subsystem names to create
+
+    Returns:
+        Path to graph root directory
+    """
+    # Create directory structure
+    # Create subsystem nodes
+    # Create intent nodes (outcomes, specs, etc)
+    # Create graph-index.json
+    # Return graph root path
+```
+
+**Phase 2: Fix Group 1 - Graph Index Fixtures (~30 tests)**
+- Update all graph loading tests to use `create_test_graph()` helper
+- Ensure graph-index.json exists in test fixtures
+- Strategy: FIX (mechanical, add fixture helper calls)
+
+**Commit:**
+```bash
+git commit -m "test(core): fix graph loading tests with proper fixtures (Group 1)
+
+Fixed 30 tests to use create_test_graph() helper.
+All tests now create graph-index.json in fixtures.
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: Tests created minimal fixtures, validation now requires index
+Result: All Group 1 tests pass
+
+Unit: Test Repair WU2.5.1 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.5"
+```
+
+**Phase 3: Fix Group 2 - Status Logic Tests (~7 tests)**
+- Update test_status_logic.py to use `create_test_graph()` helper
+- Ensure tests create complete graph structures (not minimal fixtures)
+- Strategy: FIX
+
+**Commit:**
+```bash
+git commit -m "test(cli): fix status logic tests with complete fixtures (Group 2)
+
+Fixed 7 tests to use complete graph structures.
+Updated fixtures to create subsystems, index, etc.
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: calculate_status() now runs comprehensive validation
+Result: All Group 2 tests pass
+
+Unit: Test Repair WU2.5.2"
+```
+
+**Phase 4: Fix Group 3 - Validator Tests (~6 tests)**
+- Update test_validator.py to create proper graph structures
+- Strategy: FIX
+
+**Commit:**
+```bash
+git commit -m "test(core): fix validator tests with proper graph fixtures (Group 3)
+
+Fixed 6 tests to create graph-index.json in fixtures.
+Updated to use create_test_graph() helper.
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Result: All Group 3 tests pass
+
+Unit: Test Repair WU2.5.3"
+```
+
+**Phase 5: Fix Group 4 - Subsystem Path Validation (~20+ tests)**
+- Update tests that create nodes with subsystem="core"
+- Ensure test fixtures create matching subsystem nodes
+- Strategy: FIX
+
+**Commit:**
+```bash
+git commit -m "test(core): fix subsystem path validation tests (Group 4)
+
+Fixed 20+ tests to create subsystem definitions in fixtures.
+Tests creating nodes with subsystem='core' now create core subsystem.
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: validate_nested_subsystems() now validates subsystem paths
+Result: All Group 4 tests pass
+
+Unit: Test Repair WU2.5.4"
+```
+
+**Phase 6: Delete Group 5 - Obsolete Tests (if any)**
+- Delete any tests classified as Bucket C
+- Strategy: DELETE
+
+**Quality Standards:**
+- No shims, no feature flags, no backwards compatibility
+- Every test has `@jig T-XXX verifies:S-YYY subsystem:name` annotation
+- Test fixture helpers are reusable and well-documented
+- Commit messages explain strategy and root cause
+
+**Test Plan:**
+```bash
+# After each group fix
+pytest tests/unit/test_<group>.py -v
+
+# After all groups
+pytest tests/unit/ -v
+# Should show 0 failures (or <5 if some skipped for WU3+)
+```
+
+**Docs to Update:**
+- Add test fixture helpers documentation
+- Update CONTRIBUTING.md with fixture usage examples (if needed)
+
+**Reflect:**
+- Groups fixed: (list)
+- Tests passing: (count)
+- Fixture helpers created: (list)
+- Challenges: (any issues encountered)
+
+---
+
+### Work Unit 2.6: Validation & Integration
+
+**Goal:** Verify test suite is healthy, JIG-aligned, and ready for WU3.
+
+**Planned Effort:** 30-60 minutes
+
+**Acceptance Criteria:**
+- Full test suite passes: `pytest tests/unit/ -v` shows 0 failures
+- All tests have `@jig T-XXX verifies:S-YYY` annotations (or path to completion)
+- `jigy index rebuild` succeeds
+- `jigy status` passes (no validation errors)
+- Test count healthy (within 5% of baseline, accounting for deletes)
+- Coverage >80% on all subsystems (or documented plan to reach)
+- No commented-out tests in codebase
+- No anti-patterns (shims, TODOs, temporary fixes)
+
+**Implementation Notes:**
+
+**Validation Checklist:**
+```markdown
+## WU2.6 Validation Results
+
+### Test Suite Health
+- [ ] Full test suite passes: `pytest tests/unit/ -v`
+- [ ] Test count: ____ tests (baseline: ~365, expected: ~360-365)
+- [ ] Failure rate: 0% (target: 0%)
+
+### JIG Alignment
+- [ ] All tests have `@jig` annotations (or documented in TODO)
+- [ ] `jigy index rebuild` succeeds
+- [ ] `jigy status` shows healthy graph (0 errors)
+- [ ] No orphaned test nodes in graph
+
+### Code Quality
+- [ ] No commented-out tests: `grep -r "# def test_" tests/` (should be empty)
+- [ ] No TODO comments: `grep -r "# TODO.*test" tests/` (should be empty)
+- [ ] No shims or adapters added
+- [ ] Test fixture helpers documented
+
+### Coverage (if measurable)
+- [ ] Overall coverage: __% (target: >80%)
+- [ ] Core module coverage: __% (target: >80%)
+- [ ] CLI module coverage: __% (target: >80%)
+```
+
+**Anti-Pattern Search:**
+```bash
+# Search for commented-out tests
+grep -r "# def test_" tests/
+
+# Search for TODO markers
+grep -r "# TODO" tests/ | grep -i test
+
+# Search for temporary fixes
+grep -r "FIXME\|HACK\|XXX" tests/
+
+# All should return empty or have documented reasons
+```
+
+**Final Verification:**
+```bash
+# Full test suite
+pytest tests/unit/ -v > test-final.txt
+grep -E "(PASSED|FAILED|ERROR)" test-final.txt | tail -20
+
+# JIG validation
+jigy index rebuild
+jigy status
+
+# Coverage (optional, if pytest-cov installed)
+pytest tests/unit/ --cov=jig --cov-report=term-missing
+```
+
+**Completion Summary Template:**
+```markdown
+## Test Repair Completion Summary (WU2.1-2.6)
+
+### Baseline (from WU2.1)
+- Total tests: 365
+- Failing: 85 (23.3%)
+- Passing: 280 (76.7%)
+
+### Classification (from WU2.2)
+- Bucket A (align): ___ tests
+- Bucket B (create SPEC): ___ tests
+- Bucket C (delete): ___ tests
+- Bucket D (skip - TDD): ___ tests
+- Bucket E (debug - CODE bug): ___ tests
+
+### Strategy Execution (from WU2.5)
+- FIX: ___ tests (mechanical changes)
+- REWRITE: ___ tests (deleted old, wrote new per SPEC)
+- DELETE: ___ tests (obsolete features)
+- SKIP: ___ tests (CODE not implemented)
+- DEBUG: ___ tests (redirected to DEBUG workflow)
+
+### Test Fixture Helpers Created
+- `tests/helpers/graph_fixtures.py::create_test_graph()` - Build valid graph for tests
+- [Other helpers if created]
+
+### Final State (from WU2.6)
+- Total tests: ___ (expected: ~360-365)
+- Passing: ___ (target: 100%)
+- Failing: 0 (target: 0)
+- SPEC coverage: ___% have @jig annotations
+- JIG validation: PASS/FAIL
+
+### Key Decisions
+#DECISION "Fix test fixtures vs make validation opt-in"
+**Choice:** Fix test fixtures (create helpers)
+**Rationale:** Validation strictness is correct, tests need proper fixtures
+**Tradeoffs:** More work now, but durable test suite
+
+### Key Learnings
+#LEARNED "Comprehensive validation requires comprehensive test fixtures"
+Tests can't use minimal fixtures when validation is strict.
+Created reusable helpers to build valid graph structures.
+
+#LEARNED "Group by root cause for batch fixes"
+Identified 4-5 groups covering ~85 tests. Batch strategy 10x faster.
+
+### Time Investment
+- WU2.1 (Stop Bleeding): ___ min
+- WU2.2 (SPEC Audit): ___ hr
+- WU2.3 (Create SPECs): ___ hr (or N/A)
+- WU2.4 (Root Cause Grouping): ___ hr
+- WU2.5 (Execute Repairs): ___ hr
+- WU2.6 (Validation): ___ min
+- **Total: ___ hours** (estimated: 3-4 hr)
+
+### Markers Captured
+- #DISCOVERY: ___ markers
+- #DECISION: ___ markers
+- #LEARNED: ___ markers
+
+### Ready for WU3
+- [x] All tests pass
+- [x] No failing tests block WU3 work
+- [x] Test fixtures support stricter validation
+- [x] Can proceed with flag implementation
+```
+
+**Test Plan:**
+- Run full test suite and verify 0 failures
+- Run JIG validation and verify healthy graph
+- Review code for anti-patterns
+
+**Docs to Update:**
+- Add completion summary to this PLAN document (after WU2.6)
+- Update S032_RETROSPECTIVE with resolution notes
+
+**Reflect:**
+- Test suite health: (PASS/FAIL)
+- Blockers for WU3: (any remaining issues)
+- Confidence level: (ready to proceed?)
 
 ---
 
@@ -553,13 +1188,18 @@ Simplify JIG's command interface by consolidating validation functionality into 
 - (To be filled upon completion)
 
 ### Metrics
-- Units: 6 (excluding WU0)
-- Estimated total effort: 6-9 hours (reduced from 8-11h due to clean break)
+- Units: 12 total (excluding WU0)
+  - Original: 6 units (WU1-WU6)
+  - Test Recovery: 6 units (WU2.1-WU2.6)
+- Estimated total effort: 10-13 hours
+  - Original work: 6-9 hours
+  - Test recovery: 4-6 hours (WU2.1-2.6)
 - Median cycle time: (to be measured)
 - Rework rate: (to be measured)
 - Test coverage: (to be measured)
 - Markers captured: (to be counted)
 - Files deleted: 3+ (validate.py, test files)
+- Tests repaired: ~85 tests (from WU2 test suite breakage)
 
 ### Reflection Roll-up
 - Repeatable wins: (to be filled)
