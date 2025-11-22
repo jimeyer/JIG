@@ -379,7 +379,7 @@ Clean break = committed. If issues found, revert the commit. Old YAML is in git 
   - File size: 24KB JSON (vs ~23KB YAML estimated from analysis) [measurement]
 
 **Links**
-- Commit: <to be filled in commit step>
+- Commit: d89d728068edd392875a124fb9b8b54dda49ab25
 
 **Human Validation**
 ```bash
