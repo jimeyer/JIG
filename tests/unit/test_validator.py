@@ -491,3 +491,68 @@ def test_validation_result_dataclass() -> None:
     assert not result2.valid
     assert len(result2.errors) == 2
     assert len(result2.warnings) == 1
+
+
+# @jig T-JIGY-040 verifies:S-JIGY-012 subsystem:jigy-tool
+def test_validate_graph_with_ct_nodes(tmp_path: Path) -> None:
+    """Verify validator understands C/T nodes from graph-index.yaml.
+
+    This test verifies that the validator doesn't generate false errors
+    for C (code) and T (test) nodes that exist in graph-index.yaml but
+    not as markdown files.
+    """
+    import yaml
+
+    # Create markdown nodes (O/S/X)
+    outcomes_dir = tmp_path / "outcomes"
+    outcomes_dir.mkdir(parents=True)
+
+    outcome_content = """---
+id: O-TEST-001
+type: outcome
+title: "Test outcome"
+subsystem: test
+created: 2025-11-21
+---
+Content
+"""
+    (outcomes_dir / "O-TEST-001.md").write_text(outcome_content)
+
+    specs_dir = tmp_path / "specifications"
+    specs_dir.mkdir(parents=True)
+
+    spec_content = """---
+id: S-TEST-001
+type: specification
+title: "Test specification"
+subsystem: test
+created: 2025-11-21
+---
+Content
+"""
+    (specs_dir / "S-TEST-001.md").write_text(spec_content)
+
+    # Add C/T nodes to graph-index.yaml
+    graph_index = {
+        "version": "1.0",
+        "nodes": [
+            {"id": "O-TEST-001", "type": "outcome", "subsystem": "test"},
+            {"id": "S-TEST-001", "type": "specification", "subsystem": "test"},
+            {"id": "C-TEST-001", "type": "code", "subsystem": "test", "file": "src/test.py", "line": 10},
+            {"id": "T-TEST-001", "type": "test", "subsystem": "test", "file": "tests/test_test.py", "line": 5},
+        ],
+        "edges": []
+    }
+    (tmp_path / "graph-index.yaml").write_text(yaml.dump(graph_index))
+
+    # Validate
+    result = validate_graph(tmp_path)
+
+    # Should pass (no false errors for C/T)
+    assert result.valid, f"Validation failed with errors: {result.errors}"
+
+    # Should NOT have errors about C/T nodes being non-existent
+    error_text = " ".join(result.errors).lower()
+    assert "c-test-001" not in error_text, "False error for C-TEST-001"
+    assert "t-test-001" not in error_text, "False error for T-TEST-001"
+    assert "non-existent node" not in error_text, "False 'non-existent node' errors"

@@ -83,7 +83,7 @@ All constraints are known from SCOPE. Creating specifications upfront enables TD
 ## Work Unit Checklist
 
 - [x] WU0: Create known Intent nodes (S-JIGY-012, S-JIGY-013, S-JIGY-014) — intent ✅ / validate ✅ / reflect ✅
-- [ ] WU1: Refactor validator to use Graph.load_from_dir() — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Refactor validator to use Graph.load_from_dir() — tests ✅ / docs N/A / reflect ✅
 - [ ] WU2: Add subsystem export to index rebuild — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Fix edge deduplication and counting — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Fix node counting in index rebuild — tests ☐ / docs ☐ / reflect ☐
@@ -572,14 +572,28 @@ def test_validate_command_no_false_errors():
 - S-JIGY-012.md already documents expected behavior
 
 **Reflect:**
-- What worked well: …
-- What could be better: …
-- Discoveries: …
-- Decisions: …
+- What worked well:
+  - TDD approach (writing tests first) caught edge cases early
+  - S-JIGY-012 spec was clear and comprehensive, making implementation straightforward
+  - Graph.load_from_dir() abstraction worked exactly as needed
+
+- What could be better:
+  - Initial implementation failed 2 existing tests due to not understanding Graph.load_from_dir() behavior
+  - Had to iterate on validation logic to handle O/S/X vs C/T node distinction
+
+- Discoveries:
+  - #LEARNED: Graph.load_from_dir() loads ALL markdown files regardless of graph-index, then overlays graph-index nodes
+  - #LEARNED: For O/S/X nodes in graph-index, must validate they have corresponding markdown files (constraint not in original spec)
+  - #DECISION: Check node type from graph-index to distinguish O/S/X (need markdown) from C/T (don't need markdown)
+
+- Decisions:
+  - Kept explicit validation of markdown nodes for format/schema (not just relying on graph loading)
+  - C/T nodes validated "indirectly" - if graph loads successfully, they're valid
+  - Orphaned node check now compares markdown_node_ids against indexed_ids (not all_node_ids)
 
 **Links:**
 - PR: (to be filled)
-- Commit: (to be filled)
+- Commit: f1ea243 (WU0), <pending> (WU1)
 
 **Human Validation:**
 ```bash

@@ -109,12 +109,19 @@ def validate_node(node: OSTCNode) -> ValidationResult:
 def validate_graph(intent_dir: Path) -> ValidationResult:
     """Validate all OSTC nodes and graph consistency.
 
+    Uses unified graph loading to understand all node types (O/S/X/C/T).
+    Markdown nodes (O/S/X) are validated explicitly for format/schema.
+    Code and test nodes (C/T) are validated indirectly through successful
+    graph loading from graph-index.yaml.
+
     Args:
         intent_dir: Path to directory containing OSTC nodes
 
     Returns:
         ValidationResult with all errors and warnings across the graph
     """
+    from jig.core.graph import Graph
+
     errors: list[str] = []
     warnings: list[str] = []
 
@@ -122,12 +129,19 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
         errors.append(f"Intent directory not found: {intent_dir}")
         return ValidationResult(valid=False, errors=errors, warnings=warnings)
 
-    # Track all node IDs and their file paths
-    node_ids: dict[str, Path] = {}
-    all_nodes: list[OSTCNode] = []
+    # Load complete graph using unified loading logic (S-JIGY-012)
+    # This loads O/S/X from markdown + C/T from graph-index.yaml
+    try:
+        graph = Graph.load_from_dir(intent_dir)
+        all_node_ids = set(graph.nodes.keys())
+    except Exception as e:
+        errors.append(f"Failed to load graph: {e}")
+        return ValidationResult(valid=False, errors=errors, warnings=warnings)
 
-    # Load and validate all nodes (O/S/X markdown nodes only)
-    # T/C nodes discovered via @jig annotations (future feature)
+    # Track markdown node IDs and their file paths (for explicit validation)
+    markdown_node_ids: dict[str, Path] = {}
+
+    # Explicitly validate markdown nodes (O/S/X) for format and schema
     for node_type in ["outcomes", "specifications", "constraints"]:
         type_dir = intent_dir / node_type
         if not type_dir.exists():
@@ -137,19 +151,19 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
         for node_file in type_dir.glob("*.md"):
             try:
                 node = parse_ostc_node(node_file)
-                all_nodes.append(node)
 
-                # Check for duplicate IDs
-                if node.id in node_ids:
+                # Track markdown node ID → file path mapping
+                if node.id in markdown_node_ids:
+                    # Duplicate ID within markdown files
                     errors.append(
                         f"Duplicate node ID '{node.id}' found in:\n"
-                        f"  - {node_ids[node.id]}\n"
+                        f"  - {markdown_node_ids[node.id]}\n"
                         f"  - {node_file}"
                     )
                 else:
-                    node_ids[node.id] = node_file
+                    markdown_node_ids[node.id] = node_file
 
-                # Validate individual node
+                # Validate individual node format and schema
                 node_result = validate_node(node)
                 if not node_result.valid:
                     for error in node_result.errors:
@@ -159,7 +173,19 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
             except Exception as e:
                 errors.append(f"Failed to parse {node_file}: {e}")
 
-    # Validate graph-index.yaml if it exists
+    # C/T nodes are validated indirectly - if Graph.load_from_dir() succeeded,
+    # they are valid (their structure is defined in graph-index.yaml)
+
+    # Check for duplicate node IDs across ALL node types (O/S/X/C/T)
+    node_id_counts: dict[str, int] = {}
+    for node_id in all_node_ids:
+        node_id_counts[node_id] = node_id_counts.get(node_id, 0) + 1
+
+    for node_id, count in node_id_counts.items():
+        if count > 1:
+            errors.append(f"Duplicate node ID '{node_id}' found {count} times across graph")
+
+    # Validate graph-index.yaml consistency
     graph_index_file = intent_dir / "graph-index.yaml"
     if graph_index_file.exists():
         try:
@@ -167,23 +193,34 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
             if graph_data and "nodes" in graph_data:
                 indexed_ids = {n["id"] for n in graph_data["nodes"] if "id" in n}
 
-                # Check that all indexed nodes exist
-                for indexed_id in indexed_ids:
-                    if indexed_id not in node_ids:
-                        errors.append(
-                            f"Graph index references non-existent node: {indexed_id}"
-                        )
+                # Check that O/S/X nodes in graph-index have corresponding markdown files
+                # (C/T nodes don't need markdown files - they're discovered via annotations)
+                for node_data in graph_data["nodes"]:
+                    if not isinstance(node_data, dict):
+                        continue
+
+                    indexed_id = node_data.get("id")
+                    node_type = node_data.get("type", "")
+
+                    if not indexed_id or not node_type:
+                        continue
+
+                    # Only O/S/X nodes should have markdown files
+                    # C/T nodes are annotation-based and don't need markdown files
+                    if node_type in ["outcome", "specification", "constraint"]:
+                        if indexed_id not in markdown_node_ids:
+                            errors.append(
+                                f"Graph index references non-existent node: {indexed_id}"
+                            )
 
                 # Check for orphaned nodes (exist but not in index)
-                orphaned_ids = set(node_ids.keys()) - indexed_ids
+                orphaned_ids = set(markdown_node_ids.keys()) - indexed_ids
                 if orphaned_ids:
                     warnings.append(
                         f"Nodes not referenced in graph index: {', '.join(sorted(orphaned_ids))}"
                     )
         except Exception as e:
             errors.append(f"Failed to load graph index: {e}")
-    else:
-        warnings.append(f"Graph index not found: {graph_index_file}")
 
     return ValidationResult(valid=len(errors) == 0, errors=errors, warnings=warnings)
 

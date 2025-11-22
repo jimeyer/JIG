@@ -421,3 +421,35 @@ def test_jigy_validate_colorized_output(tmp_path: Path) -> None:
 
     # Check for checkmark (✓) or cross (✗) symbols
     assert "✓" in result.output or "✗" in result.output
+
+
+# @jig T-JIGY-041 verifies:S-JIGY-012 subsystem:jigy-tool
+def test_validate_command_no_false_errors() -> None:
+    """Verify validate command on real codebase reports 0 false errors for C/T nodes.
+
+    This integration test verifies that running jigy validate on the actual
+    jig codebase does not report C/T nodes as non-existent. The codebase has
+    many C and T nodes discovered via @jig annotations that exist in
+    graph-index.yaml but not as markdown files.
+    """
+    runner = CliRunner()
+
+    # Run validate on the real jig codebase (current directory)
+    # Note: This test assumes it's run from the jig project root
+    result = runner.invoke(cli, ["validate"])
+
+    # Should not report C/T nodes as non-existent
+    # These are examples of actual C/T nodes in the codebase
+    assert "C-CLI-003" not in result.output, "False error for C-CLI-003"
+    assert "T-JIGY-012" not in result.output, "False error for T-JIGY-012"
+    assert "C-CORE-003" not in result.output, "False error for C-CORE-003"
+
+    # Should not have the generic "non-existent node" error for C/T nodes
+    # Note: There may be legitimate errors for missing O/S/X nodes, but not for C/T
+    if "non-existent node" in result.output.lower():
+        # If there are any "non-existent" errors, they should only be for O/S/X nodes
+        # not for C- or T- prefixed nodes
+        error_lines = [line for line in result.output.split('\n') if 'non-existent' in line.lower()]
+        for line in error_lines:
+            assert not line.startswith("C-"), f"False 'non-existent' error for code node: {line}"
+            assert not line.startswith("T-"), f"False 'non-existent' error for test node: {line}"
