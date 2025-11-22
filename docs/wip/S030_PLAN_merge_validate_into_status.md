@@ -93,8 +93,8 @@ Simplify JIG's command interface by consolidating validation functionality into 
 - [x] WU2: Merge validation into status command — tests ✓ / docs ✓ / reflect ☐
 - [x] **WU2.1: Stop Bleeding - Fix critical blockers** — tests ✓ / docs n/a / reflect ✓
 - [x] **WU2.2: SPEC Audit - Classify all failures** — tests n/a / docs ✓ / reflect ✓
-- [ ] **WU2.3: Create Missing SPECs (if needed)** — tests ☐ / docs ☐ / reflect ☐
-- [ ] **WU2.4: Root Cause Grouping** — tests ☐ / docs ☐ / reflect ☐
+- [x] **WU2.3: Create Missing SPECs (if needed)** — tests n/a / docs n/a / reflect n/a (skipped - no SPECs needed)
+- [x] **WU2.4: Root Cause Grouping** — tests n/a / docs ✓ / reflect ✓
 - [ ] **WU2.5: Execute Repairs (batch fixes)** — tests ☐ / docs ☐ / reflect ☐
 - [ ] **WU2.6: Validation & Integration** — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Add CLI flags for exit code control — tests ☐ / docs ☐ / reflect ☐
@@ -745,9 +745,321 @@ Cannot use minimal fixtures anymore (subsystems required, index required).
 - Document grouping results in this PLAN
 
 **Reflect:**
-- Groups identified: (count)
-- FIX vs REWRITE ratio: (distribution)
-- Surprises: (unexpected patterns)
+- Groups identified: **5 consolidated groups** (from 9 initial groups in WU2.2)
+- FIX vs REWRITE ratio: **100% FIX** (0% REWRITE, 0% DELETE)
+- Surprises: All groups use same helper function strategy - single foundational fix enables all repairs
+
+## Root Cause Grouping Results (WU2.4)
+
+**Summary:** Consolidated 9 test groups from WU2.2 into 5 repair groups based on common root causes and repair actions. All groups use **FIX** strategy (mechanical changes).
+
+**Consolidation Rationale:** Multiple test groups share the same root cause (missing graph-index.json) and can be fixed with the same helper function. Consolidating reduces duplication and enables batch fixes.
+
+### Repair Group 1: Graph Index Fixtures - 55 tests (FIX)
+
+**Root Cause:** Tests create markdown nodes but no graph-index.json
+
+**Source Groups:**
+- Group 1: Graph Commands (24 tests)
+- Group 2: Graph Traversal (11 tests)
+- Group 3: Graph Queries (10 tests)
+- Group 6: Validator Tests (7 tests)
+- Group 9: Other Tests (3 tests)
+
+**Files Affected:**
+- `tests/unit/test_graph_commands.py` (24 tests)
+- `tests/unit/test_graph_traversal.py` (11 tests)
+- `tests/unit/test_graph_queries.py` (10 tests)
+- `tests/unit/test_validator.py` (7 tests)
+- `tests/unit/test_edge_validation.py` (1 test)
+- `tests/unit/test_node_registry.py` (1 test)
+- `tests/unit/test_decompose_metrics.py` (1 test)
+
+**Strategy:** FIX (mechanical)
+
+**Repair Actions:**
+1. Create `tests/helpers/graph_fixtures.py` with foundational helper
+2. Implement `create_test_graph(tmp_path, nodes, subsystems=None, edges=None)` function
+3. Update all 55 tests to use helper instead of manual fixture creation
+4. Helper generates both markdown files AND graph-index.json
+5. Verify tests pass after update
+
+**Decision Criteria (FIX vs REWRITE):**
+- Would you write the same test today? **YES** - Test intent unchanged
+- Test just needs proper fixtures with graph-index.json
+
+**Batch Commit Message:**
+```
+test(core): fix graph index fixtures (Repair Group 1 - 55 tests)
+
+Created tests/helpers/graph_fixtures.py with create_test_graph() helper.
+Updated 55 tests to use helper for generating complete graph fixtures.
+
+Tests now create:
+- Markdown node files (outcomes, specs, etc.)
+- graph-index.json with proper structure
+- Subsystem definitions (when needed)
+
+Files updated:
+- tests/unit/test_graph_commands.py (24 tests)
+- tests/unit/test_graph_traversal.py (11 tests)
+- tests/unit/test_graph_queries.py (10 tests)
+- tests/unit/test_validator.py (7 tests)
+- tests/unit/test_edge_validation.py (1 test)
+- tests/unit/test_node_registry.py (1 test)
+- tests/unit/test_decompose_metrics.py (1 test)
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: Graph.load_from_dir() now requires graph-index.json
+Result: All 55 tests pass
+
+Unit: Test Repair WU2.5.1 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.4 → Repair Group 1
+```
+
+### Repair Group 2: Graph Index Format Migration - 8 tests (FIX)
+
+**Root Cause:** Tests expect YAML format, code now uses JSON format
+
+**Source Groups:**
+- Group 4: Graph Index Loading (8 tests)
+
+**Files Affected:**
+- `tests/unit/test_graph_index_loading.py` (8 tests)
+
+**Strategy:** FIX (mechanical)
+
+**Repair Actions:**
+1. Update tests to create graph-index.json instead of graph-index.yaml
+2. Convert YAML test data to JSON format
+3. Update assertions to expect JSON structure
+4. Use `json.dumps()` instead of `yaml.dump()`
+5. Verify JSON format validation works correctly
+
+**Decision Criteria (FIX vs REWRITE):**
+- Would you write the same test today? **YES** - Format changed, not requirements
+- Tests verify index loading, just need JSON instead of YAML
+
+**Batch Commit Message:**
+```
+test(core): migrate graph index tests to JSON format (Repair Group 2 - 8 tests)
+
+Updated all graph index loading tests from YAML to JSON format.
+Tests now create graph-index.json (not graph-index.yaml).
+
+Changes:
+- Convert test fixtures from YAML to JSON
+- Update assertions for JSON structure
+- Use json.dumps() instead of yaml.dump()
+- Verify JSON parsing and validation
+
+Files updated:
+- tests/unit/test_graph_index_loading.py (8 tests)
+
+Strategy: FIX (mechanical format migration)
+Root Cause: Clean break from YAML to JSON (WU4 format migration)
+Result: All 8 tests pass
+
+Unit: Test Repair WU2.5.2 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.4 → Repair Group 2
+```
+
+### Repair Group 3: Annotation Validation Fixtures - 8 tests (FIX)
+
+**Root Cause:** Validation now expects complete graph structure (stricter validation from WU2)
+
+**Source Groups:**
+- Group 5: Annotation Validation (8 tests)
+
+**Files Affected:**
+- `tests/unit/test_annotation_validation.py` (8 tests)
+
+**Strategy:** FIX (mechanical)
+
+**Repair Actions:**
+1. Use `create_test_graph()` helper from Repair Group 1
+2. Create complete graph structures with graph-index.json
+3. Add subsystem definitions where needed
+4. Ensure all referenced nodes exist in fixtures
+5. Verify comprehensive validation passes
+
+**Decision Criteria (FIX vs REWRITE):**
+- Would you write the same test today? **YES** - Validation stricter, not different
+- Tests verify annotation validation, just need complete fixtures
+
+**Batch Commit Message:**
+```
+test(core): fix annotation validation fixtures (Repair Group 3 - 8 tests)
+
+Updated annotation validation tests to create complete graph structures.
+Validation now comprehensive (from WU2), tests need proper fixtures.
+
+Changes:
+- Use create_test_graph() helper for complete fixtures
+- Add graph-index.json to all test setups
+- Create subsystem definitions where referenced
+- Ensure all node references are valid
+
+Files updated:
+- tests/unit/test_annotation_validation.py (8 tests)
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: Comprehensive validation expects complete graph
+Result: All 8 tests pass
+
+Unit: Test Repair WU2.5.3 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.4 → Repair Group 3
+```
+
+### Repair Group 4: Status Logic Fixtures - 7 tests (FIX)
+
+**Root Cause:** calculate_status() now runs comprehensive validation (from WU2), expects complete graph + graph-index.json
+
+**Source Groups:**
+- Group 7: Status Logic (7 tests)
+
+**Files Affected:**
+- `tests/unit/test_status_logic.py` (7 tests)
+
+**Strategy:** FIX (mechanical)
+
+**Repair Actions:**
+1. Use `create_test_graph()` helper from Repair Group 1
+2. Create graph-index.json in all test fixtures
+3. Add subsystem definitions
+4. Handle validation results in status output
+5. Update assertions for validation section in status
+
+**Decision Criteria (FIX vs REWRITE):**
+- Would you write the same test today? **YES** - Status now includes validation (expected)
+- Tests verify status logic, just need to handle new validation output
+
+**Batch Commit Message:**
+```
+test(cli): fix status logic fixtures (Repair Group 4 - 7 tests)
+
+Updated status tests to create complete graph structures with validation.
+Status command now runs comprehensive validation (WU2 integration).
+
+Changes:
+- Use create_test_graph() helper for complete fixtures
+- Create graph-index.json in all test setups
+- Add subsystem definitions
+- Update assertions for validation in status output
+- Handle validation errors/warnings in test expectations
+
+Files updated:
+- tests/unit/test_status_logic.py (7 tests)
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: calculate_status() now includes comprehensive validation
+Result: All 7 tests pass
+
+Unit: Test Repair WU2.5.4 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.4 → Repair Group 4
+```
+
+### Repair Group 5: Nested Subsystems Fixtures - 7 tests (FIX)
+
+**Root Cause:** Tests create nodes with subsystem references but no subsystem definitions + missing graph-index.json
+
+**Source Groups:**
+- Group 8: Nested Subsystems (7 tests)
+
+**Files Affected:**
+- `tests/unit/test_nested_subsystems.py` (7 tests)
+
+**Strategy:** FIX (mechanical)
+
+**Repair Actions:**
+1. Use `create_test_graph()` helper with subsystems parameter
+2. Create subsystem hierarchy definitions
+3. Create graph-index.json with subsystems section
+4. Ensure all node subsystem paths are valid
+5. Verify nested subsystem validation works
+
+**Decision Criteria (FIX vs REWRITE):**
+- Would you write the same test today? **YES** - Subsystem validation unchanged
+- Tests verify nested subsystems, just need proper subsystem definitions
+
+**Batch Commit Message:**
+```
+test(core): fix nested subsystem fixtures (Repair Group 5 - 7 tests)
+
+Updated nested subsystem tests to create complete subsystem hierarchies.
+Tests now create subsystem definitions + graph-index.json.
+
+Changes:
+- Use create_test_graph() with subsystems parameter
+- Create subsystem hierarchy in fixtures
+- Add subsystems section to graph-index.json
+- Ensure all node subsystem paths are valid
+- Verify nested validation works correctly
+
+Files updated:
+- tests/unit/test_nested_subsystems.py (7 tests)
+
+Strategy: FIX (mechanical change, SPECs unchanged)
+Root Cause: Validation requires complete subsystem definitions
+Result: All 7 tests pass
+
+Unit: Test Repair WU2.5.5 (taskTestRepair Phase 4)
+See: docs/wip/S030_PLAN → WU2.4 → Repair Group 5
+```
+
+## Grouping Summary
+
+**Total Groups:** 5 (consolidated from 9)
+
+| Group | Tests | Strategy | Root Cause | Repair Action |
+|-------|-------|----------|------------|---------------|
+| 1: Graph Index Fixtures | 55 | FIX | Missing graph-index.json | Create helper, update tests |
+| 2: Format Migration | 8 | FIX | YAML→JSON migration | Convert format in tests |
+| 3: Annotation Validation | 8 | FIX | Stricter validation | Use helper for complete fixtures |
+| 4: Status Logic | 7 | FIX | Status includes validation | Use helper + update assertions |
+| 5: Nested Subsystems | 7 | FIX | Missing subsystem defs | Use helper with subsystems |
+| **TOTAL** | **85** | **100% FIX** | | |
+
+## Batch Repair Plan
+
+**Execution Order:**
+1. **Phase 0 (Foundational):** Create `tests/helpers/graph_fixtures.py` helper
+2. **Phase 1:** Repair Group 1 (55 tests) - enables other groups
+3. **Phase 2:** Repair Group 2 (8 tests) - format migration
+4. **Phase 3:** Repair Group 3 (8 tests) - uses helper from Phase 1
+5. **Phase 4:** Repair Group 4 (7 tests) - uses helper from Phase 1
+6. **Phase 5:** Repair Group 5 (7 tests) - uses helper from Phase 1
+
+**One commit per group** (6 commits total: 1 helper + 5 groups)
+
+**Quality Standards:**
+- No shims, no feature flags, no backwards compatibility code
+- Every test uses `create_test_graph()` helper (consistency)
+- All tests pass after each group repair
+- Commit messages follow JIG format with strategy and root cause
+
+## Decision Rationale
+
+**#DECISION "Consolidate 9 groups into 5 repair groups"**
+**Choice:** Merge groups with same root cause and repair action
+**Rationale:** Reduces duplication, enables single helper to fix multiple groups
+**Tradeoffs:** Larger commits per group, but clearer repair strategy
+
+**#DECISION "Create single test fixture helper for all groups"**
+**Choice:** `create_test_graph()` in `tests/helpers/graph_fixtures.py`
+**Rationale:** All repairs need graph-index.json generation - single source of truth
+**Tradeoffs:** Helper function complexity vs. duplicated fixture code
+**Result:** Maintainable, reusable, consistent across all tests
+
+**#LEARNED "Stricter validation requires stricter test fixtures"**
+Validation now comprehensive (from WU2) - tests cannot use minimal fixtures anymore. Every test that loads a graph needs:
+1. Markdown node files (outcomes, specs, etc.)
+2. graph-index.json with complete structure
+3. Subsystem definitions (if nodes reference subsystems)
+4. Valid references (no dangling edges)
+
+**#LEARNED "Clean breaks enable batch fixes"**
+By removing YAML fallback (clean break), all failures follow same pattern. This enables systematic batch fixes with clear commit boundaries. Gradual migration would have created messy failure patterns.
 
 ---
 
