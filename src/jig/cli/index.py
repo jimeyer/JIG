@@ -51,31 +51,30 @@ def rebuild(dry_run: bool, backup: bool, project_dir: Path) -> None:
     
     # Report results
     click.echo("Scanning sources:")
-    
+
     # Count nodes by type
     node_counts = {}
     for node in result.nodes.values():
         node_counts[node.type] = node_counts.get(node.type, 0) + 1
-    
-    # Report markdown nodes
+
+    # Get counts for all node types (default to 0)
     outcomes = node_counts.get("outcome", 0)
     specs = node_counts.get("specification", 0)
     constraints = node_counts.get("constraint", 0)
-    click.echo(f"  ✓ jig/outcomes/*.md ({outcomes} nodes)")
-    click.echo(f"  ✓ jig/specifications/*.md ({specs} nodes)")
-    if constraints > 0:
-        click.echo(f"  ✓ jig/constraints/*.md ({constraints} nodes)")
-    
-    # Report annotation nodes
     code = node_counts.get("code", 0)
     tests = node_counts.get("test", 0)
-    if code > 0:
-        click.echo(f"  ✓ src/ for @jig annotations ({code} code nodes)")
-    if tests > 0:
-        click.echo(f"  ✓ test/ for @jig annotations ({tests} test nodes)")
-    
+
+    # Report markdown nodes (always show, even if 0)
+    click.echo(f"  ✓ jig/outcomes/*.md ({outcomes} nodes)")
+    click.echo(f"  ✓ jig/specifications/*.md ({specs} nodes)")
+    click.echo(f"  ✓ jig/constraints/*.md ({constraints} nodes)")
+
+    # Report annotation nodes (always show, even if 0)
+    click.echo(f"  ✓ src/ and tests/ for @jig annotations ({code} code, {tests} test nodes)")
+
     click.echo()
-    click.echo(f"Total nodes: {len(result.nodes)} ({outcomes} O, {specs} S, {code} C, {tests} T)")
+    # Use X for constraints, not C
+    click.echo(f"Total nodes: {len(result.nodes)} ({outcomes} O, {specs} S, {constraints} X, {code} C, {tests} T)")
 
     # Count edges (deduplicated)
     edge_count = len(result.edges)
