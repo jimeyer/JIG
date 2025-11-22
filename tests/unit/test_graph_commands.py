@@ -129,10 +129,10 @@ def test_graph_show_displays_body_content(setup_test_graph: Path) -> None:
     """Test 'jigy graph show' displays node body content."""
     runner = CliRunner()
     result = runner.invoke(graph, ["show", "O-TEST-001"])
-    
+
     assert result.exit_code == 0
-    assert "First Outcome" in result.output
-    assert "first test outcome" in result.output
+    assert "# First outcome" in result.output
+    assert "Test node content" in result.output
 
 
 def test_graph_list_all_nodes(setup_test_graph: Path) -> None:
@@ -308,25 +308,22 @@ def test_graph_commands_performance(setup_test_graph: Path) -> None:
 
 def test_graph_list_empty_result(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test 'jigy graph list' with filters that match no nodes."""
-    jig_dir = tmp_path / "jig"
-    jig_dir.mkdir()
-    (jig_dir / "outcomes").mkdir()
-    (jig_dir / "specifications").mkdir()
-    
+    jig_dir = create_test_graph(tmp_path, nodes=[], subsystems={})
+
     from jig.core.config import JigConfig
     config = JigConfig(
         project_name="test",
         intent_dir=jig_dir,
         delta_dir=tmp_path / "deltas",
         templates_dir=tmp_path / "templates",
-        graph_index_file=jig_dir / "graph-index.yaml",
+        graph_index_file=jig_dir / "graph-index.json",
         subsystems_file=jig_dir / "subsystems.yaml"
     )
     monkeypatch.setattr("jig.cli.graph.load_config", lambda: config)
-    
+
     runner = CliRunner()
     result = runner.invoke(graph, ["list", "--type", "outcome"])
-    
+
     assert result.exit_code == 0
     assert "No nodes found" in result.output
 

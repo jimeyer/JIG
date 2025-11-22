@@ -90,6 +90,19 @@ def create_test_graph(
         # Add all nodes to index
         index_nodes.append(_build_index_node(node))
 
+    # Build subsystems dict with node lists
+    subsystems_dict = {}
+    if subsystems:
+        # Initialize subsystem structures
+        for subsystem_name in subsystems.keys():
+            subsystems_dict[subsystem_name] = {"nodes": []}
+
+        # Collect nodes by subsystem
+        for node in nodes:
+            subsystem_name = node.get("subsystem")
+            if subsystem_name and subsystem_name in subsystems_dict:
+                subsystems_dict[subsystem_name]["nodes"].append(node["id"])
+
     # Create graph-index.json
     graph_index = {
         "version": "1.0",
@@ -97,9 +110,9 @@ def create_test_graph(
         "nodes": index_nodes,
     }
 
-    # Add subsystems if provided
-    if subsystems:
-        graph_index["subsystems"] = subsystems
+    # Add subsystems if any were created
+    if subsystems_dict:
+        graph_index["subsystems"] = subsystems_dict
 
     graph_index_path = jig_dir / "graph-index.json"
     graph_index_path.write_text(json.dumps(graph_index, indent=2))

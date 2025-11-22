@@ -95,7 +95,7 @@ Simplify JIG's command interface by consolidating validation functionality into 
 - [x] **WU2.2: SPEC Audit - Classify all failures** — tests n/a / docs ✓ / reflect ✓
 - [x] **WU2.3: Create Missing SPECs (if needed)** — tests n/a / docs n/a / reflect n/a (skipped - no SPECs needed)
 - [x] **WU2.4: Root Cause Grouping** — tests n/a / docs ✓ / reflect ✓
-- [ ] **WU2.5: Execute Repairs (batch fixes)** — tests 🔄 (20/85) / docs ✓ / reflect ✓ (IN PROGRESS - Phase 0 done, Phase 1 partial)
+- [ ] **WU2.5: Execute Repairs (batch fixes)** — tests 🔄 (24/85 - 28%) / docs ✓ / reflect ✓ (IN PROGRESS - Phase 0 ✓, Phase 1 partial)
 - [ ] **WU2.6: Validation & Integration** — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Add CLI flags for exit code control — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Remove validate command completely — tests ☐ / docs ☐ / reflect ☐
@@ -1202,16 +1202,18 @@ pytest tests/unit/ -v
 - Update CONTRIBUTING.md with fixture usage examples (if needed)
 
 **Reflect:**
-- Groups fixed: **Phase 0 complete**, Phase 1 in progress (20/24 tests in first file)
-- Tests passing: 20/85 tests (24% - test_graph_commands.py partial)
+- Groups fixed: **Phase 0 complete**, Phase 1 partial (24/55 tests - 1/7 files complete)
+- Tests passing: 24/55 in Group 1 (44% - test_graph_commands.py ✓)
 - Fixture helpers created: `tests/helpers/graph_fixtures.py::create_test_graph()`
 - Challenges encountered:
-  - Helper works for 20/24 tests in first file
-  - Remaining 4 tests need:
-    * Custom markdown body content support
-    * Subsystem filtering edge case handling
-  - Estimated 3-4 hours remaining to complete all 85 tests across 7 files
-- Status: **IN PROGRESS** - WU2.5 requires continuation in next session
+  - Helper successfully fixed all 24 tests in test_graph_commands.py
+  - Fixed subsystem filtering by generating proper subsystems dict with node lists
+  - Remaining 6 files need different approach:
+    * test_graph_traversal.py uses edge-centric format (edges list separate from nodes)
+    * Other files (31 tests) need similar conversions
+  - Estimated 2-3 hours remaining to complete Group 1
+- Status: **IN PROGRESS** - WU2.5.1 partial, requires continuation
+- Progress: test_graph_commands.py (24/24 ✓), 6 files remaining (31 tests pending)
 
 ---
 
