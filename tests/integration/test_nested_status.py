@@ -9,7 +9,16 @@ from click.testing import CliRunner
 
 from jig.cli.graph import graph
 from jig.cli.status import status
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
@@ -42,13 +51,14 @@ def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, s
 
 def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict) -> Path:
     """Helper to create a test graph-index.yaml file with nested subsystems."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
 
 
@@ -60,7 +70,7 @@ def mock_config(tmp_path: Path):
         intent_dir=tmp_path,
         delta_dir=tmp_path / "deltas",
         templates_dir=tmp_path / "templates",
-        graph_index_file=tmp_path / "graph-index.yaml",
+        graph_index_file=tmp_path / "graph-index.json",
         subsystems_file=tmp_path / "subsystems.yaml",
     )
 

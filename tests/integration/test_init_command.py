@@ -1,6 +1,7 @@
 # @jig T-CLI-001 verifies:S-JIG-002 subsystem:core
 """Integration tests for jigy init command."""
 
+import json
 import time
 from pathlib import Path
 
@@ -27,12 +28,14 @@ def test_jigy_init_creates_structure(tmp_path: Path) -> None:
     assert (tmp_path / "jig" / "specifications").is_dir()
     assert (tmp_path / "jig" / "constraints").is_dir()
 
-    # Verify graph-index.yaml created and valid
-    graph_index_file = tmp_path / "jig" / "graph-index.yaml"
+    # Verify graph-index.json created and valid
+    graph_index_file = tmp_path / "jig" / "graph-index.json"
     assert graph_index_file.exists()
-    graph_data = yaml.safe_load(graph_index_file.read_text())
-    assert graph_data["version"] == "1.0"
+    graph_data = json.loads(graph_index_file.read_text())
+    assert graph_data["version"] == "1.0.0"
     assert graph_data["nodes"] == []
+    assert graph_data["edges"] == []
+    assert graph_data["subsystems"] == {}
 
     # Verify subsystems.yaml created and valid
     subsystems_file = tmp_path / "jig" / "subsystems.yaml"
@@ -79,17 +82,17 @@ def test_jigy_init_repairs_missing_components(tmp_path: Path) -> None:
     # Delete some components
     import shutil
     shutil.rmtree(tmp_path / "jig" / "constraints")
-    (tmp_path / "jig" / "graph-index.yaml").unlink()
+    (tmp_path / "jig" / "graph-index.json").unlink()
 
     # Run jigy init again - should repair
     result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
     assert result.exit_code == 0
     assert "✓ Repaired JIG structure" in result.output
     assert "Repaired:" in result.output
-    
+
     # Verify components were restored
     assert (tmp_path / "jig" / "constraints").is_dir()
-    assert (tmp_path / "jig" / "graph-index.yaml").exists()
+    assert (tmp_path / "jig" / "graph-index.json").exists()
 
 
 # @jig T-CLI-003 verifies:S-JIG-001 subsystem:core
@@ -140,19 +143,19 @@ def test_jigy_help() -> None:
 
 
 def test_jigy_init_creates_valid_yaml_files(tmp_path: Path) -> None:
-    """Verify created YAML files are valid and well-formed."""
+    """Verify created JSON/YAML files are valid and well-formed."""
     runner = CliRunner()
 
     result = runner.invoke(cli, ["init", "--path", str(tmp_path)])
     assert result.exit_code == 0
 
-    # Verify graph-index.yaml is valid YAML
-    graph_index_file = tmp_path / "jig" / "graph-index.yaml"
-    graph_yaml = graph_index_file.read_text()
-    assert "version:" in graph_yaml
-    assert "nodes:" in graph_yaml
+    # Verify graph-index.json is valid JSON
+    graph_index_file = tmp_path / "jig" / "graph-index.json"
+    graph_json = graph_index_file.read_text()
+    assert '"version"' in graph_json
+    assert '"nodes"' in graph_json
     # Should parse without errors
-    graph_data = yaml.safe_load(graph_yaml)
+    graph_data = json.loads(graph_json)
     assert isinstance(graph_data, dict)
 
     # Verify subsystems.yaml is valid YAML

@@ -7,7 +7,16 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from jig.cli.graph import graph
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
@@ -46,14 +55,15 @@ def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, s
 
 
 def create_test_graph_index(tmp_path: Path, edges: list[dict[str, str]], subsystems: dict[str, dict[str, list[str]]]) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    """Helper to create a test graph-index.json file."""
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
 
 
@@ -61,6 +71,8 @@ def test_graph_show_displays_node() -> None:
     """Verify show command displays node details."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+
+        setup_test_jig_structure(tmp_path)
 
         # Create a test node
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Test Outcome", "core")
@@ -77,7 +89,7 @@ def test_graph_show_displays_node() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -108,6 +120,8 @@ def test_graph_show_displays_relationships() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create nodes with relationships (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
@@ -135,7 +149,7 @@ def test_graph_show_displays_relationships() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -188,6 +202,8 @@ def test_graph_show_node_not_found() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create a node but request a different one
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_graph_index(tmp_path, [], {})
@@ -203,7 +219,7 @@ def test_graph_show_node_not_found() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -238,7 +254,7 @@ def test_graph_show_not_initialized() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -262,6 +278,8 @@ def test_graph_show_truncates_long_body() -> None:
     """Verify body is truncated after 10 lines."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+
+        setup_test_jig_structure(tmp_path)
 
         # Create node with long body
         node_dir = tmp_path / "outcomes"
@@ -307,7 +325,7 @@ def test_graph_show_truncates_long_body() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -339,6 +357,8 @@ def test_graph_show_colorized_output() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create test nodes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
@@ -359,7 +379,7 @@ def test_graph_show_colorized_output() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 

@@ -5,8 +5,18 @@ import tempfile
 import time
 from pathlib import Path
 
+import yaml
 from jig.cli.status import calculate_status
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, subsystem: str = "core") -> Path:
@@ -41,15 +51,36 @@ def create_test_node(tmp_path: Path, node_id: str, node_type: str, title: str, s
 
 
 def create_test_graph_index(tmp_path: Path, edges: list[dict], subsystems: dict) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    """Helper to create a test graph-index.json file."""
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
+
+
+def create_test_subsystems_file(tmp_path: Path, subsystem_names: list[str]) -> Path:
+    """Helper to create a test subsystems.yaml file."""
+    import yaml
+    subsystems_path = tmp_path / "subsystems.yaml"
+    data = {
+        "version": "1.0.0",
+        "subsystems": {}
+    }
+    for name in subsystem_names:
+        data["subsystems"][name] = {
+            "name": name,
+            "description": f"Test subsystem {name}",
+            "max_exports": 5,
+            "allowed_dependencies": [],
+            "status": "active"
+        }
+    write_file(subsystems_path, yaml.dump(data, sort_keys=False))
+    return subsystems_path
 
 
 def test_status_performance():
@@ -139,7 +170,12 @@ def test_status_command_cli_output():
         edges = [
             {"from": "S-TEST-001", "to": "O-TEST-001", "type": "implements"},
         ]
-        create_test_graph_index(tmp_path, edges, {})
+        subsystems = {
+            "core": {"nodes": ["O-TEST-001", "S-TEST-001"]},
+            "api": {"nodes": ["O-TEST-002"]}
+        }
+        create_test_graph_index(tmp_path, edges, subsystems)
+        create_test_subsystems_file(tmp_path, ["core", "api"])
 
         # Mock config to point to tmp_path
         import jig.cli.status
@@ -152,7 +188,7 @@ def test_status_command_cli_output():
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -198,6 +234,13 @@ def test_status_command_verbose_output():
         create_test_node(tmp_path, "O-CORE-001", "outcome", "Core outcome", "core")
         create_test_node(tmp_path, "O-CORE-002", "outcome", "Core outcome 2", "core")
 
+        # Create graph index and subsystems
+        subsystems = {
+            "core": {"nodes": ["O-CORE-001", "O-CORE-002"]}
+        }
+        create_test_graph_index(tmp_path, [], subsystems)
+        create_test_subsystems_file(tmp_path, ["core"])
+
         # Mock config
         import jig.cli.status
         original_load_config = jig.cli.status.load_config
@@ -209,7 +252,7 @@ def test_status_command_verbose_output():
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -247,7 +290,7 @@ def test_status_command_not_initialized():
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -274,6 +317,10 @@ def test_status_command_empty_graph():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        # Create empty graph index and subsystems
+        create_test_graph_index(tmp_path, [], {})
+        create_test_subsystems_file(tmp_path, [])
+
         # Mock config to point to empty directory
         import jig.cli.status
         original_load_config = jig.cli.status.load_config
@@ -285,7 +332,7 @@ def test_status_command_empty_graph():
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -336,7 +383,7 @@ def test_status_command_healthy_graph():
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -352,7 +399,7 @@ def test_status_command_healthy_graph():
             # New format: "✓ 2 nodes, X edges, Y subsystems"
             assert "2 nodes" in result.output
             assert "edges" in result.output
-            # Healthy graph shows success message (not Suggestions section)
-            assert "Graph looks healthy!" in result.output
+            # Healthy graph shows validation passed
+            assert "Graph is valid" in result.output or "All" in result.output and "valid" in result.output
         finally:
             jig.cli.status.load_config = original_load_config

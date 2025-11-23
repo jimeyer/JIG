@@ -112,7 +112,7 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
     Uses unified graph loading to understand all node types (O/S/X/C/T).
     Markdown nodes (O/S/X) are validated explicitly for format/schema.
     Code and test nodes (C/T) are validated indirectly through successful
-    graph loading from graph-index.yaml.
+    graph loading from graph-index.json.
 
     Args:
         intent_dir: Path to directory containing OSTC nodes
@@ -130,7 +130,7 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
         return ValidationResult(valid=False, errors=errors, warnings=warnings)
 
     # Load complete graph using unified loading logic (S-JIGY-012)
-    # This loads O/S/X from markdown + C/T from graph-index.yaml
+    # This loads O/S/X from markdown + C/T from graph-index.json
     try:
         graph = Graph.load_from_dir(intent_dir)
         all_node_ids = set(graph.nodes.keys())
@@ -174,7 +174,7 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
                 errors.append(f"Failed to parse {node_file}: {e}")
 
     # C/T nodes are validated indirectly - if Graph.load_from_dir() succeeded,
-    # they are valid (their structure is defined in graph-index.yaml)
+    # they are valid (their structure is defined in graph-index.json)
 
     # Check for duplicate node IDs across ALL node types (O/S/X/C/T)
     node_id_counts: dict[str, int] = {}
@@ -185,11 +185,12 @@ def validate_graph(intent_dir: Path) -> ValidationResult:
         if count > 1:
             errors.append(f"Duplicate node ID '{node_id}' found {count} times across graph")
 
-    # Validate graph-index.yaml consistency
-    graph_index_file = intent_dir / "graph-index.yaml"
+    # Validate graph-index.json consistency
+    graph_index_file = intent_dir / "graph-index.json"
     if graph_index_file.exists():
         try:
-            graph_data = yaml.safe_load(graph_index_file.read_text())
+            import json
+            graph_data = json.load(graph_index_file.open())
             if graph_data and "nodes" in graph_data:
                 indexed_ids = {n["id"] for n in graph_data["nodes"] if "id" in n}
 

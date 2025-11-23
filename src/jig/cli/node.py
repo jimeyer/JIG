@@ -1,6 +1,7 @@
 # @jig C-CLI-003 implements:S-JIG-002 subsystem:core interface:public
 """Create OSTC nodes from templates."""
 
+import json
 import re
 import sys
 from datetime import datetime
@@ -236,18 +237,18 @@ def _substitute_placeholders(
 
 
 def _update_graph_index(graph_file: Path, node_id: str, node_type: str) -> None:
-    """Update graph-index.yaml with new node entry.
+    """Update graph-index.json with new node entry.
 
     Args:
-        graph_file: Path to graph-index.yaml
+        graph_file: Path to graph-index.json
         node_id: ID of new node
         node_type: Type of new node
     """
     # Load existing graph index
     if graph_file.exists():
-        graph_data = yaml.safe_load(graph_file.read_text())
+        graph_data = json.loads(graph_file.read_text())
     else:
-        graph_data = {"version": "1.0", "nodes": []}
+        graph_data = {"version": "1.0.0", "nodes": [], "edges": [], "subsystems": {}}
 
     # Add new node entry
     if "nodes" not in graph_data:
@@ -256,4 +257,4 @@ def _update_graph_index(graph_file: Path, node_id: str, node_type: str) -> None:
     graph_data["nodes"].append({"id": node_id, "type": node_type})
 
     # Write updated graph index
-    write_file(graph_file, yaml.dump(graph_data, sort_keys=False))
+    write_file(graph_file, json.dumps(graph_data, indent=2))

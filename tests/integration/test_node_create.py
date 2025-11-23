@@ -1,6 +1,7 @@
 # @jig T-CLI-004 verifies:S-JIG-002 subsystem:core
 """Integration tests for jigy node create command."""
 
+import json
 import os
 import time
 from collections.abc import Iterator
@@ -67,8 +68,8 @@ def test_jigy_node_create_outcome(tmp_path: Path) -> None:
     assert node.subsystem == "core"
 
     # Verify graph-index updated
-    graph_file = tmp_path / "jig" / "graph-index.yaml"
-    graph_data = yaml.safe_load(graph_file.read_text())
+    graph_file = tmp_path / "jig" / "graph-index.json"
+    graph_data = json.loads(graph_file.read_text())
     assert any(n["id"] == "O-TEST-001" for n in graph_data["nodes"])
 
 
@@ -368,8 +369,8 @@ def test_jigy_node_create_updates_graph_index(tmp_path: Path) -> None:
             assert result.exit_code == 0
 
     # Verify all nodes in graph index
-    graph_file = tmp_path / "jig" / "graph-index.yaml"
-    graph_data = yaml.safe_load(graph_file.read_text())
+    graph_file = tmp_path / "jig" / "graph-index.json"
+    graph_data = json.loads(graph_file.read_text())
 
     assert len(graph_data["nodes"]) == 3
     node_ids = [n["id"] for n in graph_data["nodes"]]

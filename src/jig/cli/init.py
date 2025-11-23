@@ -1,6 +1,7 @@
 # @jig C-CLI-002 implements:S-CLI-003,S-CLI-004,S-CLI-005 subsystem:cli interface:public
 """Initialize JIG directory structure in a project."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -50,11 +51,11 @@ def init(path: str) -> None:
                 target_list = repaired if already_initialized else created
                 target_list.append(str(dir_path))
 
-        # Create/verify graph-index.yaml
-        graph_index_path = jig_dir / "graph-index.yaml"
+        # Create/verify graph-index.json
+        graph_index_path = jig_dir / "graph-index.json"
         if not graph_index_path.exists():
-            graph_index = {"version": "1.0", "nodes": []}
-            write_file(graph_index_path, yaml.dump(graph_index, sort_keys=False))
+            graph_index = {"version": "1.0.0", "nodes": [], "edges": [], "subsystems": {}}
+            write_file(graph_index_path, json.dumps(graph_index, indent=2))
             target_list = repaired if already_initialized else created
             target_list.append(str(graph_index_path))
 
@@ -105,7 +106,7 @@ build/
                     "intent_dir": "jig",
                     "delta_dir": "jig/deltas",
                     "templates_dir": "templates",
-                    "graph_index_file": "jig/graph-index.yaml",
+                    "graph_index_file": "jig/graph-index.json",
                     "subsystems_file": "jig/subsystems.yaml",
                 }
             }

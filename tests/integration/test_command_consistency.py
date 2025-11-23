@@ -143,7 +143,7 @@ def test_validate_status_index_consistency(tmp_path: Path) -> None:
         id: S-TEST-003
         type: specification
         title: "Test Spec 3"
-        subsystem: core.security
+        subsystem: security
         status: active
         implements:
           - O-TEST-001

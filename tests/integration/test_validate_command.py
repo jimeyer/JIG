@@ -24,6 +24,14 @@ def chdir(path: Path) -> Iterator[None]:
         os.chdir(original_dir)
 
 
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
+
+
 def test_jigy_validate_all_valid(tmp_path: Path) -> None:
     """Verify jigy validate passes for valid graph."""
     runner = CliRunner()
@@ -257,10 +265,11 @@ def test_jigy_validate_graph_index_nonexistent_node(tmp_path: Path) -> None:
         assert result.exit_code == 0
 
     # Manually add non-existent node to graph index
-    graph_index_file = tmp_path / "jig" / "graph-index.yaml"
-    graph_data = yaml.safe_load(graph_index_file.read_text())
+    import json
+    graph_index_file = tmp_path / "jig" / "graph-index.json"
+    graph_data = json.loads(graph_index_file.read_text())
     graph_data["nodes"].append({"id": "O-MISSING-001", "type": "outcome"})
-    graph_index_file.write_text(yaml.dump(graph_data))
+    graph_index_file.write_text(json.dumps(graph_data, indent=2))
 
     with chdir(tmp_path):
         result = runner.invoke(cli, ["validate"])
@@ -430,7 +439,7 @@ def test_validate_command_no_false_errors() -> None:
     This integration test verifies that running jigy validate on the actual
     jig codebase does not report C/T nodes as non-existent. The codebase has
     many C and T nodes discovered via @jig annotations that exist in
-    graph-index.yaml but not as markdown files.
+    graph-index.json but not as markdown files.
     """
     runner = CliRunner()
 

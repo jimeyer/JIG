@@ -8,7 +8,15 @@ from pathlib import Path
 from click.testing import CliRunner
 
 from jig.cli.graph import graph
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(
@@ -49,14 +57,15 @@ def create_test_graph_index(
     edges: list[dict[str, str]],
     subsystems: dict[str, dict[str, list[str]]],
 ) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    """Helper to create a test graph-index.json file."""
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
 
 
@@ -64,6 +73,7 @@ def test_graph_deps_shows_tree() -> None:
     """Verify deps shows dependency tree."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
@@ -89,7 +99,7 @@ def test_graph_deps_shows_tree() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -117,6 +127,7 @@ def test_graph_deps_handles_cycles() -> None:
     """Verify cycle detection in dependency tree."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create a cycle: S-001 -> O-001 -> S-001
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
@@ -141,7 +152,7 @@ def test_graph_deps_handles_cycles() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -165,6 +176,7 @@ def test_graph_impact_shows_dependents() -> None:
     """Verify impact shows what depends on node."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create: O-001 <- S-001 <- T-001
         #                 <- S-002
@@ -193,7 +205,7 @@ def test_graph_impact_shows_dependents() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -222,6 +234,7 @@ def test_graph_deps_performance() -> None:
     """Verify deps completes in <200ms for 100 nodes."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create a chain of 100 nodes
         edges = []
@@ -261,7 +274,7 @@ def test_graph_deps_performance() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -287,6 +300,7 @@ def test_graph_deps_no_dependencies() -> None:
     """Verify deps handles nodes with no dependencies."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create a node with no dependencies
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
@@ -305,7 +319,7 @@ def test_graph_deps_no_dependencies() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -331,6 +345,7 @@ def test_graph_impact_no_dependents() -> None:
     """Verify impact handles nodes with no dependents."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create a node with no dependents (using O/S/C nodes)
         create_test_node(tmp_path, "C-TEST-001", "constraint", "Constraint 1", "core")
@@ -349,7 +364,7 @@ def test_graph_impact_no_dependents() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -371,6 +386,7 @@ def test_graph_deps_node_not_found() -> None:
     """Verify error when node not found."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_graph_index(tmp_path, [], {})
@@ -388,7 +404,7 @@ def test_graph_deps_node_not_found() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -411,6 +427,7 @@ def test_graph_impact_node_not_found() -> None:
     """Verify error when node not found."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_graph_index(tmp_path, [], {})
@@ -428,7 +445,7 @@ def test_graph_impact_node_not_found() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 

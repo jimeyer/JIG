@@ -8,7 +8,16 @@ import yaml
 from click.testing import CliRunner
 
 from jig.cli.graph import graph
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(
@@ -49,14 +58,15 @@ def create_test_graph_index(
     edges: list[dict[str, str]],
     subsystems: dict[str, dict[str, list[str]]],
 ) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    """Helper to create a test graph-index.json file."""
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
 
 
@@ -64,6 +74,8 @@ def test_graph_path_finds_route() -> None:
     """Verify path command finds route between nodes."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+
+        setup_test_jig_structure(tmp_path)
 
         # Create a chain: C-001 -> S-001 -> O-001 (using O/S/C nodes)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
@@ -89,7 +101,7 @@ def test_graph_path_finds_route() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -114,6 +126,8 @@ def test_graph_path_no_route() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create disconnected nodes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
@@ -134,7 +148,7 @@ def test_graph_path_no_route() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -158,6 +172,8 @@ def test_graph_list_all_nodes() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create mixed nodes (O/S/C - test nodes not loaded from markdown)
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
@@ -178,7 +194,7 @@ def test_graph_list_all_nodes() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -210,6 +226,8 @@ def test_graph_list_filter_by_type() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create mixed nodes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
@@ -230,7 +248,7 @@ def test_graph_list_filter_by_type() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -256,6 +274,8 @@ def test_graph_list_filter_by_subsystem() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create nodes in different subsystems
         create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
         create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI Outcome", "cli")
@@ -275,7 +295,7 @@ def test_graph_list_filter_by_subsystem() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -301,6 +321,8 @@ def test_graph_list_yaml_output() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create test nodes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "S-TEST-001", "specification", "Spec 1", "core")
@@ -320,7 +342,7 @@ def test_graph_list_yaml_output() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -356,6 +378,8 @@ def test_graph_path_same_node() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_graph_index(tmp_path, [], {})
 
@@ -372,7 +396,7 @@ def test_graph_path_same_node() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -395,6 +419,8 @@ def test_graph_path_node_not_found() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_graph_index(tmp_path, [], {})
 
@@ -411,7 +437,7 @@ def test_graph_path_node_not_found() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -441,6 +467,8 @@ def test_graph_list_empty_result() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create only outcomes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
 
@@ -459,7 +487,7 @@ def test_graph_list_empty_result() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -482,6 +510,8 @@ def test_graph_list_combined_filters() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create diverse nodes
         create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
         create_test_node(tmp_path, "O-CLI-001", "outcome", "CLI Outcome", "cli")
@@ -502,7 +532,7 @@ def test_graph_list_combined_filters() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -530,6 +560,8 @@ def test_graph_list_compact_format() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create diverse nodes
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
         create_test_node(tmp_path, "O-TEST-002", "outcome", "Outcome 2", "core")
@@ -551,7 +583,7 @@ def test_graph_list_compact_format() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -584,6 +616,8 @@ def test_graph_list_compact_with_subsystem_filter() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create nodes in different subsystems
         create_test_node(tmp_path, "O-CORE-001", "outcome", "Core Outcome", "core")
         create_test_node(tmp_path, "O-CORE-002", "outcome", "Core Outcome 2", "core")
@@ -604,7 +638,7 @@ def test_graph_list_compact_with_subsystem_filter() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 
@@ -636,6 +670,8 @@ def test_graph_list_default_format_is_table() -> None:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
 
+        setup_test_jig_structure(tmp_path)
+
         # Create test node
         create_test_node(tmp_path, "O-TEST-001", "outcome", "Outcome 1", "core")
 
@@ -654,7 +690,7 @@ def test_graph_list_default_format_is_table() -> None:
                 intent_dir=tmp_path,
                 delta_dir=tmp_path / "deltas",
                 templates_dir=tmp_path / "templates",
-                graph_index_file=tmp_path / "graph-index.yaml",
+                graph_index_file=tmp_path / "graph-index.json",
                 subsystems_file=tmp_path / "subsystems.yaml",
             )
 

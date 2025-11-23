@@ -140,9 +140,9 @@ def calculate_status(intent_dir: Path) -> StatusData:
         if node_id not in nodes_with_subsystem
     ]
 
-    # Check for missing graph-index.yaml
+    # Check for missing graph-index.json
     validation_errors = []
-    graph_index_path = intent_dir / "graph-index.yaml"
+    graph_index_path = intent_dir / "graph-index.json"
     if not graph_index_path.exists() and total_nodes > 0:
         validation_errors.append(
             f"Warning: {graph_index_path} not found. "
@@ -353,10 +353,10 @@ def format_status_output(status_data: StatusData, verbose: bool, flat: bool = Fa
         )
         suggestions.append(format_suggestion(suggestion_text))
 
-    # Suggest creating graph-index.yaml if missing
-    if "graph-index.yaml not found" in str(status_data.validation_errors):
+    # Suggest creating graph-index.json if missing
+    if "graph-index.json not found" in str(status_data.validation_errors):
         suggestions.append(
-            format_suggestion("Create graph-index.yaml to define relationships and subsystems")
+            format_suggestion("Create graph-index.json to define relationships and subsystems")
         )
 
     # Suggest running validate

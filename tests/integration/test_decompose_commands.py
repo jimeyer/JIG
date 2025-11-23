@@ -8,7 +8,15 @@ from textwrap import dedent
 from click.testing import CliRunner
 
 from jig.cli.decompose import decompose
-from jig.utils.yaml_utils import dump_yaml
+from jig.utils.io import write_file
+import json
+
+
+def setup_test_jig_structure(tmp_path: Path) -> None:
+    """Create standard JIG directory structure for tests."""
+    (tmp_path / "outcomes").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "specifications").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "constraints").mkdir(parents=True, exist_ok=True)
 
 
 def create_test_node(
@@ -44,14 +52,15 @@ def create_test_node(
 def create_test_graph_index(
     tmp_path: Path, edges: list[dict], subsystems: dict
 ) -> Path:
-    """Helper to create a test graph-index.yaml file."""
-    graph_index_path = tmp_path / "graph-index.yaml"
+    """Helper to create a test graph-index.json file."""
+    graph_index_path = tmp_path / "graph-index.json"
     data = {
         "version": "1.0.0",
+        "nodes": [],
         "edges": edges,
         "subsystems": subsystems,
     }
-    dump_yaml(data, graph_index_path)
+    write_file(graph_index_path, json.dumps(data, indent=2))
     return graph_index_path
 
 
@@ -64,7 +73,7 @@ def mock_config(tmp_path: Path):
         intent_dir=tmp_path,
         delta_dir=tmp_path / "deltas",
         templates_dir=tmp_path / "templates",
-        graph_index_file=tmp_path / "graph-index.yaml",
+        graph_index_file=tmp_path / "graph-index.json",
         subsystems_file=tmp_path / "subsystems.yaml",
     )
 
@@ -73,6 +82,7 @@ def test_decompose_metrics_overall() -> None:
     """Test decompose metrics command with overall graph."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create test nodes in two subsystems
         create_test_node(tmp_path, "O-A-001", "outcome", "A1", "subsystem_a")
@@ -119,6 +129,7 @@ def test_decompose_metrics_specific_subsystem() -> None:
     """Test decompose metrics with --subsystem option."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create nested subsystem structure
         create_test_node(tmp_path, "O-SER-001", "outcome", "Serialization", "crdt.ser")
@@ -167,6 +178,7 @@ def test_decompose_metrics_hierarchical_coupling() -> None:
     """Test coupling ratio aggregates child metrics correctly."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create parent with two children
         create_test_node(tmp_path, "O-C1-001", "outcome", "C1-1", "parent.child1")
@@ -219,6 +231,7 @@ def test_decompose_metrics_excludes_constraint_edges() -> None:
     """Test that constraint edges are excluded from coupling metrics."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "S-001", "specification", "Spec", "core")
         create_test_node(tmp_path, "X-001", "constraint", "Constraint", "core")
@@ -261,6 +274,7 @@ def test_decompose_report_generates_markdown() -> None:
     """Test decompose report command generates markdown."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         # Create simple graph
         create_test_node(tmp_path, "O-001", "outcome", "Test", "core")
@@ -292,6 +306,7 @@ def test_decompose_report_outputs_to_file() -> None:
     """Test decompose report writes to file."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "O-001", "outcome", "Test", "core")
         subsystems = {"core": {"nodes": ["O-001"]}}
@@ -324,6 +339,7 @@ def test_decompose_metrics_nonexistent_subsystem() -> None:
     """Test metrics command handles nonexistent subsystem."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "O-001", "outcome", "Test", "core")
         subsystems = {"core": {"nodes": ["O-001"]}}
@@ -350,6 +366,7 @@ def test_decompose_metrics_yaml_output() -> None:
     """Test metrics command with YAML output."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
+        setup_test_jig_structure(tmp_path)
 
         create_test_node(tmp_path, "O-001", "outcome", "Test", "core")
         create_test_node(tmp_path, "O-002", "outcome", "Test2", "core")
