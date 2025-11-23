@@ -3,6 +3,8 @@ id: S-JIG-001
 type: specification
 title: "Marker extraction processes 1000 files in <1s"
 subsystem: core
+implements:
+  - O-JIG-001
 created: 2025-11-18
 ---
 

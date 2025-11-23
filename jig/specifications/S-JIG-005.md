@@ -3,6 +3,8 @@ id: S-JIG-005
 type: specification
 title: "Test nodes discovered via @jig annotations"
 subsystem: core
+implements:
+  - O-JIG-002
 created: 2025-11-20
 ---
 

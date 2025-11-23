@@ -3,6 +3,8 @@ id: S-JIG-006
 type: specification
 title: "Graph loads O/S/X markdown nodes only"
 subsystem: core
+implements:
+  - O-JIG-002
 created: 2025-11-20
 ---
 

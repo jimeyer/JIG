@@ -1,6 +1,6 @@
 # @jig C-STATUS-001 implements:S-GRAPH-001 subsystem:core interface:public
 # @jig C-CLI-010 implements:S-CLI-007 subsystem:cli interface:public
-# @jig C-CLI-012 implements:S-CLI-022 subsystem:cli interface:public
+# @jig C-CLI-015 implements:S-CLI-022 subsystem:cli interface:public
 """Status command for JIG graph health monitoring."""
 
 import sys

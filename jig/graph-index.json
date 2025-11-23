@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated": "2025-11-22T16:02:26.675487+00:00",
+  "generated": "2025-11-23T22:02:13.622534+00:00",
   "nodes": [
     {
       "id": "C-CLI-001",
@@ -122,6 +122,18 @@
       "line": 15,
       "implements": [
         "S-CLI-006"
+      ]
+    },
+    {
+      "id": "C-CLI-015",
+      "type": "code",
+      "title": "C-CLI-015",
+      "subsystem": "cli",
+      "status": "active",
+      "file": "/Users/jamesmeyer/Code/jig/src/jig/cli/status.py",
+      "line": 3,
+      "implements": [
+        "S-CLI-022"
       ]
     },
     {
@@ -265,7 +277,7 @@
       "subsystem": "jigy-tool",
       "status": "active",
       "file": "/Users/jamesmeyer/Code/jig/src/jig/core/validator.py",
-      "line": 253,
+      "line": 254,
       "implements": [
         "S-JIGY-004"
       ]
@@ -337,7 +349,7 @@
       "subsystem": "core",
       "status": "active",
       "file": "/Users/jamesmeyer/Code/jig/src/jig/core/validator.py",
-      "line": 342,
+      "line": 343,
       "implements": [
         "S-NESTED-005"
       ]
@@ -349,7 +361,7 @@
       "subsystem": "core",
       "status": "active",
       "file": "/Users/jamesmeyer/Code/jig/src/jig/cli/status.py",
-      "line": 21,
+      "line": 23,
       "implements": [
         "S-NESTED-003"
       ]
@@ -531,12 +543,23 @@
       "file": "jig/outcomes/O-JIGY-004.md"
     },
     {
+      "id": "O-TEST-001",
+      "type": "outcome",
+      "title": "Test fixtures support graph validation and testing",
+      "subsystem": "test-fixtures",
+      "status": "test-fixture",
+      "file": "jig/outcomes/O-TEST-001.md"
+    },
+    {
       "id": "S-AUTH-001",
       "type": "specification",
       "title": "JWT token authentication (test fixture)",
       "subsystem": "test-fixtures",
       "status": "test-fixture",
-      "file": "jig/specifications/S-AUTH-001.md"
+      "file": "jig/specifications/S-AUTH-001.md",
+      "implements": [
+        "O-TEST-001"
+      ]
     },
     {
       "id": "S-AUTH-002",
@@ -544,7 +567,10 @@
       "title": "JWT token refresh mechanism (test fixture)",
       "subsystem": "test-fixtures",
       "status": "test-fixture",
-      "file": "jig/specifications/S-AUTH-002.md"
+      "file": "jig/specifications/S-AUTH-002.md",
+      "implements": [
+        "O-TEST-001"
+      ]
     },
     {
       "id": "S-CLI-003",
@@ -584,28 +610,43 @@
       "type": "specification",
       "title": "Standard Formatting Library for CLI Output",
       "subsystem": "cli",
-      "file": "jig/specifications/S-CLI-006.md"
+      "file": "jig/specifications/S-CLI-006.md",
+      "implements": [
+        "O-CLI-003"
+      ]
     },
     {
       "id": "S-CLI-007",
       "type": "specification",
       "title": "Status Command Output Format",
       "subsystem": "cli",
-      "file": "jig/specifications/S-CLI-007.md"
+      "file": "jig/specifications/S-CLI-007.md",
+      "implements": [
+        "O-CLI-003",
+        "O-CLI-005"
+      ]
     },
     {
       "id": "S-CLI-008",
       "type": "specification",
       "title": "Validate Command Output Format",
       "subsystem": "cli",
-      "file": "jig/specifications/S-CLI-008.md"
+      "file": "jig/specifications/S-CLI-008.md",
+      "implements": [
+        "O-CLI-003",
+        "O-CLI-004"
+      ]
     },
     {
       "id": "S-CLI-009",
       "type": "specification",
       "title": "Graph Command Output Format",
       "subsystem": "cli",
-      "file": "jig/specifications/S-CLI-009.md"
+      "file": "jig/specifications/S-CLI-009.md",
+      "implements": [
+        "O-CLI-003",
+        "O-CLI-005"
+      ]
     },
     {
       "id": "S-CLI-022",
@@ -694,42 +735,62 @@
       "type": "specification",
       "title": "Marker extraction processes 1000 files in <1s",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-001.md"
+      "file": "jig/specifications/S-JIG-001.md",
+      "implements": [
+        "O-JIG-001"
+      ]
     },
     {
       "id": "S-JIG-002",
       "type": "specification",
       "title": "OSTC nodes use YAML frontmatter + Markdown",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-002.md"
+      "file": "jig/specifications/S-JIG-002.md",
+      "implements": [
+        "O-JIG-002",
+        "O-JIG-004"
+      ]
     },
     {
       "id": "S-JIG-003",
       "type": "specification",
       "title": "Commands output valid YAML",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-003.md"
+      "file": "jig/specifications/S-JIG-003.md",
+      "implements": [
+        "O-JIG-002",
+        "O-JIG-003"
+      ]
     },
     {
       "id": "S-JIG-004",
       "type": "specification",
       "title": "Subsystems export <5 interfaces",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-004.md"
+      "file": "jig/specifications/S-JIG-004.md",
+      "implements": [
+        "O-JIG-005"
+      ]
     },
     {
       "id": "S-JIG-005",
       "type": "specification",
       "title": "Test nodes discovered via @jig annotations",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-005.md"
+      "file": "jig/specifications/S-JIG-005.md",
+      "implements": [
+        "O-JIG-002"
+      ]
     },
     {
       "id": "S-JIG-006",
       "type": "specification",
       "title": "Graph loads O/S/X markdown nodes only",
       "subsystem": "core",
-      "file": "jig/specifications/S-JIG-006.md"
+      "file": "jig/specifications/S-JIG-006.md",
+      "implements": [
+        "O-JIG-002"
+      ]
     },
     {
       "id": "S-JIGY-001",
@@ -929,7 +990,10 @@
       "title": "Constraint scopes with nested subsystem paths",
       "subsystem": "core",
       "status": "active",
-      "file": "jig/specifications/S-NESTED-006.md"
+      "file": "jig/specifications/S-NESTED-006.md",
+      "depends_on": [
+        "S-NESTED-002"
+      ]
     },
     {
       "id": "S-TEST-001",
@@ -937,7 +1001,10 @@
       "title": "Generic test specification for fixtures and examples",
       "subsystem": "test-fixtures",
       "status": "test-fixture",
-      "file": "jig/specifications/S-TEST-001.md"
+      "file": "jig/specifications/S-TEST-001.md",
+      "implements": [
+        "O-TEST-001"
+      ]
     }
   ],
   "subsystems": {
@@ -989,6 +1056,7 @@
         "C-CLI-012",
         "C-CLI-013",
         "C-CLI-014",
+        "C-CLI-015",
         "O-CLI-001",
         "O-CLI-002",
         "O-CLI-003",
@@ -1051,6 +1119,7 @@
     },
     "test-fixtures": {
       "nodes": [
+        "O-TEST-001",
         "S-AUTH-001",
         "S-AUTH-002",
         "S-TEST-001"

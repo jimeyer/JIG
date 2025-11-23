@@ -4,6 +4,8 @@ type: specification
 title: Generic test specification for fixtures and examples
 subsystem: test-fixtures
 status: test-fixture
+implements:
+  - O-TEST-001
 created: 2025-11-21
 ---
 

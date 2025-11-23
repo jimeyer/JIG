@@ -3,6 +3,9 @@ id: S-JIG-002
 type: specification
 title: "OSTC nodes use YAML frontmatter + Markdown"
 subsystem: core
+implements:
+  - O-JIG-002
+  - O-JIG-004
 created: 2025-11-18
 ---
 

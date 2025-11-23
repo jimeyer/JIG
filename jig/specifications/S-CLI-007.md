@@ -3,6 +3,9 @@ id: S-CLI-007
 type: specification
 title: "Status Command Output Format"
 subsystem: cli
+implements:
+  - O-CLI-003
+  - O-CLI-005
 created: 2025-11-21
 ---
 

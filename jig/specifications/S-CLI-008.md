@@ -3,6 +3,9 @@ id: S-CLI-008
 type: specification
 title: "Validate Command Output Format"
 subsystem: cli
+implements:
+  - O-CLI-003
+  - O-CLI-004
 created: 2025-11-21
 ---
 

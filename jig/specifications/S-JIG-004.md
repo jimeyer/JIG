@@ -3,6 +3,8 @@ id: S-JIG-004
 type: specification
 title: "Subsystems export <5 interfaces"
 subsystem: core
+implements:
+  - O-JIG-005
 created: 2025-11-18
 ---
 

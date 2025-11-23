@@ -3,6 +3,9 @@ id: S-JIG-003
 type: specification
 title: "Commands output valid YAML"
 subsystem: core
+implements:
+  - O-JIG-002
+  - O-JIG-003
 created: 2025-11-18
 ---
 

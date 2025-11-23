@@ -3,6 +3,8 @@ id: S-CLI-006
 type: specification
 title: "Standard Formatting Library for CLI Output"
 subsystem: cli
+implements:
+  - O-CLI-003
 created: 2025-11-21
 ---
 

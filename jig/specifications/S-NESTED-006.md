@@ -4,6 +4,8 @@ type: specification
 title: Constraint scopes with nested subsystem paths
 subsystem: core
 status: active
+depends_on:
+  - S-NESTED-002
 created: 2025-11-21
 ---
 
