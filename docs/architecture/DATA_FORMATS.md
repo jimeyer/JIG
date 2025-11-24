@@ -595,7 +595,7 @@ These formats satisfy JIG's core constraints:
 - [YAML Specification](https://yaml.org/spec/1.2/spec.html)
 - [Markdown Specification (CommonMark)](https://commonmark.org/)
 - [python-frontmatter](https://python-frontmatter.readthedocs.io/)
-- [JIG Concept v6.1](../jig-concept/JIG-Concept-v6.1.md)
+- [JIG Concept v6.1](J011-JIG-Concept-v6.1.md)
 
 ---
 

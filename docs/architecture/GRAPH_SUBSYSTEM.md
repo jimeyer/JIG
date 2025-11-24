@@ -804,7 +804,7 @@ Tests cover:
 - [User Guide](../user-guide/NESTED_SUBSYSTEMS.md) - Concepts and usage
 - [Migration Guide](../user-guide/MIGRATION_NESTED.md) - Flat to nested migration
 - [Tutorial](../tutorials/NESTED_SUBSYSTEMS_TUTORIAL.md) - Hands-on example
-- [JIG Concept v7](../jig-concept/JIG-Concept-v7.md) - OSTCX model
+- [JIG Concept v7](J013-JIG-Concept-v7.md) - OSTCX model
 - [Data Formats](DATA_FORMATS.md) - File format specifications
 
 ---

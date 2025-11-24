@@ -661,7 +661,7 @@ rm -rf jig-tutorial
 - [User Guide](../user-guide/NESTED_SUBSYSTEMS.md) - Complete nested subsystems guide
 - [Migration Guide](../user-guide/MIGRATION_NESTED.md) - Flat to nested migration
 - [Architecture](../architecture/GRAPH_SUBSYSTEM.md) - Implementation details
-- [JIG Concept v7](../jig-concept/JIG-Concept-v7.md) - OSTCX model
+- [JIG Concept v7](J013-JIG-Concept-v7.md) - OSTCX model
 
 ---
 

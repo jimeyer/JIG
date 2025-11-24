@@ -572,7 +572,7 @@ Use `jigy status --flat` to view nested subsystems in flat format.
 - [Migration Guide](MIGRATION_NESTED.md) - Step-by-step migration from flat to nested
 - [Tutorial](../tutorials/NESTED_SUBSYSTEMS_TUTORIAL.md) - Hands-on example with sample project
 - [Architecture](../architecture/GRAPH_SUBSYSTEM.md) - Implementation details
-- [JIG Concept v7](../jig-concept/JIG-Concept-v7.md) - OSTCX model with nested subsystems
+- [JIG Concept v7](J013-JIG-Concept-v7.md) - OSTCX model with nested subsystems
 - [Data Formats](../architecture/DATA_FORMATS.md) - File format specifications
 
 ---
