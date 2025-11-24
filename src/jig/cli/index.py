@@ -168,3 +168,6 @@ def diff(project_dir: Path) -> None:
         if result.validation_errors:
             click.echo(f"  • {len(result.validation_errors)} validation errors")
 
+
+
+

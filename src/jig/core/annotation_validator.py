@@ -366,3 +366,6 @@ def validate_annotations(project_root: Path, strict: bool = False) -> Validation
     validator = AnnotationValidator(project_root)
     return validator.validate(strict=strict)
 
+
+
+

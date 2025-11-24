@@ -238,7 +238,7 @@ The agent builds _inside_ the Brick, and the AG ensures correctness.
 
 ## 6. Alignment Between Intent, Code, and Tests
 
-The AG allows us to compute alignment and drift.
+The AG (Alignment Graph) allows us to compute alignment and drift.
 
 ### 6.1 Brick → Intent Alignment
 
