@@ -1,0 +1,78 @@
+# Index Builder Brick
+brick:
+  id: BRICK-INDEX
+  name: "Index Builder"
+  version: "1.0.0"
+  layer: analysis
+
+responsibility: |
+  Build graph-index.json from multiple sources.
+  Discovers markdown nodes from jig/ directory,
+  discovers code/test nodes from @jig annotations,
+  merges nodes from multiple sources, detects ID conflicts,
+  builds subsystem hierarchy from node metadata,
+  and generates graph-index.json.
+
+interface:
+  public:
+    - class: RebuildResult
+      fields:
+        - success: bool
+        - nodes_discovered: int
+        - conflicts: list[str]
+        - errors: list[str]
+    - class: IndexBuilder
+      methods:
+        - discover_markdown_nodes() -> list[OSTCNode]
+        - discover_annotation_nodes() -> list[OSTCNode]
+        - build() -> RebuildResult
+        - save(path: Path) -> None
+    - function: build_graph_index(project_root: Path) -> RebuildResult
+    - function: detect_conflicts(nodes: list[OSTCNode]) -> list[str]
+    - function: merge_nodes(nodes: list[OSTCNode]) -> tuple[dict, list[str]]
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-PARSER
+    - BRICK-SCANNER
+    - BRICK-GRAPH
+    - BRICK-UTILS
+  external:
+    - json
+
+code:
+  paths:
+    - src/jig/core/index_builder.py
+  loc: 530
+
+tests:
+  paths:
+    - tests/unit/test_index_rebuild.py
+    - tests/unit/test_graph_index_loading.py
+    - tests/unit/test_node_registry.py
+  count: 32
+  coverage: 80%
+
+intent:
+  outcomes:
+    - O-INDEX-001
+  specifications:
+    - S-INDEX-001
+    - S-CLI-023
+  notes: |
+    Maps to index-related intent nodes.
+    Could use more detailed specifications for conflict resolution.
+
+metrics:
+  coupling_ratio: "6:1"
+  test_coverage: 80%
+  cyclomatic_complexity: medium
+
+health:
+  score: good
+  status: stable
+  last_review: 2025-11-22
+  notes: Clear orchestration responsibility, good integration of parser and scanner

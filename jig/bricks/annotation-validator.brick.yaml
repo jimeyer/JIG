@@ -1,0 +1,62 @@
+# Annotation Validator Brick
+brick:
+  id: BRICK-ANNOT-VALIDATOR
+  name: "Annotation Validator"
+  version: "1.0.0"
+  layer: analysis
+
+responsibility: |
+  Validate @jig annotations against Intent graph.
+  Loads Intent graph, scans for annotations,
+  validates node IDs exist in graph, checks annotation relationships,
+  reports orphan annotations, and verifies annotation metadata.
+
+interface:
+  public:
+    - class: AnnotationValidator
+      methods:
+        - validate() -> ValidationResult
+    - function: validate_annotations(project_root: Path, strict: bool = False) -> ValidationResult
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-SCANNER
+    - BRICK-GRAPH
+    - BRICK-PARSER
+  external:
+    - re
+
+code:
+  paths:
+    - src/jig/core/annotation_validator.py
+  loc: 368
+
+tests:
+  paths:
+    - tests/unit/test_annotation_validation.py
+  count: 24
+  coverage: 85%
+
+intent:
+  outcomes:
+    - O-CLI-004
+  specifications:
+    - S-CLI-009
+    - S-ANNOTATION-001
+  notes: |
+    Maps to annotation validation intent nodes.
+    Clear cross-layer validation responsibilities.
+
+metrics:
+  coupling_ratio: "8:1"
+  test_coverage: 85%
+  cyclomatic_complexity: medium
+
+health:
+  score: good
+  status: stable
+  last_review: 2025-11-22
+  notes: Clear cross-layer validation, good integration of scanner and graph

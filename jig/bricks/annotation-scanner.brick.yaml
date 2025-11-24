@@ -1,0 +1,70 @@
+# Annotation Scanner Brick
+brick:
+  id: BRICK-SCANNER
+  name: "Annotation Scanner"
+  version: "1.0.0"
+  layer: analysis
+
+responsibility: |
+  Fast scanning of @jig annotations in source files.
+  Parses @jig annotation syntax, scans individual files and directories,
+  respects .jigignore patterns, detects duplicate annotations,
+  and extracts node IDs and metadata.
+
+interface:
+  public:
+    - class: Annotation
+      fields:
+        - node_id: str
+        - file_path: Path
+        - line_number: int
+        - annotation_type: str
+        - metadata: dict[str, Any]
+    - class: AnnotationScanner
+      methods:
+        - scan_file(path: Path) -> list[Annotation]
+        - scan_directory(path: Path) -> list[Annotation]
+        - scan(paths: list[Path]) -> list[Annotation]
+        - find_duplicates() -> dict[str, list[Annotation]]
+    - function: parse_annotation_line(line: str) -> Annotation | None
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-CONFIG
+  external:
+    - re
+
+code:
+  paths:
+    - src/jig/core/scanner.py
+  loc: 301
+
+tests:
+  paths:
+    - tests/unit/test_annotation_scanner.py
+  count: 28
+  coverage: 90%
+
+intent:
+  outcomes:
+    - O-CLI-003
+  specifications:
+    - S-CLI-008
+    - S-SCANNER-001
+  notes: |
+    Maps to scanner-related intent nodes.
+    Highly cohesive single-purpose component.
+
+metrics:
+  coupling_ratio: "15:1"
+  test_coverage: 90%
+  cyclomatic_complexity: low
+
+health:
+  score: excellent
+  status: stable
+  last_review: 2025-11-22
+  notes: Highly cohesive, single purpose, excellent test coverage

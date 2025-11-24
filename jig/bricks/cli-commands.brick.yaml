@@ -1,0 +1,111 @@
+# CLI Commands Brick
+brick:
+  id: BRICK-CLI
+  name: "CLI Commands"
+  version: "1.0.0"
+  layer: interface
+
+responsibility: |
+  Command-line interface and user interaction.
+  Implements all jigy commands, formats output for terminal,
+  handles user input, orchestrates core operations,
+  generates reports, and provides error handling and feedback.
+
+interface:
+  public:
+    - function: cli() -> None
+    - function: init(path: str) -> None
+    - function: validate() -> None
+    - function: status() -> None
+    - function: node() -> None
+    - function: graph() -> None
+    - function: index() -> None
+    - function: decompose() -> None
+
+  stability: evolving
+  versioning: semver
+  notes: |
+    Public interface includes all Click command decorators.
+    This is the orchestration layer, so interfaces may evolve as commands are added.
+
+dependencies:
+  bricks:
+    - BRICK-UTILS
+    - BRICK-CONFIG
+    - BRICK-PARSER
+    - BRICK-VALIDATOR
+    - BRICK-GRAPH
+    - BRICK-INDEX
+    - BRICK-SCANNER
+    - BRICK-ANNOT-VALIDATOR
+    - BRICK-DECOMPOSE
+  external:
+    - click
+    - sys
+    - yaml
+
+code:
+  paths:
+    - src/jig/cli/main.py
+    - src/jig/cli/init.py
+    - src/jig/cli/node.py
+    - src/jig/cli/validate.py
+    - src/jig/cli/status.py
+    - src/jig/cli/graph.py
+    - src/jig/cli/index.py
+    - src/jig/cli/decompose.py
+    - src/jig/cli/formatting.py
+  loc: 2338
+
+tests:
+  paths:
+    - tests/unit/cli/test_formatting.py
+    - tests/unit/test_graph_commands.py
+    - tests/unit/test_status_logic.py
+    - tests/unit/test_templates.py
+    - tests/integration/test_cli_init.py
+    - tests/integration/test_cli_node.py
+    - tests/integration/test_cli_validate.py
+    - tests/integration/test_cli_status.py
+    - tests/integration/test_cli_graph.py
+    - tests/integration/test_cli_index.py
+    - tests/integration/test_decompose_commands.py
+  count: 87
+  coverage: 70%
+
+intent:
+  outcomes:
+    - O-CLI-001
+    - O-CLI-002
+    - O-CLI-005
+  specifications:
+    - S-CLI-004
+    - S-CLI-005
+    - S-CLI-006
+    - S-CLI-007
+    - S-CLI-022
+    - S-CLI-024
+    - S-CLI-025
+  notes: |
+    Excellent coverage of CLI-related intent nodes.
+    This is the orchestration layer with expected high coupling.
+    Could potentially split by command group if complexity grows:
+    - CLI Core (main, formatting)
+    - CLI Graph (graph, status)
+    - CLI Management (init, node, validate)
+    - CLI Analysis (decompose, index)
+
+metrics:
+  coupling_ratio: "2:1"
+  test_coverage: 70%
+  cyclomatic_complexity: medium-high
+
+health:
+  score: fair
+  status: stable
+  last_review: 2025-11-22
+  notes: |
+    Large orchestration layer with expected high coupling.
+    Heavy reliance on integration tests is appropriate for CLI.
+    Monitor complexity and consider splitting by command group if needed.
+    Could benefit from more unit tests for formatting and logic functions.

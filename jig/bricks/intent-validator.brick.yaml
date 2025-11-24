@@ -1,0 +1,72 @@
+# Intent Validator Brick
+brick:
+  id: BRICK-VALIDATOR
+  name: "Intent Validator"
+  version: "1.0.0"
+  layer: domain-core
+
+responsibility: |
+  Validate OSTC nodes and graph consistency.
+  Validates individual node schemas, graph-wide consistency,
+  edge validity, cycle detection, orphan detection,
+  and nested subsystem structure validation.
+
+interface:
+  public:
+    - class: ValidationResult
+      fields:
+        - valid: bool
+        - errors: list[str]
+        - warnings: list[str]
+    - function: validate_node(node: OSTCNode) -> ValidationResult
+    - function: validate_graph(intent_dir: Path) -> ValidationResult
+    - function: validate_edges(graph: Graph) -> ValidationResult
+    - function: validate_nested_subsystems(graph: Graph) -> list[str]
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-PARSER
+    - BRICK-GRAPH
+  external:
+    - yaml
+    - networkx
+
+code:
+  paths:
+    - src/jig/core/validator.py
+    - src/jig/core/validation.py
+  loc: 528
+
+tests:
+  paths:
+    - tests/unit/test_validator.py
+    - tests/unit/test_validation_core.py
+    - tests/unit/test_edge_validation.py
+    - tests/unit/test_nested_subsystems.py
+  count: 42
+  coverage: 80%
+
+intent:
+  outcomes:
+    - O-JIG-002
+  specifications:
+    - S-JIG-003
+    - S-CLI-003
+    - S-VALIDATION-001
+  notes: |
+    Good coverage of validation-related intent nodes.
+    Cohesive validation responsibilities.
+
+metrics:
+  coupling_ratio: "8:1"
+  test_coverage: 80%
+  cyclomatic_complexity: medium
+
+health:
+  score: good
+  status: stable
+  last_review: 2025-11-22
+  notes: Cohesive validation responsibilities, good test coverage

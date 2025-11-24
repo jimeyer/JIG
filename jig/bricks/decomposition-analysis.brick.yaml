@@ -1,0 +1,62 @@
+# Decomposition Analysis Brick
+brick:
+  id: BRICK-DECOMPOSE
+  name: "Decomposition Analysis"
+  version: "1.0.0"
+  layer: analysis
+
+responsibility: |
+  Calculate decomposability metrics for subsystems.
+  Computes modularity (Newman-Girvan), coupling ratio,
+  analyzes internal vs. external edges,
+  measures subsystem independence,
+  and supports nested subsystem metrics.
+
+interface:
+  public:
+    - function: calculate_modularity(graph: Graph, subsystem: str | None) -> float
+    - function: calculate_coupling_ratio(graph: Graph, subsystem: str) -> float
+    - function: calculate_all_metrics(graph: Graph, subsystem: str | None) -> dict[str, float]
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-GRAPH
+  external:
+    - networkx
+
+code:
+  paths:
+    - src/jig/decompose/metrics.py
+  loc: 246
+
+tests:
+  paths:
+    - tests/unit/test_decompose_metrics.py
+    - tests/integration/test_decompose_commands.py
+  count: 22
+  coverage: 90%
+
+intent:
+  outcomes:
+    - O-CLI-006
+    - O-CLI-007
+  specifications:
+    - S-DECOMP-001
+    - S-DECOMP-003
+  notes: |
+    Maps to decomposition-related intent nodes.
+    Specialized analysis domain with complex metric calculations.
+
+metrics:
+  coupling_ratio: "20:1"
+  test_coverage: 90%
+  cyclomatic_complexity: medium
+
+health:
+  score: excellent
+  status: stable
+  last_review: 2025-11-22
+  notes: Specialized analysis domain, excellent test coverage, high internal cohesion

@@ -1,0 +1,65 @@
+# Intent Parser Brick
+brick:
+  id: BRICK-PARSER
+  name: "Intent Parser"
+  version: "1.0.0"
+  layer: domain-core
+
+responsibility: |
+  Parse OSTC node files (YAML frontmatter + Markdown body).
+  Reads .md files from jig/ directory, parses YAML frontmatter,
+  extracts markdown body, validates basic structure,
+  and creates OSTCNode domain objects.
+
+interface:
+  public:
+    - class: OSTCNode
+      fields:
+        - id: str
+        - type: NodeType
+        - title: str
+        - subsystem: str | None
+        - body: str
+    - function: parse_ostc_node(path: Path) -> OSTCNode
+
+  stability: stable
+  versioning: semver
+
+dependencies:
+  bricks:
+    - BRICK-UTILS
+  external:
+    - frontmatter
+    - pyyaml
+
+code:
+  paths:
+    - src/jig/core/parser.py
+  loc: 129
+
+tests:
+  paths:
+    - tests/unit/test_parser.py
+  count: 15
+  coverage: 85%
+
+intent:
+  outcomes:
+    - O-PARSER-001
+  specifications:
+    - S-PARSER-001
+    - S-JIG-002
+  notes: |
+    Maps to parser-related intent nodes.
+    Could use more explicit specifications for error handling.
+
+metrics:
+  coupling_ratio: "15:1"
+  test_coverage: 85%
+  cyclomatic_complexity: low
+
+health:
+  score: excellent
+  status: stable
+  last_review: 2025-11-22
+  notes: Single clear responsibility, high internal cohesion
