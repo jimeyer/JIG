@@ -301,7 +301,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - Function bodies not analyzed (calls, assignments deferred to WU3)
 
 **Links:**
-- Commit(s): _Next commit_
+- Commit(s): abc7a96
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_python_analyzer.py -v`
