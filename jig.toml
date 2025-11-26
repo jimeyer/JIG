@@ -1,7 +1,0 @@
-[project]
-name = "jig"
-intent_dir = "jig"
-delta_dir = "jig/deltas"
-templates_dir = "templates"
-graph_index_file = "jig/graph-index.yaml"
-subsystems_file = "jig/subsystems.yaml"
