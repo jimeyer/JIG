@@ -5,7 +5,9 @@ interface, using AST parsing to extract code structure.
 """
 
 import ast
+import json
 import logging
+import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -223,3 +225,55 @@ class PythonAnalyzer(LanguageAnalyzer):
 
         # Fallback: use the file stem as module name
         return module_path.stem
+
+
+def main() -> None:
+    """Command-line interface for testing the Python analyzer."""
+    if len(sys.argv) < 2:
+        print("Usage: python -m jig.impl_graph.analyzers.python <file.py>")
+        print("\nAnalyzes a Python file and prints the extracted structure as JSON.")
+        sys.exit(1)
+
+    file_path = Path(sys.argv[1])
+
+    if not file_path.exists():
+        print(f"Error: File not found: {file_path}")
+        sys.exit(1)
+
+    if not file_path.suffix in [".py", ".pyx"]:
+        print(f"Error: Not a Python file: {file_path}")
+        sys.exit(1)
+
+    # Analyze the file
+    analyzer = PythonAnalyzer(project_root=Path.cwd())
+    try:
+        result = analyzer.analyze_file(file_path)
+
+        # Print results as formatted JSON
+        print(json.dumps(result, indent=2))
+
+        # Print summary
+        nodes = result["nodes"]
+        edges = result["edges"]
+        modules = [n for n in nodes if n["type"] == "module"]
+        classes = [n for n in nodes if n["type"] == "class"]
+        functions = [n for n in nodes if n["type"] == "function"]
+
+        print("\n" + "=" * 60, file=sys.stderr)
+        print(f"Summary:", file=sys.stderr)
+        print(f"  Modules:   {len(modules)}", file=sys.stderr)
+        print(f"  Classes:   {len(classes)}", file=sys.stderr)
+        print(f"  Functions: {len(functions)}", file=sys.stderr)
+        print(f"  Edges:     {len(edges)}", file=sys.stderr)
+        print("=" * 60, file=sys.stderr)
+
+    except ParseError as e:
+        print(str(e), file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error analyzing {file_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
