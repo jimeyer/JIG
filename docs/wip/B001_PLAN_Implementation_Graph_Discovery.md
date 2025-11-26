@@ -393,7 +393,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - Performance impact of visiting function bodies not measured
 
 **Links:**
-- Commit(s): _Next commit_
+- Commit(s): 7a45909
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_dependency_graph.py -v`
