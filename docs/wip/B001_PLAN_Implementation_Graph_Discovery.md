@@ -85,7 +85,7 @@ branch: impl-graph-discovery
 - [x] WU2: Python AST parser (modules, classes, functions) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU4: Decorator extraction (@jig.implements) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU5: NDJSON writer (deterministic output) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU5: NDJSON writer (deterministic output) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU6: CLI integration and end-to-end validation — tests ☐ / docs ☐ / reflect ☐
 
 ---
@@ -533,20 +533,48 @@ specifies: [S-001, S-003, S-005, S-006]
 - Add example output with annotations
 
 **Reflect:**
-_(To be filled after completion)_
 
 - What worked well:
+  - Graph class provides clean in-memory representation (simple list-based storage)
+  - Deterministic sorting by node ID and edge (source, target, type) tuple is straightforward
+  - sort_keys=True in json.dumps() ensures field order stability
+  - NDJSON format is simple to implement and test
+  - 13 comprehensive tests cover all edge cases
+  - 100% coverage on both graph.py and ndjson_writer.py
+  - 83.33% overall coverage exceeds 80% target
+  - All 79 tests pass (no regressions)
+  - Optional timestamp enables deterministic testing while supporting real-world use
+
 - What could be better:
+  - Could add schema validation for nodes/edges before writing
+  - Could add compression support (gzip NDJSON)
+  - Could add streaming write for very large graphs
+  - Graph class is simple but could add more helper methods (find_node_by_id, etc.)
+  - No index or fast lookup - would need external index for large graphs
+
 - Discoveries:
+  - NDJSON is incredibly simple: json.dumps() + newline
+  - Determinism requires sorting both nodes and edges
+  - Sorting edges by (source, target, type) tuple provides stable ordering
+  - sort_keys=True is essential for deterministic JSON serialization
+  - Path.parent.mkdir(parents=True, exist_ok=True) handles nested directories elegantly
+  - timestamp in metadata needs to be optional for deterministic testing
+  - Empty graphs are valid (just metadata line)
+
 - Risk watchlist:
+  - No validation that node/edge dictionaries have required fields
+  - Large graphs (millions of nodes) would need streaming or chunking
+  - No duplicate detection (same node ID added twice)
+  - Edge validation (source/target exist) not performed
+  - Memory usage: entire graph held in memory before writing
 
 **Links:**
 - Commit(s): _TBD_
 
 **Human Validation:**
-- Run: `pytest tests/unit/test_ndjson_writer.py -v`
-- Run: Check output is valid NDJSON: `cat jig/generated/implementation-graph.ndjson | while read line; do echo "$line" | python -m json.tool > /dev/null; done`
-- Look for: No errors, all lines parse as JSON
+- Run: `pytest tests/unit/test_ndjson_writer.py -v` ✅ 13/13 passed
+- Run: `pytest tests/unit/ --cov=src/jig/impl_graph` ✅ 79/79 passed, 83.33% coverage
+- Look for: Deterministic output, valid NDJSON format ✅ Verified
 
 ---
 
