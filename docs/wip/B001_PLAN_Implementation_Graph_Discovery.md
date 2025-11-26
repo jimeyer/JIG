@@ -81,7 +81,7 @@ branch: impl-graph-discovery
 ## Work Unit Checklist
 
 - [x] WU0: Create Specification and Outcome Files (O-001 through O-003, S-001 through S-006) — done ☑
-- [ ] WU1: Language analyzer plugin architecture — tests ☐ / docs ☐ / reflect ☐
+- [x] WU1: Language analyzer plugin architecture — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU2: Python AST parser (modules, classes, functions) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Decorator extraction (@jig.implements) — tests ☐ / docs ☐ / reflect ☐
@@ -190,15 +190,32 @@ specifies: [S-001, S-003, S-005, S-006]
 - Document LanguageAnalyzer interface contract in API docs
 
 **Reflect:**
-_(To be filled after completion)_
 
 - What worked well:
+  - ABC enforcement via Python's abc module provides strong compile-time guarantees
+  - Registry pattern with global singleton balances convenience with testability
+  - Comprehensive test suite (24 tests) caught edge cases early (missing dots, case sensitivity)
+  - 95.24% coverage achieved, exceeding 80% target
+  - Type hints throughout enable static analysis and IDE support
+
 - What could be better:
+  - Consider making AnalyzerRegistry truly immutable after registration (freeze pattern)
+  - Could add analyzer validation at registration time (e.g., verify extensions are unique within analyzer)
+  - Logging configuration left to caller - might want structured logging support
+
 - Discoveries:
+  - File extension matching needs case-insensitivity for cross-platform compatibility
+  - Auto-correction of malformed extensions (missing dot) reduces friction for analyzer authors
+  - Empty extension list is valid edge case - analyzer may use other detection methods in future
+  - Path.suffix already handles multiple dots correctly (.tar.gz → .gz)
+
 - Risk watchlist:
+  - Global registry singleton could cause issues in multi-threaded scenarios (not current requirement)
+  - No version checking for analyzers - assume backward compatibility for now
+  - Extension conflicts between analyzers resolved by "last wins" - could be stricter
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): _Next commit_
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_analyzer_*.py -v`
