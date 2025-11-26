@@ -144,11 +144,16 @@ class PythonAnalyzer(LanguageAnalyzer):
         visitor = PythonStructureVisitor(file_path, module_name)
         visitor.visit(tree)
         nodes = visitor.get_nodes()
+        imports = visitor.get_imports()
+        calls = visitor.get_calls()
+
+        # Track external modules and add them as nodes
+        external_modules: Dict[str, Dict[str, Any]] = {}
 
         # Add module node at the beginning
         all_nodes = [module_node] + nodes
 
-        # For now, no edges (imports, calls, etc. will be added in WU3)
+        # Initialize edges list
         edges: List[Dict[str, Any]] = []
 
         # Build containment edges
@@ -190,6 +195,127 @@ class PythonAnalyzer(LanguageAnalyzer):
                         }
                     )
 
+        # Build import edges
+        for imp in imports:
+            if imp["type"] == "import":
+                # import os, import networkx
+                imported_module = imp["module"]
+                target_id = f"M-{imported_module}"
+
+                # Create external module node if not in project
+                if not self._is_internal_module(imported_module):
+                    if target_id not in external_modules:
+                        external_modules[target_id] = {
+                            "id": target_id,
+                            "type": "external_module",
+                            "language": "python",
+                            "name": imported_module,
+                        }
+
+                # Create import edge
+                edges.append(
+                    {
+                        "source": module_node["id"],
+                        "target": target_id,
+                        "type": "imports",
+                        "line": imp["line"],
+                    }
+                )
+
+            elif imp["type"] == "from_import":
+                # from pathlib import Path, from . import utils
+                imported_module = imp["module"]
+
+                # Handle relative imports
+                if imp["level"] > 0:
+                    # Relative import - resolve relative to current module
+                    # For now, we'll just mark it as internal
+                    # TODO: Properly resolve relative imports
+                    pass
+                elif imported_module:
+                    target_id = f"M-{imported_module}"
+
+                    # Create external module node if not in project
+                    if not self._is_internal_module(imported_module):
+                        if target_id not in external_modules:
+                            external_modules[target_id] = {
+                                "id": target_id,
+                                "type": "external_module",
+                                "language": "python",
+                                "name": imported_module,
+                            }
+
+                    # Create import edge
+                    edges.append(
+                        {
+                            "source": module_node["id"],
+                            "target": target_id,
+                            "type": "imports",
+                            "line": imp["line"],
+                        }
+                    )
+
+        # Build call edges
+        for call in calls:
+            caller_id = call["caller"]
+            callee_name = call["callee"]
+
+            # Try to resolve the callee to a function ID
+            if call["type"] == "direct_call":
+                # Direct call - could be to a function in this module or imported
+                # Try to find the function in this module first
+                target_id = f"F-{module_name}.{callee_name}"
+
+                # Check if this function exists in our nodes
+                func_exists = any(n["id"] == target_id for n in nodes)
+
+                if func_exists:
+                    edges.append(
+                        {
+                            "source": caller_id,
+                            "target": target_id,
+                            "type": "calls",
+                            "line": call["line"],
+                        }
+                    )
+                # Otherwise, skip (might be imported, would need more context)
+
+            elif call["type"] == "attribute_call":
+                # Attribute call like json.dumps() or module.func()
+                # For V1, we'll try to match against imports
+                # This is simplified - full resolution would need import tracking
+                parts = callee_name.split(".")
+                if len(parts) >= 2:
+                    # Could be module.func() or obj.method()
+                    # For now, we'll skip these as they require type inference
+                    # or import resolution
+                    pass
+
+        # Build inheritance edges
+        for node in nodes:
+            if node["type"] == "class" and "bases" in node:
+                for base_class_name in node["bases"]:
+                    # Try to resolve base class to a class ID
+                    # First, check if it's a class in this module
+                    target_id = f"C-{module_name}.{base_class_name}"
+
+                    # Check if this class exists in our nodes
+                    class_exists = any(n["id"] == target_id for n in nodes)
+
+                    if class_exists:
+                        edges.append(
+                            {
+                                "source": node["id"],
+                                "target": target_id,
+                                "type": "extends",
+                            }
+                        )
+                    # Otherwise, it might be imported or external
+                    # Would need import resolution to handle properly
+
+        # Add external module nodes to the node list
+        all_nodes.extend(external_modules.values())
+
         return {"nodes": all_nodes, "edges": edges}
 
     def _derive_module_name(self, file_path: Path) -> str:
@@ -225,6 +351,52 @@ class PythonAnalyzer(LanguageAnalyzer):
 
         # Fallback: use the file stem as module name
         return module_path.stem
+
+    def _is_internal_module(self, module_name: str) -> bool:
+        """Check if a module is internal to the project or external.
+
+        Args:
+            module_name: The module name to check (e.g., 'os', 'jig.core.graph').
+
+        Returns:
+            True if the module is internal to the project, False if external.
+        """
+        # Python standard library modules are external
+        # This is a simplified list - a complete implementation would use
+        # sys.stdlib_module_names (Python 3.10+) or a comprehensive list
+        stdlib_modules = {
+            "abc",
+            "argparse",
+            "ast",
+            "asyncio",
+            "collections",
+            "datetime",
+            "functools",
+            "io",
+            "itertools",
+            "json",
+            "logging",
+            "os",
+            "pathlib",
+            "re",
+            "sys",
+            "typing",
+            "unittest",
+        }
+
+        # Get the top-level module name
+        top_level = module_name.split(".")[0]
+
+        # Check if it's stdlib
+        if top_level in stdlib_modules:
+            return False
+
+        # For now, assume anything not in stdlib could be either internal or external
+        # A more sophisticated approach would:
+        # 1. Check if the module exists in the project source tree
+        # 2. Parse package imports to know what's external
+        # For V1, we'll treat non-stdlib as potentially external
+        return False
 
 
 def main() -> None:

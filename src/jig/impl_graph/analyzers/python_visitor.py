@@ -27,8 +27,11 @@ class PythonStructureVisitor(ast.NodeVisitor):
         self.file_path = file_path
         self.module_name = module_name
         self.nodes: List[Dict[str, Any]] = []
+        self.imports: List[Dict[str, Any]] = []
+        self.calls: List[Dict[str, Any]] = []
         self.current_class: Optional[str] = None
         self.class_stack: List[str] = []  # For tracking nested classes
+        self.current_function: Optional[str] = None  # For tracking function context
 
     def get_nodes(self) -> List[Dict[str, Any]]:
         """Return the collected nodes.
@@ -37,6 +40,22 @@ class PythonStructureVisitor(ast.NodeVisitor):
             List of node dictionaries with structure information.
         """
         return self.nodes
+
+    def get_imports(self) -> List[Dict[str, Any]]:
+        """Return the collected imports.
+
+        Returns:
+            List of import dictionaries.
+        """
+        return self.imports
+
+    def get_calls(self) -> List[Dict[str, Any]]:
+        """Return the collected function calls.
+
+        Returns:
+            List of call dictionaries.
+        """
+        return self.calls
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit a class definition node.
@@ -142,8 +161,11 @@ class PythonStructureVisitor(ast.NodeVisitor):
 
         self.nodes.append(func_node)
 
-        # Don't visit nested functions (could be complex, defer to V2)
-        # self.generic_visit(node)
+        # Visit function body to extract calls
+        old_function = self.current_function
+        self.current_function = func_id
+        self.generic_visit(node)
+        self.current_function = old_function
 
     def _extract_signature(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
         """Extract function signature as a string.
@@ -254,3 +276,95 @@ class PythonStructureVisitor(ast.NodeVisitor):
                 return ast.unparse(node)
             except Exception:
                 return None
+
+    def visit_Import(self, node: ast.Import) -> None:
+        """Visit an import statement.
+
+        Extracts imports like: import os, import sys
+
+        Args:
+            node: The Import AST node.
+        """
+        for alias in node.names:
+            import_info: Dict[str, Any] = {
+                "module": alias.name,
+                "alias": alias.asname,
+                "line": node.lineno,
+                "type": "import",
+            }
+            self.imports.append(import_info)
+
+        # Continue visiting
+        self.generic_visit(node)
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+        """Visit a from...import statement.
+
+        Extracts imports like: from pathlib import Path
+
+        Args:
+            node: The ImportFrom AST node.
+        """
+        module = node.module or ""  # Handle "from . import X"
+        level = node.level  # Relative import level (0 = absolute, 1 = ., 2 = .., etc.)
+
+        for alias in node.names:
+            import_info: Dict[str, Any] = {
+                "module": module,
+                "name": alias.name,
+                "alias": alias.asname,
+                "line": node.lineno,
+                "level": level,
+                "type": "from_import",
+            }
+            self.imports.append(import_info)
+
+        # Continue visiting
+        self.generic_visit(node)
+
+    def visit_Call(self, node: ast.Call) -> None:
+        """Visit a function call.
+
+        Extracts direct function calls like: func(), module.func()
+        Skips method calls that require type inference: obj.method()
+
+        Args:
+            node: The Call AST node.
+        """
+        # Only track calls if we're inside a function
+        if not self.current_function:
+            self.generic_visit(node)
+            return
+
+        # Get the function being called
+        func = node.func
+
+        # Case 1: Direct name call - func()
+        if isinstance(func, ast.Name):
+            call_info: Dict[str, Any] = {
+                "caller": self.current_function,
+                "callee": func.id,
+                "type": "direct_call",
+                "line": node.lineno,
+            }
+            self.calls.append(call_info)
+
+        # Case 2: Attribute call - module.func() or obj.method()
+        # For V1, we only capture module.func() where we can statically resolve the module
+        elif isinstance(func, ast.Attribute):
+            # Try to get the full dotted name
+            full_name = self._get_name_from_node(func)
+            if full_name:
+                # Check if it looks like a module call vs instance method
+                # For V1, we'll capture all attribute calls and filter later
+                # based on whether they resolve to known modules
+                call_info: Dict[str, Any] = {
+                    "caller": self.current_function,
+                    "callee": full_name,
+                    "type": "attribute_call",
+                    "line": node.lineno,
+                }
+                self.calls.append(call_info)
+
+        # Continue visiting child nodes
+        self.generic_visit(node)

@@ -83,7 +83,7 @@ branch: impl-graph-discovery
 - [x] WU0: Create Specification and Outcome Files (O-001 through O-003, S-001 through S-006) — done ☑
 - [x] WU1: Language analyzer plugin architecture — tests ☑ / docs ☑ / reflect ☑
 - [x] WU2: Python AST parser (modules, classes, functions) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU4: Decorator extraction (@jig.implements) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: NDJSON writer (deterministic output) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: CLI integration and end-to-end validation — tests ☐ / docs ☐ / reflect ☐
@@ -355,18 +355,48 @@ specifies: [S-001, S-003, S-005, S-006]
 - Add examples of direct call detection (what works, what doesn't)
 
 **Reflect:**
-_(To be filled after completion)_
 
 - What worked well:
+  - Extending visitor pattern for imports and calls was straightforward
+  - Import extraction from ast.Import and ast.ImportFrom nodes is highly reliable
+  - Call extraction catches direct calls and function references cleanly
+  - Inheritance edges work perfectly with base classes from WU2
+  - External module detection via stdlib list is simple and effective for V1
+  - Test-driven approach caught edge cases (typing imports, RobotDog filtering)
+  - 78.79% coverage close to 80% target (missing mainly CLI code and error paths)
+  - 54 tests passing (38 from WU1/WU2, 16 new for WU3)
+
 - What could be better:
+  - Module resolution for internal vs external is simplistic (always treats as external)
+  - Relative imports (from . import X) not fully resolved
+  - Attribute calls (module.func()) captured but not resolved in V1
+  - Method calls (obj.method()) correctly skipped but no edges created
+  - Could extract more metadata on imports (aliases, specific imported names)
+  - Stdlib module list is hardcoded and incomplete
+  - Main() function in python.py adds untested lines (affects coverage)
+
 - Discoveries:
+  - ast.Import and ast.ImportFrom have different structures (module vs name)
+  - Need to track current_function context to know where calls originate
+  - from typing import List, Optional creates multiple import records
+  - Visiting function bodies enables call extraction but increases complexity
+  - Direct calls (func()) easy to resolve, attribute calls (mod.func()) need imports
+  - Type inference would be needed for method calls (deferred to V2)
+  - Containment edges from WU2 work seamlessly with new edge types
+
 - Risk watchlist:
+  - Import resolution will need project-aware logic for internal modules
+  - Call resolution limited without import tracking and aliasing support
+  - Attribute calls captured but not linked (would need import context)
+  - No validation that call targets exist (could create dangling edges)
+  - Relative imports may create incorrect module IDs
+  - Performance impact of visiting function bodies not measured
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): _Next commit_
 
 **Human Validation:**
-- Run: `pytest tests/unit/test_edge_builder.py -v`
+- Run: `pytest tests/unit/test_dependency_graph.py -v`
 - Run: Test on real file with imports/calls
 - Look for: All direct calls captured, method calls skipped (as expected)
 
