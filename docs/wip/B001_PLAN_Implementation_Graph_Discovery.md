@@ -80,7 +80,7 @@ branch: impl-graph-discovery
 
 ## Work Unit Checklist
 
-- [ ] WU0: Create Specification and Outcome Files (O-001 through O-003, S-001 through S-006) — done ☐
+- [x] WU0: Create Specification and Outcome Files (O-001 through O-003, S-001 through S-006) — done ☑
 - [ ] WU1: Language analyzer plugin architecture — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU2: Python AST parser (modules, classes, functions) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☐ / docs ☐ / reflect ☐
