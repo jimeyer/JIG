@@ -106,6 +106,15 @@ class PythonAnalyzer(LanguageAnalyzer):
             ParseError: If the file cannot be parsed (syntax errors).
             IOError: If the file cannot be read.
         """
+        # Convert to relative path if project_root is set
+        display_path = file_path
+        if self.project_root:
+            try:
+                display_path = file_path.relative_to(self.project_root)
+            except ValueError:
+                # File is outside project root, use absolute path
+                pass
+
         # Read source code
         try:
             source = file_path.read_text(encoding="utf-8")
@@ -142,11 +151,11 @@ class PythonAnalyzer(LanguageAnalyzer):
             "type": "module",
             "language": "python",
             "name": module_name,
-            "file": str(file_path),
+            "file": str(display_path),
         }
 
         # Extract structure using visitor
-        visitor = PythonStructureVisitor(file_path, module_name)
+        visitor = PythonStructureVisitor(display_path, module_name)
         visitor.visit(tree)
         nodes = visitor.get_nodes()
         imports = visitor.get_imports()

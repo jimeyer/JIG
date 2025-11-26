@@ -262,3 +262,26 @@ def test_builder_empty_source_directory(tmp_path: Path) -> None:
     # Should have empty graph
     assert graph.node_count() == 0
     assert graph.edge_count() == 0
+
+
+@jig.verifies("S-003")
+def test_builder_uses_relative_paths(tmp_path: Path) -> None:
+    """Test that file paths are relative to project root, not absolute."""
+    project_root = tmp_path / "test_project"
+    src_dir = project_root / "src"
+    src_dir.mkdir(parents=True)
+
+    # Create a simple Python file
+    (src_dir / "example.py").write_text("def hello(): pass")
+
+    builder = GraphBuilder(project_root)
+    graph = builder.build()
+
+    # Get all nodes with file paths
+    nodes = graph.get_nodes()
+    file_paths = [n["file"] for n in nodes if "file" in n]
+
+    # All paths should be relative (not start with /)
+    for path in file_paths:
+        assert not path.startswith("/"), f"Path should be relative: {path}"
+        assert path.startswith("src/"), f"Path should start with src/: {path}"
