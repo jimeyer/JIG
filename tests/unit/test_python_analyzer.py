@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+import jig
 from jig.impl_graph.analyzers import ParseError, PythonAnalyzer
 
 # Get path to test fixtures
@@ -32,6 +33,7 @@ def test_python_analyzer_interface_compliance(analyzer: PythonAnalyzer) -> None:
     assert ".pyx" in analyzer.file_extensions()
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_simple_module(analyzer: PythonAnalyzer) -> None:
     """Test analysis of a simple module with functions.
 
@@ -79,6 +81,7 @@ def test_python_analyzer_simple_module(analyzer: PythonAnalyzer) -> None:
     assert len(private) == 1
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_class_with_methods(analyzer: PythonAnalyzer) -> None:
     """Test analysis of classes with methods.
 
@@ -133,6 +136,7 @@ def test_python_analyzer_class_with_methods(analyzer: PythonAnalyzer) -> None:
     assert len(class_contains) >= 3
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_inheritance(analyzer: PythonAnalyzer) -> None:
     """Test extraction of class inheritance relationships.
 
@@ -164,6 +168,7 @@ def test_python_analyzer_inheritance(analyzer: PythonAnalyzer) -> None:
     assert "Dog" in robot_dog["bases"]
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_nested_classes(analyzer: PythonAnalyzer) -> None:
     """Test handling of nested class definitions.
 
@@ -217,6 +222,7 @@ def test_python_analyzer_nested_classes(analyzer: PythonAnalyzer) -> None:
     assert len(inner_contains_deep) >= 1
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_type_hints(analyzer: PythonAnalyzer) -> None:
     """Test extraction of type hints and annotations.
 
@@ -256,6 +262,7 @@ def test_python_analyzer_type_hints(analyzer: PythonAnalyzer) -> None:
     assert "-> int" in process_method["signature"]
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_async_functions(analyzer: PythonAnalyzer) -> None:
     """Test handling of async functions and methods.
 
@@ -292,6 +299,7 @@ def test_python_analyzer_async_functions(analyzer: PythonAnalyzer) -> None:
     assert len(sync_methods) >= 1
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_node_id_format(analyzer: PythonAnalyzer) -> None:
     """Test that node IDs follow the correct format.
 
@@ -322,6 +330,7 @@ def test_python_analyzer_node_id_format(analyzer: PythonAnalyzer) -> None:
         assert func["name"] in func["id"]
 
 
+@jig.verifies("S-006")
 def test_python_analyzer_parse_error_handling() -> None:
     """Test that syntax errors are caught and reported clearly.
 
@@ -411,6 +420,7 @@ def test_python_analyzer_language_agnostic_output_format(analyzer: PythonAnalyze
         assert "type" in edge
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_accuracy_metrics(analyzer: PythonAnalyzer) -> None:
     """Test accuracy of module/class/function discovery.
 
@@ -437,6 +447,7 @@ def test_python_analyzer_accuracy_metrics(analyzer: PythonAnalyzer) -> None:
     assert len(functions) == 5  # 100% accuracy in this case
 
 
+@jig.verifies("S-001")
 def test_python_analyzer_integration_all_fixtures(analyzer: PythonAnalyzer) -> None:
     """Integration test: analyze all fixture files successfully.
 

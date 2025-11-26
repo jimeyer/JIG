@@ -9,7 +9,10 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List
 
+import jig
 
+
+@jig.implements("S-004")
 class LanguageAnalyzer(ABC):
     """Abstract base class for language-specific code analyzers.
 

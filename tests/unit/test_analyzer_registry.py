@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 import pytest
 
+import jig
 from jig.impl_graph.analyzers import (
     AnalyzerRegistry,
     LanguageAnalyzer,
@@ -84,6 +85,7 @@ def test_registry_initialization(registry: AnalyzerRegistry) -> None:
     assert registry.supported_languages() == []
 
 
+@jig.verifies("S-004")
 def test_registry_registration(registry: AnalyzerRegistry) -> None:
     """Test that analyzers can be registered.
 
@@ -98,6 +100,7 @@ def test_registry_registration(registry: AnalyzerRegistry) -> None:
     assert ".pyx" in registry.supported_extensions()
 
 
+@jig.verifies("S-004")
 def test_registry_auto_detection(registry: AnalyzerRegistry) -> None:
     """Test that registry routes files by extension.
 
@@ -132,6 +135,7 @@ def test_registry_case_insensitive_extensions(registry: AnalyzerRegistry) -> Non
     assert registry.get_analyzer(Path("foo.Py")) is analyzer
 
 
+@jig.verifies("S-004")
 def test_registry_get_analyzer_by_language(registry: AnalyzerRegistry) -> None:
     """Test retrieval of analyzer by language name."""
     py_analyzer = MockPythonAnalyzer()
@@ -301,6 +305,7 @@ def test_registry_file_path_with_multiple_dots(registry: AnalyzerRegistry) -> No
     assert registry.get_analyzer(Path("foo.bar.baz")) is None
 
 
+@jig.verifies("S-004")
 def test_registry_end_to_end_integration(registry: AnalyzerRegistry) -> None:
     """Integration test: register analyzers and process multiple files.
 

@@ -1,662 +1,740 @@
-# PLAN Workflow (JIG Edition)
+# Task: Execute Work Plan with Intent-First Development
 
-**Version:** 1.0.0 (JIG-integrated)
-**Owner:** Jim Meyer
-**Audience:** Human developers + AI coding agents (AIA)
-**Intent:** Lightweight planning + execution loop for fast, high-quality delivery. Optimized for AI-assisted development, PDCA learning, and JIG harvest.
+**Version:** 2.0.0 (JIG v8 aligned)
+**Audience:** AI coding agents + Human developers
+**Status:** Active
 
----
+## Objective
 
-## 0) What's Different in the JIG Edition?
+Execute planned work using Test-Driven Development while maintaining alignment between intent (specifications), implementation (code), and verification (tests) as measured by the JIG Alignment Graph.
 
-This workflow integrates JIG (Jig Intent Graph) principles:
+## Context
 
-- **Development is constraint satisfaction** - Work from KNOWNS (Intent) to UNKNOWNS (discoveries)
-- **Intent-first when known** - Create Outcome and Specification nodes **before** coding if requirements are clear
-- **PLAN is a Delta** - Lives in `jig/deltas/active/<branch>/` as a temporal narrative
-- **Markers capture learning** - Use `#DISCOVERY`, `#DECISION`, `#LEARNED` for what you learn along the way
-- **Harvest discoveries** - Run `jig ai-distill` to extract new insights into the Intent Graph
-- **Future you is smarter** - Expect to discover new constraints and requirements during implementation
+### What is JIG?
 
-**TL;DR:** Write known Intent upfront (O→S→TDD) + capture learnings with markers + harvest discoveries = constraint-driven development.
+JIG (Just-In-Graph) is an alignment measurement system that makes the relationship between intent, implementation, and verification explicit and measurable through a graph of nodes and edges:
 
----
+- **S nodes (Specifications)**: What we intend to build
+- **F nodes (Functions)**: What we actually built
+- **T nodes (Tests)**: What we actually verify
+- **Edges**: implements (F→S), verifies (T→S), covers (T→F)
 
-## 1) Purpose
+### The Five JIG Artifacts
 
-Create a shared, minimal process that:
+1. **Specification Files**: `jig/specifications/S-001.md` (intent, human-authored)
+2. **Outcome Files**: `jig/outcomes/O-001.md` (optional, high-level goals)
+3. **Brick Definitions**: `jig/bricks.yaml` (architectural partitions)
+4. **@jig Decorators**: In source code (`@jig.implements("S-001")`, `@jig.verifies("S-001")`)
+5. **Graph Files**: `jig/generated/*.ndjson` (machine-generated)
 
-* Turns a SCOPE into **Intent** (Outcomes and Specifications) when known upfront
-* Creates an executable PLAN with short **Work Units**
-* Follows O→S→TDD flow: Outcomes define "why", Specs define "what", Tests verify, Code implements
-* Captures **discoveries** during execution (what you learned that you didn't know upfront)
-* Marks insights for JIG harvest (`#DISCOVERY`, `#DECISION`, `#LEARNED`)
-* Commits code + updates artifacts with traceability
-* Feeds discovered insights into the Intent Graph via `jig ai-distill` on completion
+### Core Workflow: O→S→TDD
 
-**Philosophy:** Development is constraint satisfaction. Start with known constraints (Intent), discover new constraints along the way (Deltas), harvest discoveries into Intent for future work.
+1. **O (Outcomes)**: WHY we build this (business value)
+2. **S (Specifications)**: WHAT we build (concrete requirements)
+3. **T (Tests)**: Verify specifications (write first, TDD red phase)
+4. **F (Functions)**: Implement specifications (TDD green phase)
 
----
+**Philosophy**: Development is constraint satisfaction. Start with known constraints (Intent), write tests that verify them, then implement.
 
-## 2) JIG Context: Where PLANs Live
+## Inputs
 
-```
-jig/
-├── outcomes/              # Why we build (Intent - separate files)
-├── specifications/        # What we build (Intent - separate files)
-└── deltas/
-    ├── active/
-    │   └── <branch-name>/
-    │       └── PLAN_<feature>.md     # ← YOUR PLAN LIVES HERE
-    └── archive/
-        └── <branch-name>/            # Moved here after merge
+When starting work, you receive:
 
-src/                       # Code with @jig annotations (C nodes)
-tests/                     # Tests with @jig annotations (T nodes)
-```
+1. **SCOPE Document**: Describes the feature/problem to solve
+   - May reference existing O/S nodes (e.g., "Implements: O-001, S-003")
+   - May describe new intent to be created as O/S nodes
 
-**Key Points:**
-- Create PLAN when starting a branch: `jig delta new --type plan`
-- PLAN stays with the branch (temporal, disposable)
-- Intent (O, S) lives forever in `jig/{outcomes,specifications}/`
-- Tests (T) and Code (C) are marked inline with `@jig` annotations
-- Harvest extracts Intent from PLAN before archiving
+2. **Existing JIG Artifacts**: Review before starting
+   - `jig/outcomes/*.md` - existing outcomes
+   - `jig/specifications/*.md` - existing specifications
+   - `jig/bricks.yaml` - architectural partitions
 
----
+3. **Codebase Context**: Relevant code, tests, documentation
 
-## 3) Inputs
+## Process
 
-* **SCOPE** – source of truth for intent, constraints, acceptance criteria
-  - May reference existing Intent nodes (e.g., "Implements: O-AUTH-001, S-AUTH-003")
-  - May describe new Intent to be created (becomes O/S nodes before coding)
-* **Existing Intent Graph** – constraints already known
-  - Read `jig/outcomes/` and `jig/specifications/` to understand existing constraints
-  - Build on what's known, discover what's unknown
-* **Design/System context** – architecture notes, interfaces, dependencies
-  - Reference `jig/specifications/` and `docs/architecture/` as needed
+### Step 1: Create PLAN Document (Work Tracker)
 
----
+Create a markdown file to track your work. This is NOT a JIG artifact, just your working notes.
 
-## 4) Primary Output Artifacts
+**Location**: `docs/plans/PLAN-<feature-name>.md` (or similar location outside `jig/`)
 
-* **PLAN** – Work Units, status, links, reflections, JIG markers
-* **Completion Summary** – outcomes, deltas, metrics, learning roll-up, harvest prep
-* **Code/Test/Docs** – committed to VCS with traceability
-* **Harvest Report** – Generated by `jig extract`, feeds `jig ai-synthesize`
-
----
-
-## 5) PLAN Structure (JIG-Aware Template)
-
+**Template**:
 ```markdown
----
-delta_type: plan
-branch: <git-branch-name>
----
+# PLAN: <Feature Name>
 
-# PLAN: <Feature / Problem>
-
-- **SCOPE:** <link or path>
-- **Start:** <YYYY-MM-DD>
-- **Owner:** <name>
-- **Status:** <Draft | In-Progress | Complete>
-- **Subsystem:** <subsystem-name>  # e.g., auth, user, billing
+- **SCOPE**: <link to scope document>
+- **Start**: <YYYY-MM-DD>
+- **Status**: Draft | In-Progress | Complete
+- **Branch**: <git-branch-name>
 
 ## Known Intent (Created Before Coding)
 
-**Outcomes Created:**
-- O-AUTH-001: "Users authenticate securely across devices" (jig/outcomes/O-AUTH-001.md)
-- O-AUTH-002: "Zero authentication bypass incidents" (jig/outcomes/O-AUTH-002.md)
+**Outcomes**:
+- O-001: <description> (jig/outcomes/O-001.md)
 
-**Specifications Created:**
-- S-AUTH-001: "JWT tokens with 24-hour expiration" (jig/specifications/S-AUTH-001.md)
-- S-AUTH-002: "Constant-time JWT validation" (jig/specifications/S-AUTH-002.md)
+**Specifications**:
+- S-001: <description> (jig/specifications/S-001.md)
+- S-002: <description> (jig/specifications/S-002.md)
 
-**Rationale:** These constraints were known from SCOPE. Creating them upfront enables O→S→TDD flow.
+**Bricks Affected**:
+- B-001: <brick name>
 
 ## Work Unit Checklist
-- [ ] WU0: Create known Intent nodes (O/S) — done ☑
-- [ ] WU1: <title> — tests ☐ / docs ☐ / reflect ☐
-- [ ] WU2: <title> — tests ☐ / docs ☐ / reflect ☐
+- [ ] WU0: Create Intent nodes (O/S)
+- [ ] WU1: <title> — tests ☐ / code ☐ / docs ☐
+- [ ] WU2: <title> — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
 
 ### Work Unit 0: Create Known Intent
 
-**Goal:** Capture all known Outcomes and Specifications from SCOPE as Intent nodes before coding.
+**Goal**: Capture all known Outcomes and Specifications from SCOPE before writing any code.
 
-**Acceptance Criteria:**
-- All known "why" statements → Outcome nodes in jig/outcomes/
-- All known "what" requirements → Specification nodes in jig/specifications/
-- All nodes have proper YAML frontmatter and markdown content
-- `jig validate` passes
+**Acceptance Criteria**:
+- [ ] All known "why" statements → Outcome files in `jig/outcomes/`
+- [ ] All known "what" requirements → Specification files in `jig/specifications/`
+- [ ] All files have proper YAML frontmatter
+- [ ] `jigy validate` passes
 
-**Created Nodes:**
-- [List files created with brief descriptions]
+**Created Nodes**:
+- (List will be filled during execution)
 
-**Reflect:**
-- What was clear from SCOPE: [clarity wins]
-- What was ambiguous: [gaps, will discover during implementation]
-
----
-
-## Work Units
-
-### Work Unit N: <title>
-
-**Goal:** <single, testable goal>
-**Planned Effort:** <e.g., 60–90m>
-**Acceptance Criteria:** …
-
-**Implementation Notes**
-- Steps / approach / alternatives considered
-- Files: `path/to/file.py:123-145`
-  # @jig todo
-
-**Test Plan**
-- Unit: …
-- Integration: …
-- Test files with @jig annotations: `tests/auth/test_authentication.py::test_token_validation`
-
-**Docs to Update**
-- README / ADR / API docs, etc.
-
-**Reflect (≤5 bullets; keep crisp)**
-
-- What worked well:
-  - Regex-based extraction was 10x faster than AST parsing [tools]
-    #LEARNED "Pattern matching > AST for simple syntax extraction"
-
-- What could be better:
-  - SCOPE was ambiguous about token refresh timing [scope]
-    #DISCOVERY "Token refresh timing not specified - need to add to S-AUTH-001"
-
-- Next experiment:
-  - Try batch validation to reduce I/O calls
-    #DECISION "Batch token validation vs per-request"
-    **Choice:** Batch (if >10 tokens/sec)
-    **Rationale:** Reduces DB round-trips by 80%
-    **Tradeoffs:** Adds 50ms latency, acceptable for background workers
-
-- Discoveries:
-  - JWT signature validation requires constant-time comparison for security
-    #DISCOVERY "JWT validation must use constant-time compare to prevent timing attacks"
-
-- Risk watchlist:
-  - Token storage in memory could leak on crash [risk]
-
-**Links**
-- MR/PR: <url>
-- Commit(s): <hash>
-
-**Human Validation**
-- Commands: `jig validate`, `pytest tests/auth/test_token.py -v`
-- Look for: All tests pass, no alignment violations in `jig status`
-```
+**Reflect**:
+- What was clear from SCOPE: <clarity wins>
+- What was ambiguous: <will discover during implementation>
 
 ---
 
-## 6) JIG Marker Syntax
+### Work Unit N: <Title>
 
-### Minimal Marker Set (Use in Reflect Blocks)
+**Goal**: <Single, testable goal>
 
-**DISCOVERY** - Surprising findings, gaps, non-obvious insights:
-```markdown
-#DISCOVERY "OR-Set requires hashable elements, lists must expand"
-#DISCOVERY "Token refresh timing not specified in SCOPE"
-#DISCOVERY "JWT timing attacks possible without constant-time comparison"
+**Planned Effort**: 60-90 minutes
+
+**Acceptance Criteria**:
+- [ ] Specification S-NNN is implemented by function(s)
+- [ ] Specification S-NNN is verified by test(s)
+- [ ] Tests execute implementation (coverage confirms)
+- [ ] `jigy status` shows alignment
+
+**Implementation Notes**:
+- Approach: <steps>
+- Files: `path/to/file.py`
+- Decorators added: `@jig.implements("S-NNN")`
+
+**Test Plan**:
+- Unit tests: <describe>
+- Test file: `tests/path/test_feature.py`
+- Decorators added: `@jig.verifies("S-NNN")`
+
+**Docs Updated**:
+- README / ADR / API docs
+
+**Reflect** (≤5 bullets):
+- What worked well: <concise notes>
+- What could be better: <process improvements>
+- Surprises/discoveries: <non-obvious learnings>
+- Risks identified: <watch items>
+
+**Links**:
+- Commit: <hash>
+- PR: <url if applicable>
 ```
 
-**DECISION** - Choices with tradeoffs:
-```markdown
-#DECISION "WebSocket vs gRPC for device communication"
-**Choice:** WebSocket
-**Rationale:** Simpler deployment, no protobuf compilation
-**Tradeoffs:** Process management complexity vs simplicity
-```
+### Step 2: Execute Work Unit 0 (Intent-First)
 
-**LEARNED** - Reusable patterns:
-```markdown
-#LEARNED "Shutdown timeout = N × max_cleanup_time + margin"
-#LEARNED "Pattern matching > AST parsing for simple syntax extraction"
-#LEARNED "Always validate input types at API boundaries"
-```
+**DO THIS FIRST** - before writing any implementation code.
 
-**IMPLEMENTS** - Traceability to Intent Graph:
-```markdown
-#IMPLEMENTS S-AUTH-001
-#IMPLEMENTS O-AUTH-003, S-USER-042
-```
+#### 2.1: Read SCOPE Carefully
 
-**Code Annotations** - Mark code and test locations:
-```python
-# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:auth interface:public
-def validate_token(token: str) -> bool:
-    """Validate JWT with constant-time comparison."""
-```
+Extract known constraints:
+- **WHY statements** (business value, user needs) → Outcomes
+- **WHAT statements** (technical requirements, constraints) → Specifications
+- If unclear or ambiguous, note for later discovery (don't guess)
 
-**Test Annotations** - Mark test functions:
-```python
-# @jig T-AUTH-001 verifies:S-AUTH-001 subsystem:auth
-def test_jwt_token_validation():
-    """Verify JWT tokens validate correctly with device ID"""
-```
+#### 2.2: Create Outcome Files
 
-### When to Use Markers
+For each WHY statement:
 
-**Use markers for DISCOVERIES (things you learned, not things you knew):**
-- A new constraint found during implementation → `#DISCOVERY` (becomes new O/S node)
-- A pattern worth preserving → `#LEARNED` (becomes reusable knowledge)
-- A decision with tradeoffs → `#DECISION` (captures rationale for future you)
-- A gap in existing specifications → `#DISCOVERY` (updates existing S node)
-- Something surprising or non-obvious → `#DISCOVERY`
-
-**Don't marker things you knew upfront:**
-- If it was in SCOPE, it should be an O/S node already (Work Unit 0)
-- Markers are for the journey from present knowledge to future knowledge
-- Future you is smarter than present you - markers capture that learning
-
-**Don't over-marker:**
-- Not every reflection bullet needs a marker
-- Aim for 1-3 markers per Work Unit
-- Markers are for harvestable insights, not routine notes
-
----
-
-## 7) Execution Workflow (Constraint-Driven)
-
-### Work Unit 0: Create Known Intent (Do First!)
-
-1. **Read SCOPE carefully**
-   * Extract all known "why" statements (business value, user needs) → Outcomes
-   * Extract all known "what" requirements (technical constraints, specs) → Specifications
-   * If unclear, mark as "to be discovered" - don't guess
-
-2. **Create Outcome nodes in jig/outcomes/**
-   * One file per outcome: `O-<SUBSYSTEM>-NNN.md`
-   * YAML frontmatter with id, type, title, subsystem
-   * Markdown body with value proposition, acceptance criteria
-   * Run `jig validate` to check format
-
-3. **Create Specification nodes in jig/specifications/**
-   * One file per spec: `S-<SUBSYSTEM>-NNN.md`
-   * Link to Outcomes they implement: `implements: O-XXX-NNN`
-   * Include rationale, constraints, references
-   * Run `jig validate` to check format
-
-4. **Commit Intent**
-   ```bash
-   git add jig/outcomes/ jig/specifications/
-   git commit -m "intent: define known constraints for <feature>
-
-   Created Outcomes: O-XXX-001, O-XXX-002
-   Created Specs: S-XXX-001, S-XXX-002, S-XXX-003
-
-   See: jig/deltas/active/<branch>/PLAN.md → Work Unit 0"
-   ```
-
-### Work Units 1-N: Implement with TDD
-
-1. **Plan the Unit**
-   * AIA drafts Work Unit N from SCOPE + Intent nodes + PLAN context
-   * Reference existing O/S nodes in acceptance criteria
-   * Human adjusts goal, acceptance criteria, risks
-
-2. **Write Tests First (TDD)**
-   * Write tests that verify the Specifications
-   * Add `@jig T-XXX-NNN verifies:S-YYY-NNN subsystem:name` annotations
-   * Tests should fail (red) because implementation doesn't exist yet
-
-3. **Implement**
-   * AIA generates minimal, correct code aligned to acceptance criteria
-   * Keep scope to the unit; defer extras
-   * Add `@jig` annotations to code:
-     ```python
-     # @jig C-XXX-NNN implements:S-YYY-NNN subsystem:auth
-     def validate_token(token: str) -> bool:
-     ```
-
-3. **Test**
-   * AIA writes/updates unit & integration tests; run locally/CI
-   * Add `@jig` annotations to test functions:
-     ```python
-     # @jig T-XXX-NNN verifies:S-YYY-NNN subsystem:auth
-     def test_jwt_constant_time_validation():
-     ```
-
-4. **Docs**
-   * AIA updates docs in the same change (API, README, ADR, changelog as needed)
-
-5. **Reflect** *(Capture Discoveries)*
-   * Fill **Reflect** block (≤5 bullets) under current Work Unit
-   * Focus on **what you learned** that wasn't in the original Intent nodes:
-     - New constraints discovered → `#DISCOVERY` (will become new S nodes)
-     - Gaps in existing specs → `#DISCOVERY` (will update existing S nodes)
-     - Patterns that worked → `#LEARNED` (reusable knowledge)
-     - Tradeoff decisions made → `#DECISION` (rationale for future)
-   * Tag bullets with process labels in `[]` (e.g., `[scope]`, `[tests]`)
-
-6. **Update Checklist**
-   * Mark tests ✅, docs ✅, reflect ✅ in Work Unit Checklist
-
-7. **Commit**
-   * AIA creates commit per unit with conventions in §9
-   * Include trailer: `Unit: <N>`, `Implements: S-XXX-NNN`
-
-8. **Review & Merge**
-   * Human reviews diff, tests, risks. Iterate if needed.
-
-9. **Human Validation**
-   * Instructions for observing functional outcomes
-   * Include `jig status` and `jig validate` in validation steps
-
----
-
-## 8) Completion Summary (when PLAN completes)
+**File**: `jig/outcomes/O-NNN.md` (sequential numbering: O-001, O-002, etc.)
 
 ```markdown
-### Summary
-- Scope delivered: …
-- Key decisions: …
-- Deltas from SCOPE: …
+---
+id: O-001
+type: outcome
+---
 
-### Metrics
-- Units: <count>; median cycle time: <min>
-- Rework rate (units reopened): <pct>
-- Flaky test events: <count>
-- Docs lag: <pct>
-- Markers captured: <count> (#DISCOVERY, #DECISION, #LEARNED)
+# <Human-Readable Title>
 
-### Reflection Roll-up
-- Repeatable wins: …
-- Systemic frictions (top 3): …
-- Process changes adopted: …
-- Open questions for next plan: …
+<Description of the business value, user need, or goal>
 
-### Harvest Preparation (JIG)
-**Markers Summary:**
-- Discoveries: <count>
-- Decisions: <count>
-- Learned patterns: <count>
+**Value**: <Why this matters>
 
-**Recommended OSTC Nodes (from DISCOVERIES only):**
-(AIA proposes based on #DISCOVERY markers - these are NEW constraints learned during implementation)
-- [ ] S-AUTH-004: "JWT timing attacks require constant-time comparison" (NEW - discovered during security review)
-- [ ] S-AUTH-003: Add "token refresh timing must be <100ms" (UPDATE - gap found during implementation)
-- [ ] O-PERF-001: "Authentication completes in <100ms" (NEW - performance constraint discovered)
-
-**Note:** Outcomes and Specifications that were known from SCOPE should already exist (created in Work Unit 0).
-Harvest captures NEW insights discovered during the work.
-
-**Subsystems Touched:** auth (primary), user (dependency)
-
-**Next Step:** `jig ai-distill --branch <branch-name>`
+**Acceptance Criteria**:
+- <Observable outcome 1>
+- <Observable outcome 2>
 ```
 
+**Validation**: Run `jigy validate` to check format.
+
+#### 2.3: Create Specification Files
+
+For each WHAT statement:
+
+**File**: `jig/specifications/S-NNN.md` (sequential numbering: S-001, S-002, etc.)
+
+```markdown
+---
+id: S-001
+type: specification
+implements: [O-001]  # Links to outcome(s) this spec satisfies
 ---
 
-## 9) Reflection Metrics
+# <Human-Readable Title>
 
-**Derived metrics (auto-summarized by AIA):**
+<Concrete, testable requirement>
 
-* Median unit cycle time vs. planned effort → sizing calibration
-* Rework rate (units reopened) → quality/flow signal
-* Flaky test rate (`tests`) → stabilize foundation before new scope
-* Docs lag (% units with docs updated after commit) → docs discipline
-* Marker density (markers per work unit) → harvest richness signal
+**Acceptance Criteria**:
+- <Testable criterion 1>
+- <Testable criterion 2>
 
----
+**Rationale**: <Why this constraint exists>
 
-## 10) Commit Conventions (per Work Unit)
-
-**Subject:**
+**References**: <Links to external docs, RFCs, etc.>
 ```
-feat|fix|refactor(scope): brief message
 
-Unit: <N>
-Implements: S-AUTH-001, S-USER-042
-Reflection: see jig/deltas/active/<branch>/PLAN.md → Work Unit N
-```
+**Validation**: Run `jigy validate` to check format.
 
-**Body:**
-- Be short and concise
-- Reference OSTC nodes where applicable
-- Link to PLAN for full context
-
----
-
-## 11) Operating Rules (PDCA + JIG)
-
-**PDCA Rules:**
-* Reflection is **part of DoD**: no commit without filled **Reflect** block (≤5 bullets), unless emergency
-* If `scope` appears in >20% of units → next plan requires acceptance-criteria pass before implementation
-* If `tests` flakiness >5% → allocate one unit to deflake before new scope
-* If `review` latency >24h → switch to smaller units (<90m) or adjust reviewer rotation
-* Prefer **smaller units**; if unit exceeds 2h, split
-
-**JIG Rules:**
-* **Markers are optional but encouraged**: Aim for 1-3 harvestable markers per work unit
-* **Harvest before merge**: Run `jig ai-distill --branch <branch>` before merging to main
-* **Review synthesis proposals**: Human approves/rejects LLM-proposed OSTC nodes
-* **Validate alignment**: Run `jig validate` before marking unit complete
-* **Annotate as you code**: Add `@jig` annotations to code and test functions inline
-  - Code: `# @jig C-XXX-NNN implements:S-YYY-NNN subsystem:name`
-  - Tests: `# @jig T-XXX-NNN verifies:S-YYY-NNN subsystem:name`
-
----
-
-## 12) JIG Workflow Integration
-
-### Before Starting (Branch Creation + Intent-First)
+#### 2.4: Commit Intent (Before Any Code)
 
 ```bash
-# 1. Create feature branch
-git checkout -b auth-jwt-validation
-
-# 2. Create PLAN Delta
-jig delta new --type plan
-# Creates: jig/deltas/active/auth-jwt-validation/PLAN_auth_jwt_validation.md
-
-# 3. Fill in PLAN using this template (AIA can draft from SCOPE)
-
-# 4. Execute Work Unit 0: Create Known Intent
-# Read SCOPE, extract known Outcomes and Specifications
-# Create jig/outcomes/O-AUTH-*.md files
-# Create jig/specifications/S-AUTH-*.md files
-
-# 5. Commit Intent nodes (before any code)
 git add jig/outcomes/ jig/specifications/
-git commit -m "intent: define JWT validation constraints
+git commit -m "intent: define constraints for <feature>
 
-Created:
-- O-AUTH-001: Multi-device authentication
-- S-AUTH-001: JWT with 24h expiration
-- S-AUTH-002: Device ID in token claims
+Created Outcomes: O-001, O-002
+Created Specifications: S-001, S-002, S-003
 
-See: jig/deltas/active/auth-jwt-validation/PLAN.md → WU0"
-
-# 6. Commit initial PLAN
-git add jig/deltas/
-git commit -m "plan: JWT validation implementation plan
-
-Implements: O-AUTH-001, S-AUTH-001, S-AUTH-002
-See: jig/deltas/active/auth-jwt-validation/PLAN.md"
+See: docs/plans/PLAN-<feature>.md → Work Unit 0"
 ```
 
-### During Execution (per Work Unit)
+### Step 3: Execute Work Units 1-N (TDD Loop)
+
+For each work unit:
+
+#### 3.1: Write Tests First (RED)
+
+Write tests that verify the specifications:
+
+```python
+@jig.verifies("S-001")
+def test_token_expiration():
+    """Verify tokens expire after 15 minutes of inactivity."""
+    token = create_token(user="test")
+    token.last_activity = datetime.now() - timedelta(minutes=15, seconds=1)
+    assert is_expired(token)
+```
+
+**Expected**: Tests FAIL (red) because implementation doesn't exist yet.
+
+#### 3.2: Implement Code (GREEN)
+
+Write minimal code to make tests pass:
+
+```python
+@jig.implements("S-001")
+def is_expired(token: Token) -> bool:
+    """Check if token has expired based on inactivity."""
+    inactive_duration = datetime.now() - token.last_activity
+    return inactive_duration > timedelta(minutes=15)
+```
+
+**Expected**: Tests PASS (green).
+
+#### 3.3: Refactor (If Needed)
+
+Improve code quality while keeping tests green.
+
+#### 3.4: Update Documentation
+
+Update relevant docs in the same commit:
+- README if public API changed
+- Architecture Decision Records (ADRs) if design choices made
+- API documentation if interfaces changed
+
+#### 3.5: Verify Alignment
 
 ```bash
-# Work normally, update PLAN after each unit
-# Add JIG markers in Reflect blocks
-# Commit code + PLAN updates together
+# Regenerate graphs to include new code/tests
+jigy index                          # Update intent graph
+jigy impl rebuild                   # Update implementation graph
+jigy verify rebuild --run-tests     # Update verification graph (runs tests with coverage)
 
-git add src/ tests/ jig/deltas/
-git commit -m "feat(auth): implement constant-time JWT validation
-
-Unit: 3
-Implements: S-AUTH-001
-Reflection: see PLAN → Work Unit 3"
+# Check alignment
+jigy status
 ```
 
-### After Completion (Harvest)
+**Expected output**:
+```
+S-001: Token Expiration
+  ✓ Implemented by: F-auth.tokens.is_expired (B-001)
+  ✓ Verified by: T-test_auth.test_token_expiration (B-001)
+  ✓ Test covers implementation
+
+  Alignment: PERFECT
+```
+
+#### 3.6: Update PLAN Reflect Block
+
+Fill in the Reflect section for this work unit (≤5 bullets):
+- **What worked well**: Concise wins (tools, techniques, approaches)
+- **What could be better**: Process improvements, scope clarity issues
+- **Surprises**: Non-obvious discoveries, edge cases found
+- **Risks**: Items to watch, technical debt, potential issues
+
+**Purpose**: PDCA learning (Plan-Do-Check-Act), not for harvest or synthesis. Focus on improving your development process.
+
+#### 3.7: Commit
 
 ```bash
-# 1. Fill Completion Summary in PLAN (AIA generates Harvest Preparation section)
+git add src/ tests/ docs/ jig/generated/
+git commit -m "feat(<scope>): <brief description>
 
-# 2. Run harvest pipeline
-jig ai-distill --branch auth-jwt-validation
+Implements: S-001, S-002
+Tests: T-001, T-002
+Alignment: verified with jigy status
 
-# What happens:
-# - Extracts all markers from PLAN
-# - LLM synthesizes into OSTC node proposals
-# - Human reviews and approves in terminal UI
-# - Creates/updates jig/{outcomes,specifications}/ files
-# - Proposes @jig annotations for test/code files
-
-# 3. Review Intent Graph changes
-git diff jig/
-jig validate --check-all
-
-# 4. Commit harvest
-git add jig/
-git commit -m "harvest: JWT validation insights
-
-Distilled 12 markers into 3 OSTC nodes:
-- S-AUTH-003 (NEW): Constant-time JWT validation
-- O-AUTH-001 (UPDATE): Added timing attack prevention
-- T-AUTH-012 (NEW): Constant-time validation test
-
-See: jig/harvest-reports/auth-jwt-validation-2025-11-18.yaml"
-
-# 5. Merge branch
-git checkout main
-git merge auth-jwt-validation
-
-# 6. Archive Delta
-jig delta archive --branch auth-jwt-validation --retention long-term
-# Moves: jig/deltas/active/X/ → jig/deltas/archive/X/
+See: docs/plans/PLAN-<feature>.md → Work Unit N"
 ```
 
+**Commit Guidelines**:
+- Type: `feat` (new feature), `fix` (bug fix), `refactor` (no behavior change)
+- Reference S/T nodes for traceability
+- Link to PLAN work unit for context
+
+#### 3.8: Mark Checklist Complete
+
+In your PLAN document, mark the work unit checklist items:
+- [x] WUN: <title> — tests ✅ / code ✅ / docs ✅
+
+### Step 4: Complete PLAN
+
+When all work units are done:
+
+#### 4.1: Add Completion Summary to PLAN
+
+```markdown
+## Completion Summary
+
+**Scope Delivered**:
+- <Summary of what was accomplished>
+
+**Metrics**:
+- Work Units: <count>
+- Specifications Created: <count>
+- Specifications Implemented: <count>
+- Alignment: <percentage from jigy status>
+
+**Key Decisions**:
+- <Important choices made and rationale>
+
+**Deltas from Original Scope**:
+- <What changed and why>
+
+**Reflection Roll-Up**:
+- **Repeatable wins**: <Patterns that worked well>
+- **Systemic frictions**: <Process issues to address>
+- **Open questions**: <Items for future work>
+
+**Final Validation**:
+- [ ] All work unit checklists complete
+- [ ] `jigy validate` passes
+- [ ] `jigy status` shows expected alignment
+- [ ] All tests passing
+- [ ] Documentation updated
+```
+
+#### 4.2: Final Alignment Check
+
+```bash
+jigy validate              # Check artifact integrity
+jigy status               # Check alignment status
+pytest                    # Run all tests
+```
+
+#### 4.3: Mark PLAN Complete
+
+Update PLAN header: `Status: Complete`
+
+## Outputs
+
+### Required Artifacts
+
+1. **Intent Nodes**: `jig/outcomes/O-*.md`, `jig/specifications/S-*.md`
+2. **Implementation**: Code with `@jig.implements("S-NNN")` decorators
+3. **Verification**: Tests with `@jig.verifies("S-NNN")` decorators
+4. **Updated Graphs**: `jig/generated/*.ndjson` (regenerated via jigy commands)
+5. **PLAN Document**: Work tracker with reflections and completion summary
+6. **Git Commits**: Clean history with traceability to S/T nodes
+
+### Output Locations
+
+```
+jig/
+├── outcomes/
+│   ├── O-001.md              # Created in WU0
+│   └── O-002.md
+├── specifications/
+│   ├── S-001.md              # Created in WU0
+│   ├── S-002.md
+│   └── S-003.md
+├── bricks.yaml               # Updated if new bricks defined
+└── generated/
+    ├── intent-graph.ndjson   # Regenerated after O/S changes
+    ├── implementation-graph.ndjson  # Regenerated after code changes
+    └── verification-graph.ndjson    # Regenerated after test runs
+
+src/
+└── <modules>/
+    └── *.py                  # Code with @jig.implements decorators
+
+tests/
+└── <modules>/
+    └── test_*.py             # Tests with @jig.verifies decorators
+
+docs/
+└── plans/
+    └── PLAN-<feature>.md     # Your work tracker
+```
+
+## Success Criteria
+
+Your work is complete when:
+
+- [ ] All O/S nodes from SCOPE are created in `jig/outcomes/` and `jig/specifications/`
+- [ ] All specifications have `@jig.implements("S-NNN")` decorators in code
+- [ ] All specifications have `@jig.verifies("S-NNN")` decorators in tests
+- [ ] `jigy validate` passes with no errors
+- [ ] `jigy status` shows expected alignment (typically 100% for new work)
+- [ ] All tests pass (`pytest`)
+- [ ] Documentation is updated
+- [ ] PLAN document has completion summary
+- [ ] Git commits reference S/T nodes for traceability
+
+## Constraints
+
+### DO NOT
+
+- **Write code before creating Intent nodes** (WU0 must be first)
+- **Write implementation before writing tests** (TDD: tests first)
+- **Commit code without @jig decorators** (breaks alignment measurement)
+- **Skip alignment validation** (`jigy status` is required)
+- **Use domain prefixes in IDs** (use S-001, not S-AUTH-001; bricks provide organization)
+- **Manually edit graph files** (`jig/generated/*.ndjson` are machine-generated)
+
+### MUST
+
+- **Follow O→S→TDD workflow** (Outcome → Spec → Test → Code)
+- **Use sequential numbering** for O/S nodes (O-001, O-002, S-001, S-002)
+- **Add decorators as you code** (@jig.implements in code, @jig.verifies in tests)
+- **Regenerate graphs after changes** (jigy index, jigy impl rebuild, jigy verify rebuild)
+- **Validate before completing** (jigy validate, jigy status)
+
+### PREFER
+
+- **Small work units** (60-90 minutes each)
+- **One specification per file** (S-001.md, S-002.md)
+- **Atomic commits** (one work unit per commit when possible)
+- **Concise reflections** (≤5 bullets per work unit)
+
+## Examples
+
+### Example: Work Unit 0 Execution
+
+**SCOPE excerpt**:
+> Users must be able to authenticate securely using JWT tokens that expire after 15 minutes of inactivity.
+
+**Extract intent**:
+- **WHY**: Secure authentication (business value: reduce unauthorized access)
+- **WHAT**: JWT tokens with 15-minute inactivity expiration (technical constraint)
+
+**Create O-001.md**:
+```markdown
+---
+id: O-001
+type: outcome
 ---
 
-## 13) AI Agent Prompts (JIG-Enhanced)
+# Secure User Authentication
 
-### Create PLAN from SCOPE (Intent-First)
+Users can authenticate securely without password vulnerabilities.
 
-> Read SCOPE and draft a minimal PLAN per the JIG-aware template.
->
-> **Step 1: Extract Known Intent**
-> 1. Identify all known "why" statements (business value) → List as Outcomes to create
-> 2. Identify all known "what" requirements (technical specs) → List as Specifications to create
-> 3. Mark anything unclear as "to be discovered during implementation"
->
-> **Step 2: Create Work Unit 0**
-> 1. List all O and S nodes to be created upfront
-> 2. Provide rationale: "These constraints were known from SCOPE"
-> 3. This enables O→S→TDD flow for all subsequent units
->
-> **Step 3: Plan Implementation Units**
-> 1. Add YAML frontmatter: `delta_type: plan`, `branch: <name>`
-> 2. Propose 3–7 Work Units (after WU0), each with acceptance criteria, tests, and risks
-> 3. Keep units ≤90m
-> 4. Reference the Intent nodes created in WU0 (not "will implement S-XXX", but "implements S-XXX")
-> 5. Suggest appropriate subsystem
->
-> **Step 4: Save and Execute WU0 First**
-> 1. Save to: `jig/deltas/active/<branch>/PLAN_<feature>.md`
-> 2. Create the O/S node files in jig/outcomes/ and jig/specifications/
-> 3. Commit Intent before writing any implementation code
+**Value**: Reduces support burden from password resets and improves security posture.
 
-### Per Work Unit (TDD Loop)
+**Acceptance Criteria**:
+- Users successfully authenticate across multiple sessions
+- No authentication bypasses in security audits
+```
 
-> Execute Work Unit N strictly to acceptance criteria, following TDD.
->
-> **Constraint-driven implementation:**
-> 1. **Read the constraints** - Review O/S nodes this unit implements (already created in WU0)
-> 2. **Write tests first** (RED):
->    ```python
->    # @jig T-XXX-NNN verifies:S-YYY-NNN subsystem:auth
->    def test_my_function():
->        # Test should fail - implementation doesn't exist yet
->    ```
-> 3. **Implement minimal code** (GREEN):
->    ```python
->    # @jig C-XXX-NNN implements:S-YYY-NNN subsystem:auth interface:public
->    def my_function():
->        # Make tests pass with simplest implementation
->    ```
-> 4. **Refactor** if needed (REFACTOR)
-> 5. **Update docs**
-> 6. **Fill Reflect block** (≤5 bullets):
->    - Focus on DISCOVERIES (things you learned that weren't in the Intent nodes)
->    - Add JIG markers for NEW constraints (`#DISCOVERY`), patterns (`#LEARNED`), decisions (`#DECISION`)
->    - Don't marker things that were already in O/S nodes - those were known constraints
->    - Add process labels (`[scope]`, `[tests]`, etc.)
-> 7. **Mark checklist**: tests ✅, docs ✅, reflect ✅
-> 8. **Prepare commit** per §10
-> 9. **Include `jig validate`** in human validation steps
+**Create S-001.md**:
+```markdown
+---
+id: S-001
+type: specification
+implements: [O-001]
+---
 
-### Completion Summary
+# JWT Token Inactivity Expiration
 
-> When all units are complete:
->
-> 1. Produce Completion Summary with standard metrics
-> 2. Add **Harvest Preparation** section:
->    - Count markers by type (focus on #DISCOVERY - these are NEW learnings)
->    - Propose NEW or UPDATED OSTC nodes based on discovery markers
->    - DO NOT propose nodes for constraints that were known upfront (already created in WU0)
->    - List subsystems touched
-> 3. Generate command: `jig ai-distill --branch <branch>`
-> 4. Summarize reflection roll-up themes
-> 5. Note the constraint satisfaction journey:
->    - Known constraints at start (WU0 Intent nodes)
->    - Discovered constraints during work (harvest markers)
->    - How future you is now smarter than past you
+Authentication tokens MUST expire after 15 minutes of inactivity.
+
+**Acceptance Criteria**:
+- Token created with `expires_at = now() + 15 minutes`
+- Any operation updates `last_activity` timestamp
+- Token rejected if `now() > last_activity + 15 minutes`
+
+**Rationale**: Limits exposure window if token is compromised.
+```
+
+**Commit**:
+```bash
+git add jig/outcomes/O-001.md jig/specifications/S-001.md
+git commit -m "intent: define JWT authentication constraints
+
+Created: O-001 (Secure Authentication), S-001 (Token Expiration)
+See: docs/plans/PLAN-jwt-auth.md → WU0"
+```
+
+### Example: Work Unit 1 Execution (TDD)
+
+**Goal**: Implement S-001 (JWT Token Inactivity Expiration)
+
+**Step 1: Write Test First** (RED):
+```python
+# tests/auth/test_tokens.py
+from datetime import datetime, timedelta
+from auth.tokens import is_expired, Token
+
+@jig.verifies("S-001")
+def test_token_expires_after_15_minutes_inactivity():
+    """Verify tokens expire after 15 minutes of inactivity."""
+    token = Token(user="test", last_activity=datetime.now())
+
+    # Token should NOT be expired at 14 minutes
+    token.last_activity = datetime.now() - timedelta(minutes=14)
+    assert not is_expired(token)
+
+    # Token SHOULD be expired at 15 minutes + 1 second
+    token.last_activity = datetime.now() - timedelta(minutes=15, seconds=1)
+    assert is_expired(token)
+```
+
+Run test: `pytest tests/auth/test_tokens.py::test_token_expires_after_15_minutes_inactivity`
+**Expected**: FAILS (function doesn't exist yet)
+
+**Step 2: Implement** (GREEN):
+```python
+# src/auth/tokens.py
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+
+@dataclass
+class Token:
+    user: str
+    last_activity: datetime
+
+@jig.implements("S-001")
+def is_expired(token: Token) -> bool:
+    """Check if token has expired due to inactivity."""
+    inactive_duration = datetime.now() - token.last_activity
+    return inactive_duration > timedelta(minutes=15)
+```
+
+Run test: `pytest tests/auth/test_tokens.py::test_token_expires_after_15_minutes_inactivity`
+**Expected**: PASSES
+
+**Step 3: Verify Alignment**:
+```bash
+jigy impl rebuild
+jigy verify rebuild --run-tests
+jigy status
+```
+
+**Output**:
+```
+S-001: JWT Token Inactivity Expiration
+  ✓ Implemented by: F-auth.tokens.is_expired (B-001)
+  ✓ Verified by: T-test_auth.test_token_expires_after_15_minutes_inactivity (B-001)
+  ✓ Test covers implementation
+
+  Alignment: PERFECT
+```
+
+**Step 4: Commit**:
+```bash
+git add src/auth/tokens.py tests/auth/test_tokens.py jig/generated/
+git commit -m "feat(auth): implement JWT token expiration
+
+Implements: S-001
+Tests: T-test_auth.test_token_expires_after_15_minutes_inactivity
+Alignment: verified (100%)
+
+Tokens now expire after 15 minutes of inactivity as specified.
+
+See: docs/plans/PLAN-jwt-auth.md → WU1"
+```
+
+## Common Pitfalls
+
+### Pitfall 1: Writing Code Before Intent
+
+**Wrong**:
+```bash
+# Starts coding immediately
+vim src/auth/tokens.py  # Writing implementation first
+```
+
+**Right**:
+```bash
+# Creates intent first
+vim jig/specifications/S-001.md  # Define what we're building
+jigy validate                     # Validate format
+git commit                        # Commit intent
+vim tests/auth/test_tokens.py    # Then write test
+vim src/auth/tokens.py           # Then implement
+```
+
+### Pitfall 2: Skipping @jig Decorators
+
+**Wrong**:
+```python
+def is_expired(token: Token) -> bool:
+    # No decorator - alignment cannot be measured!
+    return datetime.now() - token.last_activity > timedelta(minutes=15)
+```
+
+**Right**:
+```python
+@jig.implements("S-001")
+def is_expired(token: Token) -> bool:
+    # Decorator makes alignment measurable
+    return datetime.now() - token.last_activity > timedelta(minutes=15)
+```
+
+### Pitfall 3: Using Domain Prefixes in IDs
+
+**Wrong**:
+```markdown
+---
+id: S-AUTH-001  # Don't use domain prefixes!
+---
+```
+
+**Right**:
+```markdown
+---
+id: S-001       # Sequential numbering
+type: specification
+---
+# JWT Token Expiration
+# (Brick assignment provides organizational context)
+```
+
+### Pitfall 4: Forgetting to Regenerate Graphs
+
+**Wrong**:
+```bash
+vim src/auth/tokens.py    # Add @jig.implements
+git commit                # Commit immediately
+jigy status              # Old graph - doesn't show new implementation!
+```
+
+**Right**:
+```bash
+vim src/auth/tokens.py    # Add @jig.implements
+jigy impl rebuild         # Regenerate graph
+jigy status              # Now shows new implementation
+git add jig/generated/   # Include updated graphs in commit
+git commit
+```
+
+## Quick Reference
+
+### Essential Commands
+
+```bash
+# Validate artifact integrity
+jigy validate
+
+# Generate/update graphs
+jigy index                         # Intent graph (O, S nodes)
+jigy impl rebuild                  # Implementation graph (F nodes, F→S edges)
+jigy verify rebuild --run-tests    # Verification graph (T nodes, T→S, T→F edges)
+
+# Check alignment
+jigy status                        # Overall alignment report
+jigy status --spec S-001          # Alignment for specific spec
+
+# Run tests
+pytest                             # All tests
+pytest -v                          # Verbose output
+pytest --cov                       # With coverage
+```
+
+### Decorator Syntax
+
+```python
+# In implementation code
+@jig.implements("S-001")
+def my_function():
+    pass
+
+@jig.implements("S-001", "S-002")  # Multiple specs
+def another_function():
+    pass
+
+# In test code
+@jig.verifies("S-001")
+def test_my_function():
+    pass
+
+@jig.verifies("S-001", "S-002")    # Multiple specs
+def test_comprehensive():
+    pass
+```
+
+### File Naming Conventions
+
+```
+jig/outcomes/O-001.md               # Sequential numbering
+jig/outcomes/O-002.md
+jig/specifications/S-001.md         # Sequential numbering
+jig/specifications/S-002.md
+```
+
+### Commit Message Template
+
+```
+<type>(<scope>): <brief description>
+
+Implements: S-001, S-002
+Tests: T-001, T-002
+Alignment: verified
+
+<Optional detailed explanation>
+
+See: docs/plans/PLAN-<feature>.md → Work Unit N
+```
+
+## Version History
+
+- **2.0.0** (2025-11-26): Aligned with JIG v8
+  - Removed: Deltas, harvest pipeline, markers, subsystems
+  - Simplified: O→S→TDD workflow, sequential IDs, decorator syntax
+  - Focused: Alignment measurement, five artifacts, bricks
+
+- **1.0.0** (2024): Original version (JIG v7, included deltas/harvest)
 
 ---
 
-## 14) Quick Reference: JIG Markers
-
-| Marker | When to Use | Example |
-|--------|-------------|---------|
-| `#DISCOVERY` | Surprising finding, gap, non-obvious insight | `#DISCOVERY "Lists are unhashable in Python sets"` |
-| `#DECISION` | Choice with tradeoffs | `#DECISION "Chose X over Y because..."` |
-| `#LEARNED` | Reusable pattern | `#LEARNED "Always validate input types"` |
-| `#IMPLEMENTS` | Fulfills requirement | `#IMPLEMENTS S-AUTH-003` |
-| `# @jig C-XXX` | Code annotation | Mark code implementations: `# @jig C-AUTH-001 implements:S-AUTH-001 subsystem:auth` |
-| `# @jig T-XXX` | Test annotation | Mark test functions: `# @jig T-AUTH-001 verifies:S-AUTH-001 subsystem:auth` |
-
----
-
-## 15) Benefits of JIG Integration
-
-**For the Developer:**
-- Same PLAN workflow you already know
-- Markers are optional, add when valuable
-- Harvest is one command at the end
-- Intent Graph provides living documentation
-
-**For the AI Agent:**
-- Intent nodes provide clear constraints to satisfy (not ambiguous requirements)
-- PLAN remains the single source of state (stateless resume)
-- TDD workflow: read constraints → write tests → implement → discover new constraints
-- Markers capture the learning journey (present you → future you)
-- Harvest step is explicit, not magical
-- Traceability from code → PLAN → Intent Graph
-
-**For the Team:**
-- Decisions preserved in Intent Graph, not lost in git history
-- Patterns emerge from LEARNED markers across PLANs
-- Specs stay fresh (harvest updates them)
-- Alignment visible: `jig status` shows drift
-
-**For Future You (6 months later):**
-- Intent Graph explains *why* the code is this way
-- Deltas archived but searchable: `grep -r "#DISCOVERY" jig/deltas/archive/`
-- Harvest reports show what you learned on this branch
-- No more "why did we decide X?" mysteries
-
----
-
-**Status:** Ready for bootstrap
-**Next:** Create first PLAN using this template for JIG Slice 0 (Bootstrap)
+**Next**: Apply this workflow to your first feature. Start with Work Unit 0 (Create Intent).

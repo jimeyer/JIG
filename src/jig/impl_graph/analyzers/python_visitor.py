@@ -5,8 +5,14 @@ modules, classes, functions, and their relationships.
 """
 
 import ast
+import logging
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+import jig
+
+logger = logging.getLogger(__name__)
 
 
 class PythonStructureVisitor(ast.NodeVisitor):
@@ -57,6 +63,7 @@ class PythonStructureVisitor(ast.NodeVisitor):
         """
         return self.calls
 
+    @jig.implements("S-001")
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit a class definition node.
 
@@ -81,6 +88,9 @@ class PythonStructureVisitor(ast.NodeVisitor):
             if base_name:
                 base_classes.append(base_name)
 
+        # Extract @jig.implements decorators
+        implements_specs = self._extract_implements_decorators(node)
+
         # Create class node
         class_node: Dict[str, Any] = {
             "id": class_id,
@@ -91,6 +101,10 @@ class PythonStructureVisitor(ast.NodeVisitor):
             "line": node.lineno,
             "bases": base_classes,
         }
+
+        # Add implements field if decorators found
+        if implements_specs:
+            class_node["implements"] = implements_specs
 
         self.nodes.append(class_node)
 
@@ -123,6 +137,7 @@ class PythonStructureVisitor(ast.NodeVisitor):
         """
         self._visit_function(node, is_async=True)
 
+    @jig.implements("S-001")
     def _visit_function(
         self, node: ast.FunctionDef | ast.AsyncFunctionDef, is_async: bool
     ) -> None:
@@ -143,6 +158,9 @@ class PythonStructureVisitor(ast.NodeVisitor):
         # Extract signature
         signature = self._extract_signature(node)
 
+        # Extract @jig.implements decorators
+        implements_specs = self._extract_implements_decorators(node)
+
         # Create function node
         func_node: Dict[str, Any] = {
             "id": func_id,
@@ -159,6 +177,10 @@ class PythonStructureVisitor(ast.NodeVisitor):
         if self.current_class:
             func_node["parent_class"] = self.current_class
 
+        # Add implements field if decorators found
+        if implements_specs:
+            func_node["implements"] = implements_specs
+
         self.nodes.append(func_node)
 
         # Visit function body to extract calls
@@ -167,6 +189,7 @@ class PythonStructureVisitor(ast.NodeVisitor):
         self.generic_visit(node)
         self.current_function = old_function
 
+    @jig.implements("S-001")
     def _extract_signature(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> str:
         """Extract function signature as a string.
 
@@ -277,6 +300,78 @@ class PythonStructureVisitor(ast.NodeVisitor):
             except Exception:
                 return None
 
+    @jig.implements("S-002")
+    def _extract_implements_decorators(
+        self, node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> List[str]:
+        """Extract @jig.implements() decorator arguments from a node.
+
+        Looks for decorators matching:
+        - @jig.implements("S-001")
+        - @jig.implements("S-001", "S-002")
+        - @implements("S-001") (if imported as 'from jig import implements')
+
+        Args:
+            node: The ClassDef or FunctionDef node to inspect.
+
+        Returns:
+            List of specification IDs found in @jig.implements decorators.
+            Empty list if no decorators found or all invalid.
+        """
+        implements_specs: List[str] = []
+
+        for decorator in node.decorator_list:
+            # Look for Call nodes (decorators with arguments)
+            if not isinstance(decorator, ast.Call):
+                continue
+
+            # Check if this is @jig.implements(...) or @implements(...)
+            is_implements = False
+
+            if isinstance(decorator.func, ast.Attribute):
+                # @jig.implements(...) or @module.implements(...)
+                if decorator.func.attr == "implements":
+                    # Check if it's jig.implements
+                    if isinstance(decorator.func.value, ast.Name):
+                        if decorator.func.value.id == "jig":
+                            is_implements = True
+            elif isinstance(decorator.func, ast.Name):
+                # @implements(...) - short form
+                if decorator.func.id == "implements":
+                    is_implements = True
+
+            if not is_implements:
+                continue
+
+            # Extract string arguments (spec IDs)
+            for arg in decorator.args:
+                if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                    spec_id = arg.value
+                    # Validate spec ID format: S-{number} or O-{number}
+                    if self._validate_spec_id(spec_id):
+                        implements_specs.append(spec_id)
+                    else:
+                        logger.warning(
+                            f"{self.file_path}:{node.lineno}: "
+                            f"Invalid spec ID format '{spec_id}' in @jig.implements(). "
+                            f"Expected format: S-001 or O-001"
+                        )
+
+        return implements_specs
+
+    def _validate_spec_id(self, spec_id: str) -> bool:
+        """Validate that a spec ID matches the expected format.
+
+        Args:
+            spec_id: The specification ID to validate.
+
+        Returns:
+            True if the spec ID matches pattern ^[SO]-\\d+$, False otherwise.
+        """
+        pattern = r"^[SO]-\d+$"
+        return bool(re.match(pattern, spec_id))
+
+    @jig.implements("S-005")
     def visit_Import(self, node: ast.Import) -> None:
         """Visit an import statement.
 
@@ -297,6 +392,7 @@ class PythonStructureVisitor(ast.NodeVisitor):
         # Continue visiting
         self.generic_visit(node)
 
+    @jig.implements("S-005")
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Visit a from...import statement.
 

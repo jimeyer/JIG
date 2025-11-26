@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+import jig
 from jig.impl_graph.analyzers import PythonAnalyzer
 
 # Get path to test fixtures
@@ -23,6 +24,7 @@ def analyzer() -> PythonAnalyzer:
     return PythonAnalyzer(project_root=FIXTURES_DIR.parent.parent)
 
 
+@jig.verifies("S-005")
 def test_import_edges_stdlib(analyzer: PythonAnalyzer) -> None:
     """Test extraction of stdlib import edges.
 
@@ -60,6 +62,7 @@ def test_import_edges_stdlib(analyzer: PythonAnalyzer) -> None:
     assert os_module["name"] == "os"
 
 
+@jig.verifies("S-005")
 def test_import_edges_from_import(analyzer: PythonAnalyzer) -> None:
     """Test extraction of from...import edges.
 
@@ -223,6 +226,7 @@ def test_multiple_inheritance_edges(analyzer: PythonAnalyzer) -> None:
     assert any("Dog" in t for t in targets)
 
 
+@jig.verifies("S-005")
 def test_external_module_nodes(analyzer: PythonAnalyzer) -> None:
     """Test that external modules are added as nodes.
 
@@ -246,6 +250,7 @@ def test_external_module_nodes(analyzer: PythonAnalyzer) -> None:
         assert "name" in ext_mod
 
 
+@jig.verifies("S-005")
 def test_external_vs_internal_module_detection(analyzer: PythonAnalyzer) -> None:
     """Test detection of external vs internal modules.
 
@@ -299,6 +304,7 @@ def test_edge_types_complete(analyzer: PythonAnalyzer) -> None:
     assert "extends" in edge_types
 
 
+@jig.verifies("S-005")
 def test_import_line_numbers(analyzer: PythonAnalyzer) -> None:
     """Test that import edges include line numbers.
 
@@ -333,6 +339,7 @@ def test_call_line_numbers(analyzer: PythonAnalyzer) -> None:
         assert edge["line"] > 0
 
 
+@jig.verifies("S-005")
 def test_accuracy_metrics_imports(analyzer: PythonAnalyzer) -> None:
     """Test import discovery accuracy.
 
@@ -388,6 +395,7 @@ def test_accuracy_metrics_calls(analyzer: PythonAnalyzer) -> None:
     assert len(call_edges) >= 3
 
 
+@jig.verifies("S-001", "S-005")
 def test_integration_all_edge_types(analyzer: PythonAnalyzer) -> None:
     """Integration test: ensure all edge types work together.
 

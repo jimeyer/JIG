@@ -11,12 +11,15 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
+import jig
+
 from .base import LanguageAnalyzer
 from .python_visitor import PythonStructureVisitor
 
 logger = logging.getLogger(__name__)
 
 
+@jig.implements("S-006")
 class ParseError(Exception):
     """Raised when a Python file cannot be parsed."""
 
@@ -39,6 +42,7 @@ class ParseError(Exception):
         self.text = text
         super().__init__(self._format_message())
 
+    @jig.implements("S-006")
     def _format_message(self) -> str:
         """Format a clear, actionable error message."""
         msg = f"ERROR: Failed to parse Python file\n"
@@ -84,6 +88,7 @@ class PythonAnalyzer(LanguageAnalyzer):
         """
         return [".py", ".pyx"]
 
+    @jig.implements("S-001", "S-005", "S-006")
     def analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]:
         """Analyze a Python source file and return nodes and edges.
 
@@ -313,6 +318,18 @@ class PythonAnalyzer(LanguageAnalyzer):
                     # Otherwise, it might be imported or external
                     # Would need import resolution to handle properly
 
+        # Build implementation edges for nodes with @jig.implements decorators
+        for node in nodes:
+            if "implements" in node:
+                for spec_id in node["implements"]:
+                    edges.append(
+                        {
+                            "source": node["id"],
+                            "target": spec_id,
+                            "type": "implements",
+                        }
+                    )
+
         # Add external module nodes to the node list
         all_nodes.extend(external_modules.values())
 
@@ -352,6 +369,7 @@ class PythonAnalyzer(LanguageAnalyzer):
         # Fallback: use the file stem as module name
         return module_path.stem
 
+    @jig.implements("S-005")
     def _is_internal_module(self, module_name: str) -> bool:
         """Check if a module is internal to the project or external.
 

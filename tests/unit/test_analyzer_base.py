@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 import pytest
 
+import jig
 from jig.impl_graph.analyzers import LanguageAnalyzer
 
 
@@ -44,6 +45,7 @@ class IncompleteAnalyzer(LanguageAnalyzer):
     # Missing file_extensions() and analyze_file()
 
 
+@jig.verifies("S-004")
 def test_language_analyzer_interface() -> None:
     """Test that LanguageAnalyzer defines the required abstract interface.
 
@@ -54,6 +56,7 @@ def test_language_analyzer_interface() -> None:
         LanguageAnalyzer()  # type: ignore
 
 
+@jig.verifies("S-004")
 def test_incomplete_analyzer_cannot_be_instantiated() -> None:
     """Test that incomplete implementations cannot be instantiated.
 
@@ -63,6 +66,7 @@ def test_incomplete_analyzer_cannot_be_instantiated() -> None:
         IncompleteAnalyzer()  # type: ignore
 
 
+@jig.verifies("S-004")
 def test_mock_analyzer_interface_compliance() -> None:
     """Test that MockAnalyzer correctly implements the interface.
 
@@ -89,6 +93,7 @@ def test_mock_analyzer_interface_compliance() -> None:
     assert isinstance(result["edges"], list)
 
 
+@jig.verifies("S-004")
 def test_mock_analyzer_returns_language_agnostic_format() -> None:
     """Test that analyzer returns language-agnostic dict format.
 

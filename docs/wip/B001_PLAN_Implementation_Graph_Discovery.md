@@ -84,7 +84,7 @@ branch: impl-graph-discovery
 - [x] WU1: Language analyzer plugin architecture — tests ☑ / docs ☑ / reflect ☑
 - [x] WU2: Python AST parser (modules, classes, functions) — tests ☑ / docs ☑ / reflect ☑
 - [x] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU4: Decorator extraction (@jig.implements) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU4: Decorator extraction (@jig.implements) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU5: NDJSON writer (deterministic output) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU6: CLI integration and end-to-end validation — tests ☐ / docs ☐ / reflect ☐
 
@@ -446,20 +446,44 @@ specifies: [S-001, S-003, S-005, S-006]
 - Add examples of code annotations
 
 **Reflect:**
-_(To be filled after completion)_
 
 - What worked well:
+  - AST decorator_list inspection makes extraction straightforward
+  - Pattern matching for both @jig.implements and @implements (short form) works cleanly
+  - Regex validation (`^[SO]-\d+$`) is simple and effective
+  - Warning on invalid spec IDs provides helpful feedback without failing builds
+  - Implementation edges integrate seamlessly with existing edge types
+  - 12 comprehensive tests cover all decorator variations
+  - 81.62% coverage exceeds 80% target
+  - 100% test pass rate on 66 total tests (no regressions)
+
 - What could be better:
+  - Could extract decorator line numbers for better error reporting
+  - Could validate that referenced spec IDs actually exist (cross-reference check)
+  - No support for @jig.verifies() extraction yet (that's for verification graph)
+  - Decorator extraction for nested decorators (stacked) not explicitly tested
+
 - Discoveries:
+  - ast.Call nodes represent function calls, including decorator applications
+  - ast.Attribute.attr == "implements" identifies the decorator name
+  - ast.Constant nodes (Python 3.8+) contain string literal values
+  - Multiple spec IDs in one decorator are just multiple args to ast.Call
+  - Short import form (@implements) detectable via ast.Name check
+  - Invalid spec IDs are common enough to warrant warnings, not errors
+
 - Risk watchlist:
+  - No validation that spec files actually exist (could reference non-existent specs)
+  - Malformed decorators (@jig.implements() with no args) not explicitly tested
+  - Performance impact of decorator extraction not measured (likely negligible)
+  - No test for decorators with non-string arguments (edge case)
 
 **Links:**
 - Commit(s): _TBD_
 
 **Human Validation:**
-- Run: `pytest tests/unit/test_decorator_extractor.py -v`
-- Run: Test on fixture with various decorator styles
-- Look for: All valid decorators extracted, invalid ones warned
+- Run: `pytest tests/unit/test_decorator_extraction.py -v` ✅ 12/12 passed
+- Run: `pytest tests/unit/ --cov=src/jig/impl_graph` ✅ 66/66 passed, 81.62% coverage
+- Look for: All valid decorators extracted, invalid ones warned ✅ Verified
 
 ---
 

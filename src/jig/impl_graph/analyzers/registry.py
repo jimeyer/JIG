@@ -9,6 +9,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import jig
+
 from .base import LanguageAnalyzer
 
 logger = logging.getLogger(__name__)
@@ -36,6 +38,7 @@ class AnalyzerRegistry:
         self._analyzers: Dict[str, LanguageAnalyzer] = {}
         self._extension_map: Dict[str, LanguageAnalyzer] = {}
 
+    @jig.implements("S-004")
     def register(self, analyzer: LanguageAnalyzer) -> None:
         """Register an analyzer for its file extensions.
 
@@ -87,6 +90,7 @@ class AnalyzerRegistry:
             f"Registered {language} analyzer for extensions: {', '.join(extensions)}"
         )
 
+    @jig.implements("S-004")
     def get_analyzer(self, file_path: Path) -> Optional[LanguageAnalyzer]:
         """Get the appropriate analyzer for a file based on its extension.
 
