@@ -478,7 +478,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - No test for decorators with non-string arguments (edge case)
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): da5ad8a
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_decorator_extraction.py -v` ✅ 12/12 passed
