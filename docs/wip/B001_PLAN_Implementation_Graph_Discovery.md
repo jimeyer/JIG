@@ -655,7 +655,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - Error messages could be more actionable (suggest fixes, not just report problems)
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): cfc9233
 
 **Human Validation:**
 - Run: `pytest tests/ -v` (all tests)
