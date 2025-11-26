@@ -215,7 +215,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - Extension conflicts between analyzers resolved by "last wins" - could be stricter
 
 **Links:**
-- Commit(s): _Next commit_
+- Commit(s): 5b58dab
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_analyzer_*.py -v`
