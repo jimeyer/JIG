@@ -82,7 +82,7 @@ branch: impl-graph-discovery
 
 - [x] WU0: Create Specification and Outcome Files (O-001 through O-003, S-001 through S-006) — done ☑
 - [x] WU1: Language analyzer plugin architecture — tests ☑ / docs ☑ / reflect ☑
-- [ ] WU2: Python AST parser (modules, classes, functions) — tests ☐ / docs ☐ / reflect ☐
+- [x] WU2: Python AST parser (modules, classes, functions) — tests ☑ / docs ☑ / reflect ☑
 - [ ] WU3: Dependency graph builder (imports, calls, inheritance) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU4: Decorator extraction (@jig.implements) — tests ☐ / docs ☐ / reflect ☐
 - [ ] WU5: NDJSON writer (deterministic output) — tests ☐ / docs ☐ / reflect ☐
@@ -269,15 +269,39 @@ specifies: [S-001, S-003, S-005, S-006]
 - Add examples of generated node structures
 
 **Reflect:**
-_(To be filled after completion)_
 
 - What worked well:
+  - AST NodeVisitor pattern naturally maps to code structure traversal
+  - Fixture-driven testing provided comprehensive coverage of real-world patterns
+  - Class stack approach elegantly handles nested classes (Outer.Inner.DeepNested)
+  - Type hints extracted via ast.unparse() handle complex annotations well
+  - ParseError class with file:line reporting meets S-006 requirements
+  - 88.16% coverage on python.py, 80.67% overall exceeds target
+  - 14 test cases cover all major scenarios and edge cases
+
 - What could be better:
+  - Module name derivation logic is simplistic (src/ convention only)
+  - Could extract decorators eagerly (but deferred per plan to WU3/WU4)
+  - Signature extraction for functions with defaults could show default values
+  - No handling of *args defaults or keyword-only argument defaults
+  - Error messages could include code snippets from parse errors
+
 - Discoveries:
+  - ast.unparse() (Python 3.9+) makes annotation extraction trivial
+  - Need to track class_stack for nested class IDs, not just current_class
+  - Line numbers (node.lineno) available on all definition nodes
+  - AsyncFunctionDef is separate AST node type from FunctionDef
+  - Containment edges naturally emerge from visitor traversal order
+  - Private functions (_prefix) should be included for completeness
+
 - Risk watchlist:
+  - Module name resolution will need refinement for complex project structures
+  - No validation that module IDs match actual import paths (could cause issues in WU3)
+  - Default argument values not captured (might want them for documentation)
+  - Function bodies not analyzed (calls, assignments deferred to WU3)
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): _Next commit_
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_python_analyzer.py -v`

@@ -25,6 +25,7 @@ Example:
 """
 
 from .base import LanguageAnalyzer
+from .python import ParseError, PythonAnalyzer
 from .registry import AnalyzerRegistry, get_global_registry, reset_global_registry
 
 __all__ = [
@@ -32,4 +33,6 @@ __all__ = [
     "AnalyzerRegistry",
     "get_global_registry",
     "reset_global_registry",
+    "PythonAnalyzer",
+    "ParseError",
 ]
