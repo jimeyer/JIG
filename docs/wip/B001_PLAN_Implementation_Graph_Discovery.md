@@ -569,7 +569,7 @@ specifies: [S-001, S-003, S-005, S-006]
   - Memory usage: entire graph held in memory before writing
 
 **Links:**
-- Commit(s): _TBD_
+- Commit(s): db0377e
 
 **Human Validation:**
 - Run: `pytest tests/unit/test_ndjson_writer.py -v` ✅ 13/13 passed
