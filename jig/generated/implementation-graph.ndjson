@@ -1,0 +1,285 @@
+{"_meta": {"edge_count": 158, "generated": "2025-11-26T22:44:30.991110+00:00", "node_count": 126, "version": "1.0"}}
+{"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
+{"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
+{"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
+{"bases": ["ast.NodeVisitor"], "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "language": "python", "line": 18, "name": "PythonStructureVisitor", "type": "class"}
+{"bases": [], "file": "src/jig/impl_graph/analyzers/registry.py", "id": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "language": "python", "line": 19, "name": "AnalyzerRegistry", "type": "class"}
+{"bases": [], "file": "src/jig/impl_graph/builder.py", "id": "C-jig.impl_graph.builder.GraphBuilder", "implements": ["S-001", "S-006"], "language": "python", "line": 22, "name": "GraphBuilder", "type": "class"}
+{"bases": [], "file": "src/jig/impl_graph/graph.py", "id": "C-jig.impl_graph.graph.Graph", "implements": ["S-003"], "language": "python", "line": 13, "name": "Graph", "type": "class"}
+{"bases": [], "file": "src/jig/impl_graph/ndjson_writer.py", "id": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "implements": ["S-003"], "language": "python", "line": 18, "name": "NDJSONWriter", "type": "class"}
+{"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.decorator", "language": "python", "line": 30, "name": "decorator", "signature": "decorator(obj: Union[F, C]) -> Union[F, C]", "type": "function"}
+{"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.decorator", "language": "python", "line": 57, "name": "decorator", "signature": "decorator(func: F) -> F", "type": "function"}
+{"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.implements", "language": "python", "line": 12, "name": "implements", "signature": "implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]", "type": "function"}
+{"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.verifies", "language": "python", "line": 39, "name": "verifies", "signature": "verifies(*spec_ids: str) -> Callable[[F], F]", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.cli", "language": "python", "line": 14, "name": "cli", "signature": "cli()", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.impl", "language": "python", "line": 20, "name": "impl", "signature": "impl()", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 66, "name": "rebuild", "signature": "rebuild(project_root: Path, source_dir: Path | None, exclude: tuple[str, ...], output: Path | None, verbose: bool, strict: bool, no_timestamp: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "language": "python", "line": 52, "name": "analyze_file", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.file_extensions", "language": "python", "line": 41, "name": "file_extensions", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "file_extensions(self) -> List[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.language_name", "language": "python", "line": 32, "name": "language_name", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "language_name(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.ParseError.__init__", "language": "python", "line": 26, "name": "__init__", "parent_class": "C-jig.impl_graph.analyzers.python.ParseError", "signature": "__init__(self, file_path: Path, line: int, column: int, message: str, text: str) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "implements": ["S-006"], "language": "python", "line": 46, "name": "_format_message", "parent_class": "C-jig.impl_graph.analyzers.python.ParseError", "signature": "_format_message(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.__init__", "language": "python", "line": 65, "name": "__init__", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "__init__(self, project_root: Path | None) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._derive_module_name", "language": "python", "line": 347, "name": "_derive_module_name", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "_derive_module_name(self, file_path: Path) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "implements": ["S-005"], "language": "python", "line": 382, "name": "_is_internal_module", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "_is_internal_module(self, module_name: str) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "implements": ["S-001", "S-005", "S-006"], "language": "python", "line": 92, "name": "analyze_file", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.file_extensions", "language": "python", "line": 83, "name": "file_extensions", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "file_extensions(self) -> List[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.language_name", "language": "python", "line": 75, "name": "language_name", "parent_class": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "signature": "language_name(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.main", "language": "python", "line": 429, "name": "main", "signature": "main() -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.__init__", "language": "python", "line": 26, "name": "__init__", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "__init__(self, file_path: Path, module_name: str) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_implements_decorators", "implements": ["S-002"], "language": "python", "line": 304, "name": "_extract_implements_decorators", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_extract_implements_decorators(self, node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) -> List[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_signature", "implements": ["S-001"], "language": "python", "line": 193, "name": "_extract_signature", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_extract_signature(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._get_annotation_string", "language": "python", "line": 253, "name": "_get_annotation_string", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_get_annotation_string(self, annotation: ast.expr) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._get_name_from_node", "language": "python", "line": 268, "name": "_get_name_from_node", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_get_name_from_node(self, node: ast.expr) -> Optional[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._validate_spec_id", "language": "python", "line": 362, "name": "_validate_spec_id", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_validate_spec_id(self, spec_id: str) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._visit_function", "implements": ["S-001"], "language": "python", "line": 141, "name": "_visit_function", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "_visit_function(self, node: ast.FunctionDef | ast.AsyncFunctionDef, is_async: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_calls", "language": "python", "line": 58, "name": "get_calls", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "get_calls(self) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_imports", "language": "python", "line": 50, "name": "get_imports", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "get_imports(self) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_nodes", "language": "python", "line": 42, "name": "get_nodes", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "get_nodes(self) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_AsyncFunctionDef", "language": "python", "line": 132, "name": "visit_AsyncFunctionDef", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_Call", "language": "python", "line": 421, "name": "visit_Call", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_Call(self, node: ast.Call) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ClassDef", "implements": ["S-001"], "language": "python", "line": 67, "name": "visit_ClassDef", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_ClassDef(self, node: ast.ClassDef) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_FunctionDef", "language": "python", "line": 122, "name": "visit_FunctionDef", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_FunctionDef(self, node: ast.FunctionDef) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_Import", "implements": ["S-005"], "language": "python", "line": 375, "name": "visit_Import", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_Import(self, node: ast.Import) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ImportFrom", "implements": ["S-005"], "language": "python", "line": 396, "name": "visit_ImportFrom", "parent_class": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "signature": "visit_ImportFrom(self, node: ast.ImportFrom) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.__init__", "language": "python", "line": 36, "name": "__init__", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "__init__(self) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.clear", "language": "python", "line": 141, "name": "clear", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "clear(self) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.get_analyzer", "implements": ["S-004"], "language": "python", "line": 94, "name": "get_analyzer", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "get_analyzer(self, file_path: Path) -> Optional[LanguageAnalyzer]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.get_analyzer_by_language", "language": "python", "line": 114, "name": "get_analyzer_by_language", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "get_analyzer_by_language(self, language: str) -> Optional[LanguageAnalyzer]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.register", "implements": ["S-004"], "language": "python", "line": 42, "name": "register", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "register(self, analyzer: LanguageAnalyzer) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.supported_extensions", "language": "python", "line": 125, "name": "supported_extensions", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "supported_extensions(self) -> List[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.supported_languages", "language": "python", "line": 133, "name": "supported_languages", "parent_class": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "signature": "supported_languages(self) -> List[str]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.get_global_registry", "language": "python", "line": 155, "name": "get_global_registry", "signature": "get_global_registry() -> AnalyzerRegistry", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/registry.py", "id": "F-jig.impl_graph.analyzers.registry.reset_global_registry", "language": "python", "line": 169, "name": "reset_global_registry", "signature": "reset_global_registry() -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder.__init__", "language": "python", "line": 29, "name": "__init__", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "__init__(self, project_root: Path, source_dir: Optional[Path], registry: Optional[AnalyzerRegistry]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder._analyze_file", "language": "python", "line": 161, "name": "_analyze_file", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "_analyze_file(self, file_path: Path) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder._discover_files", "language": "python", "line": 120, "name": "_discover_files", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "_discover_files(self, exclude_patterns: List[str]) -> List[Path]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder._should_exclude", "language": "python", "line": 146, "name": "_should_exclude", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "_should_exclude(self, file_path: Path, exclude_patterns: List[str]) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder.build", "implements": ["S-001", "S-006"], "language": "python", "line": 52, "name": "build", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "build(self, exclude_patterns: Optional[List[str]], verbose: bool, strict: bool) -> Graph", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.GraphBuilder.write", "language": "python", "line": 102, "name": "write", "parent_class": "C-jig.impl_graph.builder.GraphBuilder", "signature": "write(self, output_path: Path, include_timestamp: bool, verbose: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.build_graph", "implements": ["S-001", "S-003", "S-006"], "language": "python", "line": 186, "name": "build_graph", "signature": "build_graph(project_root: Path, source_dir: Optional[Path], output_path: Optional[Path], exclude_patterns: Optional[List[str]], verbose: bool, strict: bool, include_timestamp: bool) -> Graph", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.__init__", "language": "python", "line": 20, "name": "__init__", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "__init__(self) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.add_edge", "language": "python", "line": 33, "name": "add_edge", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "add_edge(self, edge: Dict[str, Any]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.add_edges", "language": "python", "line": 49, "name": "add_edges", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "add_edges(self, edges: List[Dict[str, Any]]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.add_node", "language": "python", "line": 25, "name": "add_node", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "add_node(self, node: Dict[str, Any]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.add_nodes", "language": "python", "line": 41, "name": "add_nodes", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "add_nodes(self, nodes: List[Dict[str, Any]]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.clear", "language": "python", "line": 89, "name": "clear", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "clear(self) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.edge_count", "language": "python", "line": 65, "name": "edge_count", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "edge_count(self) -> int", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.get_edges", "language": "python", "line": 81, "name": "get_edges", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "get_edges(self) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.get_nodes", "language": "python", "line": 73, "name": "get_nodes", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "get_nodes(self) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/graph.py", "id": "F-jig.impl_graph.graph.Graph.node_count", "language": "python", "line": 57, "name": "node_count", "parent_class": "C-jig.impl_graph.graph.Graph", "signature": "node_count(self) -> int", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.__init__", "language": "python", "line": 28, "name": "__init__", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "__init__(self, graph: Graph) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._generate_metadata", "language": "python", "line": 71, "name": "_generate_metadata", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "_generate_metadata(self, include_timestamp: bool) -> Dict[str, Any]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_edges", "language": "python", "line": 104, "name": "_sort_edges", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "_sort_edges(self, edges: List[Dict[str, Any]]) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_nodes", "language": "python", "line": 93, "name": "_sort_nodes", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "_sort_nodes(self, nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "implements": ["S-003"], "language": "python", "line": 37, "name": "write", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "write(self, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.write_ndjson", "implements": ["S-003"], "language": "python", "line": 126, "name": "write_ndjson", "signature": "write_ndjson(graph: Graph, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
+{"id": "M-abc", "language": "python", "name": "abc", "type": "external_module"}
+{"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
+{"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
+{"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
+{"id": "M-datetime", "language": "python", "name": "datetime", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"file": "src/jig/__init__.py", "id": "M-jig.__init__", "language": "python", "name": "jig.__init__", "type": "module"}
+{"file": "src/jig/cli/__init__.py", "id": "M-jig.cli.__init__", "language": "python", "name": "jig.cli.__init__", "type": "module"}
+{"file": "src/jig/cli/main.py", "id": "M-jig.cli.main", "language": "python", "name": "jig.cli.main", "type": "module"}
+{"file": "src/jig/impl_graph/__init__.py", "id": "M-jig.impl_graph.__init__", "language": "python", "name": "jig.impl_graph.__init__", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/__init__.py", "id": "M-jig.impl_graph.analyzers.__init__", "language": "python", "name": "jig.impl_graph.analyzers.__init__", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/__main__.py", "id": "M-jig.impl_graph.analyzers.__main__", "language": "python", "name": "jig.impl_graph.analyzers.__main__", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/base.py", "id": "M-jig.impl_graph.analyzers.base", "language": "python", "name": "jig.impl_graph.analyzers.base", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/python.py", "id": "M-jig.impl_graph.analyzers.python", "language": "python", "name": "jig.impl_graph.analyzers.python", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/python_visitor.py", "id": "M-jig.impl_graph.analyzers.python_visitor", "language": "python", "name": "jig.impl_graph.analyzers.python_visitor", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/registry.py", "id": "M-jig.impl_graph.analyzers.registry", "language": "python", "name": "jig.impl_graph.analyzers.registry", "type": "module"}
+{"id": "M-jig.impl_graph.builder", "language": "python", "name": "jig.impl_graph.builder", "type": "external_module"}
+{"file": "src/jig/impl_graph/builder.py", "id": "M-jig.impl_graph.builder", "language": "python", "name": "jig.impl_graph.builder", "type": "module"}
+{"file": "src/jig/impl_graph/graph.py", "id": "M-jig.impl_graph.graph", "language": "python", "name": "jig.impl_graph.graph", "type": "module"}
+{"file": "src/jig/impl_graph/ndjson_writer.py", "id": "M-jig.impl_graph.ndjson_writer", "language": "python", "name": "jig.impl_graph.ndjson_writer", "type": "module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
+{"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
+{"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.file_extensions", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.language_name", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "S-004", "type": "implements"}
+{"source": "C-jig.impl_graph.analyzers.python.ParseError", "target": "F-jig.impl_graph.analyzers.python.ParseError.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.ParseError", "target": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.ParseError", "target": "S-006", "type": "implements"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._derive_module_name", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.file_extensions", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "target": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.language_name", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_implements_decorators", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_signature", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._get_annotation_string", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._get_name_from_node", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._validate_spec_id", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._visit_function", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_calls", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_imports", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.get_nodes", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_AsyncFunctionDef", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_Call", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ClassDef", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_FunctionDef", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_Import", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "target": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ImportFrom", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.clear", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.get_analyzer", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.get_analyzer_by_language", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.register", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.supported_extensions", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "target": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.supported_languages", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder._analyze_file", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder._discover_files", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder._should_exclude", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder.build", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "F-jig.impl_graph.builder.GraphBuilder.write", "type": "contains"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "S-001", "type": "implements"}
+{"source": "C-jig.impl_graph.builder.GraphBuilder", "target": "S-006", "type": "implements"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.add_edge", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.add_edges", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.add_node", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.add_nodes", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.clear", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.edge_count", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.get_edges", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.get_nodes", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "F-jig.impl_graph.graph.Graph.node_count", "type": "contains"}
+{"source": "C-jig.impl_graph.graph.Graph", "target": "S-003", "type": "implements"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.__init__", "type": "contains"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._generate_metadata", "type": "contains"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_edges", "type": "contains"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_nodes", "type": "contains"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "type": "contains"}
+{"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "S-003", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "target": "S-005", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "target": "S-005", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_implements_decorators", "target": "S-002", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._extract_signature", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor._visit_function", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ClassDef", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_Import", "target": "S-005", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor.visit_ImportFrom", "target": "S-005", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.get_analyzer", "target": "S-004", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.registry.AnalyzerRegistry.register", "target": "S-004", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.GraphBuilder.build", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.GraphBuilder.build", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.build_graph", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.build_graph", "target": "S-003", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.build_graph", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "target": "S-003", "type": "implements"}
+{"source": "F-jig.impl_graph.ndjson_writer.write_ndjson", "target": "S-003", "type": "implements"}
+{"source": "M-jig.__init__", "target": "F-jig.__init__.decorator", "type": "contains"}
+{"source": "M-jig.__init__", "target": "F-jig.__init__.decorator", "type": "contains"}
+{"source": "M-jig.__init__", "target": "F-jig.__init__.implements", "type": "contains"}
+{"source": "M-jig.__init__", "target": "F-jig.__init__.verifies", "type": "contains"}
+{"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
+{"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
+{"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.cli", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.impl", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild", "type": "contains"}
+{"line": 7, "source": "M-jig.cli.main", "target": "M-click", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.impl_graph.builder", "type": "imports"}
+{"line": 3, "source": "M-jig.cli.main", "target": "M-logging", "type": "imports"}
+{"line": 5, "source": "M-jig.cli.main", "target": "M-pathlib", "type": "imports"}
+{"line": 4, "source": "M-jig.cli.main", "target": "M-sys", "type": "imports"}
+{"source": "M-jig.impl_graph.analyzers.base", "target": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "type": "contains"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.base", "target": "M-abc", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.base", "target": "M-abc", "type": "imports"}
+{"line": 12, "source": "M-jig.impl_graph.analyzers.base", "target": "M-jig", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.analyzers.base", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.base", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.base", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.base", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.analyzers.python", "target": "C-jig.impl_graph.analyzers.python.ParseError", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.python", "target": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.python", "target": "F-jig.impl_graph.analyzers.python.main", "type": "contains"}
+{"line": 7, "source": "M-jig.impl_graph.analyzers.python", "target": "M-ast", "type": "imports"}
+{"line": 14, "source": "M-jig.impl_graph.analyzers.python", "target": "M-jig", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.python", "target": "M-json", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.analyzers.python", "target": "M-logging", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.python", "target": "M-sys", "type": "imports"}
+{"line": 12, "source": "M-jig.impl_graph.analyzers.python", "target": "M-typing", "type": "imports"}
+{"line": 12, "source": "M-jig.impl_graph.analyzers.python", "target": "M-typing", "type": "imports"}
+{"line": 12, "source": "M-jig.impl_graph.analyzers.python", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.analyzers.python_visitor", "target": "C-jig.impl_graph.analyzers.python_visitor.PythonStructureVisitor", "type": "contains"}
+{"line": 7, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-ast", "type": "imports"}
+{"line": 13, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-jig", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-logging", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-pathlib", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-re", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-typing", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-typing", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-typing", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python_visitor", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.analyzers.registry", "target": "C-jig.impl_graph.analyzers.registry.AnalyzerRegistry", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.registry", "target": "F-jig.impl_graph.analyzers.registry.get_global_registry", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.registry", "target": "F-jig.impl_graph.analyzers.registry.reset_global_registry", "type": "contains"}
+{"line": 12, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-jig", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-logging", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.analyzers.registry", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.builder", "target": "C-jig.impl_graph.builder.GraphBuilder", "type": "contains"}
+{"source": "M-jig.impl_graph.builder", "target": "F-jig.impl_graph.builder.build_graph", "type": "contains"}
+{"line": 11, "source": "M-jig.impl_graph.builder", "target": "M-jig", "type": "imports"}
+{"line": 7, "source": "M-jig.impl_graph.builder", "target": "M-logging", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.builder", "target": "M-pathlib", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.builder", "target": "M-typing", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.builder", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.graph", "target": "C-jig.impl_graph.graph.Graph", "type": "contains"}
+{"line": 9, "source": "M-jig.impl_graph.graph", "target": "M-jig", "type": "imports"}
+{"line": 7, "source": "M-jig.impl_graph.graph", "target": "M-typing", "type": "imports"}
+{"line": 7, "source": "M-jig.impl_graph.graph", "target": "M-typing", "type": "imports"}
+{"line": 7, "source": "M-jig.impl_graph.graph", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.impl_graph.ndjson_writer", "target": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "type": "contains"}
+{"source": "M-jig.impl_graph.ndjson_writer", "target": "F-jig.impl_graph.ndjson_writer.write_ndjson", "type": "contains"}
+{"line": 8, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-datetime", "type": "imports"}
+{"line": 8, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-datetime", "type": "imports"}
+{"line": 12, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-jig", "type": "imports"}
+{"line": 7, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-json", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
+{"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}

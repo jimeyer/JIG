@@ -659,8 +659,8 @@ specifies: [S-001, S-003, S-005, S-006]
 
 **Human Validation:**
 - Run: `pytest tests/ -v` (all tests)
-- Run: `jig impl rebuild --project-root ~/Code/jig --verbose`
-- Run: `jig validate`
+- Run: `jigy impl rebuild --project-root ~/Code/jig --verbose`
+- Run: `jigy validate`
 - Look for:
   - All tests pass
   - JIG codebase analyzed successfully

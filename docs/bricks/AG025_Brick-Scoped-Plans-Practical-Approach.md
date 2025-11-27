@@ -85,7 +85,7 @@ This is **good enough** if done consistently. We don't need runtime enforcement 
 **Primary Brick**: B-001 (Graph Core)
 
 **Allowed Files** (you MAY read/edit these):
-```
+
 src/jig/core/graph.py
 src/jig/core/relationships.py
 tests/unit/test_graph.py
@@ -96,18 +96,18 @@ jig/outcomes/O-002.md
 jig/specifications/S-001.md
 jig/specifications/S-002.md
 jig/specifications/S-003.md
-```
+
 
 **Forbidden Files** (you MUST NOT touch):
-```
+
 src/jig/cli/*          # CLI brick
 src/jig/decompose/*    # Analysis brick
 src/jig/core/parser.py # Parser brick
 tests/integration/*    # Integration tests
-```
+
 
 **Dependency Interfaces** (you may CALL, but not READ implementation):
-```
+
 From BRICK-UTILS:
   - read_file(path: Path) -> str
   - write_file(path: Path, content: str) -> None
@@ -116,7 +116,7 @@ From BRICK-UTILS:
 From BRICK-PARSER:
   - parse_ostc_node(path: Path) -> OSTCNode
   - OSTCNode (dataclass - see type stub below)
-```
+
 
 **Boundary Rules**:
 1. ✅ You MAY read/edit any file in "Allowed Files"
@@ -136,7 +136,7 @@ git diff --name-only <branch> | grep -v -E "^(src/jig/core/|tests/unit/test_grap
 
 ## Known Intent (Created Before Coding)
 ...
-```
+
 
 ---
 

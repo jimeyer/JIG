@@ -23,31 +23,73 @@ The jig system relies on precise artifact contracts (A001) to function correctly
 
 ## Proposed Solution
 
-Create a `jigy validate` command that runs multi-phase validation:
+Create a `jigy validate` command with three distinct validation phases that align with the natural development workflow:
 
-### Phase 1: Specification Validation (Pre-Graph)
-Validates artifacts that exist before any graph generation:
-- Specification files (`jig/specifications/S-*.md`)
-- Outcome files (`jig/outcomes/O-*.md`) if present
-- Decorator syntax in source/test files
+### Phase 1: Validate Intent (Pre-Graph)
+**Can run WITHOUT graphs existing**
 
-### Phase 2: Implementation Graph Validation (Post-AST)
-After AST parsing (but before graph file generation):
-- Verify implementation graph nodes can be constructed
-- Validate `@jig.implements` references to specs
-- Check for duplicate function IDs
+Validates human-authored artifacts before any graph generation:
+- Specification files (`jig/specifications/S-*.md` YAML frontmatter)
+- Outcome files (`jig/outcomes/O-*.md` YAML frontmatter) if present
+- Decorator references (`@jig.implements`, `@jig.verifies` point to valid IDs)
 
-### Phase 3: Brick Validation (Post-Implementation-Graph)
-After implementation graph is available:
-- Validate `bricks.yaml` structure
-- Check unit prefixes (M-, C-, F-)
-- Verify units reference existing graph nodes
-- Validate brick partition (no gaps, no overlaps)
-- Verify no class splitting across bricks
+**CLI:** `jigy validate intent`
 
-### Phase 4: Verification Validation (Post-Coverage)
-After test discovery:
-- Validate `@jig.verifies` references to specs/outcomes
+**Use case:** "Are my human-authored artifacts well-formed?"
+
+### Phase 2: Build Graphs (with Auto-Validation)
+**Graph generation IS validation**
+
+When rebuilding graphs, auto-validate intent first:
+- `jigy intent rebuild` → validates specs/outcomes, builds intent-graph.ndjson
+- `jigy impl rebuild` → validates decorators, builds implementation-graph.ndjson
+- `jigy verify rebuild` → validates test decorators, builds verification-graph.ndjson
+
+**Auto-validation:** All rebuild commands validate intent artifacts BEFORE building. Use `--skip-validation` flag to bypass.
+
+**Graph validation:** If graph generation succeeds, graphs are structurally valid (valid by construction). No separate validation needed unless graphs are hand-edited (which violates A001).
+
+### Phase 3: Validate Bricks (Post-Graph)
+**REQUIRES implementation graph to exist**
+
+Validates brick definitions against generated implementation graph:
+- Brick definitions (`bricks.yaml` structure and required fields)
+- Brick partition (every function in exactly one brick, no class splitting)
+- Unit references (all brick units point to existing graph nodes)
+
+**CLI:** `jigy validate bricks`
+
+**Use case:** "Do my brick definitions match the codebase?"
+
+---
+
+## Three Validation Phases
+
+### Clear Separation of Concerns
+
+**Phase 1: Validate Intent (Pre-Graph)**
+- **What:** Specs, outcomes, decorator references
+- **When:** Before graphs exist
+- **Requires:** Only human-authored files
+- **Command:** `jigy validate intent`
+- **Use case:** "Are my inputs valid?"
+
+**Phase 2: Build Graphs (with Auto-Validation)**
+- **What:** Generate graph files from valid artifacts
+- **When:** After intent validation passes
+- **Requires:** Valid intent artifacts
+- **Commands:** `jigy intent rebuild`, `jigy impl rebuild`, `jigy verify rebuild`
+- **Auto-validates:** Intent artifacts before building
+- **Use case:** "Build the data from validated inputs"
+
+**Phase 3: Validate Bricks (Post-Graph)**
+- **What:** Bricks.yaml against implementation graph
+- **When:** After implementation graph exists
+- **Requires:** implementation-graph.ndjson
+- **Command:** `jigy validate bricks`
+- **Use case:** "Do my bricks align with the implementation?"
+
+**No circular dependencies:** Intent validates without graphs → Graphs generated from valid intent → Bricks validated against graphs.
 
 ---
 
@@ -98,20 +140,41 @@ The linter SHALL enforce:
 ## CLI Interface
 
 ```bash
-# Run full validation
+# Pre-graph validation (Phase 1)
+jigy validate intent
+  # Validates: specs, outcomes, decorator references
+  # Can run: anytime, before graphs exist
+  # Use case: "are my human-authored artifacts well-formed?"
+
+# Post-graph validation (Phase 3)
+jigy validate bricks
+  # Validates: bricks.yaml against implementation-graph.ndjson
+  # Requires: implementation graph exists
+  # Use case: "do my brick definitions match the codebase?"
+
+# Full validation (smart)
 jigy validate
+  # Runs: intent validation, then brick validation (if graphs exist)
+  # Can run: anytime (skips brick validation if no graphs)
+  # Use case: "check everything that's possible to check"
 
-# Validate specific phase
-jigy validate --phase specs
-jigy validate --phase bricks
-jigy validate --phase decorators
+# Granular intent validation
+jigy validate intent specs       # only specifications
+jigy validate intent outcomes    # only outcomes
+jigy validate intent decorators  # only decorators
 
-# Validate specific file
-jigy validate jig/specifications/S-001.md
-jigy validate jig/bricks.yaml
+# Granular brick validation
+jigy validate bricks definitions # only bricks.yaml structure
+jigy validate bricks partition   # only partition constraint
+
+# Auto-validation in rebuild commands (Phase 2)
+jigy impl rebuild                     # validates decorators first
+jigy impl rebuild --skip-validation   # skip validation (power users)
 
 # JSON output for CI/tooling
 jigy validate --format json
+jigy validate intent --format json
+jigy validate bricks --format json
 
 # Exit codes
 # 0 = all validations passed
@@ -123,73 +186,149 @@ jigy validate --format json
 
 ## Output Format
 
-### Success Case
+### Success Case (Intent Validation)
 ```
+$ jigy validate intent
 ✓ Validating specifications (3 files)
 ✓ Validating outcomes (2 files)
-✓ Validating bricks (1 file, 4 bricks)
 ✓ Validating implementation decorators (24 functions)
 ✓ Validating verification decorators (18 tests)
+
+Intent validation passed.
+```
+
+### Success Case (Brick Validation)
+```
+$ jigy validate bricks
+✓ Validating brick definitions (1 file, 4 bricks)
 ✓ Validating brick partition (no gaps, no overlaps)
+
+Brick validation passed.
+```
+
+### Success Case (Full Validation)
+```
+$ jigy validate
+✓ Validating intent
+  ✓ Specifications (3 files)
+  ✓ Outcomes (2 files)
+  ✓ Implementation decorators (24 functions)
+  ✓ Verification decorators (18 tests)
+✓ Validating bricks
+  ✓ Brick definitions (4 bricks)
+  ✓ Brick partition (no gaps, no overlaps)
 
 All validations passed.
 ```
 
-### Failure Case
+### Failure Case (Intent Validation)
 ```
-✗ Validating specifications (3 files)
-  ERROR: jig/specifications/S-004.md
-    - Missing required field: 'type'
-    - ID format invalid: 'SPEC-4' (expected 'S-004')
-
-✗ Validating bricks (1 file, 4 bricks)
-  ERROR: jig/bricks.yaml brick 'B-002'
-    - Unit 'M-cli.invalid' not found in implementation graph
-    - Unit 'auth.session' invalid: missing prefix (expected M-/C-/F-)
-
-  ERROR: Brick partition violation
-    - Function 'F-auth.session.authenticate' in 2 bricks: B-001, B-003
-    - Function 'F-cli.main.run' in 0 bricks (gap)
+$ jigy validate intent
+✓ Validating specifications (3 files)
+✗ Validating outcomes (2 files)
+  ERROR: jig/outcomes/O-002.md
+    - Missing required field: 'specifies'
 
 ✗ Validating implementation decorators
   ERROR: src/auth/session.py:42
     - @jig.implements("S-999"): spec does not exist
+  ERROR: src/cli/main.py:18
+    - @jig.implements("S-001", invalid): expected string, got identifier
 
-3 validation failures, 6 errors total.
+Intent validation failed: 2 phases failed, 3 errors total.
+```
+
+### Failure Case (Brick Validation)
+```
+$ jigy validate bricks
+✗ Validating brick definitions (1 file, 4 bricks)
+  ERROR: jig/bricks.yaml brick 'B-002'
+    - Unit 'M-cli.invalid' not found in implementation graph
+    - Unit 'auth.session' invalid: missing prefix (expected M-/C-/F-)
+
+✗ Validating brick partition
+  ERROR: Partition violations detected
+    - Function 'F-auth.session.authenticate' in 2 bricks: B-001, B-003 (overlap)
+    - Function 'F-cli.main.run' in 0 bricks (gap)
+    - Class 'C-auth.tokens.TokenValidator' split across bricks B-001, B-004
+
+Brick validation failed: 4 errors total.
 ```
 
 ### JSON Format (for CI/tooling)
 ```json
 {
   "status": "failed",
-  "phases": {
+  "intent": {
+    "passed": false,
     "specifications": {
+      "passed": true,
+      "errors": []
+    },
+    "outcomes": {
       "passed": false,
       "errors": [
         {
-          "file": "jig/specifications/S-004.md",
+          "file": "jig/outcomes/O-002.md",
           "line": null,
           "code": "MISSING_REQUIRED_FIELD",
-          "message": "Missing required field: 'type'",
+          "field": "specifies",
+          "message": "Missing required field: 'specifies'",
           "severity": "error"
         }
       ]
     },
-    "bricks": {
+    "decorators": {
+      "passed": false,
+      "errors": [
+        {
+          "file": "src/auth/session.py",
+          "line": 42,
+          "code": "INVALID_SPEC_REFERENCE",
+          "decorator": "@jig.implements",
+          "reference": "S-999",
+          "message": "spec does not exist",
+          "severity": "error"
+        }
+      ]
+    }
+  },
+  "bricks": {
+    "passed": false,
+    "definitions": {
       "passed": false,
       "errors": [
         {
           "file": "jig/bricks.yaml",
           "brick": "B-002",
           "code": "UNIT_NOT_FOUND",
-          "message": "Unit 'M-cli.invalid' not found in implementation graph",
+          "unit": "M-cli.invalid",
+          "message": "Unit not found in implementation graph",
+          "severity": "error"
+        }
+      ]
+    },
+    "partition": {
+      "passed": false,
+      "errors": [
+        {
+          "code": "PARTITION_OVERLAP",
+          "function": "F-auth.session.authenticate",
+          "bricks": ["B-001", "B-003"],
+          "message": "Function in multiple bricks",
+          "severity": "error"
+        },
+        {
+          "code": "PARTITION_GAP",
+          "function": "F-cli.main.run",
+          "message": "Function in no bricks",
           "severity": "error"
         }
       ]
     }
   },
   "summary": {
-    "total_errors": 6,
+    "total_errors": 5,
     "total_warnings": 0
   }
 }
@@ -201,80 +340,142 @@ All validations passed.
 
 ### Work Unit Breakdown
 
-**WU1: Specification File Validator**
-- Parse YAML frontmatter from S-*.md files
-- Validate required fields (id, type)
-- Check ID format (S-{number})
-- Check ID uniqueness
-- Verify excluded fields not present
-- Check filename matches ID
+**WU1: Intent Validators**
+*Phase 1 validation - can run without graphs*
 
-**WU2: Outcome File Validator**
-- Parse YAML frontmatter from O-*.md files
-- Validate required fields (id, type, specifies)
-- Check ID format (O-{number})
-- Check ID uniqueness
-- Verify `specifies` references existing specs
-- Verify excluded fields not present
+**1a. Specification File Validator**
+- Parse YAML frontmatter from `jig/specifications/S-*.md` files
+- Validate required fields: `id`, `type`
+- Check ID format: `S-{number}`
+- Check ID uniqueness across all specs
+- Verify excluded fields NOT present: `brick`, `depends_on`, `content`
+- Check filename matches ID (S-001.md → id: S-001)
 
-**WU3: Brick Definition Validator**
-- Parse bricks.yaml
-- Validate structure (list of bricks)
-- Check required fields (id, name, units)
-- Check ID format (B-{number})
-- Check ID uniqueness
-- Validate unit prefix format (M-/C-/F-)
-- Verify excluded fields not present
+**1b. Outcome File Validator** (optional artifacts)
+- Parse YAML frontmatter from `jig/outcomes/O-*.md` files
+- Validate required fields: `id`, `type`, `specifies`
+- Check ID format: `O-{number}`
+- Check ID uniqueness across all outcomes
+- Verify `specifies` array references existing spec IDs
+- Verify excluded fields NOT present: `brick`
 
-**WU4: Brick Partition Validator**
-- Requires implementation graph
-- Expand brick units (M-* → all F- in module)
-- Build function-to-brick mapping
-- Check every function in exactly one brick
-- Check no class split across bricks
-
-**WU5: Decorator Validator**
-- Parse Python AST for @jig.implements decorators
-- Validate decorator arguments are strings
-- Check referenced spec IDs exist
-- Parse @jig.verifies decorators
+**1c. Decorator Validator**
+- Parse Python AST for `@jig.implements` decorators
+- Validate decorator arguments are string literals
+- Check referenced spec IDs exist in specifications
+- Parse `@jig.verifies` decorators
 - Check referenced spec/outcome IDs exist
+- Report file path and line number for errors
 
-**WU6: CLI Integration**
-- Add `jigy validate` command
-- Support phase filtering (--phase)
-- Support file filtering
-- Implement JSON output format
-- Implement exit codes
+**CLI:** `jigy validate intent`
 
-**WU7: Validation Reporting**
+---
+
+**WU2: Brick Validators**
+*Phase 3 validation - requires implementation graph*
+
+**2a. Brick Definition Validator**
+- Parse `jig/bricks.yaml`
+- Validate structure (list of bricks with required fields)
+- Check required fields: `id`, `name`, `units`
+- Check ID format: `B-{number}`
+- Check ID uniqueness across all bricks
+- Validate unit prefix format: must start with `M-`, `C-`, or `F-`
+- Check unit references exist in implementation-graph.ndjson
+- Verify excluded fields NOT present: `depends_on`, `public_api`, `specs`
+
+**2b. Brick Partition Validator**
+- Load implementation-graph.ndjson
+- Expand brick units (`M-auth.session` → all `F-auth.session.*`)
+- Build function-to-brick mapping
+- Check every function belongs to exactly one brick:
+  - **Gap detection:** functions in 0 bricks
+  - **Overlap detection:** functions in 2+ bricks
+- Check no class split across bricks (all methods of same class in same brick)
+
+**CLI:** `jigy validate bricks`
+
+---
+
+**WU3: CLI Integration**
+
+- Add `jigy validate` command (smart: runs intent, then bricks if graphs exist)
+- Add `jigy validate intent` subcommand
+- Add `jigy validate bricks` subcommand
+- Add granular subcommands:
+  - `jigy validate intent specs`
+  - `jigy validate intent outcomes`
+  - `jigy validate intent decorators`
+  - `jigy validate bricks definitions`
+  - `jigy validate bricks partition`
+- Support `--format json` for CI/tooling
+- Implement exit codes (0=pass, 1=failures, 2=errors)
+- Add `--skip-validation` flag to rebuild commands:
+  - `jigy impl rebuild --skip-validation`
+
+---
+
+**WU4: Validation Reporting**
+
 - Format human-readable error messages
-- Include file paths, line numbers
-- Group errors by file/phase
+- Include file paths and line numbers
+- Group errors by validation phase (intent vs. bricks)
 - Provide actionable suggestions
+- Implement JSON output format with structured error codes
+- Color-coded output (green ✓, red ✗)
+- Summary line with total errors/warnings
 
 ---
 
 ## Acceptance Criteria
 
-1. **Command exists:** `jigy validate` command available
-2. **Phase 1 works:** Validates specs/outcomes before graphs exist
-3. **Phase 3 works:** Validates bricks.yaml against implementation graph
-4. **Partition check works:** Detects gaps and overlaps in brick assignments
-5. **Decorator check works:** Validates @jig decorators reference valid IDs
-6. **Exit codes:** Returns 0 on success, non-zero on failure
-7. **Error messages:** Clear, actionable, include file paths
-8. **JSON output:** `--format json` produces machine-readable output
-9. **All A001 §10 rules:** All validation rules enforced
-10. **Documentation:** Usage documented in CLI help
+1. **Intent validation works:** `jigy validate intent` validates specs, outcomes, decorators WITHOUT graphs
+2. **Brick validation works:** `jigy validate bricks` validates bricks.yaml AGAINST implementation graph
+3. **Full validation works:** `jigy validate` runs both (skips bricks if no graph)
+4. **Partition check works:** Detects gaps, overlaps, and class splitting in brick assignments
+5. **Decorator check works:** Validates `@jig.implements` and `@jig.verifies` reference valid IDs
+6. **Auto-validation works:** `jigy impl rebuild` validates intent first, errors if invalid
+7. **Skip flag works:** `jigy impl rebuild --skip-validation` bypasses validation
+8. **Exit codes:** Returns 0 on success, 1 on validation failures, 2 on errors
+9. **Error messages:** Clear, actionable, include file paths and line numbers
+10. **JSON output:** `--format json` produces structured, machine-readable output
+11. **All A001 §10 rules:** All validation rules from contract enforced
+12. **Documentation:** Usage documented in CLI help text
+
+---
+
+## Developer Workflow Example
+
+```bash
+# 1. Write specifications
+vim jig/specifications/S-001.md
+jigy validate intent specs        # ✓ check specs are well-formed
+
+# 2. Write code with decorators
+vim src/auth/session.py          # add @jig.implements("S-001")
+jigy validate intent decorators   # ✓ check decorators reference valid specs
+
+# 3. Build graphs (auto-validates intent first)
+jigy intent rebuild               # validates specs/outcomes → builds intent-graph.ndjson
+jigy impl rebuild                 # validates decorators → builds implementation-graph.ndjson
+jigy verify rebuild               # validates test decorators → builds verification-graph.ndjson
+
+# 4. Define bricks
+vim jig/bricks.yaml              # add brick definitions
+jigy validate bricks              # ✓ check bricks reference valid nodes, no gaps/overlaps
+
+# 5. Full check before commit
+jigy validate                     # ✓ check everything
+```
 
 ---
 
 ## Dependencies
 
-- **Implementation Graph:** WU4 (partition validator) requires implementation graph
-- **AST Parser:** WU5 (decorator validator) requires Python AST parsing capability
-- **CLI Framework:** Existing `jigy` CLI structure
+- **Implementation Graph:** WU2 (brick validators) requires implementation-graph.ndjson exists
+- **Python AST Parser:** WU1c (decorator validator) requires AST parsing capability
+- **CLI Framework:** Existing `jigy` CLI structure (Click-based)
+- **YAML Parser:** PyYAML or similar for frontmatter parsing
 
 ---
 
@@ -315,21 +516,46 @@ This differs from:
 
 ---
 
-## Open Questions
+## Design Decisions
 
-1. **Should WU4 require full graph generation, or just AST parsing?**
-   - Option A: Require `jigy index` first (validates against persisted graph)
-   - Option B: Parse AST in-memory (faster, but duplicates work)
-   - **Recommendation:** Option A (validate against actual graph files)
+### 1. Auto-Validation on Rebuild (DECIDED)
+**Decision:** Graph rebuild commands auto-validate intent artifacts first.
 
-2. **How to handle transient state?**
-   - During development, graphs may be stale
-   - Should linter auto-regenerate graphs if needed?
-   - **Recommendation:** Require explicit `jigy index` first, error if graphs missing
+**Rationale:**
+- Prevents generating invalid graphs from malformed intent artifacts
+- Fail fast with clear error messages before expensive graph generation
+- Provides `--skip-validation` flag for power users who know artifacts are valid
 
-3. **Should validator run automatically before other commands?**
-   - e.g., `jigy status` runs validator first
-   - **Recommendation:** No (too slow), but add `--validate` flag to commands
+**Implementation:**
+```bash
+jigy impl rebuild                     # validates @jig.implements first
+jigy impl rebuild --skip-validation   # skip for speed (advanced usage)
+```
+
+### 2. Brick Validation Requires Persisted Graph (DECIDED)
+**Decision:** Brick validation validates against `implementation-graph.ndjson`, not in-memory AST.
+
+**Rationale:**
+- Avoids duplicating graph generation logic
+- Single source of truth (the persisted graph file)
+- Clear dependency: must rebuild graph before validating bricks
+- Simpler implementation
+
+**Implementation:**
+```bash
+jigy impl rebuild                 # generates implementation-graph.ndjson
+jigy validate bricks              # validates against persisted graph
+# If no graph exists: error "implementation graph not found, run 'jigy impl rebuild' first"
+```
+
+### 3. Separate Intent and Brick Validation (DECIDED)
+**Decision:** Intent and brick validation are separate commands with different requirements.
+
+**Rationale:**
+- Intent validation can run WITHOUT graphs (development workflow)
+- Brick validation REQUIRES graphs (post-generation workflow)
+- Clear separation of concerns (human artifacts vs. implementation alignment)
+- Incremental validation during development
 
 ---
 
