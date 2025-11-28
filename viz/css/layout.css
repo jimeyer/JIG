@@ -140,28 +140,42 @@ body {
     font-style: italic;
 }
 
-.details-panel dt {
+.details-list {
+    margin: 0;
+    padding: 0;
+}
+
+.details-list dt {
     font-weight: 600;
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-md);
     color: var(--color-text-secondary);
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.details-panel dd {
-    margin-left: 0;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-text);
-    word-break: break-word;
+.details-list dt:first-child {
+    margin-top: 0;
 }
 
-.details-panel dd code {
+.details-list dd {
+    margin-left: 0;
+    margin-top: var(--spacing-xs);
+    margin-bottom: 0;
+    color: var(--color-text);
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.details-list dd code {
     background-color: var(--color-bg);
-    padding: 2px 4px;
+    padding: 2px 6px;
     border-radius: 3px;
-    font-size: 12px;
-    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-family: 'Courier New', Consolas, Monaco, monospace;
+    word-wrap: break-word;
+    display: inline-block;
+    max-width: 100%;
 }
 
 /* Loading and empty states */

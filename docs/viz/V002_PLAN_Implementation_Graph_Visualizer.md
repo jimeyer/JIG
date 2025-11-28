@@ -33,7 +33,7 @@
 - [x] WU1: Scaffold — tests ✅ / code ✅ / docs ✅
 - [x] WU2: Graph Loading — tests ✅ / code ✅ / docs ✅
 - [x] WU3: Basic Rendering — tests ✅ / code ✅ / docs ✅
-- [ ] WU4: Interaction — tests ☐ / code ☐ / docs ☐
+- [x] WU4: Interaction — tests ✅ / code ✅ / docs ✅
 - [ ] WU5: Filtering — tests ☐ / code ☐ / docs ☐
 - [ ] WU6: Search — tests ☐ / code ☐ / docs ☐
 - [ ] WU7: Layout Switching — tests ☐ / code ☐ / docs ☐
@@ -245,15 +245,15 @@
 **Implements**: S-013 (Node details), S-014 (Edge details), S-015 (Zoom/pan)
 
 **Acceptance Criteria**:
-- [ ] S-013 is implemented by node click handler
-- [ ] S-014 is implemented by edge click handler
-- [ ] S-015 is implemented by Cytoscape zoom/pan config
-- [ ] Click node → details panel shows node metadata
-- [ ] Click edge → details panel shows edge metadata
-- [ ] Mouse wheel zooms graph
-- [ ] Click-drag pans graph
-- [ ] "Zoom to Fit" button works
-- [ ] Manual test: All interactions work smoothly
+- [x] S-013 is implemented by node click handler
+- [x] S-014 is implemented by edge click handler
+- [x] S-015 is implemented by Cytoscape zoom/pan config
+- [x] Click node → details panel shows node metadata
+- [x] Click edge → details panel shows edge metadata
+- [x] Mouse wheel zooms graph
+- [x] Click-drag pans graph
+- [x] "Zoom to Fit" button works
+- [x] Manual test: All interactions work smoothly
 
 **Implementation Notes**:
 - Approach:
@@ -282,16 +282,16 @@
   - Click "Zoom to Fit" → graph fits viewport
 
 **Docs Updated**:
-- `viz/README.md` - Document interaction controls
+- `viz/README.md` - Document interaction controls (no changes needed - already documented in WU1)
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: Cytoscape's event system is clean and easy to use, details panel updates instantly on click, highlighting connected elements provides good visual feedback, zoom controls work smoothly, HTML escaping prevents XSS in details panel
+- What could be better: Could add double-click to center on node, could add hover tooltips for quick info without clicking, details panel could be collapsible on mobile
+- Surprises/discoveries: Need to distinguish between tapping background vs elements (event.target === cy), highlighting class needs both .highlighted selector and removal of previous highlights, Cytoscape handles pan/zoom natively with good defaults
+- Risks identified: Long signatures or file paths might overflow details panel on narrow screens, clicking rapidly can queue up multiple detail updates
 
 **Links**:
-- Commit:
+- Commit: (to be added)
 
 ---
 

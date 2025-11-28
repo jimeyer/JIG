@@ -7,6 +7,7 @@
 
 import { loadGraphFile, loadGraphFromURL } from './graph-loader.js';
 import { renderGraph } from './graph-renderer.js';
+import { setupInteractions, setupZoomControls } from './graph-interactions.js';
 
 // Application state (will be expanded in later work units)
 const state = {
@@ -94,6 +95,10 @@ async function handleGraphLoad(file) {
         // Render graph
         state.cy = renderGraph(graph.elements);
 
+        // Setup interactions (click handlers, zoom controls)
+        setupInteractions(state.cy);
+        setupZoomControls(state.cy);
+
         console.log('Graph rendered successfully');
 
     } catch (err) {
@@ -141,6 +146,10 @@ async function tryLoadDefaultGraph() {
 
         // Render graph
         state.cy = renderGraph(graph.elements);
+
+        // Setup interactions (click handlers, zoom controls)
+        setupInteractions(state.cy);
+        setupZoomControls(state.cy);
 
         console.log('Default graph rendered successfully');
 

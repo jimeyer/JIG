@@ -25,3 +25,6 @@
 #cy.hidden {
     display: none;
 }
+
+/* Highlighted elements (selected nodes/edges and their neighbors) */
+/* Note: This is applied via JavaScript, Cytoscape handles its own styling via the stylesheet */

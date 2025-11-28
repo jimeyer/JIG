@@ -153,6 +153,23 @@ function getCytoscapeStylesheet() {
                 'line-color': '#ff6f00',
                 'target-arrow-color': '#ff6f00'
             }
+        },
+
+        // Highlighted elements (via .highlighted class)
+        {
+            selector: '.highlighted',
+            style: {
+                'opacity': 1,
+                'z-index': 999
+            }
+        },
+
+        // Non-highlighted elements when something is highlighted
+        {
+            selector: 'node.highlighted, edge.highlighted',
+            style: {
+                'opacity': 1
+            }
         }
     ];
 }
