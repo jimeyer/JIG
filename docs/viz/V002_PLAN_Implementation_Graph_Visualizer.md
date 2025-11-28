@@ -291,7 +291,7 @@
 - Risks identified: Long signatures or file paths might overflow details panel on narrow screens, clicking rapidly can queue up multiple detail updates
 
 **Links**:
-- Commit: (to be added)
+- Commit: f961d36
 
 ---
 
