@@ -21,20 +21,28 @@ This tool is being built incrementally following the plan in `docs/viz/V002_PLAN
 
 ## Quick Start
 
-### Option 1: Open Directly in Browser
+### Important: Requires Local Web Server
+
+Due to ES6 module CORS restrictions, you **must** run a local web server. Opening `index.html` directly with `file://` will not work.
+
+**Start a local web server:**
 
 ```bash
 # From the project root
-open viz/index.html
+cd viz
+python3 -m http.server 8000
 ```
 
-Or simply double-click `viz/index.html` in your file browser.
+Then open in your browser:
+```
+http://localhost:8000
+```
 
-### Option 2: Run Tests
+### Run Tests
 
-```bash
-# Open test runner in browser
-open viz/tests/test.html
+With the web server running (see above), open in your browser:
+```
+http://localhost:8000/tests/test.html
 ```
 
 ## Usage (Once Complete)
