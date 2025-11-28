@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIG Visualizer Tests</title>
+
+    <!-- Mocha CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/mocha@10.2.0/mocha.css">
+</head>
+<body>
+    <!-- Mocha test results will be displayed here -->
+    <div id="mocha"></div>
+
+    <!-- Mocha and Chai libraries -->
+    <script src="https://unpkg.com/mocha@10.2.0/mocha.js"></script>
+    <script src="https://unpkg.com/chai@4.3.10/chai.js"></script>
+
+    <!-- Setup Mocha -->
+    <script>
+        mocha.setup('bdd');
+        const { expect } = chai;
+    </script>
+
+    <!-- Test files will be added here in later work units -->
+    <!-- Example placeholder test -->
+    <script>
+        describe('Visualizer Scaffold', () => {
+            // @jig.verifies("S-007") - placeholder test
+            it('should have Mocha and Chai loaded', () => {
+                expect(true).to.be.true;
+            });
+
+            it('should have expect assertion available', () => {
+                expect(typeof expect).to.equal('function');
+            });
+        });
+    </script>
+
+    <!-- Test modules will be loaded here in future work units:
+    <script type="module" src="test-loader.js"></script>
+    <script type="module" src="test-filters.js"></script>
+    <script type="module" src="test-search.js"></script>
+    -->
+
+    <!-- Run tests -->
+    <script>
+        mocha.run();
+    </script>
+</body>
+</html>

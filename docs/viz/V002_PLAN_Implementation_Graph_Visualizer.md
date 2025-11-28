@@ -30,7 +30,7 @@
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O/S)
-- [ ] WU1: Scaffold — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Scaffold — tests ✅ / code ✅ / docs ✅
 - [ ] WU2: Graph Loading — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Basic Rendering — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Interaction — tests ☐ / code ☐ / docs ☐
@@ -85,11 +85,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] File structure created (`viz/index.html`, `viz/css/`, `viz/js/`)
-- [ ] Cytoscape.js loads from CDN
-- [ ] Basic layout renders (header, sidebar, canvas, details panel)
-- [ ] Page opens in browser without errors
-- [ ] Test infrastructure works (`viz/tests/test.html` runs)
+- [x] File structure created (`viz/index.html`, `viz/css/`, `viz/js/`)
+- [x] Cytoscape.js loads from CDN
+- [x] Basic layout renders (header, sidebar, canvas, details panel)
+- [x] Page opens in browser without errors
+- [x] Test infrastructure works (`viz/tests/test.html` runs)
 
 **Implementation Notes**:
 - Approach:
@@ -113,13 +113,13 @@
 - `viz/README.md` - Basic usage instructions
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: CSS custom properties made theming consistent, three-column layout works cleanly, CDN-based libraries avoid build complexity
+- What could be better: Could add dark mode support in future, mobile responsiveness is basic
+- Surprises/discoveries: Cytoscape.js is a larger library than expected (3.28.1), but necessary for graph features
+- Risks identified: No offline mode (CDN dependency), browser compatibility not tested across all browsers
 
 **Links**:
-- Commit:
+- Commit: (to be added)
 
 ---
 

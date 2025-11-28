@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIG Implementation Graph Visualizer</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/controls.css">
+    <link rel="stylesheet" href="css/graph.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <h1>JIG Implementation Graph Visualizer</h1>
+        <div class="header-controls">
+            <button id="load-graph-btn" class="btn btn-primary">Load Graph</button>
+            <button id="help-btn" class="btn btn-secondary">Help</button>
+        </div>
+        <div class="stats-panel">
+            <span id="stats-nodes">Nodes: 0</span>
+            <span id="stats-edges">Edges: 0</span>
+            <span id="stats-timestamp">Generated: -</span>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="app-content">
+        <!-- Left sidebar: Filters and search -->
+        <aside class="sidebar sidebar-left">
+            <section class="sidebar-section">
+                <h3>Filters</h3>
+
+                <h4>Node Types</h4>
+                <div class="filter-group">
+                    <label><input type="checkbox" id="filter-class" checked> Classes</label>
+                    <label><input type="checkbox" id="filter-function" checked> Functions</label>
+                    <label><input type="checkbox" id="filter-module" checked> Modules</label>
+                    <label><input type="checkbox" id="filter-external" checked> External</label>
+                </div>
+
+                <h4>Edge Types</h4>
+                <div class="filter-group">
+                    <label><input type="checkbox" id="filter-contains" checked> Contains</label>
+                    <label><input type="checkbox" id="filter-implements" checked> Implements</label>
+                    <label><input type="checkbox" id="filter-imports" checked> Imports</label>
+                </div>
+            </section>
+
+            <section class="sidebar-section">
+                <h3>Search</h3>
+                <input type="text" id="search-input" placeholder="Search nodes..." class="search-box">
+                <div id="search-results" class="search-results"></div>
+            </section>
+
+            <section class="sidebar-section">
+                <h3>Layout</h3>
+                <select id="layout-select" class="layout-select">
+                    <option value="hierarchical" selected>Hierarchical</option>
+                    <option value="force-directed">Force-directed</option>
+                    <option value="circular">Circular</option>
+                    <option value="grid">Grid</option>
+                </select>
+            </section>
+
+            <section class="sidebar-section">
+                <h3>View</h3>
+                <button id="zoom-fit-btn" class="btn btn-block">Zoom to Fit</button>
+                <button id="reset-btn" class="btn btn-block">Reset View</button>
+            </section>
+        </aside>
+
+        <!-- Main canvas: Graph visualization -->
+        <main class="graph-container">
+            <div id="cy" class="cytoscape-canvas"></div>
+            <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading graph...</p>
+            </div>
+            <div id="empty-state" class="empty-state">
+                <p>No graph loaded</p>
+                <p class="empty-state-hint">Click "Load Graph" to get started</p>
+            </div>
+        </main>
+
+        <!-- Right sidebar: Details panel -->
+        <aside class="sidebar sidebar-right">
+            <section class="sidebar-section">
+                <h3>Details</h3>
+                <div id="details-panel" class="details-panel">
+                    <p class="details-empty">Select a node or edge to see details</p>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- Hidden file input for loading graphs -->
+    <input type="file" id="file-input" accept=".ndjson" style="display: none;">
+
+    <!-- Libraries from CDN -->
+    <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/fuse.js@7.0.0/dist/fuse.min.js"></script>
+
+    <!-- Application modules (ES6 modules) -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
