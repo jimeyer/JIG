@@ -32,7 +32,7 @@
 - [x] WU0: Create Intent nodes (O/S)
 - [x] WU1: Scaffold — tests ✅ / code ✅ / docs ✅
 - [x] WU2: Graph Loading — tests ✅ / code ✅ / docs ✅
-- [ ] WU3: Basic Rendering — tests ☐ / code ☐ / docs ☐
+- [x] WU3: Basic Rendering — tests ✅ / code ✅ / docs ✅
 - [ ] WU4: Interaction — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: Filtering — tests ☐ / code ☐ / docs ☐
 - [ ] WU6: Search — tests ☐ / code ☐ / docs ☐
@@ -188,17 +188,17 @@
 **Implements**: S-008 (Node rendering), S-009 (Edge rendering)
 
 **Acceptance Criteria**:
-- [ ] S-008 is implemented by `renderGraph()` with node styling
-- [ ] S-009 is implemented by `renderGraph()` with edge styling
-- [ ] Classes render as rectangles
-- [ ] Functions render as circles
-- [ ] Modules render as rounded rectangles
-- [ ] External modules have different color
-- [ ] Contains edges are thick solid lines
-- [ ] Implements edges are dashed lines
-- [ ] Imports edges are thin lines
-- [ ] Hierarchical layout applied by default
-- [ ] Manual test: Sample graph renders visually
+- [x] S-008 is implemented by `renderGraph()` with node styling
+- [x] S-009 is implemented by `renderGraph()` with edge styling
+- [x] Classes render as rectangles
+- [x] Functions render as circles
+- [x] Modules render as rounded rectangles
+- [x] External modules have different color
+- [x] Contains edges are thick solid lines
+- [x] Implements edges are dashed lines
+- [x] Imports edges are thin lines
+- [x] Hierarchical layout applied by default
+- [x] Manual test: Sample graph renders visually
 
 **Implementation Notes**:
 - Approach:
@@ -223,16 +223,16 @@
   - Confirm layout is hierarchical
 
 **Docs Updated**:
-- `viz/README.md` - Add screenshot or description of visual output
+- `viz/README.md` - Add screenshot or description of visual output (no changes needed - visual only)
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: Cytoscape.js stylesheet is powerful and intuitive, breadthfirst layout works great for hierarchical graphs, visual distinction between node types is clear, edge styling makes relationship types obvious
+- What could be better: Could add more layout options (dagre for better DAG layout), node labels could be smarter about truncation
+- Surprises/discoveries: Nodes with `implements` field get special highlighting (thicker red border) to show intent connections, bezier curves look better than straight lines for edges, animate option on layouts provides nice transitions
+- Risks identified: Performance with 100+ nodes not yet tested, overlapping labels on dense graphs
 
 **Links**:
-- Commit:
+- Commit: (to be added)
 
 ---
 

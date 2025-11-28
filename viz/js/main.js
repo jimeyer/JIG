@@ -6,6 +6,7 @@
  */
 
 import { loadGraphFile, loadGraphFromURL } from './graph-loader.js';
+import { renderGraph } from './graph-renderer.js';
 
 // Application state (will be expanded in later work units)
 const state = {
@@ -90,8 +91,10 @@ async function handleGraphLoad(file) {
         // Hide loading spinner
         document.getElementById('loading-spinner').style.display = 'none';
 
-        // Will render graph in WU3
-        // renderGraph(graph.elements);
+        // Render graph
+        state.cy = renderGraph(graph.elements);
+
+        console.log('Graph rendered successfully');
 
     } catch (err) {
         console.error('Failed to load graph:', err);
@@ -136,8 +139,10 @@ async function tryLoadDefaultGraph() {
 
         console.log('Default graph loaded successfully');
 
-        // Will render graph in WU3
-        // renderGraph(graph.elements);
+        // Render graph
+        state.cy = renderGraph(graph.elements);
+
+        console.log('Default graph rendered successfully');
 
     } catch (err) {
         console.log('Default graph not available:', err.message);
