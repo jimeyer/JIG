@@ -74,7 +74,7 @@
 - Process win: Creating all intent upfront clarifies scope and enables test-driven development
 
 **Links**:
-- Commit: (to be added after commit)
+- Commit: df235d9
 
 ---
 
