@@ -65,8 +65,12 @@ export function parseNDJSON(content) {
 export function toCytoscapeElements(graph) {
     const elements = [];
 
+    // Build set of node IDs for validation
+    const nodeIds = new Set();
+
     // Add nodes
     for (const node of graph.nodes) {
+        nodeIds.add(node.id);
         elements.push({
             group: 'nodes',
             data: {
@@ -77,8 +81,18 @@ export function toCytoscapeElements(graph) {
         });
     }
 
-    // Add edges
+    // Add edges (only if both source and target nodes exist)
     for (const edge of graph.edges) {
+        // Skip edges with missing source or target nodes
+        if (!nodeIds.has(edge.source)) {
+            console.warn(`Skipping edge: source node "${edge.source}" not found`);
+            continue;
+        }
+        if (!nodeIds.has(edge.target)) {
+            console.warn(`Skipping edge: target node "${edge.target}" not found`);
+            continue;
+        }
+
         elements.push({
             group: 'edges',
             data: {
