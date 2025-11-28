@@ -175,7 +175,7 @@
 - Risks identified: Large files might be slow to parse (no streaming yet), no validation that source/target nodes exist for edges
 
 **Links**:
-- Commit: (to be added)
+- Commit: 1f2c4b2
 
 ---
 
