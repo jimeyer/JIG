@@ -31,7 +31,7 @@
 
 - [x] WU0: Create Intent nodes (O/S)
 - [x] WU1: Scaffold — tests ✅ / code ✅ / docs ✅
-- [ ] WU2: Graph Loading — tests ☐ / code ☐ / docs ☐
+- [x] WU2: Graph Loading — tests ✅ / code ✅ / docs ✅
 - [ ] WU3: Basic Rendering — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Interaction — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: Filtering — tests ☐ / code ☐ / docs ☐
@@ -132,13 +132,13 @@
 **Implements**: S-007 (NDJSON parsing), S-017 (File loading)
 
 **Acceptance Criteria**:
-- [ ] S-007 is implemented by `parseNDJSON()` function
-- [ ] S-017 is implemented by `loadGraphFile()` function
-- [ ] Tests verify parsing of metadata line
-- [ ] Tests verify parsing of node lines
-- [ ] Tests verify parsing of edge lines
-- [ ] Tests verify Cytoscape elements structure
-- [ ] Manual test: Load sample-graph.ndjson shows elements in console
+- [x] S-007 is implemented by `parseNDJSON()` function
+- [x] S-017 is implemented by `loadGraphFile()` function
+- [x] Tests verify parsing of metadata line
+- [x] Tests verify parsing of node lines
+- [x] Tests verify parsing of edge lines
+- [x] Tests verify Cytoscape elements structure
+- [x] Manual test: Load sample-graph.ndjson shows elements in console
 
 **Implementation Notes**:
 - Approach:
@@ -166,16 +166,16 @@
 - Manual: Load sample graph, inspect console output
 
 **Docs Updated**:
-- `viz/README.md` - Document NDJSON format expectations
+- `viz/README.md` - Document NDJSON format expectations (already documented in WU1)
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: NDJSON parsing is straightforward, FileReader API works well, comprehensive test coverage (18 tests), Cytoscape elements transform is clean
+- What could be better: Error messages could be more specific about what's wrong with malformed data
+- Surprises/discoveries: Need to filter out empty lines in NDJSON, edge IDs need to be unique (using source-target-type pattern)
+- Risks identified: Large files might be slow to parse (no streaming yet), no validation that source/target nodes exist for edges
 
 **Links**:
-- Commit:
+- Commit: (to be added)
 
 ---
 
