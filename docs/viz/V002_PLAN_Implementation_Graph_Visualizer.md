@@ -232,7 +232,7 @@
 - Risks identified: Performance with 100+ nodes not yet tested, overlapping labels on dense graphs
 
 **Links**:
-- Commit: (to be added)
+- Commit: f417127
 
 ---
 
