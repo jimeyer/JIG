@@ -119,7 +119,7 @@
 - Risks identified: No offline mode (CDN dependency), browser compatibility not tested across all browsers
 
 **Links**:
-- Commit: (to be added)
+- Commit: 4c33dbe
 
 ---
 
