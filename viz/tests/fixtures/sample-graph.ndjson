@@ -1,0 +1,23 @@
+{"_meta": {"edge_count": 12, "generated": "2025-11-28T01:10:51.728670+00:00", "node_count": 10, "version": "1.0"}}
+{"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
+{"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "language": "python", "line": 52, "name": "analyze_file", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/analyzers/python.py", "id": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "implements": ["S-006"], "language": "python", "line": 46, "name": "_format_message", "parent_class": "C-jig.impl_graph.analyzers.python.ParseError", "signature": "_format_message(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/impl_graph/builder.py", "id": "F-jig.impl_graph.builder.build_graph", "implements": ["S-001", "S-003", "S-006"], "language": "python", "line": 186, "name": "build_graph", "signature": "build_graph(project_root: Path, source_dir: Optional[Path], output_path: Optional[Path], exclude_patterns: Optional[List[str]], verbose: bool, strict: bool, include_timestamp: bool) -> Graph", "type": "function"}
+{"async": true, "file": "src/jig/example/async_handler.py", "id": "F-jig.example.async_handler.handle_request", "language": "python", "line": 12, "name": "handle_request", "signature": "async handle_request(request: Request) -> Response", "type": "function"}
+{"file": "src/jig/impl_graph/analyzers/base.py", "id": "M-jig.impl_graph.analyzers.base", "language": "python", "name": "jig.impl_graph.analyzers.base", "type": "module"}
+{"file": "src/jig/impl_graph/analyzers/python.py", "id": "M-jig.impl_graph.analyzers.python", "language": "python", "name": "jig.impl_graph.analyzers.python", "type": "module"}
+{"id": "M-abc", "language": "python", "name": "abc", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.python.ParseError", "target": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.base", "target": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "type": "contains"}
+{"source": "M-jig.impl_graph.analyzers.python", "target": "C-jig.impl_graph.analyzers.python.ParseError", "type": "contains"}
+{"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "S-004", "type": "implements"}
+{"source": "C-jig.impl_graph.analyzers.python.ParseError", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "target": "S-006", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.build_graph", "target": "S-001", "type": "implements"}
+{"source": "F-jig.impl_graph.builder.build_graph", "target": "S-003", "type": "implements"}
+{"line": 8, "source": "M-jig.impl_graph.analyzers.base", "target": "M-abc", "type": "imports"}
+{"line": 9, "source": "M-jig.impl_graph.analyzers.base", "target": "M-pathlib", "type": "imports"}
+{"line": 11, "source": "M-jig.impl_graph.analyzers.python", "target": "M-pathlib", "type": "imports"}
