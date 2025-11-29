@@ -8,6 +8,7 @@
 import { loadGraphFile, loadGraphFromURL } from './graph-loader.js';
 import { renderGraph, applyLayout } from './graph-renderer.js';
 import { setupInteractions, setupZoomControls } from './graph-interactions.js';
+import { applyFilters } from './filters.js';
 
 // Application state (will be expanded in later work units)
 const state = {
@@ -69,8 +70,69 @@ function setupEventHandlers() {
         }
     });
 
-    // Filter checkboxes (will be wired up in WU5)
-    // Zoom controls (wired up in WU4)
+    // Filter checkboxes
+    // @jig.implements("S-010", "S-011")
+    setupFilterHandlers();
+}
+
+/**
+ * Setup filter checkbox event handlers
+ *
+ * @jig.implements("S-010", "S-011")
+ */
+function setupFilterHandlers() {
+    // Node type filters
+    const nodeTypeCheckboxes = [
+        { id: 'filter-class', type: 'class' },
+        { id: 'filter-function', type: 'function' },
+        { id: 'filter-module', type: 'module' },
+        { id: 'filter-external', type: 'external_module' }
+    ];
+
+    nodeTypeCheckboxes.forEach(({ id, type }) => {
+        document.getElementById(id).addEventListener('change', (event) => {
+            if (event.target.checked) {
+                state.filters.nodeTypes.add(type);
+            } else {
+                state.filters.nodeTypes.delete(type);
+            }
+            updateFilters();
+        });
+    });
+
+    // Edge type filters
+    const edgeTypeCheckboxes = [
+        { id: 'filter-contains', type: 'contains' },
+        { id: 'filter-implements', type: 'implements' },
+        { id: 'filter-imports', type: 'imports' }
+    ];
+
+    edgeTypeCheckboxes.forEach(({ id, type }) => {
+        document.getElementById(id).addEventListener('change', (event) => {
+            if (event.target.checked) {
+                state.filters.edgeTypes.add(type);
+            } else {
+                state.filters.edgeTypes.delete(type);
+            }
+            updateFilters();
+        });
+    });
+}
+
+/**
+ * Update graph filters based on current state
+ *
+ * @jig.implements("S-010", "S-011")
+ */
+function updateFilters() {
+    if (!state.cy) return;
+
+    console.log('Applying filters:', {
+        nodeTypes: Array.from(state.filters.nodeTypes),
+        edgeTypes: Array.from(state.filters.edgeTypes)
+    });
+
+    applyFilters(state.cy, state.filters.nodeTypes, state.filters.edgeTypes);
 }
 
 /**

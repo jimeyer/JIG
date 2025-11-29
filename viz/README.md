@@ -14,7 +14,7 @@ This tool is being built incrementally following the plan in `docs/viz/V002_PLAN
 - [x] WU2: Graph Loading
 - [x] WU3: Basic Rendering
 - [x] WU4: Interaction
-- [ ] WU5: Filtering
+- [x] WU5: Filtering
 - [ ] WU6: Search
 - [x] WU7: Layout Switching
 - [ ] WU8: Polish
@@ -85,7 +85,7 @@ viz/
 │   ├── graph-loader.js  # NDJSON parsing (WU2)
 │   ├── graph-renderer.js # Cytoscape rendering (WU3) + layout switching (WU7)
 │   ├── graph-interactions.js # Click/hover handlers (WU4)
-│   ├── filters.js       # Filter logic (WU5)
+│   ├── filters.js       # Filter logic (WU5) ✓
 │   ├── search.js        # Search logic (WU6)
 │   └── details-panel.js # Details display (WU4)
 ├── tests/
