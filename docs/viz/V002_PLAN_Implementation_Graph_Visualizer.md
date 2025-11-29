@@ -460,7 +460,7 @@
 - Risks identified: The coordinate swap happens after initial layout animation, which might cause a brief visual glitch. Could be mitigated by disabling animation for hierarchical-cols. Large graphs might have performance issues with the coordinate transformation loop.
 
 **Links**:
-- Commit:
+- Commit: 9568eff
 
 ---
 
