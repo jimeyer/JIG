@@ -418,13 +418,13 @@
 **Implements**: S-016 (Layout switching)
 
 **Acceptance Criteria**:
-- [ ] S-016 is implemented by `applyLayout()` function (already exists in graph-renderer.js, needs enhancement)
-- [ ] Layout dropdown in sidebar
-- [ ] Options: Hierarchical (Rows), Hierarchical (Columns), Force-directed, Circular, Grid
-- [ ] Select layout → graph re-layouts smoothly
-- [ ] Layout persists (doesn't reset on interaction)
-- [ ] Hierarchical (Columns) flows left-to-right with modules on left
-- [ ] Manual test: All layouts work
+- [x] S-016 is implemented by `applyLayout()` function (already exists in graph-renderer.js, needs enhancement)
+- [x] Layout dropdown in sidebar
+- [x] Options: Hierarchical (Rows), Hierarchical (Columns), Force-directed, Circular, Grid
+- [x] Select layout → graph re-layouts smoothly
+- [x] Layout persists (doesn't reset on interaction)
+- [x] Hierarchical (Columns) flows left-to-right with modules on left
+- [x] Manual test: All layouts work
 
 **Implementation Notes**:
 - Approach:
@@ -451,13 +451,13 @@
   - Verify layout applies correctly after loading new graph
 
 **Docs Updated**:
-- `viz/README.md` - Document layout options
+- `viz/README.md` - Document layout options and update WU status
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: The dropdown was already scaffolded in WU1, so just needed to wire it up. Cytoscape's layout API is very flexible and easy to use. The state management pattern (storing selectedLayout in state) makes it easy to persist layout choices across graph loads. The coordinate swap trick (swapping x/y after layout) works perfectly to convert vertical hierarchical to horizontal.
+- What could be better: The coordinate swap approach for hierarchical-cols is a workaround since Cytoscape's breadthfirst doesn't have native left-to-right support. A custom layout algorithm might be cleaner but would add complexity.
+- Surprises/discoveries: Cytoscape's layout.one('layoutstop', ...) event makes it easy to post-process positions after layout. Need to call cy.fit() after coordinate transformation to re-center the graph. The existing applyLayout() function already had S-016 decorator from WU3, just needed enhancement.
+- Risks identified: The coordinate swap happens after initial layout animation, which might cause a brief visual glitch. Could be mitigated by disabling animation for hierarchical-cols. Large graphs might have performance issues with the coordinate transformation loop.
 
 **Links**:
 - Commit:
