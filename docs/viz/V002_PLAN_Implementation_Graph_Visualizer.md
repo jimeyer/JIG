@@ -413,36 +413,42 @@
 
 **Goal**: Switch between layout algorithms
 
-**Planned Effort**: 60 minutes
+**Planned Effort**: 75 minutes
 
 **Implements**: S-016 (Layout switching)
 
 **Acceptance Criteria**:
-- [ ] S-016 is implemented by `applyLayout()` function
+- [ ] S-016 is implemented by `applyLayout()` function (already exists in graph-renderer.js, needs enhancement)
 - [ ] Layout dropdown in sidebar
-- [ ] Options: Hierarchical, Force-directed, Circular, Grid
+- [ ] Options: Hierarchical (Rows), Hierarchical (Columns), Force-directed, Circular, Grid
 - [ ] Select layout → graph re-layouts smoothly
 - [ ] Layout persists (doesn't reset on interaction)
+- [ ] Hierarchical (Columns) flows left-to-right with modules on left
 - [ ] Manual test: All layouts work
 
 **Implementation Notes**:
 - Approach:
-  1. Implement `applyLayout()` in layout-manager.js
-  2. Add layout dropdown to sidebar
-  3. Wire up dropdown change handler
-  4. Configure Cytoscape layout options for each type
+  1. Add 'hierarchical-cols' case to existing `applyLayout()` in graph-renderer.js
+  2. Configure breadthfirst layout with left-to-right flow (rankDir or similar)
+  3. Add layout dropdown to sidebar (replace placeholder)
+  4. Wire up dropdown change handler in main.js
+  5. Store selected layout in state, apply on graph load/update
 - Files:
-  - `viz/js/layout-manager.js` - Layout logic
-  - `viz/index.html` - Add layout dropdown
+  - `viz/js/graph-renderer.js` - Add hierarchical-cols case to applyLayout()
+  - `viz/index.html` - Wire up layout dropdown (already exists in scaffold)
+  - `viz/js/main.js` - Add dropdown event handler
 - Decorators added:
-  - `// @jig.implements("S-016")` on applyLayout
+  - `// @jig.implements("S-016")` already exists on applyLayout (WU3)
 
 **Test Plan**:
 - Manual testing only (visual verification):
-  - Select "Hierarchical" → top-down tree layout
+  - Select "Hierarchical (Rows)" → top-down tree layout
+  - Select "Hierarchical (Columns)" → left-to-right tree, modules on left
   - Select "Force-directed" → organic clustering
   - Select "Circular" → nodes in circle
   - Select "Grid" → organized rows/columns
+  - Verify layout persists when clicking nodes/edges
+  - Verify layout applies correctly after loading new graph
 
 **Docs Updated**:
 - `viz/README.md` - Document layout options
