@@ -9,12 +9,15 @@ import { loadGraphFile, loadGraphFromURL } from './graph-loader.js';
 import { renderGraph, applyLayout } from './graph-renderer.js';
 import { setupInteractions, setupZoomControls } from './graph-interactions.js';
 import { applyFilters } from './filters.js';
+import { searchNodes, highlightSearchResults, clearSearchHighlights } from './search.js';
+import { showNodeDetails } from './details-panel.js';
 
 // Application state (will be expanded in later work units)
 const state = {
     cy: null,              // Cytoscape instance
     graph: null,           // Parsed graph data
     selectedLayout: 'hierarchical',  // Current layout algorithm
+    searchResults: [],     // Current search results
     filters: {
         nodeTypes: new Set(['class', 'function', 'module', 'external_module']),
         edgeTypes: new Set(['contains', 'implements', 'imports'])
@@ -73,6 +76,10 @@ function setupEventHandlers() {
     // Filter checkboxes
     // @jig.implements("S-010", "S-011")
     setupFilterHandlers();
+
+    // Search input
+    // @jig.implements("S-012")
+    setupSearchHandler();
 }
 
 /**
@@ -133,6 +140,138 @@ function updateFilters() {
     });
 
     applyFilters(state.cy, state.filters.nodeTypes, state.filters.edgeTypes);
+}
+
+/**
+ * Setup search input event handler
+ *
+ * @jig.implements("S-012")
+ */
+function setupSearchHandler() {
+    const searchInput = document.getElementById('search-input');
+    const searchResultsDiv = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', (event) => {
+        const query = event.target.value;
+
+        if (!state.graph) {
+            return;
+        }
+
+        // Search through nodes
+        const results = searchNodes(state.graph.nodes, query);
+        state.searchResults = results;
+
+        console.log(`Search query: "${query}", found ${results.length} results`);
+
+        // Update search results display
+        displaySearchResults(results);
+
+        // Highlight matching nodes in graph
+        if (state.cy) {
+            if (query.trim() === '') {
+                clearSearchHighlights(state.cy);
+            } else {
+                const matchingIds = results.map(node => node.id);
+                highlightSearchResults(state.cy, matchingIds);
+            }
+        }
+    });
+
+    // Clear search on escape key
+    searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+        }
+    });
+}
+
+/**
+ * Display search results in the results panel
+ *
+ * @jig.implements("S-012")
+ *
+ * @param {Array} results - Array of matching nodes
+ */
+function displaySearchResults(results) {
+    const searchResultsDiv = document.getElementById('search-results');
+
+    if (results.length === 0) {
+        searchResultsDiv.innerHTML = '<div class="search-no-results">No matches</div>';
+        return;
+    }
+
+    // Limit to first 10 results
+    const displayResults = results.slice(0, 10);
+
+    let html = '<ul class="search-results-list">';
+    displayResults.forEach(node => {
+        html += `<li class="search-result-item" data-node-id="${escapeHtml(node.id)}">`;
+        html += `<div class="search-result-name">${escapeHtml(node.name || node.id)}</div>`;
+        html += `<div class="search-result-type">${escapeHtml(node.type)}</div>`;
+        html += '</li>';
+    });
+    html += '</ul>';
+
+    if (results.length > 10) {
+        html += `<div class="search-more">+${results.length - 10} more results</div>`;
+    }
+
+    searchResultsDiv.innerHTML = html;
+
+    // Wire up click handlers for results
+    searchResultsDiv.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const nodeId = item.getAttribute('data-node-id');
+            selectAndCenterNode(nodeId);
+        });
+    });
+}
+
+/**
+ * Select and center a node in the graph
+ *
+ * @jig.implements("S-012")
+ *
+ * @param {string} nodeId - ID of node to select
+ */
+function selectAndCenterNode(nodeId) {
+    if (!state.cy) return;
+
+    const node = state.cy.getElementById(nodeId);
+    if (node.length === 0) return;
+
+    // Deselect all and select this node
+    state.cy.elements().removeClass('highlighted');
+    node.addClass('highlighted');
+
+    // Center the node with animation
+    state.cy.animate({
+        center: {
+            eles: node
+        },
+        zoom: 1.5,
+        duration: 500
+    });
+
+    // Show node details (reuse existing details panel functionality)
+    showNodeDetails(node.data());
+
+    console.log(`Selected node: ${nodeId}`);
+}
+
+/**
+ * HTML escape utility
+ */
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return '';
+    return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 /**

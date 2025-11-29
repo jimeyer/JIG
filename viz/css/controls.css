@@ -96,6 +96,12 @@
     overflow-y: auto;
 }
 
+.search-results-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .search-result-item {
     padding: var(--spacing-sm);
     cursor: pointer;
@@ -117,14 +123,42 @@
     font-weight: 500;
 }
 
+.search-result-type {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+    text-transform: capitalize;
+}
+
+.search-result-item:hover .search-result-type {
+    color: var(--color-text);
+}
+
 .search-result-id {
     font-size: 11px;
     color: var(--color-text-secondary);
     font-family: 'Courier New', monospace;
 }
 
-.search-result-item.active .search-result-id {
+.search-result-item.active .search-result-id,
+.search-result-item.active .search-result-type {
     color: rgba(255, 255, 255, 0.8);
+}
+
+.search-no-results {
+    padding: var(--spacing-md);
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    font-size: 13px;
+}
+
+.search-more {
+    padding: var(--spacing-sm);
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-style: italic;
 }
 
 /* Layout select */

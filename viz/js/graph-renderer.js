@@ -170,6 +170,17 @@ function getCytoscapeStylesheet() {
             style: {
                 'opacity': 1
             }
+        },
+
+        // Search match highlighting
+        {
+            selector: '.search-match',
+            style: {
+                'border-width': 4,
+                'border-color': '#ff6f00',
+                'background-color': '#ffe0b2',
+                'z-index': 998
+            }
         }
     ];
 }
