@@ -365,13 +365,13 @@
 **Implements**: S-012 (Fuzzy search)
 
 **Acceptance Criteria**:
-- [ ] S-012 is implemented by `searchNodes()` function
-- [ ] Tests verify search logic
-- [ ] Search input field in sidebar
-- [ ] Type query → matching nodes highlighted
-- [ ] Click search result → selects node
-- [ ] Clear search → removes highlights
-- [ ] Manual test: Search works for partial matches
+- [x] S-012 is implemented by `searchNodes()` function
+- [x] Tests verify search logic
+- [x] Search input field in sidebar
+- [x] Type query → matching nodes highlighted
+- [x] Click search result → selects node
+- [x] Clear search → removes highlights
+- [x] Manual test: Search works for partial matches
 
 **Implementation Notes**:
 - Approach:
@@ -397,16 +397,18 @@
 - Manual: Type "Token" → see TokenValidator highlighted
 
 **Docs Updated**:
-- `viz/README.md` - Document search functionality
+- `viz/README.md` - Update WU status
+- `viz/tests/test.html` - Added test-search.js to test suite
+- `viz/css/controls.css` - Added search results styling
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: Fuse.js makes fuzzy search trivial with great defaults. The search-match class styling provides clear visual feedback. Combining search with node selection/centering creates smooth UX. Limiting to 10 results keeps UI clean. Escape key to clear search is intuitive. The 12 comprehensive tests cover all edge cases including fuzzy matching, case insensitivity, and ranking.
+- What could be better: Could debounce search input to reduce calls on fast typing. Could add keyboard navigation (arrow keys) through results. Could highlight matching text in results. Could search edges too, not just nodes. Results could show more context (file path, parent class).
+- Surprises/discoveries: Fuse.js threshold of 0.4 provides good balance between strict and permissive matching. The cy.animate() API makes centering nodes very smooth. Reusing showNodeDetails() when clicking search results provides consistency. Search input was already scaffolded in WU1, just needed wiring.
+- Risks identified: No debouncing means searching large graphs on every keystroke could be slow. Fuse.js loads full node array into memory - could be issue for very large graphs (1000+ nodes). No indication when search is searching filtered-out nodes. Empty query returns all nodes which might be confusing.
 
 **Links**:
-- Commit:
+- Commit: 7092ff6
 
 ---
 
