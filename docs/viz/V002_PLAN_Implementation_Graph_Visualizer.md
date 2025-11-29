@@ -304,15 +304,15 @@
 **Implements**: S-010 (Node filtering), S-011 (Edge filtering)
 
 **Acceptance Criteria**:
-- [ ] S-010 is implemented by `filterNodesByType()` function
-- [ ] S-011 is implemented by `filterEdgesByType()` function
-- [ ] Tests verify node filtering logic
-- [ ] Tests verify edge filtering logic
-- [ ] Node type checkboxes (Classes, Functions, Modules, External)
-- [ ] Edge type checkboxes (Contains, Implements, Imports)
-- [ ] Unchecking checkbox hides nodes/edges in real-time
-- [ ] Re-checking checkbox shows nodes/edges again
-- [ ] Manual test: Filtering works smoothly
+- [x] S-010 is implemented by `filterNodesByType()` function
+- [x] S-011 is implemented by `filterEdgesByType()` function
+- [x] Tests verify node filtering logic
+- [x] Tests verify edge filtering logic
+- [x] Node type checkboxes (Classes, Functions, Modules, External)
+- [x] Edge type checkboxes (Contains, Implements, Imports)
+- [x] Unchecking checkbox hides nodes/edges in real-time
+- [x] Re-checking checkbox shows nodes/edges again
+- [x] Manual test: Filtering works smoothly
 
 **Implementation Notes**:
 - Approach:
@@ -342,16 +342,17 @@
 - Manual: Uncheck "Classes" → classes disappear, check again → reappear
 
 **Docs Updated**:
-- `viz/README.md` - Document filter controls
+- `viz/README.md` - Filter controls already documented in WU1
+- `viz/tests/test.html` - Added test-filters.js to test suite
 
 **Reflect**:
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- What worked well: Using Sets in state.filters makes add/delete operations clean. Cytoscape's element.style('display', 'none|element') works perfectly for show/hide without removing from DOM. The applyFilters() function is simple and efficient. Comprehensive tests (14 total) cover all edge cases. Filter checkboxes were already scaffolded in WU1, just needed wiring.
+- What could be better: Could add "Select All" / "Deselect All" buttons for each filter group. Could preserve filter state across graph loads. The display style approach works but could use Cytoscape's ele.remove()/restore() for better performance on very large graphs.
+- Surprises/discoveries: Hiding nodes automatically hides their edges in visual display, but we still need to explicitly hide edges by type. Using display:none preserves layout positions perfectly - nodes don't jump when re-shown. The state.filters Sets persist correctly across filter operations.
+- Risks identified: No validation that at least one node/edge type is selected - unchecking all could create confusing empty graph. Large graphs with frequent filter changes might have performance issues. Filter state doesn't persist across page reloads.
 
 **Links**:
-- Commit:
+- Commit: 4aeb3b3
 
 ---
 
