@@ -219,7 +219,7 @@ export function renderGraph(elements, container = null) {
  * @jig.implements("S-016")
  *
  * @param {Object} cy - Cytoscape instance
- * @param {string} layoutName - Name of layout (hierarchical, force-directed, circular, grid)
+ * @param {string} layoutName - Name of layout (hierarchical, hierarchical-cols, force-directed, circular, grid)
  */
 export function applyLayout(cy, layoutName = 'hierarchical') {
     let layoutOptions = {};
@@ -233,6 +233,26 @@ export function applyLayout(cy, layoutName = 'hierarchical') {
                 padding: 30,
                 animate: true,
                 animationDuration: 500
+            };
+            break;
+
+        case 'hierarchical-cols':
+            layoutOptions = {
+                name: 'breadthfirst',
+                directed: true,
+                spacingFactor: 1.5,
+                padding: 30,
+                animate: true,
+                animationDuration: 500,
+                grid: false,
+                avoidOverlap: true,
+                nodeDimensionsIncludeLabels: true,
+                // Position nodes left-to-right instead of top-down
+                // In breadthfirst, we can control this by setting the roots and layout direction
+                // However, Cytoscape's breadthfirst doesn't have a direct rankDir option
+                // We'll use a workaround: swap the positions after layout
+                fit: true,
+                circle: false
             };
             break;
 
@@ -285,6 +305,23 @@ export function applyLayout(cy, layoutName = 'hierarchical') {
     }
 
     const layout = cy.layout(layoutOptions);
+
+    // For hierarchical-cols, we need to transform positions after layout
+    if (layoutName === 'hierarchical-cols') {
+        layout.one('layoutstop', () => {
+            // Swap x and y coordinates to convert vertical layout to horizontal
+            cy.nodes().forEach(node => {
+                const pos = node.position();
+                node.position({
+                    x: pos.y,
+                    y: pos.x
+                });
+            });
+            // Fit the graph after transformation
+            cy.fit(50);
+        });
+    }
+
     layout.run();
 
     return layout;
@@ -295,9 +332,10 @@ export function applyLayout(cy, layoutName = 'hierarchical') {
  *
  * @param {Object} cy - Cytoscape instance
  * @param {Array} elements - New Cytoscape elements
+ * @param {string} layoutName - Layout to apply (defaults to 'hierarchical')
  */
-export function updateGraph(cy, elements) {
+export function updateGraph(cy, elements, layoutName = 'hierarchical') {
     cy.elements().remove();
     cy.add(elements);
-    applyLayout(cy, 'hierarchical');
+    applyLayout(cy, layoutName);
 }

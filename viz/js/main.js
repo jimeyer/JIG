@@ -6,13 +6,14 @@
  */
 
 import { loadGraphFile, loadGraphFromURL } from './graph-loader.js';
-import { renderGraph } from './graph-renderer.js';
+import { renderGraph, applyLayout } from './graph-renderer.js';
 import { setupInteractions, setupZoomControls } from './graph-interactions.js';
 
 // Application state (will be expanded in later work units)
 const state = {
     cy: null,              // Cytoscape instance
     graph: null,           // Parsed graph data
+    selectedLayout: 'hierarchical',  // Current layout algorithm
     filters: {
         nodeTypes: new Set(['class', 'function', 'module', 'external_module']),
         edgeTypes: new Set(['contains', 'implements', 'imports'])
@@ -56,9 +57,20 @@ function setupEventHandlers() {
         alert('JIG Implementation Graph Visualizer\n\nLoad a .ndjson graph file to visualize your codebase structure.\n\nSee README.md for more information.');
     });
 
+    // Layout selector
+    // @jig.implements("S-016")
+    document.getElementById('layout-select').addEventListener('change', (event) => {
+        const layoutName = event.target.value;
+        state.selectedLayout = layoutName;
+
+        if (state.cy) {
+            console.log(`Applying layout: ${layoutName}`);
+            applyLayout(state.cy, layoutName);
+        }
+    });
+
     // Filter checkboxes (will be wired up in WU5)
-    // Layout selector (will be wired up in WU7)
-    // Zoom controls (will be wired up in WU4)
+    // Zoom controls (wired up in WU4)
 }
 
 /**
@@ -94,6 +106,9 @@ async function handleGraphLoad(file) {
 
         // Render graph
         state.cy = renderGraph(graph.elements);
+
+        // Apply the currently selected layout
+        applyLayout(state.cy, state.selectedLayout);
 
         // Setup interactions (click handlers, zoom controls)
         setupInteractions(state.cy);
@@ -146,6 +161,9 @@ async function tryLoadDefaultGraph() {
 
         // Render graph
         state.cy = renderGraph(graph.elements);
+
+        // Apply the currently selected layout
+        applyLayout(state.cy, state.selectedLayout);
 
         // Setup interactions (click handlers, zoom controls)
         setupInteractions(state.cy);

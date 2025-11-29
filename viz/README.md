@@ -11,12 +11,12 @@ This tool is being built incrementally following the plan in `docs/viz/V002_PLAN
 ### Completed Work Units
 - [x] WU0: Intent definition (Outcomes O-007, O-008; Specifications S-007 through S-017)
 - [x] WU1: Scaffold (basic HTML/CSS/JS structure)
-- [ ] WU2: Graph Loading
-- [ ] WU3: Basic Rendering
-- [ ] WU4: Interaction
+- [x] WU2: Graph Loading
+- [x] WU3: Basic Rendering
+- [x] WU4: Interaction
 - [ ] WU5: Filtering
 - [ ] WU6: Search
-- [ ] WU7: Layout Switching
+- [x] WU7: Layout Switching
 - [ ] WU8: Polish
 
 ## Quick Start
@@ -64,7 +64,12 @@ http://localhost:8000/tests/test.html
 
 5. **Explore**:
    - Click nodes or edges to see details in the right panel
-   - Switch layouts using the dropdown (Hierarchical, Force-directed, Circular, Grid)
+   - Switch layouts using the dropdown:
+     - **Hierarchical (Rows)**: Top-down tree structure showing containment
+     - **Hierarchical (Columns)**: Left-to-right tree, modules on left descending right
+     - **Force-directed**: Organic clustering based on connections
+     - **Circular**: Nodes arranged in circle
+     - **Grid**: Organized rows and columns
 
 ## Architecture
 
@@ -78,12 +83,11 @@ viz/
 ├── js/
 │   ├── main.js          # Application entry point
 │   ├── graph-loader.js  # NDJSON parsing (WU2)
-│   ├── graph-renderer.js # Cytoscape rendering (WU3)
+│   ├── graph-renderer.js # Cytoscape rendering (WU3) + layout switching (WU7)
 │   ├── graph-interactions.js # Click/hover handlers (WU4)
 │   ├── filters.js       # Filter logic (WU5)
 │   ├── search.js        # Search logic (WU6)
-│   ├── details-panel.js # Details display (WU4)
-│   └── layout-manager.js # Layout switching (WU7)
+│   └── details-panel.js # Details display (WU4)
 ├── tests/
 │   ├── test.html        # Mocha test runner
 │   ├── test-loader.js   # Parser tests (WU2)
