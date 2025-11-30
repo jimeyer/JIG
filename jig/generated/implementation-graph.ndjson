@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 158, "generated": "2025-11-30T16:27:13.515395+00:00", "node_count": 126, "version": "1.0"}}
+{"_meta": {"edge_count": 199, "generated": "2025-11-30T22:15:40.992551+00:00", "node_count": 153, "version": "1.0"}}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
@@ -7,6 +7,8 @@
 {"bases": [], "file": "src/jig/impl_graph/builder.py", "id": "C-jig.impl_graph.builder.GraphBuilder", "implements": ["S-001", "S-006"], "language": "python", "line": 22, "name": "GraphBuilder", "type": "class"}
 {"bases": [], "file": "src/jig/impl_graph/graph.py", "id": "C-jig.impl_graph.graph.Graph", "implements": ["S-003"], "language": "python", "line": 13, "name": "Graph", "type": "class"}
 {"bases": [], "file": "src/jig/impl_graph/ndjson_writer.py", "id": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "implements": ["S-003"], "language": "python", "line": 18, "name": "NDJSONWriter", "type": "class"}
+{"bases": [], "file": "src/jig/validation/models.py", "id": "C-jig.validation.models.ValidationError", "language": "python", "line": 10, "name": "ValidationError", "type": "class"}
+{"bases": [], "file": "src/jig/validation/models.py", "id": "C-jig.validation.models.ValidationResult", "language": "python", "line": 28, "name": "ValidationResult", "type": "class"}
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.decorator", "language": "python", "line": 30, "name": "decorator", "signature": "decorator(obj: Union[F, C]) -> Union[F, C]", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.decorator", "language": "python", "line": 57, "name": "decorator", "signature": "decorator(func: F) -> F", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.implements", "language": "python", "line": 12, "name": "implements", "signature": "implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]", "type": "function"}
@@ -74,11 +76,26 @@
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_nodes", "language": "python", "line": 93, "name": "_sort_nodes", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "_sort_nodes(self, nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "implements": ["S-003"], "language": "python", "line": 37, "name": "write", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "write(self, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.write_ndjson", "implements": ["S-003"], "language": "python", "line": 126, "name": "write_ndjson", "signature": "write_ndjson(graph: Graph, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._get_decorator_name", "language": "python", "line": 365, "name": "_get_decorator_name", "signature": "_get_decorator_name(call_node: ast.Call) -> str", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._is_jig_decorator", "language": "python", "line": 357, "name": "_is_jig_decorator", "signature": "_is_jig_decorator(call_node: ast.Call, decorator_name: str) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_outcome_ids", "language": "python", "line": 308, "name": "_load_outcome_ids", "signature": "_load_outcome_ids(outcome_dir: Path) -> set[str]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_spec_ids", "language": "python", "line": 298, "name": "_load_spec_ids", "signature": "_load_spec_ids(spec_dir: Path) -> set[str]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._parse_frontmatter", "language": "python", "line": 282, "name": "_parse_frontmatter", "signature": "_parse_frontmatter(file_path: Path) -> Optional[dict]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._validate_function_decorators", "language": "python", "line": 318, "name": "_validate_function_decorators", "signature": "_validate_function_decorators(func_node: ast.FunctionDef, file_path: Path, valid_ids: set[str], result: ValidationResult) -> None", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_decorator_files", "implements": ["S-020"], "language": "python", "line": 227, "name": "validate_decorator_files", "signature": "validate_decorator_files(source_dir: Path, spec_dir: Path, outcome_dir: Optional[Path]) -> ValidationResult", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_outcome_files", "implements": ["S-019"], "language": "python", "line": 127, "name": "validate_outcome_files", "signature": "validate_outcome_files(outcome_dir: Path) -> ValidationResult", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_specification_files", "implements": ["S-018"], "language": "python", "line": 19, "name": "validate_specification_files", "signature": "validate_specification_files(spec_dir: Path) -> ValidationResult", "type": "function"}
+{"async": false, "file": "src/jig/validation/models.py", "id": "F-jig.validation.models.ValidationError.__str__", "language": "python", "line": 20, "name": "__str__", "parent_class": "C-jig.validation.models.ValidationError", "signature": "__str__(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/validation/models.py", "id": "F-jig.validation.models.ValidationResult.__str__", "language": "python", "line": 41, "name": "__str__", "parent_class": "C-jig.validation.models.ValidationResult", "signature": "__str__(self) -> str", "type": "function"}
+{"async": false, "file": "src/jig/validation/models.py", "id": "F-jig.validation.models.ValidationResult.add_error", "language": "python", "line": 36, "name": "add_error", "parent_class": "C-jig.validation.models.ValidationResult", "signature": "add_error(self, error: ValidationError) -> None", "type": "function"}
 {"id": "M-abc", "language": "python", "name": "abc", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
+{"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
+{"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
 {"id": "M-datetime", "language": "python", "name": "datetime", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
@@ -100,6 +117,11 @@
 {"file": "src/jig/impl_graph/builder.py", "id": "M-jig.impl_graph.builder", "language": "python", "name": "jig.impl_graph.builder", "type": "module"}
 {"file": "src/jig/impl_graph/graph.py", "id": "M-jig.impl_graph.graph", "language": "python", "name": "jig.impl_graph.graph", "type": "module"}
 {"file": "src/jig/impl_graph/ndjson_writer.py", "id": "M-jig.impl_graph.ndjson_writer", "language": "python", "name": "jig.impl_graph.ndjson_writer", "type": "module"}
+{"file": "src/jig/validation/__init__.py", "id": "M-jig.validation.__init__", "language": "python", "name": "jig.validation.__init__", "type": "module"}
+{"file": "src/jig/validation/intent.py", "id": "M-jig.validation.intent", "language": "python", "name": "jig.validation.intent", "type": "module"}
+{"id": "M-jig.validation.models", "language": "python", "name": "jig.validation.models", "type": "external_module"}
+{"id": "M-jig.validation.models", "language": "python", "name": "jig.validation.models", "type": "external_module"}
+{"file": "src/jig/validation/models.py", "id": "M-jig.validation.models", "language": "python", "name": "jig.validation.models", "type": "module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
@@ -114,6 +136,8 @@
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
@@ -125,6 +149,9 @@
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "type": "contains"}
 {"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.file_extensions", "type": "contains"}
 {"source": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "target": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.language_name", "type": "contains"}
@@ -186,6 +213,9 @@
 {"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_nodes", "type": "contains"}
 {"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "type": "contains"}
 {"source": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "target": "S-003", "type": "implements"}
+{"source": "C-jig.validation.models.ValidationError", "target": "F-jig.validation.models.ValidationError.__str__", "type": "contains"}
+{"source": "C-jig.validation.models.ValidationResult", "target": "F-jig.validation.models.ValidationResult.__str__", "type": "contains"}
+{"source": "C-jig.validation.models.ValidationResult", "target": "F-jig.validation.models.ValidationResult.add_error", "type": "contains"}
 {"source": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "target": "S-006", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "target": "S-005", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "target": "S-001", "type": "implements"}
@@ -206,6 +236,20 @@
 {"source": "F-jig.impl_graph.builder.build_graph", "target": "S-006", "type": "implements"}
 {"source": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "target": "S-003", "type": "implements"}
 {"source": "F-jig.impl_graph.ndjson_writer.write_ndjson", "target": "S-003", "type": "implements"}
+{"line": 312, "source": "F-jig.validation.intent._load_outcome_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"line": 302, "source": "F-jig.validation.intent._load_spec_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"line": 335, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
+{"line": 346, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
+{"line": 328, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
+{"line": 328, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
+{"line": 244, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_outcome_ids", "type": "calls"}
+{"line": 243, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_spec_ids", "type": "calls"}
+{"line": 259, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._validate_function_decorators", "type": "calls"}
+{"source": "F-jig.validation.intent.validate_decorator_files", "target": "S-020", "type": "implements"}
+{"line": 153, "source": "F-jig.validation.intent.validate_outcome_files", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"source": "F-jig.validation.intent.validate_outcome_files", "target": "S-019", "type": "implements"}
+{"line": 40, "source": "F-jig.validation.intent.validate_specification_files", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"source": "F-jig.validation.intent.validate_specification_files", "target": "S-018", "type": "implements"}
 {"source": "M-jig.__init__", "target": "F-jig.__init__.decorator", "type": "contains"}
 {"source": "M-jig.__init__", "target": "F-jig.__init__.decorator", "type": "contains"}
 {"source": "M-jig.__init__", "target": "F-jig.__init__.implements", "type": "contains"}
@@ -283,3 +327,27 @@
 {"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
 {"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
 {"line": 10, "source": "M-jig.impl_graph.ndjson_writer", "target": "M-typing", "type": "imports"}
+{"line": 9, "source": "M-jig.validation.__init__", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 9, "source": "M-jig.validation.__init__", "target": "M-jig.validation.models", "type": "imports"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._get_decorator_name", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._is_jig_decorator", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._load_outcome_ids", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._load_spec_ids", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._parse_frontmatter", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._validate_function_decorators", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_decorator_files", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_outcome_files", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_specification_files", "type": "contains"}
+{"line": 7, "source": "M-jig.validation.intent", "target": "M-ast", "type": "imports"}
+{"line": 14, "source": "M-jig.validation.intent", "target": "M-jig", "type": "imports"}
+{"line": 15, "source": "M-jig.validation.intent", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 15, "source": "M-jig.validation.intent", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 9, "source": "M-jig.validation.intent", "target": "M-pathlib", "type": "imports"}
+{"line": 8, "source": "M-jig.validation.intent", "target": "M-re", "type": "imports"}
+{"line": 10, "source": "M-jig.validation.intent", "target": "M-typing", "type": "imports"}
+{"line": 12, "source": "M-jig.validation.intent", "target": "M-yaml", "type": "imports"}
+{"source": "M-jig.validation.models", "target": "C-jig.validation.models.ValidationError", "type": "contains"}
+{"source": "M-jig.validation.models", "target": "C-jig.validation.models.ValidationResult", "type": "contains"}
+{"line": 5, "source": "M-jig.validation.models", "target": "M-dataclasses", "type": "imports"}
+{"line": 5, "source": "M-jig.validation.models", "target": "M-dataclasses", "type": "imports"}
+{"line": 6, "source": "M-jig.validation.models", "target": "M-typing", "type": "imports"}

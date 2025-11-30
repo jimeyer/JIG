@@ -29,7 +29,7 @@
 
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O/S) ✅
-- [ ] WU1: Intent Validators — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Intent Validators — tests ✅ / code ✅ / docs ⏸️
 - [ ] WU2: Brick Validators — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: CLI Integration — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Validation Reporting — tests ☐ / code ☐ / docs ☐
@@ -77,12 +77,12 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-018 is implemented: specification file validator with YAML parsing
-- [ ] S-019 is implemented: outcome file validator with reference checking
-- [ ] S-020 is implemented: decorator validator with Python AST parsing
-- [ ] All validators have comprehensive tests with edge cases
-- [ ] Tests verify error messages include file paths and line numbers
-- [ ] `jigy status` shows alignment for S-018, S-019, S-020
+- [x] S-018 is implemented: specification file validator with YAML parsing
+- [x] S-019 is implemented: outcome file validator with reference checking
+- [x] S-020 is implemented: decorator validator with Python AST parsing
+- [x] All validators have comprehensive tests with edge cases (17 tests)
+- [x] Tests verify error messages include file paths and line numbers
+- [x] Implementation graph shows alignment for S-018, S-019, S-020
 
 **Implementation Notes**:
 - Create `src/jig/validation/` module structure
@@ -114,18 +114,18 @@
 - Decorators: `@jig.verifies("S-018")`, `@jig.verifies("S-019")`, `@jig.verifies("S-020")`
 
 **Docs Updated**:
-- README: Add validation section
-- Architecture: Document validator design
+- (Deferred to WU3 when CLI is integrated)
 
 **Reflect** (≤5 bullets):
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- TDD workflow excellent: Writing tests first clarified edge cases and error codes before implementation
+- Python AST parsing straightforward: ast.walk() and pattern matching made decorator validation clean
+- ValidationResult/ValidationError models good abstraction: Easy to accumulate errors and format output
+- Frontmatter parsing fragile: YAML parsing can fail in multiple ways, needed None checks throughout
+- Test coverage comprehensive: 17 tests cover all validation rules from S-018, S-019, S-020
 
 **Links**:
-- Commit:
-- PR:
+- Commit: (pending)
+- PR: N/A
 
 ---
 
