@@ -305,7 +305,7 @@
 - No JSON Schema file: error codes scattered across validators, schema not formally versioned
 
 **Links**:
-- Commit: (pending)
+- Commit: f06048a
 - PR: N/A
 
 ---
