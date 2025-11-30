@@ -110,7 +110,10 @@ class PythonAnalyzer(LanguageAnalyzer):
         display_path = file_path
         if self.project_root:
             try:
-                display_path = file_path.relative_to(self.project_root)
+                # Resolve both paths to handle symlinks (e.g., /var vs /private/var on macOS)
+                resolved_file = file_path.resolve()
+                resolved_root = self.project_root.resolve()
+                display_path = resolved_file.relative_to(resolved_root)
             except ValueError:
                 # File is outside project root, use absolute path
                 pass

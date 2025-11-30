@@ -44,9 +44,9 @@ class GraphBuilder:
         self.registry = registry or get_global_registry()
         self.graph = Graph()
 
-        # Register Python analyzer if not already registered
-        if not self.registry.get_analyzer_by_language("python"):
-            self.registry.register(PythonAnalyzer(project_root=project_root))
+        # Always register Python analyzer with correct project_root
+        # This overrides any existing analyzer to ensure correct path resolution
+        self.registry.register(PythonAnalyzer(project_root=project_root))
 
     @jig.implements("S-001", "S-006")
     def build(
