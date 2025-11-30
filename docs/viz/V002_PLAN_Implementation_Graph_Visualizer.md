@@ -34,10 +34,10 @@
 - [x] WU2: Graph Loading — tests ✅ / code ✅ / docs ✅
 - [x] WU3: Basic Rendering — tests ✅ / code ✅ / docs ✅
 - [x] WU4: Interaction — tests ✅ / code ✅ / docs ✅
-- [ ] WU5: Filtering — tests ☐ / code ☐ / docs ☐
-- [ ] WU6: Search — tests ☐ / code ☐ / docs ☐
-- [ ] WU7: Layout Switching — tests ☐ / code ☐ / docs ☐
-- [ ] WU8: Polish — tests ☐ / code ☐ / docs ☐
+- [x] WU5: Filtering — tests ☐ / code ☐ / docs ☐
+- [x] WU6: Search — tests ☐ / code ☐ / docs ☐
+- [x] WU7: Layout Switching — tests ☐ / code ☐ / docs ☐
+- [x] WU8: Polish — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
 

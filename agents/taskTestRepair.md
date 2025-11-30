@@ -1,8 +1,14 @@
-# taskTESTREPAIR: SPEC-Driven Test Recovery (5-Bucket Model)
+# Task: SPEC-Driven Test Recovery (5-Bucket Model)
 
-**Version:** 2.0.0 (Updated: 2025-11-19)
+**Version:** 3.0.0 (Updated: 2025-11-30)
 
-**Purpose:** Recover failing test suites by re-aligning tests with Specifications. Tests are reproducible artifacts—SPECs are the source of truth.
+## Objective
+
+Recover failing test suites by re-aligning tests with Specifications using a 5-bucket classification system, ensuring every test traces to a specification and eliminating broken tests through regeneration rather than shimming.
+
+## Context
+
+This task exists because test suites break during refactoring, and traditional approaches (shimming old behavior, commenting out tests) create technical debt. JIG v8 provides a better way: SPECs are the source of truth, tests are reproducible code that can be regenerated from SPECs.
 
 **Philosophy:** Tests verify Specifications, not implementations. When tests break, first ask: "What SPEC does this verify?" If the SPEC is valid, the test must align. If the SPEC is obsolete, the test must die. No shims, no adapters, no backwards compatibility.
 
@@ -10,34 +16,42 @@
 
 ---
 
-## 0) JIG Foundation: The OSTC Model for Tests
+## JIG v8 Foundation: The S-F-T Triangle
 
-In JIG, **Tests (T)** are empirical truth that verify **Specifications (S)**:
+In JIG v8, the Alignment Graph has three core node types:
 
 ```
-Outcome (O) ──implements──> Specification (S) ──verifies──> Test (T)
-                                    │
-                                    └──implements──> Code (C)
+         S (Spec)
+        ╱   ╲
+       ╱     ╲
+implements  verifies
+     ╱         ╲
+    ╱           ╲
+   ▼             ▼
+  F ── covers ──> T
+(Function)      (Test)
 ```
 
 **Key Relationships:**
-- **O → S:** Specifications implement Outcomes (business value)
-- **S → T:** Tests verify Specifications (empirical proof)
-- **S → C:** Code implements Specifications (operational reality)
+- **F → S:** Functions implement Specifications (via `@jig.implements("S-001")`)
+- **T → S:** Tests verify Specifications (via `@jig.verifies("S-001")`)
+- **T → F:** Tests cover Functions (via coverage analysis)
 
 **Test Annotation Pattern:**
 ```python
-# @jig T-AUTH-001 verifies:S-AUTH-001 subsystem:auth
-def test_jwt_token_validation():
-    """Verify JWT tokens validate correctly with device ID"""
-    # Test implementation
+@jig.verifies("S-001")
+def test_token_expiration():
+    """Verify tokens expire after 15 minutes of inactivity."""
+    token = authenticate("user", "pass")
+    token.last_activity = datetime.now() - timedelta(minutes=15, seconds=1)
+    assert is_expired(token)
 ```
 
 **Critical Rule:** Every test MUST trace to a Specification. If you can't name the SPEC, the test shouldn't exist.
 
 ---
 
-## 1) Core Principles
+## Core Principles
 
 ### 1. SPEC-Centric Recovery
 - **SPECs are source of truth** - Tests serve SPECs, not vice versa
@@ -53,8 +67,8 @@ Every failing test falls into exactly one bucket:
 | **A** | **Align** | SPEC valid, test needs fixing | FIX/REWRITE/ANNOTATE test | Constructor signature changed |
 | **B** | **Create SPEC** | SPEC missing, requirement real | Create SPEC → align test | Implicit security requirement |
 | **C** | **Delete** | SPEC obsolete or redundant | DELETE test entirely | Feature removed, or duplicate test |
-| **D** | **Skip (TDD)** | O-S-T aligned, CODE missing | @pytest.mark.skip → SCOPE doc | Test written before implementation |
-| **E** | **Debug** | CODE bug detected | Redirect to DEBUG workflow | Test reveals CODE violates SPEC |
+| **D** | **Skip (TDD)** | S-F-T aligned, function missing | @pytest.mark.skip → document scope | Test written before implementation |
+| **E** | **Debug** | Function bug detected | Redirect to DEBUG workflow | Test reveals function violates SPEC |
 
 **Key Insight:** Buckets A/B/C handle SPEC lifecycle. Bucket D handles TDD scenarios. Bucket E detects bugs (redirect to DEBUG workflow).
 
@@ -71,45 +85,43 @@ Every failing test falls into exactly one bucket:
 
 | Strategy | Action |
 |----------|--------|
-| **DELETE** | Remove test entirely, update graph index |
+| **DELETE** | Remove test entirely, regenerate graphs |
 
-**For Bucket D** (CODE missing - TDD scenario):
-
-| Strategy | Action |
-|----------|--------|
-| **SKIP** | Add `@pytest.mark.skip`, create SCOPE document for future PLAN |
-
-**For Bucket E** (CODE bug detected):
+**For Bucket D** (Function missing - TDD scenario):
 
 | Strategy | Action |
 |----------|--------|
-| **DEBUG** | Create DEBUG delta, do NOT "fix" test to match buggy code |
+| **SKIP** | Add `@pytest.mark.skip`, document missing implementation |
+
+**For Bucket E** (Function bug detected):
+
+| Strategy | Action |
+|----------|--------|
+| **DEBUG** | Document bug, do NOT "fix" test to match buggy function |
 
 **NEVER:**
 - Add shims or adapters to make old tests pass
 - Preserve backwards compatibility for obsolete SPECs
 - Use feature flags to toggle test behavior
 - Comment out tests "temporarily"
-- "Fix" a test to match buggy CODE (Bucket E → DEBUG instead)
+- "Fix" a test to match buggy function (Bucket E → DEBUG instead)
 
 ---
 
-## 2) The 5-Phase Recovery Workflow
+## The 5-Phase Recovery Workflow
 
 ### Phase 0: Stop Bleeding (30 minutes)
 
 **Goal:** Get clean failure counts by fixing obvious blockers.
 
 **Actions:**
-1. Fix critical import errors (e.g., missing replicator module)
+1. Fix critical import errors (e.g., missing module imports)
 2. Fix obvious constructor signature changes
 3. Run full test suite to get accurate failure count
 4. Document baseline: X tests failing out of Y total
 
 **Output:**
 ```markdown
-# In jig/deltas/active/<branch>/NOTES.md or PLAN.md
-
 ## Phase 0: Baseline
 - Total tests: 1,528
 - Failing: 118
@@ -140,14 +152,14 @@ pytest --tb=no -q | grep FAILED > failing-tests.txt
 ### Bucket A: Existing SPEC (N tests)
 | Test | File:Line | Verifies SPEC | Status | Notes |
 |------|-----------|---------------|--------|-------|
-| test_jwt_validation | test_auth.py:42 | S-AUTH-001 | Missing @jig | Add annotation |
-| test_token_expiry | test_auth.py:58 | S-AUTH-001 | Needs update | Constructor changed |
+| test_token_validation | test_auth.py:42 | S-001 | Missing @jig decorator | Add @jig.verifies("S-001") |
+| test_token_expiry | test_auth.py:58 | S-001 | Needs update | Constructor changed |
 
 ### Bucket B: Missing SPEC (N tests)
-| Test | File:Line | Needs SPEC | Subsystem | Rationale |
-|------|-----------|------------|-----------|-----------|
-| test_constant_time_compare | test_crypto.py:120 | S-CRYPTO-005 | crypto | Security requirement, was implicit |
-| test_device_id_uniqueness | test_auth.py:205 | S-AUTH-004 | auth | Edge case not documented |
+| Test | File:Line | Needs SPEC | Brick | Rationale |
+|------|-----------|------------|-------|-----------|
+| test_constant_time_compare | test_crypto.py:120 | S-005 | B-003 | Security requirement, was implicit |
+| test_device_id_uniqueness | test_auth.py:205 | S-004 | B-001 | Edge case not documented |
 
 ### Bucket C: Obsolete SPEC (N tests)
 | Test | File:Line | Obsolete Feature | Decision |
@@ -155,40 +167,25 @@ pytest --tb=no -q | grep FAILED > failing-tests.txt
 | test_flat_map_merge | test_crdt.py:88 | Flat-map removed | DELETE (replaced by OR-Map) |
 | test_legacy_token_format | test_auth.py:310 | Pre-v2 tokens | DELETE (no migration needed) |
 
-### Bucket D: CODE Missing - TDD Scenario (N tests)
-| Test | File:Line | Verifies SPEC | CODE Status | SCOPE Doc |
-|------|-----------|---------------|-------------|-----------|
-| test_mfa_token_validation | test_auth.py:505 | S-AUTH-007 | Not implemented | SCOPE_AUTH_MFA.md |
-| test_device_enrollment | test_auth.py:520 | S-AUTH-008 | Not implemented | SCOPE_AUTH_MFA.md |
+### Bucket D: Function Missing - TDD Scenario (N tests)
+| Test | File:Line | Verifies SPEC | Function Status | Notes |
+|------|-----------|---------------|-----------------|-------|
+| test_mfa_token_validation | test_auth.py:505 | S-007 | Not implemented | Document missing function |
+| test_device_enrollment | test_auth.py:520 | S-008 | Not implemented | Document missing function |
 
-### Bucket E: CODE Bug Detected (N tests)
-| Test | File:Line | Verifies SPEC | Bug Description | DEBUG Delta |
-|------|-----------|---------------|-----------------|-------------|
-| test_device_id_uniqueness | test_auth.py:205 | S-AUTH-004 | Generates duplicate IDs | debug-device-id-collision |
-| test_token_expiry_timing | test_auth.py:175 | S-AUTH-003 | Tokens expire 1hr early | debug-token-expiry |
+### Bucket E: Function Bug Detected (N tests)
+| Test | File:Line | Verifies SPEC | Bug Description | Action |
+|------|-----------|---------------|-----------------|--------|
+| test_device_id_uniqueness | test_auth.py:205 | S-004 | Generates duplicate IDs | Document bug, fix function |
+| test_token_expiry_timing | test_auth.py:175 | S-003 | Tokens expire 1hr early | Document bug, fix function |
 ```
 
-**JIG Markers:**
-```markdown
-#DISCOVERY "Found 23 tests with no traceable SPEC (Bucket B)"
-Tests were written against implementation, not requirements.
-
-#DISCOVERY "Found 8 tests where CODE not implemented yet (Bucket D - TDD)"
-Tests exist, SPECs exist, but CODE missing. Will create SCOPE docs.
-
-#DISCOVERY "Found 2 CODE bugs during test audit (Bucket E)"
-Tests correctly verify SPECs, but CODE violates SPEC. Redirecting to DEBUG.
-
-#DECISION "Create missing SPECs before fixing tests (Bucket B)"
-**Choice:** SPEC-first approach
-**Rationale:** Tests without SPECs will break again on next refactor
-**Tradeoffs:** More upfront work, but durable alignment
-
-#DECISION "Skip Bucket D tests and create SCOPE docs vs delete tests"
-**Choice:** SKIP with SCOPE doc (preserve TDD intent)
-**Rationale:** Tests and SPECs are correct, CODE will be implemented later
-**Tradeoffs:** Skipped tests reduce coverage temporarily, but maintain O-S-T alignment
-```
+**Notes:**
+- Found 23 tests with no traceable SPEC (Bucket B) - tests were written against implementation, not requirements
+- Found 8 tests where function not implemented yet (Bucket D - TDD) - tests exist, SPECs exist, but function missing
+- Found 2 function bugs during test audit (Bucket E) - tests correctly verify SPECs, but function violates SPEC
+- Strategy: Create missing SPECs before fixing tests (Bucket B) for durable alignment
+- Strategy: Skip Bucket D tests to preserve TDD intent; function will be implemented later
 
 ### Phase 2: Create Missing SPECs (1-2 hours)
 
@@ -198,22 +195,18 @@ Tests correctly verify SPECs, but CODE violates SPEC. Redirecting to DEBUG.
 1. Read the failing test to understand what it verifies
 2. Extract the requirement (the "what", not the "how")
 3. Create SPEC file in `jig/specifications/`
-4. Link SPEC to Outcome (or create new Outcome if needed)
-5. Run `jig validate` to check format
+4. Link SPEC to Outcome if relevant (optional)
+5. Run `jigy validate` to check format
 
 **Example:**
-```yaml
-# jig/specifications/S-CRYPTO-005.md
+```markdown
+# jig/specifications/S-005.md
 ---
-id: S-CRYPTO-005
+id: S-005
 type: specification
-title: "JWT signature validation uses constant-time comparison"
-subsystem: crypto
-created: 2025-11-18
-implements: O-AUTH-002
 ---
 
-# Specification: Constant-time JWT validation
+# Token Signature Validation
 
 JWT signature validation MUST use constant-time comparison to prevent timing attacks.
 
@@ -226,27 +219,25 @@ Variable-time comparison leaks information about signature bytes through timing 
 - Use `hmac.compare_digest()` or equivalent
 
 ## Related
-- implements: O-AUTH-002 ("Zero authentication bypass incidents")
-- tested_by: T-CRYPTO-005
-- code: C-CRYPTO-003
+- Outcome: O-002 ("Secure authentication without passwords")
 ```
 
 **Commit:**
 ```bash
 git add jig/specifications/
-git commit -m "specs: create missing SPECs for crypto tests
+jigy index  # Regenerate intent graph
+git add jig/generated/intent-graph.ndjson
+git commit -m "specs: create missing SPECs for authentication and crypto
 
 Created 5 specifications for previously implicit requirements:
-- S-CRYPTO-005: Constant-time JWT validation
-- S-AUTH-004: Device ID uniqueness
-- S-AUTH-005: Token refresh timing <100ms
-- S-IPC-002: WebSocket reconnection strategy
-- S-CRDT-008: Conflict-free OR-Set semantics
+- S-005: Constant-time token signature validation
+- S-004: Device ID uniqueness
+- S-006: Token refresh timing <100ms
+- S-010: WebSocket reconnection strategy
+- S-012: Conflict-free OR-Set semantics
 
 These requirements were implemented but not specified.
-Discovered during test repair audit (Phase 1).
-
-See: jig/deltas/active/<branch>/PLAN.md → Phase 2"
+Discovered during test repair audit (Phase 1)."
 ```
 
 ### Phase 3: Root Cause Grouping (1 hour)
@@ -267,44 +258,36 @@ See: jig/deltas/active/<branch>/PLAN.md → Phase 2"
 **Root Cause:** Flat-map removed, OR-Map has different semantics
 **Strategy:** REWRITE (architecture changed, old tests verify wrong SPEC)
 **Files:** tests/crdt/test_map.py, test_merge.py
-**Action:** Delete old tests, write new tests per S-CRDT-006 (OR-Map SPEC)
+**Action:** Delete old tests, write new tests per S-006 (OR-Map SPEC)
 
 ### Group 3: Legacy Token Format (DELETE) - 18 tests
 **Root Cause:** Pre-v2 token support removed
 **Strategy:** DELETE (SPEC obsolete, no replacement)
 **Files:** tests/auth/test_legacy_tokens.py
-**Action:** Delete file entirely, remove from graph index
+**Action:** Delete file entirely, regenerate graphs
 
-### Group 4: Missing @jig Annotations (FIX) - 22 tests
+### Group 4: Missing @jig Decorators (FIX) - 22 tests
 **Root Cause:** Tests pass but lack SPEC traceability
-**Strategy:** FIX (add annotations only)
+**Strategy:** FIX (add decorators only)
 **Files:** tests/*/test_*.py (scattered)
-**Action:** Add `@jig T-XXX-NNN verifies:S-YYY-NNN` annotations
+**Action:** Add `@jig.verifies("S-XXX")` decorators
 
-### Group 5: MFA CODE Not Implemented (SKIP - Bucket D) - 8 tests
-**Root Cause:** Tests and SPECs exist, but CODE not implemented yet (TDD)
-**Strategy:** SKIP (O-S-T aligned, waiting for CODE)
+### Group 5: MFA Function Not Implemented (SKIP - Bucket D) - 8 tests
+**Root Cause:** Tests and SPECs exist, but function not implemented yet (TDD)
+**Strategy:** SKIP (S-F-T aligned, waiting for function)
 **Files:** tests/auth/test_mfa.py
-**Action:** Add `@pytest.mark.skip`, create SCOPE_AUTH_MFA.md for future PLAN
+**Action:** Add `@pytest.mark.skip`, document missing implementation
 
-### Group 6: CODE Bugs Detected (DEBUG - Bucket E) - 2 tests
-**Root Cause:** Tests correctly verify SPECs, but CODE violates SPEC
-**Strategy:** DEBUG (redirect to DEBUG workflow, not test repair)
+### Group 6: Function Bugs Detected (DEBUG - Bucket E) - 2 tests
+**Root Cause:** Tests correctly verify SPECs, but function violates SPEC
+**Strategy:** DEBUG (redirect to debugging, not test repair)
 **Files:** tests/auth/test_device_id.py, test_token_expiry.py
-**Action:** Create DEBUG deltas, do NOT "fix" tests to match buggy CODE
+**Action:** Document bugs, do NOT "fix" tests to match buggy function
 ```
 
-**JIG Markers:**
-```markdown
-#DECISION "REWRITE OR-Map tests vs FIX flat-map tests"
-**Choice:** REWRITE (delete old, write new)
-**Rationale:** OR-Map semantics fundamentally different (add-wins vs last-write-wins)
-**Tradeoffs:** More work now, but tests verify correct SPEC (S-CRDT-006)
-
-#LEARNED "Group by root cause before fixing individual tests"
-Identified 4 groups covering 118 tests. Each group has one strategy.
-Batch fixes are 10x faster than one-off repairs.
-```
+**Notes:**
+- Decision: REWRITE OR-Map tests vs FIX - chose REWRITE because semantics fundamentally different (add-wins vs last-write-wins); more work now, but tests verify correct SPEC (S-006)
+- Learning: Group by root cause before fixing individual tests - identified 4 groups covering 118 tests; batch fixes are 10x faster than one-off repairs
 
 ### Phase 4: Execute Repairs (4-6 hours)
 
@@ -316,14 +299,14 @@ Batch fixes are 10x faster than one-off repairs.
 
 ```python
 # BEFORE (broken)
-# @jig T-CRDT-012 verifies:S-CRDT-003 subsystem:crdt
+@jig.verifies("S-003")
 def test_replicator_initialization():
     """Verify replicator initializes with empty state"""
     rep = Replicator()  # Missing node_id
     assert rep.state == {}
 
 # AFTER (fixed)
-# @jig T-CRDT-012 verifies:S-CRDT-003 subsystem:crdt
+@jig.verifies("S-003")
 def test_replicator_initialization():
     """Verify replicator initializes with empty state"""
     rep = Replicator(node_id="test-node")  # Added required param
@@ -333,16 +316,15 @@ def test_replicator_initialization():
 **Commit per group:**
 ```bash
 git add tests/crdt/
+jigy verify rebuild --run-tests  # Regenerate verification graph
+git add jig/generated/verification-graph.ndjson
 git commit -m "test(crdt): fix constructor signatures (Group 1)
 
 Fixed 43 tests to use new Replicator(node_id=...) signature.
 
-Strategy: FIX (mechanical change, tests still verify S-CRDT-003)
-Root Cause: Constructor signature changed in WU5 refactor
-Result: All tests pass, semantics unchanged
-
-Unit: Test Repair Phase 4.1
-See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+Strategy: FIX (mechanical change, tests still verify S-003)
+Root Cause: Constructor signature changed during refactor
+Result: All tests pass, semantics unchanged"
 ```
 
 #### Strategy: REWRITE (Architecture Changed)
@@ -359,7 +341,7 @@ def test_flat_map_merge():
     assert merged.get("key") == "value2"  # LWW semantics
 
 # AFTER (new OR-Map test per SPEC)
-# @jig T-CRDT-015 verifies:S-CRDT-006 subsystem:crdt
+@jig.verifies("S-006")
 def test_or_map_merge_preserves_all_values():
     """Verify OR-Map merge preserves all concurrent values (add-wins)"""
     map1 = ORMap(node_id="node-1")
@@ -383,20 +365,19 @@ rm tests/crdt/test_flat_map.py
 # (Create tests/crdt/test_or_map_semantics.py)
 
 git add tests/crdt/
-git commit -m "test(crdt): rewrite OR-Map tests per S-CRDT-006 (Group 2)
+jigy verify rebuild --run-tests
+git add jig/generated/verification-graph.ndjson
+git commit -m "test(crdt): rewrite OR-Map tests per S-006 (Group 2)
 
 Deleted 35 flat-map tests (obsolete).
 Created 28 OR-Map tests verifying add-wins semantics.
 
 Strategy: REWRITE (architecture change, not backwards compatible)
 Root Cause: Flat-map removed, OR-Map has different conflict resolution
-SPECs verified: S-CRDT-006 (OR-Map add-wins), S-CRDT-007 (merge semantics)
+SPECs verified: S-006 (OR-Map add-wins), S-007 (merge semantics)
 
 New tests written from scratch per SPEC.
-No attempt to salvage old test logic (burn ships).
-
-Unit: Test Repair Phase 4.2
-See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+No attempt to salvage old test logic (burn ships)."
 ```
 
 #### Strategy: DELETE (Obsolete)
@@ -406,188 +387,144 @@ See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
 rm tests/auth/test_legacy_tokens.py
 rm tests/utils/test_deprecated_helpers.py
 
-# Update graph index (remove orphaned T nodes)
-jig index --rebuild
+# Regenerate graphs (removes orphaned test nodes)
+jigy verify rebuild --run-tests
 
-git add tests/ jig/
+git add tests/ jig/generated/
 git commit -m "test: delete obsolete legacy token tests (Group 3)
 
 Deleted 18 tests for pre-v2 token format (no longer supported).
 
 Strategy: DELETE (SPEC obsolete, no replacement needed)
-Root Cause: Legacy token support removed in WU6 (burn ships)
-Decision: No migration path, clean break
-
-Removed T-AUTH-050 through T-AUTH-067 from graph index.
-
-Unit: Test Repair Phase 4.3
-See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+Root Cause: Legacy token support removed (burn ships)
+Decision: No migration path, clean break"
 ```
 
-#### Strategy: SKIP (Bucket D - CODE Missing, TDD)
+#### Strategy: SKIP (Bucket D - Function Missing, TDD)
 
 ```python
-# Test exists, SPEC exists, but CODE not implemented yet
-# @jig T-AUTH-045 verifies:S-AUTH-007 subsystem:auth
-@pytest.mark.skip(reason="CODE not implemented - see SCOPE_AUTH_MFA.md")
+# Test exists, SPEC exists, but function not implemented yet
+@jig.verifies("S-007")
+@pytest.mark.skip(reason="Function not implemented - S-007 pending")
 def test_mfa_token_validation():
-    """Verify MFA tokens validate correctly (S-AUTH-007)"""
+    """Verify MFA tokens validate correctly (S-007)"""
     token = create_mfa_token(user_id="user-123", device_id="device-456")
     assert validate_mfa_token(token) is True
 
-# @jig T-AUTH-046 verifies:S-AUTH-008 subsystem:auth
-@pytest.mark.skip(reason="CODE not implemented - see SCOPE_AUTH_MFA.md")
+@jig.verifies("S-008")
+@pytest.mark.skip(reason="Function not implemented - S-008 pending")
 def test_mfa_device_enrollment():
-    """Verify MFA device enrollment generates unique device IDs (S-AUTH-008)"""
+    """Verify MFA device enrollment generates unique device IDs (S-008)"""
     device1 = enroll_mfa_device(user_id="user-123")
     device2 = enroll_mfa_device(user_id="user-123")
     assert device1.id != device2.id
 ```
 
-**Create SCOPE document:**
+**Document missing implementations:**
 
+```markdown
+# Add to project documentation or issue tracker
+
+## Missing Implementations (TDD Scenario)
+
+| SPEC | Description | Tests Waiting |
+|------|-------------|---------------|
+| S-007 | MFA token validation | test_mfa_token_validation |
+| S-008 | Device enrollment | test_mfa_device_enrollment |
+| S-009 | Backup code generation | test_mfa_backup_codes |
+
+All SPECs exist, tests exist and are skipped, implementations pending.
+```
+
+**Commit:**
 ```bash
-# Create SCOPE document listing missing CODE
-cat > jig/deltas/active/<branch>/SCOPE_AUTH_MFA.md <<'EOF'
-# SCOPE: Missing CODE for Auth MFA
-
-**Created:** 2025-11-19
-**Subsystem:** auth
-**Priority:** P2
-
-## Tests Skipped (waiting for CODE)
-
-| Test | Verifies SPEC | Skip Reason |
-|------|---------------|-------------|
-| test_mfa_token_validation | S-AUTH-007 | MFA validation logic not implemented |
-| test_mfa_device_enrollment | S-AUTH-008 | Device enrollment API missing |
-| test_mfa_backup_codes | S-AUTH-009 | Backup code generation not implemented |
-
-## Work Required
-
-This SCOPE will become input to a future PLAN:
-- Implement MFA token validation (S-AUTH-007)
-- Implement device enrollment API (S-AUTH-008)
-- Implement backup code generation (S-AUTH-009)
-
-## OSTC Alignment
-
-- **O-AUTH-001:** "Zero unauthorized access" (exists) ✓
-- **S-AUTH-007, 008, 009:** Specifications exist ✓
-- **T-AUTH-045, 046, 047:** Tests exist and skipped ✓
-- **C-AUTH-MFA:** CODE missing (this SCOPE) ✗
-
-**Next:** Create PLAN for WU-AUTH-MFA based on this SCOPE
-EOF
-
-git add tests/auth/ jig/deltas/
-git commit -m "test(auth): skip MFA tests pending CODE implementation (Group 5)
+git add tests/auth/
+jigy verify rebuild --run-tests
+git add jig/generated/verification-graph.ndjson
+git commit -m "test(auth): skip MFA tests pending function implementation (Group 5)
 
 Skipped 8 tests for MFA feature (TDD scenario).
 
-Strategy: SKIP (O-S-T aligned, CODE not implemented yet)
-Root Cause: Tests written before CODE (Bucket D - TDD)
-Created: SCOPE_AUTH_MFA.md for future PLAN
+Strategy: SKIP (S-F-T aligned, function not implemented yet)
+Root Cause: Tests written before implementation (Bucket D - TDD)
 
-Tests have correct @jig annotations and verify valid SPECs.
-Will implement CODE in future Work Unit.
-
-Unit: Test Repair Phase 4.4
-See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+Tests have correct @jig.verifies() decorators and verify valid SPECs.
+Will implement functions in future work."
 ```
 
-#### Strategy: DEBUG (Bucket E - CODE Bug Detected)
+#### Strategy: DEBUG (Bucket E - Function Bug Detected)
 
-```bash
-# DO NOT "fix" tests to match buggy CODE
-# Instead, redirect to DEBUG workflow
+```markdown
+# DO NOT "fix" tests to match buggy functions
+# These are actual bugs discovered by tests
 
-# Tests reveal CODE bugs:
-# - test_device_id_uniqueness: CODE generates duplicate device IDs (violates S-AUTH-004)
-# - test_token_expiry_timing: Tokens expire 1hr early (violates S-AUTH-003)
-
-# Create DEBUG deltas for each bug
-jig delta new --type debug --issue device-id-collision
-jig delta new --type debug --issue token-expiry-timing
-
-# Document in test repair notes
-cat >> jig/deltas/active/<branch>/PLAN.md <<'EOF'
-
-## Bucket E: CODE Bugs Detected During Test Repair
+## Bucket E: Function Bugs Detected During Test Repair
 
 During test audit, discovered 2 tests that correctly verify SPECs,
-but CODE violates SPECs (actual bugs, not test issues).
+but functions violate SPECs (actual bugs, not test issues).
 
-**Redirecting to DEBUG workflow:**
+### Bug 1: Device ID Collision
+- **Test:** test_device_id_uniqueness (tests/auth/test_device_id.py:205)
+- **Verifies:** S-004 ("Device IDs must be globally unique")
+- **Issue:** Function generates duplicate IDs (~1% collision rate)
+- **Status:** Marked for debugging
 
-1. **Bug: Device ID Collision**
-   - Test: test_device_id_uniqueness (tests/auth/test_device_id.py:205)
-   - Verifies: S-AUTH-004 ("Device IDs must be globally unique")
-   - Issue: CODE generates duplicate IDs (~1% collision rate)
-   - Action: Created debug-device-id-collision delta
-
-2. **Bug: Token Expiry Timing**
-   - Test: test_token_expiry_timing (tests/auth/test_token_expiry.py:175)
-   - Verifies: S-AUTH-003 ("Tokens expire after 24 hours")
-   - Issue: Tokens expire at 23 hours (timezone calculation bug)
-   - Action: Created debug-token-expiry-timing delta
+### Bug 2: Token Expiry Timing
+- **Test:** test_token_expiry_timing (tests/auth/test_token_expiry.py:175)
+- **Verifies:** S-003 ("Tokens expire after 24 hours")
+- **Issue:** Tokens expire at 23 hours (timezone calculation bug)
+- **Status:** Marked for debugging
 
 **Do NOT "fix" these tests - they are correct!**
-The CODE is buggy. Following DEBUG workflow for each.
-EOF
+The functions are buggy. Fix the functions, not the tests.
+```
 
-git add jig/deltas/
-git commit -m "test: identify CODE bugs during test repair (Group 6 - Bucket E)
+**Document and track:**
+```bash
+# Create issues or document bugs for future fixes
+# Tests remain as-is (they're working correctly)
 
-Found 2 tests that correctly verify SPECs but reveal CODE bugs.
+git commit -m "docs: identify function bugs during test repair (Group 6 - Bucket E)
 
-Strategy: DEBUG (redirect to DEBUG workflow, not test repair)
-Tests: test_device_id_uniqueness, test_token_expiry_timing
-Action: Created DEBUG deltas for each bug
+Found 2 tests that correctly verify SPECs but reveal function bugs:
+- test_device_id_uniqueness: Device ID collision bug (violates S-004)
+- test_token_expiry_timing: Token expiry timing bug (violates S-003)
 
-These are NOT test failures - these are CODE bugs.
+Strategy: DEBUG (fix functions, not tests)
+These are NOT test failures - these are function bugs.
 Tests are working as intended (catching bugs).
 
-Created:
-- jig/deltas/active/debug-device-id-collision/
-- jig/deltas/active/debug-token-expiry-timing/
-
-Will fix CODE bugs separately via DEBUG workflow.
-
-Unit: Test Repair Phase 4.5
-See: jig/deltas/active/<branch>/PLAN.md → Phase 4"
+Will fix function bugs in separate commits."
 ```
 
 ### Phase 5: JIG Integration & Validation (1-2 hours)
 
-**Goal:** Ensure all tests have `@jig` annotations and graph alignment is correct.
+**Goal:** Ensure all tests have `@jig.verifies()` decorators and graph alignment is correct.
 
 **Actions:**
-1. Add missing `@jig` annotations to passing tests (Bucket A tests that were fixed)
-2. Rebuild graph index: `jig index --rebuild`
-3. Validate alignment: `jig validate --check-all`
+1. Add missing `@jig.verifies()` decorators to passing tests (Bucket A tests that were fixed)
+2. Regenerate all graphs: `jigy index`, `jigy impl rebuild`, `jigy verify rebuild --run-tests`
+3. Validate alignment: `jigy status`
 4. Run full test suite: `pytest -v`
 5. Check coverage: ensure test count is healthy (e.g., >1450 tests)
-6. Update PLAN reflection
 
 **Validation Checklist:**
 ```markdown
 ## Phase 5: Validation Results
 
-- [ ] All tests have `@jig T-XXX-NNN verifies:S-YYY-NNN` annotations
-- [ ] `jig validate --check-all` passes (no orphaned nodes)
+- [ ] All tests have `@jig.verifies("S-XXX")` decorators
+- [ ] `jigy status` shows correct alignment
 - [ ] Full test suite passes: `pytest -v` (0 failures)
 - [ ] Test count healthy: 1,482 tests (expected: >1,450)
-- [ ] Coverage >80% on all subsystems
+- [ ] Coverage >80% on all bricks
 - [ ] No commented-out tests in codebase
 - [ ] No `# TODO: fix this test` comments
-- [ ] Graph index rebuilt: `jig index --rebuild`
-- [ ] Subsystem coupling ratios maintained (>10:1)
+- [ ] All graphs regenerated and committed
 ```
 
 **Final Commit:**
 ```bash
-git add tests/ jig/
+git add tests/ jig/generated/
 git commit -m "test: complete SPEC-driven test recovery
 
 Test Suite Recovery Summary:
@@ -598,47 +535,48 @@ Strategy Breakdown:
 - FIX: 65 tests (mechanical changes, SPECs unchanged)
 - REWRITE: 35 tests (deleted old, wrote new per SPEC)
 - DELETE: 18 tests (obsolete features, no replacement)
+- SKIP: 8 tests (function not implemented, TDD scenario)
+- DEBUG: 2 function bugs identified (fix functions, not tests)
 
-JIG Alignment:
-- All tests annotated with @jig T-XXX verifies:S-YYY
+JIG v8 Alignment:
+- All tests annotated with @jig.verifies('S-XXX')
 - Created 5 missing SPECs (Bucket B)
-- Validated: 0 orphaned nodes, 0 broken references
+- All graphs regenerated (intent, implementation, verification)
+- jigy status shows 100% alignment
 
 SPECs are source of truth. Tests are reproducible.
-No shims, no adapters, no backwards compatibility.
-
-See: jig/deltas/active/<branch>/PLAN.md → Test Repair Completion Summary"
+No shims, no adapters, no backwards compatibility."
 ```
 
 ---
 
-## 3) JIG Markers for Test Repair
+## Documentation & Learnings
 
-### Use These Markers in Your Delta (PLAN or NOTES)
+### Document Key Findings
 
-**DISCOVERY** - Gaps in test coverage or SPEC alignment:
-```markdown
-#DISCOVERY "23 tests had no traceable SPEC"
-Tests written against implementation details, not requirements.
-Created SPECs: S-CRYPTO-005, S-AUTH-004, S-AUTH-005.
+As you work through test repair, document important discoveries and decisions:
 
-#DISCOVERY "OR-Map tests verified wrong semantics"
-Tests expected last-write-wins, but OR-Map uses add-wins.
-Rewrote per S-CRDT-006.
-```
+**Discoveries** - Gaps in test coverage or SPEC alignment:
+- "23 tests had no traceable SPEC" - tests were written against implementation details, not requirements
+- "OR-Map tests verified wrong semantics" - tests expected last-write-wins, but OR-Map uses add-wins
 
-**DECISION** - Strategy choices (FIX vs REWRITE vs DELETE):
-```markdown
-#DECISION "REWRITE OR-Map tests vs FIX for backwards compatibility"
-**Choice:** REWRITE (delete old, write new)
-**Rationale:** Architecture fundamentally changed (LWW → add-wins)
-**Tradeoffs:** More work now, but tests verify correct SPEC
+**Decisions** - Strategy choices (FIX vs REWRITE vs DELETE):
+- "REWRITE OR-Map tests vs FIX for backwards compatibility"
+  - Choice: REWRITE (delete old, write new)
+  - Rationale: Architecture fundamentally changed (LWW → add-wins)
+  - Tradeoffs: More work now, but tests verify correct SPEC
 
-#DECISION "DELETE legacy token tests vs update for v2 format"
-**Choice:** DELETE (no migration)
-**Rationale:** Burn ships—v1 tokens unsupported, clean break
-**Tradeoffs:** No rollback path, acceptable for reference implementation
-```
+- "DELETE legacy token tests vs update for v2 format"
+  - Choice: DELETE (no migration)
+  - Rationale: Burn ships—v1 tokens unsupported, clean break
+  - Tradeoffs: No rollback path, acceptable for reference implementation
+
+**Learnings** - Reusable patterns from test repair:
+- "Group by root cause before fixing tests" - identified 4 groups covering 118 tests; batch fixes 10x faster
+- "SPECs make tests reproducible" - deleted 35 broken tests, regenerated 28 new tests from SPEC; code is cheap when requirements are clear
+- "Missing decorators hide alignment drift" - 22 tests passed but had no SPEC link; drift invisible until audit
+
+---
 
 **LEARNED** - Reusable patterns from test repair:
 ```markdown
@@ -670,15 +608,15 @@ Always annotate tests at creation time.
 >    - **Bucket A:** SPEC exists, test needs alignment
 >    - **Bucket B:** SPEC missing but needed (note what SPEC should say)
 >    - **Bucket C:** SPEC obsolete (note why it's no longer relevant)
->    - **Bucket D:** SPEC exists, test correct, but CODE missing (TDD scenario)
->    - **Bucket E:** SPEC exists, test correct, but CODE violates SPEC (bug detected)
+>    - **Bucket D:** SPEC exists, test correct, but function missing (TDD scenario)
+>    - **Bucket E:** SPEC exists, test correct, but function violates SPEC (bug detected)
 >
 > **Decision tree for Buckets D and E:**
 > - If SPEC exists and test looks correct:
->   - Does the CODE for this feature exist?
->     - No → **Bucket D** (TDD: test written before CODE)
->     - Yes → Does CODE pass the test when run?
->       - No, and test is correct → **Bucket E** (CODE bug)
+>   - Does the function for this feature exist?
+>     - No → **Bucket D** (TDD: test written before function)
+>     - Yes → Does function pass the test when run?
+>       - No, and test is correct → **Bucket E** (function bug)
 >       - No, and test is wrong → **Bucket A** (align test)
 >
 > **Output:** Markdown table per bucket (see Phase 1 template)
@@ -691,17 +629,18 @@ Always annotate tests at creation time.
 >
 > **Process:**
 > 1. Read the failing test to extract the requirement (the "what")
-> 2. Determine which Outcome this supports (or create new Outcome)
-> 3. Create `jig/specifications/S-<SUBSYSTEM>-NNN.md`:
->    - YAML frontmatter with id, type, title, subsystem, implements
->    - Markdown body with rationale, acceptance criteria, related nodes
-> 4. Run `jig validate` to check format
+> 2. Determine which Outcome this supports (optional)
+> 3. Create `jig/specifications/S-NNN.md`:
+>    - YAML frontmatter with id, type (minimal)
+>    - Markdown body with rationale, acceptance criteria, related info
+> 4. Run `jigy validate` to check format
+> 5. Run `jigy index` to regenerate intent graph
 >
 > **Quality bar:**
 > - SPEC describes "what", not "how"
 > - Rationale explains why this requirement exists
 > - Acceptance criteria are testable
-> - Links to at least one Outcome (business value)
+> - Optionally links to Outcome (business value)
 
 ### Phase 3: Root Cause Grouping
 
@@ -728,27 +667,29 @@ Always annotate tests at creation time.
 >
 > **For FIX groups:**
 > 1. Apply mechanical changes (add param, fix import, etc.)
-> 2. Ensure `@jig T-XXX verifies:S-YYY` annotation exists
+> 2. Ensure `@jig.verifies("S-XXX")` decorator exists
 > 3. Run tests to verify they pass
-> 4. Commit with message: `test(<subsystem>): fix <root-cause> (Group N)`
+> 4. Run `jigy verify rebuild --run-tests` to update verification graph
+> 5. Commit with message: `test(<brick>): fix <root-cause> (Group N)`
 >
 > **For REWRITE groups:**
 > 1. Delete old test file entirely (burn ships)
 > 2. Read the SPEC that these tests should verify
 > 3. Write new tests from scratch per SPEC acceptance criteria
-> 4. Add `@jig T-XXX verifies:S-YYY subsystem:name` annotations
+> 4. Add `@jig.verifies("S-XXX")` decorators
 > 5. Run tests to verify they pass
-> 6. Commit with message: `test(<subsystem>): rewrite per <SPEC> (Group N)`
+> 6. Run `jigy verify rebuild --run-tests`
+> 7. Commit with message: `test(<brick>): rewrite per <SPEC> (Group N)`
 >
 > **For DELETE groups:**
 > 1. Delete test files entirely
-> 2. Run `jig index --rebuild` to remove orphaned T nodes
+> 2. Run `jigy verify rebuild --run-tests` to update verification graph
 > 3. Commit with message: `test: delete obsolete <feature> tests (Group N)`
 >
 > **Quality bar:**
 > - No shims, no adapters, no feature flags
 > - REWRITE tests are "as good as new" (not salvaged old logic)
-> - Every test has `@jig` annotation
+> - Every test has `@jig.verifies()` decorator
 > - Commit message explains strategy and rationale
 
 ### Phase 5: Validation
@@ -756,18 +697,21 @@ Always annotate tests at creation time.
 > Validate that test suite is healthy and JIG-aligned.
 >
 > **Checklist:**
-> 1. Add `@jig` annotations to any tests missing them
-> 2. Run `jig index --rebuild` to regenerate graph index
-> 3. Run `jig validate --check-all` (must pass)
+> 1. Add `@jig.verifies()` decorators to any tests missing them
+> 2. Regenerate all graphs:
+>    - `jigy index` (intent graph)
+>    - `jigy impl rebuild` (implementation graph)
+>    - `jigy verify rebuild --run-tests` (verification graph)
+> 3. Validate alignment: `jigy status` (check for missing edges)
 > 4. Run full test suite: `pytest -v` (must pass)
 > 5. Check test count (should be close to baseline, accounting for deletes)
-> 6. Check coverage: `pytest --cov` (should be >80% on all subsystems)
+> 6. Check coverage: `pytest --cov` (should be >80% on all bricks)
 > 7. Search for anti-patterns:
 >    - Commented-out tests: `grep -r "# def test_" tests/`
 >    - TODO comments: `grep -r "# TODO.*test" tests/`
->    - Missing annotations: `grep -L "@jig T-" tests/**/*test*.py`
+>    - Missing decorators: `grep -L "@jig.verifies" tests/**/*test*.py`
 >
-> **Output:** Update PLAN with validation results and final metrics
+> **Output:** Document validation results and final metrics
 
 ---
 
@@ -777,7 +721,7 @@ Always annotate tests at creation time.
 
 ```python
 # BAD: Adding compatibility layer to make old test pass
-# @jig T-CRDT-012 verifies:S-CRDT-003 subsystem:crdt
+@jig.verifies("S-003")
 def test_replicator_initialization():
     """Verify replicator initializes with empty state"""
     # Shim to support old constructor (NO!)
@@ -789,7 +733,7 @@ def test_replicator_initialization():
 
 ```python
 # GOOD: Simple fix (if SPEC unchanged)
-# @jig T-CRDT-012 verifies:S-CRDT-003 subsystem:crdt
+@jig.verifies("S-003")
 def test_replicator_initialization():
     """Verify replicator initializes with empty state"""
     rep = Replicator(node_id="test-node")  # Just add the param
@@ -815,7 +759,7 @@ def test_replicator_initialization():
 # GOOD: Delete the file entirely (if obsolete)
 # OR rewrite from scratch (if SPEC changed)
 
-# @jig T-CRDT-015 verifies:S-CRDT-006 subsystem:crdt
+@jig.verifies("S-006")
 def test_or_map_merge_preserves_all_values():
     """Verify OR-Map merge preserves concurrent values (add-wins semantics)"""
     # New test written per updated SPEC
@@ -841,9 +785,9 @@ def test_some_edge_case():
 
 ```python
 # GOOD: Test explicitly verifies a SPEC
-# @jig T-AUTH-023 verifies:S-AUTH-004 subsystem:auth
+@jig.verifies("S-004")
 def test_device_id_uniqueness():
-    """Verify device IDs are globally unique (S-AUTH-004)"""
+    """Verify device IDs are globally unique (S-004)"""
     # Clear what requirement this verifies
     id1 = generate_device_id()
     id2 = generate_device_id()
@@ -1092,17 +1036,40 @@ When executing a test repair task:
 
 **TL;DR:**
 
-1. **Classify:** Every failing test is Bucket A (align), B (create SPEC), C (delete), D (skip - TDD), or E (debug - CODE bug)
+1. **Classify:** Every failing test is Bucket A (align), B (create SPEC), C (delete), D (skip - TDD), or E (debug - function bug)
 2. **Create SPECs:** For Bucket B, create the SPEC before fixing the test
 3. **Group:** Batch tests by root cause and strategy (FIX/REWRITE/DELETE/SKIP/DEBUG)
-4. **Execute:** No shims, no adapters—fix, rewrite from SPEC, delete, skip with SCOPE, or redirect to DEBUG
-5. **Validate:** All tests have `@jig` annotations, `jig validate` passes, test suite healthy
+4. **Execute:** No shims, no adapters—fix, rewrite from SPEC, delete, skip, or redirect to DEBUG
+5. **Validate:** All tests have `@jig.verifies()` decorators, `jigy status` shows alignment, test suite healthy
 
 **Core principle:** SPECs are source of truth. Tests are reproducible. Code is cheap when requirements are clear.
 
-**Key insight:** Bucket D (TDD) preserves O-S-T alignment when CODE is missing. Bucket E (Debug) prevents "fixing" tests to match buggy CODE.
+**Key insight:** Bucket D (TDD) preserves S-F-T alignment when function is missing. Bucket E (Debug) prevents "fixing" tests to match buggy functions.
 
 ---
 
-**Status:** Ready for use
-**Next:** Apply to first broken test suite (bootstrap validation)
+## Success Criteria
+
+Test repair is complete when ALL of the following are true:
+
+- [ ] **All failing tests classified** into Buckets A, B, C, D, or E
+- [ ] **All Bucket B SPECs created** - every test without a SPEC now has one (or is deleted)
+- [ ] **All tests aligned or resolved:**
+  - Bucket A: Fixed or rewritten per SPEC
+  - Bucket B: SPEC created, test aligned
+  - Bucket C: Tests deleted
+  - Bucket D: Tests skipped with `@pytest.mark.skip`, missing implementations documented
+  - Bucket E: Function bugs documented (tests remain as-is)
+- [ ] **All tests have decorators** - every test has `@jig.verifies("S-XXX")`
+- [ ] **All graphs regenerated** - intent, implementation, verification graphs up to date
+- [ ] **Alignment validated** - `jigy status` shows expected alignment
+- [ ] **Test suite passes** - `pytest -v` shows 0 failures (skipped tests OK)
+- [ ] **Coverage maintained** - test coverage >80% on all bricks
+- [ ] **No anti-patterns** - no commented tests, no TODOs, no shims
+- [ ] **Changes committed** - all work committed with clear messages
+
+---
+
+**Status:** Ready for use (v3.0 - JIG v8 compatible)
+**Version:** 3.0.0 (2025-11-30)
+**Compatibility:** JIG v8 (S-F-T triangle, Bricks, Decorators)

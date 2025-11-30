@@ -209,13 +209,13 @@ export function renderGraph(elements, container = null) {
         layout: {
             name: 'preset'  // Will apply layout separately
         },
-        minZoom: 0.1,
-        maxZoom: 3,
+        minZoom: 0.01,  // Allow zooming way out to see large graphs
+        maxZoom: 5,     // Allow zooming way in for details
         wheelSensitivity: 0.2
     });
 
     // Apply hierarchical layout by default
-    applyLayout(cy, 'hierarchical');
+    applyLayout(cy, 'hierarchical-cols');
 
     // Show the canvas, hide empty state
     containerElement.classList.remove('hidden');
@@ -234,76 +234,112 @@ export function renderGraph(elements, container = null) {
  */
 export function applyLayout(cy, layoutName = 'hierarchical') {
     let layoutOptions = {};
+    let fitPadding = 50;  // Default fit padding for zoom-to-fit
 
     switch (layoutName) {
-        case 'hierarchical':
+        case 'hierarchical': {
+            // Spacing controls for vertical hierarchical layout
+            const verticalSpacing = 1.5;  // Controls spacing between rows
+            const horizontalSpacing = 1.5;  // Controls spacing within rows
+            const edgePadding = 30;
+            fitPadding = 50;  // Padding when fitting to viewport
+            
             layoutOptions = {
                 name: 'breadthfirst',
                 directed: true,
-                spacingFactor: 1.5,
-                padding: 30,
+                spacingFactor: verticalSpacing,
+                padding: edgePadding,
                 animate: true,
                 animationDuration: 500
             };
             break;
+        }
 
-        case 'hierarchical-cols':
+        case 'hierarchical-cols': {
+            // Spacing controls for horizontal hierarchical layout
+            // Note: x/y are swapped after layout, so:
+            // - spacingFactor controls VERTICAL spacing before swap = HORIZONTAL after swap
+            // - We compress vertically after swap by scaling y coordinates
+            const horizontalSpacing = 2.0;  // Controls spacing between columns (left-to-right)
+            const verticalCompression = 0.15;  // How much to compress vertically (lower = more compressed)
+            const edgePadding = 3;
+            fitPadding = 10;  // Padding when fitting to viewport (smaller = more zoomed in)
+            
             layoutOptions = {
                 name: 'breadthfirst',
                 directed: true,
-                spacingFactor: 1.5,
-                padding: 30,
+                spacingFactor: horizontalSpacing,
+                padding: edgePadding,
                 animate: true,
                 animationDuration: 500,
                 grid: false,
                 avoidOverlap: true,
                 nodeDimensionsIncludeLabels: true,
-                // Position nodes left-to-right instead of top-down
-                // In breadthfirst, we can control this by setting the roots and layout direction
-                // However, Cytoscape's breadthfirst doesn't have a direct rankDir option
-                // We'll use a workaround: swap the positions after layout
                 fit: true,
-                circle: false
+                circle: false,
+                // Store compression factor for use after layout
+                _verticalCompression: verticalCompression
             };
             break;
+        }
 
-        case 'force-directed':
+        case 'force-directed': {
+            // Spacing controls for force-directed layout
+            const nodeRepulsion = 8000;  // How strongly nodes push apart
+            const edgeLength = 100;  // Ideal distance between connected nodes
+            const edgeElasticity = 100;  // How strongly edges pull nodes together
+            const gravity = 80;  // How strongly nodes are pulled to center
+            fitPadding = 50;  // Padding when fitting to viewport
+            
             layoutOptions = {
                 name: 'cose',
                 animate: true,
                 animationDuration: 1000,
-                nodeRepulsion: 8000,
-                idealEdgeLength: 100,
-                edgeElasticity: 100,
+                nodeRepulsion: nodeRepulsion,
+                idealEdgeLength: edgeLength,
+                edgeElasticity: edgeElasticity,
                 nestingFactor: 5,
-                gravity: 80,
+                gravity: gravity,
                 numIter: 1000,
                 initialTemp: 200,
                 coolingFactor: 0.95,
                 minTemp: 1.0
             };
             break;
+        }
 
-        case 'circular':
+        case 'circular': {
+            // Spacing controls for circular layout
+            const spacing = 1.5;  // Controls spacing around the circle
+            const edgePadding = 30;
+            fitPadding = 50;  // Padding when fitting to viewport
+            
             layoutOptions = {
                 name: 'circle',
                 animate: true,
                 animationDuration: 500,
-                padding: 30,
-                spacingFactor: 1.5
+                padding: edgePadding,
+                spacingFactor: spacing
             };
             break;
+        }
 
-        case 'grid':
+        case 'grid': {
+            // Spacing controls for grid layout
+            const gridSpacing = 1.5;  // Controls spacing between grid cells
+            const edgePadding = 30;
+            fitPadding = 50;  // Padding when fitting to viewport
+            
             layoutOptions = {
                 name: 'grid',
                 animate: true,
                 animationDuration: 500,
-                padding: 30,
-                spacingFactor: 1.5,
+                padding: edgePadding,
+                spacingFactor: gridSpacing,
                 avoidOverlap: true
             };
             break;
+        }
 
         default:
             console.warn(`Unknown layout: ${layoutName}, using hierarchical`);
@@ -320,18 +356,24 @@ export function applyLayout(cy, layoutName = 'hierarchical') {
     // For hierarchical-cols, we need to transform positions after layout
     if (layoutName === 'hierarchical-cols') {
         layout.one('layoutstop', () => {
+            const compression = layoutOptions._verticalCompression || 1.0;
+            
             // Swap x and y coordinates to convert vertical layout to horizontal
+            // and apply vertical compression
             cy.nodes().forEach(node => {
                 const pos = node.position();
                 node.position({
                     x: pos.y,
-                    y: pos.x
+                    y: pos.x * compression  // Compress vertically
                 });
             });
             // Fit the graph after transformation
-            cy.fit(50);
+            cy.fit(fitPadding);
         });
     }
+
+    // Store the fitPadding on the cy instance so zoom controls can use it
+    cy.scratch('_fitPadding', fitPadding);
 
     layout.run();
 

@@ -15,11 +15,19 @@
     <!-- Mocha and Chai libraries -->
     <script src="https://unpkg.com/mocha@10.2.0/mocha.js"></script>
     <script src="https://unpkg.com/chai@4.3.10/chai.js"></script>
+    
+    <!-- Fuse.js for search functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
 
     <!-- Setup Mocha -->
     <script>
         mocha.setup('bdd');
         const { expect } = chai;
+        
+        // Export globals for ES modules
+        window.describe = describe;
+        window.it = it;
+        window.expect = expect;
     </script>
 
     <!-- Test files will be added here in later work units -->
@@ -42,7 +50,9 @@
     <script type="module" src="test-search.js"></script>
 
     <!-- Run tests -->
-    <script>
+    <script type="module">
+        // Wait for all modules to load
+        await new Promise(resolve => setTimeout(resolve, 100));
         mocha.run();
     </script>
 </body>

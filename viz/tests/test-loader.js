@@ -4,6 +4,8 @@
 
 import { parseNDJSON, toCytoscapeElements } from '../js/graph-loader.js';
 
+const { describe, it, expect } = window;
+
 describe('Graph Loader', () => {
     describe('parseNDJSON', () => {
         // @jig.verifies("S-007")
@@ -162,7 +164,11 @@ describe('Graph Loader', () => {
         it('should convert edges to Cytoscape format', () => {
             const graph = {
                 metadata: {},
-                nodes: [],
+                nodes: [
+                    { id: 'N-001', type: 'class', name: 'A' },
+                    { id: 'N-002', type: 'function', name: 'B' },
+                    { id: 'S-001', type: 'spec', name: 'C' }
+                ],
                 edges: [
                     { source: 'N-001', target: 'N-002', type: 'contains' },
                     { source: 'N-002', target: 'S-001', type: 'implements' }
@@ -182,7 +188,10 @@ describe('Graph Loader', () => {
         it('should create unique edge IDs', () => {
             const graph = {
                 metadata: {},
-                nodes: [],
+                nodes: [
+                    { id: 'N-001', type: 'class', name: 'A' },
+                    { id: 'N-002', type: 'function', name: 'B' }
+                ],
                 edges: [
                     { source: 'N-001', target: 'N-002', type: 'contains' }
                 ]
@@ -219,7 +228,10 @@ describe('Graph Loader', () => {
         it('should preserve all edge properties in data', () => {
             const graph = {
                 metadata: {},
-                nodes: [],
+                nodes: [
+                    { id: 'M-001', type: 'module', name: 'A' },
+                    { id: 'M-002', type: 'module', name: 'B' }
+                ],
                 edges: [
                     { source: 'M-001', target: 'M-002', type: 'imports', line: 5 }
                 ]
@@ -227,7 +239,8 @@ describe('Graph Loader', () => {
 
             const elements = toCytoscapeElements(graph);
 
-            const edge = elements[0].data;
+            const edges = elements.filter(el => el.group === 'edges');
+            const edge = edges[0].data;
             expect(edge.source).to.equal('M-001');
             expect(edge.target).to.equal('M-002');
             expect(edge.type).to.equal('imports');
@@ -253,7 +266,8 @@ describe('Graph Loader', () => {
             const graph = {
                 metadata: {},
                 nodes: [
-                    { id: 'N-001', type: 'class', name: 'A' }
+                    { id: 'N-001', type: 'class', name: 'A' },
+                    { id: 'N-002', type: 'function', name: 'B' }
                 ],
                 edges: [
                     { source: 'N-001', target: 'N-002', type: 'contains' }
@@ -262,9 +276,10 @@ describe('Graph Loader', () => {
 
             const elements = toCytoscapeElements(graph);
 
-            expect(elements).to.have.lengthOf(2);
+            expect(elements).to.have.lengthOf(3);
             expect(elements[0].group).to.equal('nodes');
-            expect(elements[1].group).to.equal('edges');
+            expect(elements[1].group).to.equal('nodes');
+            expect(elements[2].group).to.equal('edges');
         });
     });
 });

@@ -101,7 +101,9 @@ export function setupZoomControls(cy) {
     const zoomFitBtn = document.getElementById('zoom-fit-btn');
     if (zoomFitBtn) {
         zoomFitBtn.addEventListener('click', () => {
-            cy.fit(null, 50); // 50px padding
+            // Use the fitPadding from the current layout
+            const padding = cy.scratch('_fitPadding') || 50;
+            cy.fit(null, padding);
             console.log('Zoom to fit');
         });
     }
@@ -110,7 +112,9 @@ export function setupZoomControls(cy) {
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
-            cy.fit(null, 50);
+            // Use the fitPadding from the current layout
+            const padding = cy.scratch('_fitPadding') || 50;
+            cy.fit(null, padding);
             cy.elements().removeClass('highlighted');
             clearDetails();
             console.log('View reset');
