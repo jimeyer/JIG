@@ -58,7 +58,42 @@ function setupEventHandlers() {
 
     // Help button
     document.getElementById('help-btn').addEventListener('click', () => {
-        alert('JIG Implementation Graph Visualizer\n\nLoad a .ndjson graph file to visualize your codebase structure.\n\nSee README.md for more information.');
+        const helpText = `JIG Implementation Graph Visualizer
+
+LOADING GRAPHS:
+• Click "Load Graph" to select a .ndjson file
+• Or the default graph loads automatically if available
+
+NAVIGATION:
+• Mouse wheel to zoom in/out
+• Click and drag to pan the graph
+• Click "Zoom to Fit" to see the entire graph
+• Click "Reset View" to clear selection and fit graph
+
+INTERACTION:
+• Click nodes or edges to see details in the right panel
+• Click background to deselect
+
+FILTERING:
+• Use checkboxes to show/hide node types (Classes, Functions, etc.)
+• Use checkboxes to show/hide edge types (Contains, Implements, etc.)
+
+SEARCH:
+• Type in search box to find nodes by name or ID
+• Click search results to select and center nodes
+• Press Escape to clear search
+
+LAYOUTS:
+• Choose different layouts to reveal different patterns:
+  - Hierarchical (Rows): Top-down tree
+  - Hierarchical (Columns): Left-to-right tree
+  - Force-directed: Organic clustering
+  - Circular: Nodes in circle
+  - Grid: Organized rows/columns
+
+For more information, see README.md`;
+
+        alert(helpText);
     });
 
     // Layout selector
@@ -305,6 +340,14 @@ async function handleGraphLoad(file) {
         // Hide loading spinner
         document.getElementById('loading-spinner').style.display = 'none';
 
+        // Check for empty graph
+        if (graph.nodes.length === 0) {
+            console.warn('Graph has no nodes');
+            document.getElementById('empty-state').style.display = 'flex';
+            document.querySelector('#empty-state p').textContent = 'No nodes found in graph';
+            return;
+        }
+
         // Render graph
         state.cy = renderGraph(graph.elements);
 
@@ -359,6 +402,12 @@ async function tryLoadDefaultGraph() {
         updateStats(graph.metadata);
 
         console.log('Default graph loaded successfully');
+
+        // Check for empty graph
+        if (graph.nodes.length === 0) {
+            console.warn('Default graph has no nodes');
+            return;
+        }
 
         // Render graph
         state.cy = renderGraph(graph.elements);

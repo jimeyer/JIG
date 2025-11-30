@@ -228,4 +228,60 @@ body {
     :root {
         --sidebar-width: 180px;
     }
+
+    .stats-panel {
+        flex-wrap: wrap;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --sidebar-width: 100%;
+        --header-height: auto;
+    }
+
+    .app-header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: var(--spacing-sm);
+    }
+
+    .app-header h1 {
+        font-size: 16px;
+        width: 100%;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stats-panel {
+        width: 100%;
+        justify-content: space-around;
+        margin-top: var(--spacing-sm);
+    }
+
+    .sidebar-left {
+        position: fixed;
+        left: -100%;
+        top: var(--header-height);
+        bottom: 0;
+        z-index: 200;
+        width: 80%;
+        max-width: 300px;
+        background-color: var(--color-surface);
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-left.open {
+        left: 0;
+    }
+
+    .graph-container {
+        width: 100%;
+    }
 }

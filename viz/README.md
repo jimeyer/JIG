@@ -4,9 +4,9 @@ A browser-based visualization tool for exploring JIG implementation graphs.
 
 ## Status
 
-**Phase 1: Implementation Graph Only (In Progress)**
+**Phase 1: Implementation Graph Only - COMPLETE**
 
-This tool is being built incrementally following the plan in `docs/viz/V002_PLAN_Implementation_Graph_Visualizer.md`.
+This tool was built incrementally following the plan in `docs/viz/V002_PLAN_Implementation_Graph_Visualizer.md`.
 
 ### Completed Work Units
 - [x] WU0: Intent definition (Outcomes O-007, O-008; Specifications S-007 through S-017)
@@ -17,7 +17,9 @@ This tool is being built incrementally following the plan in `docs/viz/V002_PLAN
 - [x] WU5: Filtering
 - [x] WU6: Search
 - [x] WU7: Layout Switching
-- [ ] WU8: Polish
+- [x] WU8: Polish
+
+**Phase 1 Complete!** All core functionality implemented and tested.
 
 ## Quick Start
 
@@ -143,6 +145,68 @@ Loaded from CDN (no installation required):
 - **Fuse.js** (7.0.0) - Fuzzy search
 - **Mocha** (10.2.0) - Test framework
 - **Chai** (4.3.10) - Assertion library
+
+## Troubleshooting
+
+### Graph doesn't load / "Load Graph" button doesn't work
+
+**Problem**: ES6 modules require HTTP server due to CORS restrictions.
+
+**Solution**: Make sure you're running a local web server:
+```bash
+cd viz
+python3 -m http.server 8000
+```
+Then open `http://localhost:8000` (not `file://...`)
+
+### "Can not create edge with nonexistent target" error
+
+**Problem**: Graph file contains edges referencing nodes that don't exist.
+
+**Solution**: The visualizer automatically skips these edges with console warnings. Check the browser console to see which edges were skipped. This is expected when the graph contains references to spec nodes or other intent layer elements.
+
+### "No nodes found in graph" message
+
+**Problem**: The NDJSON file is empty or doesn't contain any valid node entries.
+
+**Solution**:
+- Verify the file contains node objects with `id` and `type` fields
+- Check the browser console for parsing errors
+- Ensure the first line contains metadata: `{"_meta": {...}}`
+
+### "Invalid JSON at line N" error
+
+**Problem**: The NDJSON file contains malformed JSON on a specific line.
+
+**Solution**:
+- Open the file and check line N for syntax errors
+- Common issues: missing commas, unquoted strings, trailing commas
+- Each line must be valid standalone JSON
+
+### Graph is too large / performance issues
+
+**Problem**: Large graphs (1000+ nodes) may be slow to render or filter.
+
+**Solution**:
+- Use filters to hide node/edge types you don't need
+- Use search to focus on specific areas
+- Consider generating smaller subgraphs for specific modules
+
+### Search doesn't find expected nodes
+
+**Problem**: Search uses fuzzy matching which may not match exact expectations.
+
+**Solution**:
+- Try partial matches (e.g., "Token" instead of "TokenValidator")
+- Search is case-insensitive
+- Search looks in both `name` and `id` fields
+- Empty query returns all nodes
+
+### Sidebar doesn't appear on mobile
+
+**Problem**: Responsive design hides sidebars on narrow screens.
+
+**Solution**: On screens < 768px, the right sidebar is hidden. On screens < 480px, the left sidebar becomes a slide-out panel. This is intentional to maximize graph viewing area on small screens.
 
 ## Future Phases
 
