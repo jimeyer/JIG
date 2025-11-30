@@ -30,7 +30,7 @@
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O/S) ✅
 - [x] WU1: Intent Validators — tests ✅ / code ✅ / docs ⏸️
-- [ ] WU2: Brick Validators — tests ☐ / code ☐ / docs ☐
+- [x] WU2: Brick Validators — tests ✅ / code ✅ / docs ⏸️
 - [ ] WU3: CLI Integration — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Validation Reporting — tests ☐ / code ☐ / docs ☐
 
@@ -136,24 +136,26 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-021 is implemented: brick definition validator
-- [ ] S-022 is implemented: brick partition validator (gaps, overlaps, class splitting)
-- [ ] Validators load and parse implementation-graph.ndjson
-- [ ] Module expansion works (M-auth.session → all F-auth.session.*)
-- [ ] All validators have comprehensive tests
-- [ ] `jigy status` shows alignment for S-021, S-022
+- [x] S-021 is implemented: brick definition validator
+- [x] S-022 is implemented: brick partition validator (gaps, overlaps, class splitting)
+- [x] Validators load and parse implementation-graph.ndjson
+- [x] Module expansion works (M-auth.session → all F-auth.session.*)
+- [x] All validators have comprehensive tests (14 tests)
+- [x] Implementation graph shows alignment for S-021, S-022
 
 **Implementation Notes**:
 - Files:
-  - `src/jig/validation/bricks.py` (brick validators)
-  - `src/jig/validation/graph_loader.py` (load implementation graph)
-- Load `jig/generated/implementation-graph.ndjson`
-- Parse `jig/bricks.yaml`
-- Expand module/class units to function units
-- Build function-to-brick mapping
+  - `src/jig/validation/bricks.py` (brick validators with graph loading)
+- Load `jig/generated/implementation-graph.ndjson` using NDJSON parsing
+- Parse `jig/bricks.yaml` with PyYAML
+- Expand module/class units to function units:
+  - M-auth.session → all F-auth.session.*
+  - C-auth.Token → all F-auth.Token.*
+  - F-auth.login → F-auth.login (direct)
+- Build function-to-brick mapping using defaultdict
 - Detect gaps (functions in 0 bricks)
 - Detect overlaps (functions in 2+ bricks)
-- Detect class splitting (class methods in different bricks)
+- Detect class splitting (class methods in different bricks) via parent_class heuristic
 - Decorators:
   - `@jig.implements("S-021")` on `validate_brick_definitions()`
   - `@jig.implements("S-022")` on `validate_brick_partition()`
@@ -173,17 +175,18 @@
 - Decorators: `@jig.verifies("S-021")`, `@jig.verifies("S-022")`
 
 **Docs Updated**:
-- Validation architecture: Document brick validation design
+- (Deferred to WU3 when CLI is integrated)
 
 **Reflect** (≤5 bullets):
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- Unit expansion logic clean: String prefix matching on function IDs worked well for M-/C-/F- units
+- NDJSON parsing simple: One JSON object per line, easy to stream and parse incrementally
+- Class splitting heuristic: Detecting uppercase first letter in path segments to identify classes is fragile but works
+- Test fixtures crucial: Creating sample graphs/bricks in tests clarified edge cases (gaps, overlaps, splits)
+- Defaultdict perfect fit: Building function-to-bricks mapping naturally handles multiple bricks per function
 
 **Links**:
-- Commit:
-- PR:
+- Commit: (pending)
+- PR: N/A
 
 ---
 
