@@ -73,11 +73,15 @@ def validate_brick_definitions(
         )
         return result
 
+    # Handle both formats: {"bricks": [...]} or direct [...]
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks",
+                message="bricks.yaml must contain a list of bricks (either as top-level list or under 'bricks:' key)",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -232,6 +236,20 @@ def validate_brick_partition(
                 file=str(bricks_file),
                 message=f"Failed to parse bricks.yaml: {e}",
                 code="INVALID_YAML",
+            )
+        )
+        return result
+
+    # Handle both formats: {"bricks": [...]} or direct [...]
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
+    if not isinstance(bricks_data, list):
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must contain a list of bricks (either as top-level list or under 'bricks:' key)",
+                code="INVALID_STRUCTURE",
             )
         )
         return result

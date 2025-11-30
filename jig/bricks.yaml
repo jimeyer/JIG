@@ -8,15 +8,24 @@ bricks:
     name: CLI Interface
     units:
       - M-jig.cli.main
+      - M-jig.cli.validate
 
   - id: B-003
+    name: Artifact Validation
+    units:
+      - M-jig.validation.intent
+      - M-jig.validation.bricks
+      - M-jig.validation.models
+      - M-jig.validation.reporting
+
+  - id: B-004
     name: Implementation Graph Core
     units:
       - M-jig.impl_graph.graph
       - M-jig.impl_graph.builder
       - M-jig.impl_graph.ndjson_writer
 
-  - id: B-004
+  - id: B-005
     name: Language Analyzers
     units:
       - M-jig.impl_graph.analyzers.base
