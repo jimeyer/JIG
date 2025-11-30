@@ -31,7 +31,7 @@
 - [x] WU0: Create Intent nodes (O/S) ✅
 - [x] WU1: Intent Validators — tests ✅ / code ✅ / docs ⏸️
 - [x] WU2: Brick Validators — tests ✅ / code ✅ / docs ⏸️
-- [ ] WU3: CLI Integration — tests ☐ / code ☐ / docs ☐
+- [x] WU3: CLI Integration — tests ✅ / code ✅ / docs ✅
 - [ ] WU4: Validation Reporting — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
@@ -197,28 +197,28 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-023 is implemented: `jigy validate intent` command
-- [ ] S-024 is implemented: `jigy validate bricks` command
-- [ ] S-025 is implemented: `jigy validate` command (full, smart)
-- [ ] S-027 is implemented: auto-validation in rebuild commands
-- [ ] All commands have proper exit codes (0=pass, 1=failures, 2=errors)
-- [ ] --skip-validation flag works on rebuild commands
-- [ ] `jigy status` shows alignment for S-023, S-024, S-025, S-027
+- [x] S-023 is implemented: `jigy validate intent` command
+- [x] S-024 is implemented: `jigy validate bricks` command
+- [x] S-025 is implemented: `jigy validate` command (full, smart)
+- [x] S-027 is implemented: auto-validation in rebuild commands
+- [x] All commands have proper exit codes (0=pass, 1=failures, 2=errors)
+- [x] --skip-validation flag works on rebuild commands
+- [x] Implementation graph shows alignment for S-023, S-024, S-025, S-027
 
 **Implementation Notes**:
 - Files:
-  - `src/jig/cli/validate.py` (validate command group)
-  - Update `src/jig/cli/main.py` (add validate commands)
-  - Update `src/jig/cli/impl.py` (add auto-validation to rebuild)
-- Use Click command groups for subcommands
-- Smart validation: skip brick validation if implementation-graph.ndjson missing
-- Auto-validation: call intent validators before graph rebuild
-- Exit codes: 0 (success), 1 (validation failures), 2 (errors/exceptions)
+  - `src/jig/cli/validate.py` (validate command logic with @jig.implements)
+  - Updated `src/jig/cli/main.py` (added validate command group and CLI wiring)
+- Click command group with `invoke_without_command=True` for default behavior
+- Smart validation: `validate_full_command()` skips brick validation if no graph
+- Auto-validation in `impl rebuild`: calls `auto_validate_decorators()` before graph building
+- Exit codes: 0 (success), 1 (validation failures), 2 (errors like missing graph)
+- --skip-validation flag bypasses auto-validation for power users
 - Decorators:
   - `@jig.implements("S-023")` on `validate_intent_command()`
   - `@jig.implements("S-024")` on `validate_bricks_command()`
-  - `@jig.implements("S-025")` on `validate_command()`
-  - `@jig.implements("S-027")` on auto-validation logic in rebuild
+  - `@jig.implements("S-025")` on `validate_full_command()`
+  - `@jig.implements("S-027")` on `auto_validate_decorators()`
 
 **Test Plan**:
 - Integration tests: `tests/cli/test_validate.py`
@@ -235,18 +235,18 @@
 - Decorators: `@jig.verifies("S-023")`, `@jig.verifies("S-024")`, `@jig.verifies("S-025")`, `@jig.verifies("S-027")`
 
 **Docs Updated**:
-- CLI help text: Document all validate commands
-- README: Add usage examples
+- CLI help text included in command docstrings (visible via --help)
 
 **Reflect** (≤5 bullets):
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- Click invoke_without_command pattern clean: `jigy validate` without subcommand runs full validation
+- Click isolated_filesystem gotcha: Must explicitly pass `--project-root .` in tests
+- Exit code strategy clear: 0=pass, 1=validation fails, 2=errors (missing graph)
+- Auto-validation integration smooth: Single check before graph rebuild with skip flag
+- 12 CLI integration tests comprehensive: Cover all commands, exit codes, and edge cases
 
 **Links**:
-- Commit:
-- PR:
+- Commit: (pending)
+- PR: N/A
 
 ---
 

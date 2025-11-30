@@ -49,6 +49,17 @@ def validate_brick_definitions(
     # Load implementation graph nodes
     graph_node_ids = _load_graph_node_ids(impl_graph_file)
 
+    # Check bricks.yaml exists
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
     # Parse bricks.yaml
     try:
         bricks_data = yaml.safe_load(bricks_file.read_text())
@@ -200,6 +211,17 @@ def validate_brick_partition(
     # Load implementation graph
     graph_nodes = _load_graph_nodes(impl_graph_file)
     functions = [node for node in graph_nodes if node.get("type") == "function"]
+
+    # Check bricks.yaml exists
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
 
     # Parse bricks.yaml
     try:
