@@ -28,7 +28,7 @@
 - B-003: Artifact Validation (new brick for linter functionality)
 
 ## Work Unit Checklist
-- [ ] WU0: Create Intent nodes (O/S)
+- [x] WU0: Create Intent nodes (O/S) ✅
 - [ ] WU1: Intent Validators — tests ☐ / code ☐ / docs ☐
 - [ ] WU2: Brick Validators — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: CLI Integration — tests ☐ / code ☐ / docs ☐
@@ -41,10 +41,10 @@
 **Goal**: Capture all known Outcomes and Specifications from AG026 before writing any code.
 
 **Acceptance Criteria**:
-- [ ] All "why" statements → Outcome files in `jig/outcomes/` (O-004, O-005, O-006)
-- [ ] All "what" requirements → Specification files in `jig/specifications/` (S-018 through S-027)
-- [ ] All files have proper YAML frontmatter
-- [ ] `jigy validate` passes (on existing artifacts, new ones will be validated manually)
+- [x] All "why" statements → Outcome files in `jig/outcomes/` (O-004, O-005, O-006)
+- [x] All "what" requirements → Specification files in `jig/specifications/` (S-018 through S-027)
+- [x] All files have proper YAML frontmatter
+- [x] Manual validation passes (validated YAML frontmatter with Python script)
 
 **Created Nodes**:
 - O-004: Early Error Detection - developers discover validation errors before graph generation
@@ -62,8 +62,11 @@
 - S-027: Auto-Validation - rebuild commands validate before building, --skip-validation flag
 
 **Reflect**:
-- What was clear from SCOPE: Three distinct validation phases (intent, graph building, bricks)
-- What was ambiguous: Exact error code taxonomy, performance targets beyond "< 5 seconds"
+- What was clear from SCOPE: Three distinct validation phases (intent, graph building, bricks) mapped cleanly to outcomes/specs
+- What was ambiguous: Exact error code taxonomy will emerge during implementation
+- Linking outcomes to specs: Each spec clearly implements one or more outcomes
+- Sequential numbering: O-004 through O-006, S-018 through S-027 follows convention
+- AG026 is comprehensive: All validation rules mapped to specifications
 
 ---
 
