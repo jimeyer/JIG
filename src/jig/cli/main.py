@@ -36,11 +36,18 @@ def impl():
     default=Path.cwd(),
     help="Root directory of the project (default: current directory)",
 )
-def validate(ctx, project_root: Path):
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["human", "json"], case_sensitive=False),
+    default="human",
+    help="Output format (default: human-readable)",
+)
+def validate(ctx, project_root: Path, output_format: str):
     """Validate JIG artifacts."""
     # If no subcommand, run full validation
     if ctx.invoked_subcommand is None:
-        exit_code = validate_full_command(project_root)
+        exit_code = validate_full_command(project_root, output_format)
         sys.exit(exit_code)
 
 
@@ -158,7 +165,14 @@ def rebuild(
     default=Path.cwd(),
     help="Root directory of the project (default: current directory)",
 )
-def validate_intent_cli(project_root: Path) -> None:
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["human", "json"], case_sensitive=False),
+    default="human",
+    help="Output format (default: human-readable)",
+)
+def validate_intent_cli(project_root: Path, output_format: str) -> None:
     """Validate intent artifacts (specifications, outcomes, decorators).
 
     Validates human-authored artifacts before any graph generation.
@@ -166,8 +180,9 @@ def validate_intent_cli(project_root: Path) -> None:
 
     Example:
         jig validate intent
+        jig validate intent --format json
     """
-    exit_code = validate_intent_command(project_root)
+    exit_code = validate_intent_command(project_root, output_format)
     sys.exit(exit_code)
 
 
@@ -178,7 +193,14 @@ def validate_intent_cli(project_root: Path) -> None:
     default=Path.cwd(),
     help="Root directory of the project (default: current directory)",
 )
-def validate_bricks_cli(project_root: Path) -> None:
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["human", "json"], case_sensitive=False),
+    default="human",
+    help="Output format (default: human-readable)",
+)
+def validate_bricks_cli(project_root: Path, output_format: str) -> None:
     """Validate brick definitions and partition constraints.
 
     Validates brick definitions against implementation graph.
@@ -186,8 +208,9 @@ def validate_bricks_cli(project_root: Path) -> None:
 
     Example:
         jig validate bricks
+        jig validate bricks --format json
     """
-    exit_code = validate_bricks_command(project_root)
+    exit_code = validate_bricks_command(project_root, output_format)
     sys.exit(exit_code)
 
 
@@ -198,16 +221,24 @@ def validate_bricks_cli(project_root: Path) -> None:
     default=Path.cwd(),
     help="Root directory of the project (default: current directory)",
 )
-def full(project_root: Path) -> None:
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["human", "json"], case_sensitive=False),
+    default="human",
+    help="Output format (default: human-readable)",
+)
+def full(project_root: Path, output_format: str) -> None:
     """Run full validation (intent + bricks if graph exists).
 
     Validates all artifacts. Runs intent validation always,
     and brick validation if implementation graph exists.
 
     Example:
-        jig validate
+        jig validate full
+        jig validate full --format json
     """
-    exit_code = validate_full_command(project_root)
+    exit_code = validate_full_command(project_root, output_format)
     sys.exit(exit_code)
 
 

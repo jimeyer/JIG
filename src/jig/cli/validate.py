@@ -14,10 +14,11 @@ from jig.validation.intent import (
     validate_outcome_files,
     validate_specification_files,
 )
+from jig.validation.reporting import format_as_json
 
 
 @jig.implements("S-023")
-def validate_intent_command(project_root: Path) -> int:
+def validate_intent_command(project_root: Path, output_format: str = "human") -> int:
     """
     Validate intent artifacts (specifications, outcomes, decorators).
 
@@ -27,56 +28,70 @@ def validate_intent_command(project_root: Path) -> int:
     outcome_dir = project_root / "jig" / "outcomes"
     src_dir = project_root / "src"
 
-    all_passed = True
-    total_errors = 0
+    results = {}
 
     # Validate specifications
     if spec_dir.exists():
-        result = validate_specification_files(spec_dir)
-        click.echo(str(result))
-        if not result.passed:
-            all_passed = False
-            total_errors += len(result.errors)
-            for error in result.errors:
-                click.echo(str(error))
+        results["specifications"] = validate_specification_files(spec_dir)
     else:
-        click.echo("✓ Validating specifications (0 files)")
+        from jig.validation.models import ValidationResult
+        results["specifications"] = ValidationResult(passed=True, phase_name="specifications", items_checked=0)
 
     # Validate outcomes
     if outcome_dir.exists():
-        result = validate_outcome_files(outcome_dir)
-        click.echo(str(result))
-        if not result.passed:
-            all_passed = False
-            total_errors += len(result.errors)
-            for error in result.errors:
-                click.echo(str(error))
+        results["outcomes"] = validate_outcome_files(outcome_dir)
     else:
-        click.echo("✓ Validating outcomes (0 files)")
+        from jig.validation.models import ValidationResult
+        results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
 
     # Validate decorators
     if src_dir.exists() and spec_dir.exists():
-        result = validate_decorator_files(src_dir, spec_dir, outcome_dir if outcome_dir.exists() else None)
-        click.echo(str(result))
-        if not result.passed:
-            all_passed = False
-            total_errors += len(result.errors)
+        results["decorators"] = validate_decorator_files(src_dir, spec_dir, outcome_dir if outcome_dir.exists() else None)
+    else:
+        from jig.validation.models import ValidationResult
+        results["decorators"] = ValidationResult(passed=True, phase_name="decorators", items_checked=0)
+
+    # Format output
+    if output_format == "json":
+        # Combine all into single "intent" result for JSON
+        combined = {"intent": _combine_results(results)}
+        click.echo(format_as_json(combined))
+    else:
+        # Human-readable output
+        for result in results.values():
+            click.echo(str(result))
             for error in result.errors:
                 click.echo(str(error))
-    else:
-        click.echo("✓ Validating decorators (0 files)")
 
-    # Summary
-    if all_passed:
-        click.echo("\nIntent validation passed.")
-        return 0
-    else:
-        click.echo(f"\nIntent validation failed: {total_errors} errors total.")
-        return 1
+        all_passed = all(r.passed for r in results.values())
+        if all_passed:
+            click.echo("\nIntent validation passed.")
+        else:
+            total_errors = sum(len(r.errors) for r in results.values())
+            click.echo(f"\nIntent validation failed: {total_errors} errors total.")
+
+    # Return exit code
+    all_passed = all(r.passed for r in results.values())
+    return 0 if all_passed else 1
+
+
+def _combine_results(results: dict) -> "ValidationResult":
+    """Combine multiple ValidationResult objects into one."""
+    from jig.validation.models import ValidationResult
+
+    combined = ValidationResult(passed=True, phase_name="combined")
+    combined.items_checked = sum(r.items_checked for r in results.values())
+
+    for result in results.values():
+        if not result.passed:
+            combined.passed = False
+        combined.errors.extend(result.errors)
+
+    return combined
 
 
 @jig.implements("S-024")
-def validate_bricks_command(project_root: Path) -> int:
+def validate_bricks_command(project_root: Path, output_format: str = "human") -> int:
     """
     Validate brick definitions and partition against implementation graph.
 
@@ -85,69 +100,81 @@ def validate_bricks_command(project_root: Path) -> int:
     bricks_file = project_root / "jig" / "bricks.yaml"
     impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
 
-    all_passed = True
-    total_errors = 0
+    results = {}
 
     # Validate brick definitions
-    result = validate_brick_definitions(bricks_file, impl_graph)
-    click.echo(str(result))
-    if not result.passed:
-        all_passed = False
-        total_errors += len(result.errors)
-        for error in result.errors:
-            click.echo(str(error))
+    definitions_result = validate_brick_definitions(bricks_file, impl_graph)
+    results["definitions"] = definitions_result
 
-        # If graph not found, return error code 2
-        if any(err.code == "GRAPH_NOT_FOUND" for err in result.errors):
-            return 2
+    # If graph not found, return error code 2
+    if any(err.code == "GRAPH_NOT_FOUND" for err in definitions_result.errors):
+        if output_format == "json":
+            click.echo(format_as_json({"bricks": _combine_results(results)}))
+        else:
+            click.echo(str(definitions_result))
+            for error in definitions_result.errors:
+                click.echo(str(error))
+        return 2
 
     # Validate brick partition
-    if all_passed or impl_graph.exists():
-        result = validate_brick_partition(bricks_file, impl_graph)
-        click.echo(str(result))
-        if not result.passed:
-            all_passed = False
-            total_errors += len(result.errors)
+    partition_result = validate_brick_partition(bricks_file, impl_graph)
+    results["partition"] = partition_result
+
+    # Format output
+    if output_format == "json":
+        combined = {"bricks": _combine_results(results)}
+        click.echo(format_as_json(combined))
+    else:
+        for result in results.values():
+            click.echo(str(result))
             for error in result.errors:
                 click.echo(str(error))
 
-    # Summary
-    if all_passed:
-        click.echo("\nBrick validation passed.")
-        return 0
-    else:
-        click.echo(f"\nBrick validation failed: {total_errors} errors total.")
-        return 1
+        all_passed = all(r.passed for r in results.values())
+        if all_passed:
+            click.echo("\nBrick validation passed.")
+        else:
+            total_errors = sum(len(r.errors) for r in results.values())
+            click.echo(f"\nBrick validation failed: {total_errors} errors total.")
+
+    # Return exit code
+    all_passed = all(r.passed for r in results.values())
+    return 0 if all_passed else 1
 
 
 @jig.implements("S-025")
-def validate_full_command(project_root: Path) -> int:
+def validate_full_command(project_root: Path, output_format: str = "human") -> int:
     """
     Run full validation (intent + bricks if graph exists).
 
     Returns exit code: 0 (success), 1 (validation failures).
     """
     # Always run intent validation
-    click.echo("=== Validating Intent ===\n")
-    intent_exit_code = validate_intent_command(project_root)
+    if output_format != "json":
+        click.echo("=== Validating Intent ===\n")
+
+    intent_exit_code = validate_intent_command(project_root, output_format)
 
     # Conditionally run brick validation if implementation graph exists
     impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
     if impl_graph.exists():
-        click.echo("\n=== Validating Bricks ===\n")
-        brick_exit_code = validate_bricks_command(project_root)
+        if output_format != "json":
+            click.echo("\n=== Validating Bricks ===\n")
+        brick_exit_code = validate_bricks_command(project_root, output_format)
     else:
-        click.echo("\n=== Skipping Brick Validation ===")
-        click.echo("(Implementation graph not found)")
+        if output_format != "json":
+            click.echo("\n=== Skipping Brick Validation ===")
+            click.echo("(Implementation graph not found)")
         brick_exit_code = 0
 
     # Overall result
-    if intent_exit_code == 0 and brick_exit_code == 0:
-        click.echo("\n✓ All validations passed.")
-        return 0
-    else:
-        click.echo("\n✗ Validation failed.")
-        return 1
+    if output_format != "json":
+        if intent_exit_code == 0 and brick_exit_code == 0:
+            click.echo("\n✓ All validations passed.")
+        else:
+            click.echo("\n✗ Validation failed.")
+
+    return 0 if (intent_exit_code == 0 and brick_exit_code == 0) else 1
 
 
 @jig.implements("S-027")

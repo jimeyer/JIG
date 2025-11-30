@@ -331,3 +331,94 @@ def my_function():
         result = runner.invoke(cli, ["impl", "rebuild", "--project-root", "."])
         # Should succeed (only validates decorators, not spec files)
         assert result.exit_code == 0
+
+
+@jig.verifies("S-026")
+def test_validate_intent_json_format():
+    """jigy validate intent --format json produces valid JSON."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        # Create valid spec
+        spec_dir = Path("jig/specifications")
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test
+"""
+        )
+
+        result = runner.invoke(cli, ["validate", "intent", "--project-root", ".", "--format", "json"])
+        assert result.exit_code == 0
+
+        # Should be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+        assert "summary" in data
+        assert data["status"] == "passed"
+
+
+@jig.verifies("S-026")
+def test_validate_bricks_json_format():
+    """jigy validate bricks --format json produces valid JSON."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        # Create implementation graph
+        graph_dir = Path("jig/generated")
+        graph_dir.mkdir(parents=True)
+        graph_file = graph_dir / "implementation-graph.ndjson"
+        graph_file.write_text(
+            json.dumps({"id": "F-test.func", "type": "function"}) + "\n"
+        )
+
+        # Create valid bricks
+        (Path("jig") / "bricks.yaml").write_text(
+            """- id: B-001
+  name: Test
+  units:
+    - F-test.func
+"""
+        )
+
+        result = runner.invoke(cli, ["validate", "bricks", "--project-root", ".", "--format", "json"])
+        assert result.exit_code == 0
+
+        # Should be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+        assert data["status"] == "passed"
+
+
+@jig.verifies("S-026")
+def test_validate_json_format_with_errors():
+    """jigy validate --format json includes structured errors."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        # Create invalid spec
+        spec_dir = Path("jig/specifications")
+        spec_dir.mkdir(parents=True)
+        (spec_dir / "S-001.md").write_text(
+            """---
+type: specification
+---
+
+# Missing id
+"""
+        )
+
+        result = runner.invoke(cli, ["validate", "intent", "--project-root", ".", "--format", "json"])
+        assert result.exit_code == 1
+
+        # Should be valid JSON with errors
+        data = json.loads(result.output)
+        assert data["status"] == "failed"
+        assert data["summary"]["total_errors"] > 0
+        # Should have error details
+        assert len(data["intent"]["errors"]) > 0
+        error = data["intent"]["errors"][0]
+        assert "code" in error
+        assert "message" in error
+        assert "file" in error

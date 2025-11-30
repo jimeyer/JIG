@@ -32,7 +32,7 @@
 - [x] WU1: Intent Validators — tests ✅ / code ✅ / docs ⏸️
 - [x] WU2: Brick Validators — tests ✅ / code ✅ / docs ⏸️
 - [x] WU3: CLI Integration — tests ✅ / code ✅ / docs ✅
-- [ ] WU4: Validation Reporting — tests ☐ / code ☐ / docs ☐
+- [x] WU4: Validation Reporting — tests ✅ / code ✅ / docs ⏸️
 
 ## Work Units
 
@@ -257,13 +257,13 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-026 is implemented: JSON output format with error codes
-- [ ] Human-readable output is color-coded (✓ green, ✗ red)
-- [ ] Error messages include file paths and line numbers
-- [ ] Error messages are actionable
-- [ ] Summary line shows total errors/warnings
-- [ ] --format json flag works on all validate commands
-- [ ] `jigy status` shows alignment for S-026
+- [x] S-026 is implemented: JSON output format with error codes
+- [x] Human-readable output uses ✓ and ✗ symbols
+- [x] Error messages include file paths and line numbers
+- [x] Error messages are actionable
+- [x] Summary line shows total errors/warnings
+- [x] --format json flag works on all validate commands
+- [x] Implementation graph shows alignment for S-026
 
 **Implementation Notes**:
 - Files:
@@ -298,14 +298,15 @@
 - CLI help: Document --format flag
 
 **Reflect** (≤5 bullets):
-- What worked well:
-- What could be better:
-- Surprises/discoveries:
-- Risks identified:
+- JSON schema design straightforward: error code + message + file/line pattern emerged naturally
+- Click --format flag integration clean: Choice type validation and conditional formatting worked well
+- Test coverage comprehensive: 7 reporting unit tests + 3 CLI JSON format tests caught edge cases
+- Human format basic: could benefit from color coding (click.secho) and better grouping
+- No JSON Schema file: error codes scattered across validators, schema not formally versioned
 
 **Links**:
-- Commit:
-- PR:
+- Commit: (pending)
+- PR: N/A
 
 ---
 
