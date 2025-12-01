@@ -125,7 +125,7 @@ Actions to verify:
 - [ ] Check brick nodes have `units` arrays with M-/C-/F- prefixes
 
 **Links**:
-- Commit:
+- Commit: a33fbab
 
 ---
 
