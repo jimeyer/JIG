@@ -108,7 +108,7 @@ def validate_specification_files(spec_dir: Path) -> ValidationResult:
             seen_ids[spec_id] = spec_file.name
 
         # Check excluded fields
-        excluded_fields = ["brick", "depends_on", "content"]
+        excluded_fields = ["brick", "depends_on", "content", "implements"]
         for field in excluded_fields:
             if field in frontmatter:
                 result.add_error(
@@ -180,6 +180,16 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
                     message="Missing required field: 'type'",
                     code="MISSING_REQUIRED_FIELD",
                     field="type",
+                )
+            )
+
+        if "specifies" not in frontmatter:
+            result.add_error(
+                ValidationError(
+                    file=str(outcome_file),
+                    message="Missing required field: 'specifies'",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="specifies",
                 )
             )
 
