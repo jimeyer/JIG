@@ -12,7 +12,7 @@ Execute planned work using Test-Driven Development while maintaining alignment b
 
 ### What is JIG?
 
-JIG (Just-In-Graph) is an alignment measurement system that makes the relationship between intent, implementation, and verification explicit and measurable through a graph of nodes and edges:
+JIG (JIG-Intent-Graph) is an alignment measurement system that makes the relationship between intent, implementation, and verification explicit and measurable through a graph of nodes and edges:
 
 - **S nodes (Specifications)**: What we intend to build
 - **F nodes (Functions)**: What we actually built
@@ -130,6 +130,10 @@ Create a markdown file to track your work. This is NOT a JIG artifact, just your
 
 **Docs Updated**:
 - README / ADR / API docs
+
+**Human Verification**:
+- commands the human can run to see progress
+- actions the human should try to verify fuctionality
 
 **Reflect** (≤5 bullets):
 - What worked well: <concise notes>

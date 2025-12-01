@@ -341,3 +341,110 @@
 - [ ] Documentation updated
 - [ ] CLI help text complete
 - [ ] JSON output schema documented
+
+
+---
+
+## Hands-On Guide
+
+Here's a hands-on guide to explore the new validation functionality:
+
+  Basic Validation Commands
+
+  # 1. Validate intent artifacts (specs, outcomes, decorators)
+  jigy validate intent
+
+  # 2. Validate brick definitions and partition
+  jigy validate bricks
+
+  # 3. Full validation (runs both intent + bricks if graph exists)
+  jigy validate
+
+  # 4. JSON format output (for CI/tooling)
+  jigy validate intent --format json
+  jigy validate bricks --format json
+  jigy validate --format json
+
+  See Auto-Validation in Action
+
+  # 5. Rebuild triggers automatic decorator validation
+  jigy impl rebuild
+
+  # 6. Skip validation if needed (power user mode)
+  jigy impl rebuild --skip-validation
+
+  Test Error Detection
+
+  # 7. Create an invalid spec to see validation catch it
+  mkdir -p jig/specifications
+  cat > jig/specifications/S-999.md << 'EOF'
+  ---
+  type: specification
+  ---
+  # Missing ID - this should fail!
+  EOF
+
+  jigy validate intent
+  # Should show: ✗ Missing required field 'id' in S-999.md
+
+  # 8. Clean up the test file
+  rm jig/specifications/S-999.md
+
+  # 9. Create invalid decorator reference
+  cat > src/test_invalid.py << 'EOF'
+  import jig
+
+  @jig.implements("S-NONEXISTENT")  # References non-existent spec
+  def test_function():
+      pass
+  EOF
+
+  jigy validate intent
+  # Should show: ✗ Decorator references non-existent spec: S-NONEXISTENT
+
+  # 10. Try to rebuild with invalid decorator (should fail)
+  jigy impl rebuild
+  # Should prevent graph generation
+
+  # 11. Clean up
+  rm src/test_invalid.py
+
+  Explore JSON Output Structure
+
+  # 12. See JSON schema with errors
+  jigy validate --format json | python -m json.tool
+
+  # 13. Check exit codes
+  jigy validate && echo "Exit code: $?"
+  # 0 = success, 1 = validation failures, 2 = errors (missing graph)
+
+  Check Current Project Status
+
+  # 14. Validate your current jig project
+  jigy validate
+
+  # 15. See what specifications exist
+  ls -la jig/specifications/
+
+  # 16. See what outcomes exist
+  ls -la jig/outcomes/
+
+  # 17. Check implementation graph alignment
+  jigy impl rebuild
+  grep '"implements"' jig/generated/implementation-graph.ndjson | head -20
+
+  Help Documentation
+
+  # 18. See all validation commands
+  jigy validate --help
+
+  # 19. See specific command help
+  jigy validate intent --help
+  jigy validate bricks --help
+
+  Key things to observe:
+  - ✓ and ✗ symbols in human output
+  - File paths and line numbers in error messages
+  - JSON structure with error codes, severity, summary
+  - Auto-validation preventing graph rebuild with invalid decorators
+  - Exit codes: 0 (pass), 1 (fail), 2 (error)
