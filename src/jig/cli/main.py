@@ -13,6 +13,7 @@ from jig.cli.validate import (
     validate_intent_command,
 )
 from jig.impl_graph.builder import build_graph
+from jig.intent_graph.generator import generate_intent_graph
 
 
 @click.group()
@@ -25,6 +26,12 @@ def cli():
 @cli.group()
 def impl():
     """Implementation graph commands."""
+    pass
+
+
+@cli.group()
+def intent():
+    """Intent graph commands."""
     pass
 
 
@@ -155,6 +162,63 @@ def rebuild(
 
     except Exception as e:
         click.echo(f"\n✗ Error: {e}", err=True)
+        sys.exit(1)
+
+
+@intent.command()
+@click.option(
+    "--project-root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=Path.cwd(),
+    help="Root directory of the project (default: current directory)",
+)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Output file path (default: <project-root>/jig/generated/intent-graph.ndjson)",
+)
+@click.option(
+    "--no-timestamp",
+    is_flag=True,
+    help="Exclude timestamp from metadata (for deterministic output)",
+)
+def rebuild(
+    project_root: Path,
+    output: Path | None,
+    no_timestamp: bool,
+) -> None:
+    """Generate intent-graph.ndjson from specifications, outcomes, and bricks.
+
+    Reads all specification and outcome files, loads bricks.yaml,
+    and generates an NDJSON intent graph per A001 §6.1.
+
+    Example:
+        jigy intent rebuild
+        jigy intent rebuild --project-root ~/my-project
+        jigy intent rebuild --output custom-intent-graph.ndjson
+    """
+    try:
+        click.echo(f"Generating intent graph for {project_root}")
+
+        output_path = generate_intent_graph(
+            project_root=project_root,
+            output_path=output,
+            include_timestamp=not no_timestamp,
+        )
+
+        click.echo(f"\n✓ Intent graph generated successfully:")
+        click.echo(f"  - Output: {output_path}")
+
+    except FileNotFoundError as e:
+        click.echo(f"\n✗ Error: {e}", err=True)
+        sys.exit(1)
+    except ValueError as e:
+        click.echo(f"\n✗ Error: {e}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"\n✗ Unexpected error: {e}", err=True)
         sys.exit(1)
 
 

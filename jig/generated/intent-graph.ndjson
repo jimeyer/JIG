@@ -1,0 +1,57 @@
+{"_meta": {"brick_count": 5, "generated": "2025-12-01T04:35:28.388555+00:00", "outcome_count": 11, "spec_count": 34, "version": "1.0"}}
+{"file": "jig/specifications/S-001.md", "id": "S-001", "type": "specification"}
+{"file": "jig/specifications/S-002.md", "id": "S-002", "type": "specification"}
+{"file": "jig/specifications/S-003.md", "id": "S-003", "type": "specification"}
+{"file": "jig/specifications/S-004.md", "id": "S-004", "type": "specification"}
+{"file": "jig/specifications/S-005.md", "id": "S-005", "type": "specification"}
+{"file": "jig/specifications/S-006.md", "id": "S-006", "type": "specification"}
+{"file": "jig/specifications/S-007.md", "id": "S-007", "type": "specification"}
+{"file": "jig/specifications/S-008.md", "id": "S-008", "type": "specification"}
+{"file": "jig/specifications/S-009.md", "id": "S-009", "type": "specification"}
+{"file": "jig/specifications/S-010.md", "id": "S-010", "type": "specification"}
+{"file": "jig/specifications/S-011.md", "id": "S-011", "type": "specification"}
+{"file": "jig/specifications/S-012.md", "id": "S-012", "type": "specification"}
+{"file": "jig/specifications/S-013.md", "id": "S-013", "type": "specification"}
+{"file": "jig/specifications/S-014.md", "id": "S-014", "type": "specification"}
+{"file": "jig/specifications/S-015.md", "id": "S-015", "type": "specification"}
+{"file": "jig/specifications/S-016.md", "id": "S-016", "type": "specification"}
+{"file": "jig/specifications/S-017.md", "id": "S-017", "type": "specification"}
+{"file": "jig/specifications/S-018.md", "id": "S-018", "type": "specification"}
+{"file": "jig/specifications/S-019.md", "id": "S-019", "type": "specification"}
+{"file": "jig/specifications/S-020.md", "id": "S-020", "type": "specification"}
+{"file": "jig/specifications/S-021.md", "id": "S-021", "type": "specification"}
+{"file": "jig/specifications/S-022.md", "id": "S-022", "type": "specification"}
+{"file": "jig/specifications/S-023.md", "id": "S-023", "type": "specification"}
+{"file": "jig/specifications/S-024.md", "id": "S-024", "type": "specification"}
+{"file": "jig/specifications/S-025.md", "id": "S-025", "type": "specification"}
+{"file": "jig/specifications/S-026.md", "id": "S-026", "type": "specification"}
+{"file": "jig/specifications/S-027.md", "id": "S-027", "type": "specification"}
+{"file": "jig/specifications/S-028.md", "id": "S-028", "type": "specification"}
+{"file": "jig/specifications/S-029.md", "id": "S-029", "type": "specification"}
+{"file": "jig/specifications/S-030.md", "id": "S-030", "type": "specification"}
+{"file": "jig/specifications/S-031.md", "id": "S-031", "type": "specification"}
+{"file": "jig/specifications/S-032.md", "id": "S-032", "type": "specification"}
+{"file": "jig/specifications/S-033.md", "id": "S-033", "type": "specification"}
+{"file": "jig/specifications/S-034.md", "id": "S-034", "type": "specification"}
+{"file": "jig/outcomes/O-001.md", "id": "O-001", "specifies": ["S-001", "S-003", "S-005", "S-006"], "type": "outcome"}
+{"file": "jig/outcomes/O-002.md", "id": "O-002", "specifies": ["S-002"], "type": "outcome"}
+{"file": "jig/outcomes/O-003.md", "id": "O-003", "specifies": ["S-004"], "type": "outcome"}
+{"file": "jig/outcomes/O-004.md", "id": "O-004", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-005.md", "id": "O-005", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-006.md", "id": "O-006", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-007.md", "id": "O-007", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-008.md", "id": "O-008", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-009.md", "id": "O-009", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-010.md", "id": "O-010", "specifies": [], "type": "outcome"}
+{"file": "jig/outcomes/O-011.md", "id": "O-011", "specifies": [], "type": "outcome"}
+{"file": "jig/bricks.yaml", "id": "B-001", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
+{"file": "jig/bricks.yaml", "id": "B-002", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate"]}
+{"file": "jig/bricks.yaml", "id": "B-003", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
+{"file": "jig/bricks.yaml", "id": "B-004", "name": "Implementation Graph Core", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
+{"file": "jig/bricks.yaml", "id": "B-005", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
+{"source": "O-001", "target": "S-001", "type": "specifies"}
+{"source": "O-001", "target": "S-003", "type": "specifies"}
+{"source": "O-001", "target": "S-005", "type": "specifies"}
+{"source": "O-001", "target": "S-006", "type": "specifies"}
+{"source": "O-002", "target": "S-002", "type": "specifies"}
+{"source": "O-003", "target": "S-004", "type": "specifies"}

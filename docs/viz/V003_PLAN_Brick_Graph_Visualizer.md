@@ -51,7 +51,7 @@ Viz tool:
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O/S)
-- [ ] WU1: Implement intent-graph generator (CLI)
+- [x] WU1: Implement intent-graph generator (CLI)
 - [ ] WU2: Multi-graph loading in viz
 - [ ] WU3: Compute brick membership at query time
 - [ ] WU4: Compound node rendering
@@ -257,10 +257,10 @@ Options:
 6. Test end-to-end with real data
 
 **Reflect**:
-- What was clear:
-- What was ambiguous:
-- Surprises:
-- Process win/improvement:
+- What was clear: Generator pattern from existing impl_graph code; YAML frontmatter parsing pattern from validation module; NDJSON write pattern for deterministic output
+- What was ambiguous: Whether to add `@jig.implements` decorator in CLI (decided against to follow existing CLI pattern)
+- Surprises: Including `units` array in brick nodes (not in A001 §6.1 explicitly) but necessary for viz query-time joining - documented as extension
+- Process win/improvement: Reused existing patterns (frontmatter parsing, NDJSON writing) for consistency; comprehensive tests caught edge cases (no outcomes, missing bricks.yaml)
 
 **Human Verification**:
 
