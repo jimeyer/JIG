@@ -50,7 +50,7 @@ Viz tool:
 
 ## Work Unit Checklist
 
-- [ ] WU0: Create Intent nodes (O/S)
+- [x] WU0: Create Intent nodes (O/S)
 - [ ] WU1: Implement intent-graph generator (CLI)
 - [ ] WU2: Multi-graph loading in viz
 - [ ] WU3: Compute brick membership at query time
@@ -91,10 +91,38 @@ Viz tool:
 4. Create sample intent-graph.ndjson per A001 format
 
 **Reflect**:
-- What was clear:
-- What was ambiguous:
-- Surprises:
-- Process win/improvement:
+- What was clear: A001 §6.1 schema for intent graph nodes; outcome vs spec distinction (why vs what); sample fixture format with metadata, nodes, and edges
+- What was ambiguous: Whether to include `implements` field in outcome frontmatter (decided to omit, following O-007/O-008 pattern)
+- Surprises: Brick nodes need `units` array included in intent-graph despite A001 §6.1 not explicitly showing it - necessary for query-time joining
+- Process win/improvement: Creating all intent artifacts before coding ensures complete specification; parallel structure of outcomes (value-focused) and specs (acceptance criteria) worked well
+
+**Human Verification**:
+
+Commands to run:
+```bash
+# Check that outcome files exist
+ls -la jig/outcomes/O-009.md jig/outcomes/O-010.md jig/outcomes/O-011.md
+
+# Check that spec files exist
+ls -la jig/specifications/S-028.md jig/specifications/S-029.md jig/specifications/S-030.md jig/specifications/S-031.md jig/specifications/S-032.md jig/specifications/S-033.md jig/specifications/S-034.md
+
+# Validate frontmatter format
+head -5 jig/outcomes/O-009.md
+head -5 jig/specifications/S-028.md
+
+# Check sample fixture exists
+ls -la viz/tests/fixtures/sample-intent-graph.ndjson
+head -20 viz/tests/fixtures/sample-intent-graph.ndjson
+```
+
+Actions to verify:
+- [ ] Open each outcome file, verify YAML frontmatter has `id` and `type` fields
+- [ ] Read outcome bodies, verify they explain "why" brick visualization matters
+- [ ] Open each spec file, verify clear acceptance criteria
+- [ ] Verify spec S-028 describes CLI command for intent graph generation
+- [ ] Verify spec S-030 describes brick membership computation at query time
+- [ ] Read sample-intent-graph.ndjson, verify it has spec nodes, outcome nodes, and brick nodes
+- [ ] Check brick nodes have `units` arrays with M-/C-/F- prefixes
 
 **Links**:
 - Commit:
@@ -234,6 +262,46 @@ Options:
 - Surprises:
 - Process win/improvement:
 
+**Human Verification**:
+
+Commands to run:
+```bash
+# Run the intent rebuild command
+jigy intent rebuild
+
+# Verify output file exists
+ls -lh jig/generated/intent-graph.ndjson
+
+# Check first 30 lines to see metadata + sample nodes
+head -30 jig/generated/intent-graph.ndjson
+
+# Count node types
+grep '"type":"specification"' jig/generated/intent-graph.ndjson | wc -l
+grep '"type":"outcome"' jig/generated/intent-graph.ndjson | wc -l
+grep '"type":"brick"' jig/generated/intent-graph.ndjson | wc -l
+
+# Check brick nodes have units arrays
+grep '"type":"brick"' jig/generated/intent-graph.ndjson | head -3
+
+# Verify metadata line
+head -1 jig/generated/intent-graph.ndjson | jq '._meta'
+
+# Run tests
+python -m pytest tests/jig/intent_graph/ -v
+```
+
+Actions to verify:
+- [ ] Command runs without errors
+- [ ] Output file created at `jig/generated/intent-graph.ndjson`
+- [ ] First line contains `_meta` with `spec_count`, `outcome_count`, `brick_count`
+- [ ] Spec nodes match schema: `{"id":"S-001","type":"specification","file":"..."}`
+- [ ] Outcome nodes include `specifies` array
+- [ ] Brick nodes include `name` and `units` arrays
+- [ ] Brick units use M-/C-/F- prefixes
+- [ ] Count matches: 27 specs, 8 outcomes, 5 bricks (current state)
+- [ ] Help text displays: `jigy intent rebuild --help`
+- [ ] All unit tests pass
+
 **Links**:
 - Commit:
 
@@ -358,6 +426,36 @@ function extractBricks(intentGraph) {
 - What was ambiguous:
 - Surprises:
 - Process win/improvement:
+
+**Human Verification**:
+
+Commands to run:
+```bash
+# Start viz server (if not already running)
+cd viz
+python3 -m http.server 8000
+
+# Open browser
+open http://localhost:8000
+
+# Check console (open browser DevTools)
+# Should see logs like:
+#   "intent graph loaded: ..."
+#   "impl graph loaded: ..."
+#   "Extracted N bricks from intent graph"
+```
+
+Actions to verify:
+- [ ] Open browser at http://localhost:8000
+- [ ] Open DevTools console (F12 or Cmd+Option+I)
+- [ ] Verify console shows: "intent graph loaded"
+- [ ] Verify console shows: "impl graph loaded"
+- [ ] Verify console shows: "Extracted 5 bricks from intent graph"
+- [ ] Check header shows graph selection checkboxes (Intent, Implementation, Verification)
+- [ ] Intent and Implementation checkboxes should be checked by default
+- [ ] Click "Load Graph" button, select a file, verify multi-file loading works
+- [ ] Refresh page, verify both graphs auto-load
+- [ ] Check no errors in console
 
 **Links**:
 - Commit:
@@ -510,6 +608,32 @@ async function tryLoadDefaultGraphs() {
 - What was ambiguous:
 - Surprises:
 - Process win/improvement:
+
+**Human Verification**:
+
+Commands to run:
+```bash
+# Open browser with DevTools console
+open http://localhost:8000
+
+# Run unit tests for brick membership logic
+cd viz
+# Open viz/tests/test.html in browser to run Mocha tests
+open tests/test.html
+```
+
+Actions to verify:
+- [ ] Open browser at http://localhost:8000
+- [ ] Open DevTools console
+- [ ] Verify console shows: "Computed brick membership for N nodes"
+- [ ] Verify console shows: "✓ Brick partition valid (all functions in exactly one brick)"
+- [ ] If partition violations exist, should see warnings with specific function IDs
+- [ ] Type in console: `state.brickMembership` - should see Map with entries
+- [ ] Type in console: `state.brickMembership.size` - should show count
+- [ ] Type in console: `state.brickMembership.get('M-jig.__init__')` - should return 'B-001'
+- [ ] Open viz/tests/test.html, verify brick-membership tests pass (green)
+- [ ] Tests should cover M- expansion, C- expansion, F- exact match
+- [ ] No errors in console during membership computation
 
 **Links**:
 - Commit:
@@ -666,6 +790,33 @@ async function handleGraphLoad() {
 - Surprises:
 - Process win/improvement:
 
+**Human Verification**:
+
+Commands to run:
+```bash
+# Refresh browser to see updated rendering
+open http://localhost:8000
+
+# Inspect Cytoscape elements in console
+# Type in browser console:
+cy.nodes('[type="brick"]').length  # Should show 5 (number of bricks)
+cy.nodes('[parent]').length        # Should show count of nodes with parents
+```
+
+Actions to verify:
+- [ ] Refresh browser at http://localhost:8000
+- [ ] **Visual check**: See blue rectangular boundaries around groups of nodes
+- [ ] **Visual check**: Brick names appear at top of each container (e.g., "JIG Core Decorators")
+- [ ] Count 5 brick containers visible (B-001 through B-005)
+- [ ] Member nodes appear inside brick boundaries
+- [ ] Brick boundaries have blue borders, semi-transparent background
+- [ ] Brick labels are bold, larger font than member nodes
+- [ ] Right-click a brick node → Inspect element → verify it has `type="brick"`
+- [ ] Right-click a member node → Inspect element → verify it has `parent="B-XXX"`
+- [ ] In console, type: `cy.nodes('[type="brick"]')[0].children().length` - should show member count
+- [ ] No layout issues - nodes don't overlap brick boundaries
+- [ ] Graph fits in viewport, can zoom/pan to see all bricks
+
 **Links**:
 - Commit:
 
@@ -815,6 +966,42 @@ document.getElementById('collapse-all-btn').addEventListener('click', () => {
 - Surprises:
 - Process win/improvement:
 
+**Human Verification**:
+
+Commands to run:
+```bash
+# Refresh browser
+open http://localhost:8000
+```
+
+Actions to verify:
+- [ ] Refresh browser at http://localhost:8000
+- [ ] Locate "Bricks" section in left sidebar
+- [ ] See "Expand All" and "Collapse All" buttons
+- [ ] **Test double-click collapse**:
+  - [ ] Double-click a brick container (e.g., B-001)
+  - [ ] Brick should collapse - member nodes hidden
+  - [ ] Brick label shows member count: "JIG Core Decorators (4)"
+  - [ ] Brick background becomes more opaque
+- [ ] **Test double-click expand**:
+  - [ ] Double-click the collapsed brick again
+  - [ ] Member nodes reappear
+  - [ ] Label returns to just brick name
+- [ ] **Test Collapse All button**:
+  - [ ] Click "Collapse All"
+  - [ ] All 5 bricks collapse simultaneously
+  - [ ] All show member counts in labels
+- [ ] **Test Expand All button**:
+  - [ ] Click "Expand All"
+  - [ ] All bricks expand
+  - [ ] All member nodes visible
+- [ ] **Test layout persistence**:
+  - [ ] Collapse a brick
+  - [ ] Switch layout (e.g., Hierarchical → Force-directed)
+  - [ ] Brick remains collapsed after layout change
+- [ ] In console, check: `cy.nodes('[type="brick"].collapsed').length` shows collapsed count
+- [ ] Console shows "Collapsed brick: B-XXX" / "Expanded brick: B-XXX" messages
+
 **Links**:
 - Commit:
 
@@ -951,6 +1138,49 @@ document.getElementById('filter-bricks-none').addEventListener('click', () => {
 - Surprises:
 - Process win/improvement:
 
+**Human Verification**:
+
+Commands to run:
+```bash
+# Refresh browser
+open http://localhost:8000
+```
+
+Actions to verify:
+- [ ] Refresh browser at http://localhost:8000
+- [ ] Check "Bricks" section in left sidebar
+- [ ] See list of brick checkboxes (5 bricks listed)
+- [ ] All checkboxes should be checked by default
+- [ ] See "All" and "None" buttons above checkbox list
+- [ ] **Test individual brick filtering**:
+  - [ ] Uncheck "B-002: CLI Interface"
+  - [ ] B-002 brick container disappears
+  - [ ] All member nodes of B-002 disappear
+  - [ ] Other bricks remain visible
+  - [ ] Check the checkbox again
+  - [ ] B-002 reappears with members
+- [ ] **Test "None" button**:
+  - [ ] Click "None"
+  - [ ] All brick checkboxes uncheck
+  - [ ] All bricks and members disappear
+  - [ ] Graph appears empty
+- [ ] **Test "All" button**:
+  - [ ] Click "All"
+  - [ ] All checkboxes check
+  - [ ] All bricks reappear
+- [ ] **Test interaction with collapse**:
+  - [ ] Collapse a brick (double-click)
+  - [ ] Uncheck that brick's checkbox
+  - [ ] Brick disappears
+  - [ ] Check checkbox again
+  - [ ] Brick reappears still collapsed
+- [ ] **Test with node type filters**:
+  - [ ] Uncheck "Modules" in node type filters
+  - [ ] Module nodes disappear from all bricks
+  - [ ] Brick containers remain visible
+- [ ] Console shows "Added 5 brick filters" on page load
+- [ ] Filter state persists across layout changes
+
 **Links**:
 - Commit:
 
@@ -1076,6 +1306,55 @@ BRICK VISUALIZATION:
 - What was ambiguous:
 - Surprises:
 - Process win/improvement:
+
+**Human Verification**:
+
+Commands to run:
+```bash
+# Refresh browser
+open http://localhost:8000
+
+# Check README updates
+cat viz/README.md | grep -A 20 "Brick Visualization"
+
+# Verify all graphs generated
+ls -lh jig/generated/
+```
+
+Actions to verify:
+- [ ] Refresh browser at http://localhost:8000
+- [ ] **Test all layouts with bricks**:
+  - [ ] Hierarchical (Rows): Bricks arranged top-to-bottom, members inside
+  - [ ] Hierarchical (Columns): Bricks arranged left-to-right, members inside
+  - [ ] Force-directed: Bricks cluster together, members stay within boundaries
+  - [ ] Circular: Bricks arranged in circle, members visible inside
+  - [ ] Grid: Bricks in grid, members positioned inside
+- [ ] **Visual quality checks**:
+  - [ ] Brick boundaries clearly visible in all layouts
+  - [ ] Brick labels don't overlap member nodes
+  - [ ] Adequate padding around member nodes
+  - [ ] No visual artifacts or rendering glitches
+  - [ ] Zoom to fit includes all brick boundaries
+- [ ] **Performance check**:
+  - [ ] All 5 bricks + ~125 nodes load within 2 seconds
+  - [ ] Layout changes complete within 1 second
+  - [ ] Collapse/expand is responsive
+  - [ ] No lag when filtering
+- [ ] **Documentation**:
+  - [ ] Open viz/README.md
+  - [ ] See "Brick Visualization" section
+  - [ ] Instructions for generating graphs are clear
+  - [ ] "How It Works" explains A001 compliance
+  - [ ] Help dialog (click Help button) includes brick features
+- [ ] **End-to-end workflow**:
+  - [ ] Run: `jigy intent rebuild && jigy impl rebuild`
+  - [ ] Refresh viz (auto-loads both graphs)
+  - [ ] See 5 bricks with boundaries
+  - [ ] Collapse B-001, expand it
+  - [ ] Filter: uncheck B-002, recheck it
+  - [ ] Switch to Force-directed layout
+  - [ ] Search for a function, see it highlighted within brick
+- [ ] Take screenshot for documentation
 
 **Links**:
 - Commit:
