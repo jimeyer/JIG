@@ -144,7 +144,7 @@
 - Integration into CLI required both spec_dir and outcome_dir existence check (validation only runs if both present)
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: d27c503
 - PR: (TBD)
 
 ---
