@@ -25,7 +25,7 @@
 - [x] WU1: Brick ID format validation — tests ☑ / code ☑ / docs ☐
 - [x] WU2: Layer field validation (presence & value) — tests ☑ / code ☑ / docs ☐
 - [x] WU3: Layer constraint validation — tests ☑ / code ☑ / docs ☐
-- [ ] WU4: Circular dependency detection — tests ☐ / code ☐ / docs ☐
+- [x] WU4: Circular dependency detection — tests ☑ / code ☑ / docs ☐
 - [ ] WU5: CLI `jigy layers` command — tests ☐ / code ☐ / docs ☐
 - [ ] WU6: CLI `jigy layers suggest` command — tests ☐ / code ☐ / docs ☐
 - [ ] WU7: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
@@ -222,11 +222,11 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-039 is implemented (cycle detection)
-- [ ] S-039 is verified by comprehensive tests
-- [ ] Tests cover cycles at layer 0 and across layers
-- [ ] Error messages show the cycle path (B-a → B-b → B-c → B-a)
-- [ ] `jigy validate bricks` reports cycles with clear descriptions
+- [x] S-039 is implemented (cycle detection)
+- [x] S-039 is verified by comprehensive tests
+- [x] Tests cover cycles at layer 0 and across layers
+- [x] Error messages show the cycle path (B-a → B-b → B-c → B-a)
+- [x] `jigy validate bricks` reports cycles with clear descriptions
 
 **Implementation Notes**:
 - Approach:
@@ -258,10 +258,14 @@
 - Verify cycle path is clearly reported
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- DFS with recursion stack elegantly detects all cycles in single graph traversal
+- Cycle normalization (starting from min ID) prevents duplicate cycle reports
+- Error messages show full cycle path AND function calls that create each dependency
+- Works at all layers including layer 0 (foundation bricks may depend on each other but no cycles)
+- Test suite comprehensive: 9 tests covering 2-brick, 3-brick, long cycles, multiple cycles, diamond patterns
 
 **Links**:
-- Commit: (TBD)
+- Commit: 0639889
 - PR: (TBD)
 
 ---
