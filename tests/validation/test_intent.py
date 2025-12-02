@@ -487,3 +487,159 @@ def my_function():
         result = validate_decorator_files(src_dir, spec_dir)
         assert not result.passed
         assert any("string" in err.message.lower() or "literal" in err.message.lower() for err in result.errors)
+
+
+# --- S-042: Outcome Completeness Validation ---
+
+
+@jig.verifies("S-042")
+def test_validate_outcome_completeness_valid_single_spec():
+    """Outcome with one specification passes completeness validation."""
+    from jig.validation.intent import validate_outcome_completeness
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        outcome_file = outcome_dir / "O-001.md"
+        outcome_file.write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_outcome_completeness(outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 1
+
+
+@jig.verifies("S-042")
+def test_validate_outcome_completeness_valid_multiple_specs():
+    """Outcome with multiple specifications passes completeness validation."""
+    from jig.validation.intent import validate_outcome_completeness
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        outcome_file = outcome_dir / "O-001.md"
+        outcome_file.write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001, S-002, S-003]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_outcome_completeness(outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 1
+
+
+@jig.verifies("S-042")
+def test_validate_outcome_completeness_empty_specifies():
+    """Outcome with empty specifies array fails completeness validation."""
+    from jig.validation.intent import validate_outcome_completeness
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        outcome_file = outcome_dir / "O-001.md"
+        outcome_file.write_text(
+            """---
+id: O-001
+type: outcome
+specifies: []
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_outcome_completeness(outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "O-001" in result.errors[0].message
+        assert "empty" in result.errors[0].message.lower() or "completeness" in result.errors[0].message.lower()
+        assert str(outcome_file) in result.errors[0].file
+
+
+@jig.verifies("S-042")
+def test_validate_outcome_completeness_multiple_empty():
+    """Multiple outcomes with empty specifies arrays all reported."""
+    from jig.validation.intent import validate_outcome_completeness
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Outcome with empty specifies
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: []
+---
+
+# Test Outcome 1
+"""
+        )
+
+        # Valid outcome
+        (outcome_dir / "O-002.md").write_text(
+            """---
+id: O-002
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome 2
+"""
+        )
+
+        # Another outcome with empty specifies
+        (outcome_dir / "O-003.md").write_text(
+            """---
+id: O-003
+type: outcome
+specifies: []
+---
+
+# Test Outcome 3
+"""
+        )
+
+        result = validate_outcome_completeness(outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 2
+        assert result.items_checked == 3
+        # Check that both O-001 and O-003 are reported
+        error_messages = " ".join([err.message for err in result.errors])
+        assert "O-001" in error_messages
+        assert "O-003" in error_messages
+
+
+@jig.verifies("S-042")
+def test_validate_outcome_completeness_no_outcomes():
+    """Validation passes when no outcome files present (outcomes are optional)."""
+    from jig.validation.intent import validate_outcome_completeness
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        result = validate_outcome_completeness(outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 0

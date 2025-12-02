@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 345, "generated": "2025-12-02T04:20:19.127107+00:00", "node_count": 238, "version": "1.0"}}
+{"_meta": {"edge_count": 349, "generated": "2025-12-02T12:49:14.697849+00:00", "node_count": 239, "version": "1.0"}}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
@@ -34,11 +34,11 @@
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate", "language": "python", "line": 54, "name": "validate", "signature": "validate(ctx, project_root: Path, output_format: str)", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_bricks_cli", "language": "python", "line": 268, "name": "validate_bricks_cli", "signature": "validate_bricks_cli(project_root: Path, output_format: str) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_intent_cli", "language": "python", "line": 240, "name": "validate_intent_cli", "signature": "validate_intent_cli(project_root: Path, output_format: str) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate._combine_results", "language": "python", "line": 83, "name": "_combine_results", "signature": "_combine_results(results: dict) -> 'ValidationResult'", "type": "function"}
-{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.auto_validate_decorators", "implements": ["S-027"], "language": "python", "line": 197, "name": "auto_validate_decorators", "signature": "auto_validate_decorators(project_root: Path) -> bool", "type": "function"}
-{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_bricks_command", "implements": ["S-024"], "language": "python", "line": 99, "name": "validate_bricks_command", "signature": "validate_bricks_command(project_root: Path, output_format: str) -> int", "type": "function"}
-{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_full_command", "implements": ["S-025"], "language": "python", "line": 162, "name": "validate_full_command", "signature": "validate_full_command(project_root: Path, output_format: str) -> int", "type": "function"}
-{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_intent_command", "implements": ["S-023"], "language": "python", "line": 26, "name": "validate_intent_command", "signature": "validate_intent_command(project_root: Path, output_format: str) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate._combine_results", "language": "python", "line": 87, "name": "_combine_results", "signature": "_combine_results(results: dict) -> 'ValidationResult'", "type": "function"}
+{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.auto_validate_decorators", "implements": ["S-027"], "language": "python", "line": 201, "name": "auto_validate_decorators", "signature": "auto_validate_decorators(project_root: Path) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_bricks_command", "implements": ["S-024"], "language": "python", "line": 103, "name": "validate_bricks_command", "signature": "validate_bricks_command(project_root: Path, output_format: str) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_full_command", "implements": ["S-025"], "language": "python", "line": 166, "name": "validate_full_command", "signature": "validate_full_command(project_root: Path, output_format: str) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_intent_command", "implements": ["S-023"], "language": "python", "line": 27, "name": "validate_intent_command", "signature": "validate_intent_command(project_root: Path, output_format: str) -> int", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "language": "python", "line": 52, "name": "analyze_file", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.file_extensions", "language": "python", "line": 41, "name": "file_extensions", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "file_extensions(self) -> List[str]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.language_name", "language": "python", "line": 32, "name": "language_name", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "language_name(self) -> str", "type": "function"}
@@ -118,13 +118,14 @@
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks.validate_brick_definitions", "implements": ["S-021", "S-035", "S-036", "S-037"], "language": "python", "line": 23, "name": "validate_brick_definitions", "signature": "validate_brick_definitions(bricks_file: Path, impl_graph_file: Path) -> ValidationResult", "type": "function"}
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks.validate_brick_layer_constraints", "implements": ["S-038"], "language": "python", "line": 460, "name": "validate_brick_layer_constraints", "signature": "validate_brick_layer_constraints(bricks_file: Path, impl_graph_file: Path) -> ValidationResult", "type": "function"}
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks.validate_brick_partition", "implements": ["S-022"], "language": "python", "line": 233, "name": "validate_brick_partition", "signature": "validate_brick_partition(bricks_file: Path, impl_graph_file: Path) -> ValidationResult", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._get_decorator_name", "language": "python", "line": 375, "name": "_get_decorator_name", "signature": "_get_decorator_name(call_node: ast.Call) -> str", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._is_jig_decorator", "language": "python", "line": 367, "name": "_is_jig_decorator", "signature": "_is_jig_decorator(call_node: ast.Call, decorator_name: str) -> bool", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_outcome_ids", "language": "python", "line": 318, "name": "_load_outcome_ids", "signature": "_load_outcome_ids(outcome_dir: Path) -> set[str]", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_spec_ids", "language": "python", "line": 308, "name": "_load_spec_ids", "signature": "_load_spec_ids(spec_dir: Path) -> set[str]", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._parse_frontmatter", "language": "python", "line": 292, "name": "_parse_frontmatter", "signature": "_parse_frontmatter(file_path: Path) -> Optional[dict]", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._validate_function_decorators", "language": "python", "line": 328, "name": "_validate_function_decorators", "signature": "_validate_function_decorators(func_node: ast.FunctionDef, file_path: Path, valid_ids: set[str], result: ValidationResult) -> None", "type": "function"}
-{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_decorator_files", "implements": ["S-020"], "language": "python", "line": 237, "name": "validate_decorator_files", "signature": "validate_decorator_files(source_dir: Path, spec_dir: Path, outcome_dir: Optional[Path]) -> ValidationResult", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._get_decorator_name", "language": "python", "line": 420, "name": "_get_decorator_name", "signature": "_get_decorator_name(call_node: ast.Call) -> str", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._is_jig_decorator", "language": "python", "line": 412, "name": "_is_jig_decorator", "signature": "_is_jig_decorator(call_node: ast.Call, decorator_name: str) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_outcome_ids", "language": "python", "line": 363, "name": "_load_outcome_ids", "signature": "_load_outcome_ids(outcome_dir: Path) -> set[str]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._load_spec_ids", "language": "python", "line": 353, "name": "_load_spec_ids", "signature": "_load_spec_ids(spec_dir: Path) -> set[str]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._parse_frontmatter", "language": "python", "line": 337, "name": "_parse_frontmatter", "signature": "_parse_frontmatter(file_path: Path) -> Optional[dict]", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent._validate_function_decorators", "language": "python", "line": 373, "name": "_validate_function_decorators", "signature": "_validate_function_decorators(func_node: ast.FunctionDef, file_path: Path, valid_ids: set[str], result: ValidationResult) -> None", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_decorator_files", "implements": ["S-020"], "language": "python", "line": 282, "name": "validate_decorator_files", "signature": "validate_decorator_files(source_dir: Path, spec_dir: Path, outcome_dir: Optional[Path]) -> ValidationResult", "type": "function"}
+{"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_outcome_completeness", "implements": ["S-042"], "language": "python", "line": 237, "name": "validate_outcome_completeness", "signature": "validate_outcome_completeness(outcome_dir: Path) -> ValidationResult", "type": "function"}
 {"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_outcome_files", "implements": ["S-019"], "language": "python", "line": 127, "name": "validate_outcome_files", "signature": "validate_outcome_files(outcome_dir: Path) -> ValidationResult", "type": "function"}
 {"async": false, "file": "src/jig/validation/intent.py", "id": "F-jig.validation.intent.validate_specification_files", "implements": ["S-018"], "language": "python", "line": 19, "name": "validate_specification_files", "signature": "validate_specification_files(spec_dir: Path) -> ValidationResult", "type": "function"}
 {"async": false, "file": "src/jig/validation/models.py", "id": "F-jig.validation.models.ValidationError.__str__", "language": "python", "line": 20, "name": "__str__", "parent_class": "C-jig.validation.models.ValidationError", "signature": "__str__(self) -> str", "type": "function"}
@@ -314,13 +315,13 @@
 {"line": 310, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
 {"source": "F-jig.cli.layers.suggest_layers_command", "target": "S-041", "type": "implements"}
 {"source": "F-jig.cli.validate.auto_validate_decorators", "target": "S-027", "type": "implements"}
-{"line": 117, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
-{"line": 141, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
+{"line": 121, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
+{"line": 145, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
 {"source": "F-jig.cli.validate.validate_bricks_command", "target": "S-024", "type": "implements"}
-{"line": 179, "source": "F-jig.cli.validate.validate_full_command", "target": "F-jig.cli.validate.validate_bricks_command", "type": "calls"}
-{"line": 172, "source": "F-jig.cli.validate.validate_full_command", "target": "F-jig.cli.validate.validate_intent_command", "type": "calls"}
+{"line": 183, "source": "F-jig.cli.validate.validate_full_command", "target": "F-jig.cli.validate.validate_bricks_command", "type": "calls"}
+{"line": 176, "source": "F-jig.cli.validate.validate_full_command", "target": "F-jig.cli.validate.validate_intent_command", "type": "calls"}
 {"source": "F-jig.cli.validate.validate_full_command", "target": "S-025", "type": "implements"}
-{"line": 62, "source": "F-jig.cli.validate.validate_intent_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
+{"line": 66, "source": "F-jig.cli.validate.validate_intent_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
 {"source": "F-jig.cli.validate.validate_intent_command", "target": "S-023", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "target": "S-006", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "target": "S-005", "type": "implements"}
@@ -370,16 +371,18 @@
 {"line": 303, "source": "F-jig.validation.bricks.validate_brick_partition", "target": "F-jig.validation.bricks._expand_units_to_functions", "type": "calls"}
 {"line": 254, "source": "F-jig.validation.bricks.validate_brick_partition", "target": "F-jig.validation.bricks._load_graph_nodes", "type": "calls"}
 {"source": "F-jig.validation.bricks.validate_brick_partition", "target": "S-022", "type": "implements"}
-{"line": 322, "source": "F-jig.validation.intent._load_outcome_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
-{"line": 312, "source": "F-jig.validation.intent._load_spec_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
-{"line": 345, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
-{"line": 356, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
-{"line": 338, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
-{"line": 338, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
-{"line": 254, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_outcome_ids", "type": "calls"}
-{"line": 253, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_spec_ids", "type": "calls"}
-{"line": 269, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._validate_function_decorators", "type": "calls"}
+{"line": 367, "source": "F-jig.validation.intent._load_outcome_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"line": 357, "source": "F-jig.validation.intent._load_spec_ids", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"line": 390, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
+{"line": 401, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._get_decorator_name", "type": "calls"}
+{"line": 383, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
+{"line": 383, "source": "F-jig.validation.intent._validate_function_decorators", "target": "F-jig.validation.intent._is_jig_decorator", "type": "calls"}
+{"line": 299, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_outcome_ids", "type": "calls"}
+{"line": 298, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._load_spec_ids", "type": "calls"}
+{"line": 314, "source": "F-jig.validation.intent.validate_decorator_files", "target": "F-jig.validation.intent._validate_function_decorators", "type": "calls"}
 {"source": "F-jig.validation.intent.validate_decorator_files", "target": "S-020", "type": "implements"}
+{"line": 259, "source": "F-jig.validation.intent.validate_outcome_completeness", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
+{"source": "F-jig.validation.intent.validate_outcome_completeness", "target": "S-042", "type": "implements"}
 {"line": 153, "source": "F-jig.validation.intent.validate_outcome_files", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
 {"source": "F-jig.validation.intent.validate_outcome_files", "target": "S-019", "type": "implements"}
 {"line": 40, "source": "F-jig.validation.intent.validate_specification_files", "target": "F-jig.validation.intent._parse_frontmatter", "type": "calls"}
@@ -446,11 +449,12 @@
 {"line": 17, "source": "M-jig.cli.validate", "target": "M-jig.validation.intent", "type": "imports"}
 {"line": 17, "source": "M-jig.cli.validate", "target": "M-jig.validation.intent", "type": "imports"}
 {"line": 17, "source": "M-jig.cli.validate", "target": "M-jig.validation.intent", "type": "imports"}
-{"line": 42, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
-{"line": 49, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
-{"line": 56, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
-{"line": 85, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
-{"line": 22, "source": "M-jig.cli.validate", "target": "M-jig.validation.reporting", "type": "imports"}
+{"line": 17, "source": "M-jig.cli.validate", "target": "M-jig.validation.intent", "type": "imports"}
+{"line": 43, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 52, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 60, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 89, "source": "M-jig.cli.validate", "target": "M-jig.validation.models", "type": "imports"}
+{"line": 23, "source": "M-jig.cli.validate", "target": "M-jig.validation.reporting", "type": "imports"}
 {"line": 6, "source": "M-jig.cli.validate", "target": "M-pathlib", "type": "imports"}
 {"line": 5, "source": "M-jig.cli.validate", "target": "M-sys", "type": "imports"}
 {"source": "M-jig.impl_graph.analyzers.base", "target": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "type": "contains"}
@@ -562,6 +566,7 @@
 {"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._parse_frontmatter", "type": "contains"}
 {"source": "M-jig.validation.intent", "target": "F-jig.validation.intent._validate_function_decorators", "type": "contains"}
 {"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_decorator_files", "type": "contains"}
+{"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_outcome_completeness", "type": "contains"}
 {"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_outcome_files", "type": "contains"}
 {"source": "M-jig.validation.intent", "target": "F-jig.validation.intent.validate_specification_files", "type": "contains"}
 {"line": 7, "source": "M-jig.validation.intent", "target": "M-ast", "type": "imports"}

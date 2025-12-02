@@ -16,6 +16,7 @@ from jig.validation.bricks import (
 )
 from jig.validation.intent import (
     validate_decorator_files,
+    validate_outcome_completeness,
     validate_outcome_files,
     validate_specification_files,
 )
@@ -45,9 +46,12 @@ def validate_intent_command(project_root: Path, output_format: str = "human") ->
     # Validate outcomes
     if outcome_dir.exists():
         results["outcomes"] = validate_outcome_files(outcome_dir)
+        # Validate outcome completeness (S-042)
+        results["outcome_completeness"] = validate_outcome_completeness(outcome_dir)
     else:
         from jig.validation.models import ValidationResult
         results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
+        results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
 
     # Validate decorators
     if src_dir.exists() and spec_dir.exists():

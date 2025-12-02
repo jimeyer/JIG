@@ -19,7 +19,7 @@
 
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O-015, S-042, S-043)
-- [ ] WU1: Outcome orphan detection — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Outcome orphan detection — tests ☑ / code ☑ / docs ☐
 - [ ] WU2: Specification orphan detection — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
 
@@ -56,11 +56,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-042 is implemented by validation function
-- [ ] S-042 is verified by comprehensive tests
-- [ ] Tests cover outcomes with empty/non-empty specifies arrays
-- [ ] Error messages clearly identify which outcomes are orphaned
-- [ ] `jigy validate intent` reports orphaned outcomes
+- [x] S-042 is implemented by validation function
+- [x] S-042 is verified by comprehensive tests
+- [x] Tests cover outcomes with empty/non-empty specifies arrays
+- [x] Error messages clearly identify which outcomes are orphaned
+- [x] `jigy validate intent` reports orphaned outcomes
 
 **Implementation Notes**:
 - Approach:
@@ -87,10 +87,14 @@
 - Create test outcome with empty specifies array and verify error reporting
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- TDD workflow (RED→GREEN) worked smoothly: wrote 5 tests first, saw them fail, implemented function, all tests passed
+- Validation function cleanly integrates into existing `validate_intent_command` alongside other validations
+- Implementation reuses `_parse_frontmatter` helper, maintaining consistency with existing validation code
+- Error messages follow existing pattern: clear identification of problem + actionable fix guidance
+- Validation passes on current codebase (all 15 outcomes have non-empty specifies arrays after previous session fix)
 
 **Links**:
-- Commit: (TBD)
+- Commit: (TBD after commit)
 - PR: (TBD)
 
 ---

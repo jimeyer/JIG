@@ -233,6 +233,51 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
     return result
 
 
+@jig.implements("S-042")
+def validate_outcome_completeness(outcome_dir: Path) -> ValidationResult:
+    """
+    Validate that outcomes have non-empty specifies arrays.
+
+    Per S-042: All outcomes SHALL specify at least one specification.
+    Empty specifies arrays are incomplete and prevent O→S→TDD workflow.
+
+    Checks:
+    - Each outcome has 'specifies' field (checked by validate_outcome_files)
+    - 'specifies' array is non-empty (has at least one spec ID)
+    """
+    result = ValidationResult(passed=True, phase_name="outcome completeness")
+
+    outcome_files = sorted(outcome_dir.glob("O-*.md"))
+    result.items_checked = len(outcome_files)
+
+    # Outcomes are optional, so no files is valid
+    if len(outcome_files) == 0:
+        return result
+
+    for outcome_file in outcome_files:
+        # Parse YAML frontmatter
+        frontmatter = _parse_frontmatter(outcome_file)
+        if frontmatter is None:
+            # Malformed frontmatter is caught by validate_outcome_files
+            continue
+
+        outcome_id = frontmatter.get("id")
+        specifies = frontmatter.get("specifies", [])
+
+        # Check if specifies array is empty
+        if isinstance(specifies, list) and len(specifies) == 0:
+            result.add_error(
+                ValidationError(
+                    file=str(outcome_file),
+                    message=f"Outcome completeness: Outcome '{outcome_id}' has empty specifies array. Outcomes must decompose into at least one concrete specification.",
+                    code="EMPTY_SPECIFIES",
+                    field="specifies",
+                )
+            )
+
+    return result
+
+
 @jig.implements("S-020")
 def validate_decorator_files(
     source_dir: Path,
