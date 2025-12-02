@@ -94,7 +94,7 @@
 - Validation passes on current codebase (all 15 outcomes have non-empty specifies arrays after previous session fix)
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: 9de20df
 - PR: (TBD)
 
 ---
