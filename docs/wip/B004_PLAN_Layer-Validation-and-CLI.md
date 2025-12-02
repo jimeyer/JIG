@@ -210,7 +210,7 @@
 - Validation conditionally runs only if definitions pass (avoids cascade errors when layer field missing)
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: 22cec0b
 - PR: (TBD)
 
 ---
