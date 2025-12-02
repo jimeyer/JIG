@@ -17,6 +17,7 @@ from jig.validation.models import ValidationError, ValidationResult
 
 
 @jig.implements("S-021")
+@jig.implements("S-035")
 def validate_brick_definitions(
     bricks_file: Path,
     impl_graph_file: Path,
@@ -27,7 +28,7 @@ def validate_brick_definitions(
     Checks:
     - Implementation graph exists
     - Required fields: id, name, units
-    - ID format: B-{number}
+    - ID format: B-[a-z0-9-]+ (kebab-case)
     - ID uniqueness
     - Unit prefix: must start with M-, C-, or F-
     - Unit references exist in implementation graph
@@ -90,7 +91,8 @@ def validate_brick_definitions(
     result.items_checked = len(bricks_data)
 
     seen_ids = {}
-    brick_pattern = re.compile(r"^B-\d+$")
+    # S-035: Require kebab-case with at least one letter (semantic naming)
+    brick_pattern = re.compile(r"^B-[a-z0-9-]*[a-z][a-z0-9-]*$")
     unit_prefix_pattern = re.compile(r"^(M-|C-|F-)")
 
     for i, brick in enumerate(bricks_data):
@@ -128,12 +130,12 @@ def validate_brick_definitions(
                 )
             )
 
-        # Check ID format
+        # Check ID format (S-035: kebab-case)
         if not brick_pattern.match(brick_id):
             result.add_error(
                 ValidationError(
                     file=str(bricks_file),
-                    message=f"Brick '{brick_id}': Invalid ID format (expected B-NNN pattern)",
+                    message=f"Brick '{brick_id}': Invalid ID format. Must match pattern B-[a-z0-9-]+ (kebab-case). Example: B-auth, B-core-utils",
                     code="INVALID_ID_FORMAT",
                     field="id",
                 )

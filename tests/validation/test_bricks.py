@@ -35,11 +35,11 @@ def test_validate_brick_definitions_valid():
             ],
         )
 
-        # Create bricks.yaml
+        # Create bricks.yaml (S-035: use kebab-case ID)
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-authentication
   name: Authentication
   units:
     - M-auth.session
@@ -62,7 +62,7 @@ def test_validate_brick_definitions_missing_impl_graph():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-test
   name: Test
   units:
     - M-test
@@ -90,7 +90,7 @@ def test_validate_brick_definitions_missing_required_field():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-test
   units:
     - M-test
 """
@@ -101,9 +101,68 @@ def test_validate_brick_definitions_missing_required_field():
         assert any("name" in err.message.lower() for err in result.errors)
 
 
-@jig.verifies("S-021")
-def test_validate_brick_definitions_invalid_id_format():
-    """Invalid brick ID format rejected."""
+@jig.verifies("S-035")
+def test_validate_brick_definitions_valid_kebab_case_ids():
+    """Valid kebab-case brick IDs pass validation."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [{"id": "M-test", "type": "module"}])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-auth
+  name: Authentication
+  units:
+    - M-test
+
+- id: B-core-utils
+  name: Core Utilities
+  units:
+    - M-test
+
+- id: B-rest-api
+  name: REST API
+  units:
+    - M-test
+
+- id: B-cli-interface
+  name: CLI Interface
+  units:
+    - M-test
+
+- id: B-a
+  name: Short
+  units:
+    - M-test
+
+- id: B-user-management
+  name: User Management
+  units:
+    - M-test
+
+- id: B-with-many-hyphens
+  name: Many Hyphens
+  units:
+    - M-test
+
+- id: B-api-v2
+  name: API Version 2
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert result.passed, f"Expected validation to pass but got errors: {[e.message for e in result.errors]}"
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_old_numeric_format():
+    """Old numeric format (B-001) rejected with clear error."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
 
@@ -113,7 +172,7 @@ def test_validate_brick_definitions_invalid_id_format():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: INVALID-001
+- id: B-001
   name: Test
   units:
     - M-test
@@ -122,7 +181,130 @@ def test_validate_brick_definitions_invalid_id_format():
 
         result = validate_brick_definitions(bricks_file, impl_graph)
         assert not result.passed
-        assert any("format" in err.message.lower() or "pattern" in err.message.lower() for err in result.errors)
+        assert any("B-001" in err.message for err in result.errors)
+        assert any("kebab-case" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_uppercase():
+    """Uppercase letters in brick ID rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-Auth
+  name: Test
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("B-Auth" in err.message for err in result.errors)
+        assert any("kebab-case" in err.message.lower() or "lowercase" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_underscore():
+    """Underscores in brick ID rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-core_utils
+  name: Test
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("B-core_utils" in err.message for err in result.errors)
+        assert any("kebab-case" in err.message.lower() or "hyphen" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_empty_name():
+    """Empty brick name (just 'B-') rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-
+  name: Test
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("B-" in err.message for err in result.errors)
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_missing_prefix():
+    """Missing 'B-' prefix rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: auth
+  name: Test
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("auth" in err.message for err in result.errors)
+
+
+@jig.verifies("S-035")
+def test_validate_brick_definitions_invalid_wrong_prefix():
+    """Wrong prefix (not B-) rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: INVALID-auth
+  name: Test
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("INVALID-auth" in err.message for err in result.errors)
 
 
 @jig.verifies("S-021")
@@ -137,12 +319,12 @@ def test_validate_brick_definitions_duplicate_ids():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-first
   name: First
   units:
     - M-first
 
-- id: B-001
+- id: B-first
   name: Duplicate
   units:
     - M-second
@@ -166,7 +348,7 @@ def test_validate_brick_definitions_invalid_unit_prefix():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-test
   name: Test
   units:
     - auth.session  # Missing prefix!
@@ -195,7 +377,7 @@ def test_validate_brick_definitions_unit_not_in_graph():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-test
   name: Test
   units:
     - M-nonexistent.module  # Not in graph!
@@ -219,12 +401,12 @@ def test_validate_brick_definitions_excluded_fields():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-test
   name: Test
   units:
     - M-test
   depends_on:
-    - B-002
+    - B-other
   public_api:
     - some_function
   specs:
@@ -263,12 +445,12 @@ def test_validate_brick_partition_valid():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-auth
   name: Authentication
   units:
     - M-auth.session  # Covers both login and logout
 
-- id: B-002
+- id: B-cli
   name: CLI
   units:
     - F-cli.main.run
@@ -298,7 +480,7 @@ def test_validate_brick_partition_gap():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-auth
   name: Auth
   units:
     - F-auth.session.login  # Only login, not logout
@@ -327,12 +509,12 @@ def test_validate_brick_partition_overlap():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-auth
   name: Auth
   units:
     - F-auth.session.login
 
-- id: B-002
+- id: B-security
   name: Security
   units:
     - F-auth.session.login  # Duplicate!
@@ -363,12 +545,12 @@ def test_validate_brick_partition_class_splitting():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-token-init
   name: TokenInit
   units:
     - F-auth.Token.__init__  # Only __init__
 
-- id: B-002
+- id: B-token-validation
   name: TokenValidation
   units:
     - F-auth.Token.validate  # Only validate - CLASS SPLIT!
@@ -401,7 +583,7 @@ def test_validate_brick_partition_module_expansion():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-auth
   name: Auth
   units:
     - M-auth.session  # Should expand to all F-auth.session.*
@@ -434,7 +616,7 @@ def test_validate_brick_partition_class_expansion():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
+- id: B-token
   name: Token
   units:
     - C-auth.Token  # Should expand to all F-auth.Token.*

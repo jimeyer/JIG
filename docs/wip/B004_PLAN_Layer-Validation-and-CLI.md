@@ -22,7 +22,7 @@
 
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (Specifications S-035 through S-041)
-- [ ] WU1: Brick ID format validation — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Brick ID format validation — tests ☑ / code ☑ / docs ☐
 - [ ] WU2: Layer field validation (presence & value) — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Layer constraint validation — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Circular dependency detection — tests ☐ / code ☐ / docs ☐
@@ -67,11 +67,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-035 is implemented by validation function(s)
-- [ ] S-035 is verified by comprehensive tests
-- [ ] Tests cover valid and invalid brick ID patterns
-- [ ] Error messages clearly indicate the problem
-- [ ] `jigy validate bricks` reports ID format violations
+- [x] S-035 is implemented by validation function(s)
+- [x] S-035 is verified by comprehensive tests
+- [x] Tests cover valid and invalid brick ID patterns
+- [x] Error messages clearly indicate the problem
+- [x] `jigy validate bricks` reports ID format violations
 
 **Implementation Notes**:
 - Approach:
@@ -98,10 +98,14 @@
 - Create test bricks.yaml with invalid IDs and verify error reporting
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- Regex pattern `^B-[a-z0-9-]*[a-z][a-z0-9-]*$` ensures at least one letter for semantic naming
+- Updated existing tests to use kebab-case (B-auth, B-cli, etc.) instead of B-001 format
+- Error message provides clear examples (B-auth, B-core-utils) to guide users
+- Validation correctly detects all 5 old-format bricks in JIG codebase (B-001 through B-005)
+- Test suite comprehensive: 7 new S-035 tests + updated 13 existing tests = 20 tests passing
 
 **Links**:
-- Commit: (TBD)
+- Commit: 8e76f2e
 - PR: (TBD)
 
 ---
