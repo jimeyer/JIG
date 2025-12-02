@@ -1,4 +1,4 @@
-{"_meta": {"brick_count": 5, "generated": "2025-12-01T14:30:12.371130+00:00", "outcome_count": 11, "spec_count": 34, "version": "1.0"}}
+{"_meta": {"brick_count": 5, "generated": "2025-12-02T12:45:16.052319+00:00", "outcome_count": 15, "spec_count": 43, "version": "1.0"}}
 {"file": "jig/specifications/S-001.md", "id": "S-001", "type": "specification"}
 {"file": "jig/specifications/S-002.md", "id": "S-002", "type": "specification"}
 {"file": "jig/specifications/S-003.md", "id": "S-003", "type": "specification"}
@@ -33,25 +33,73 @@
 {"file": "jig/specifications/S-032.md", "id": "S-032", "type": "specification"}
 {"file": "jig/specifications/S-033.md", "id": "S-033", "type": "specification"}
 {"file": "jig/specifications/S-034.md", "id": "S-034", "type": "specification"}
+{"file": "jig/specifications/S-035.md", "id": "S-035", "type": "specification"}
+{"file": "jig/specifications/S-036.md", "id": "S-036", "type": "specification"}
+{"file": "jig/specifications/S-037.md", "id": "S-037", "type": "specification"}
+{"file": "jig/specifications/S-038.md", "id": "S-038", "type": "specification"}
+{"file": "jig/specifications/S-039.md", "id": "S-039", "type": "specification"}
+{"file": "jig/specifications/S-040.md", "id": "S-040", "type": "specification"}
+{"file": "jig/specifications/S-041.md", "id": "S-041", "type": "specification"}
+{"file": "jig/specifications/S-042.md", "id": "S-042", "type": "specification"}
+{"file": "jig/specifications/S-043.md", "id": "S-043", "type": "specification"}
 {"file": "jig/outcomes/O-001.md", "id": "O-001", "specifies": ["S-001", "S-003", "S-005", "S-006"], "type": "outcome"}
 {"file": "jig/outcomes/O-002.md", "id": "O-002", "specifies": ["S-002"], "type": "outcome"}
 {"file": "jig/outcomes/O-003.md", "id": "O-003", "specifies": ["S-004"], "type": "outcome"}
-{"file": "jig/outcomes/O-004.md", "id": "O-004", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-005.md", "id": "O-005", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-006.md", "id": "O-006", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-007.md", "id": "O-007", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-008.md", "id": "O-008", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-009.md", "id": "O-009", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-010.md", "id": "O-010", "specifies": [], "type": "outcome"}
-{"file": "jig/outcomes/O-011.md", "id": "O-011", "specifies": [], "type": "outcome"}
-{"file": "jig/bricks.yaml", "id": "B-001", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
-{"file": "jig/bricks.yaml", "id": "B-002", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate"]}
-{"file": "jig/bricks.yaml", "id": "B-003", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
-{"file": "jig/bricks.yaml", "id": "B-004", "name": "Implementation Graph Core", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
-{"file": "jig/bricks.yaml", "id": "B-005", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
+{"file": "jig/outcomes/O-004.md", "id": "O-004", "specifies": ["S-023", "S-024", "S-025"], "type": "outcome"}
+{"file": "jig/outcomes/O-005.md", "id": "O-005", "specifies": ["S-018", "S-019", "S-020", "S-021", "S-022"], "type": "outcome"}
+{"file": "jig/outcomes/O-006.md", "id": "O-006", "specifies": ["S-023", "S-024", "S-025"], "type": "outcome"}
+{"file": "jig/outcomes/O-007.md", "id": "O-007", "specifies": ["S-007", "S-008", "S-009", "S-017"], "type": "outcome"}
+{"file": "jig/outcomes/O-008.md", "id": "O-008", "specifies": ["S-010", "S-011", "S-012", "S-013", "S-014"], "type": "outcome"}
+{"file": "jig/outcomes/O-009.md", "id": "O-009", "specifies": ["S-028"], "type": "outcome"}
+{"file": "jig/outcomes/O-010.md", "id": "O-010", "specifies": ["S-030", "S-031", "S-034"], "type": "outcome"}
+{"file": "jig/outcomes/O-011.md", "id": "O-011", "specifies": ["S-032", "S-033"], "type": "outcome"}
+{"file": "jig/outcomes/O-012.md", "id": "O-012", "specifies": ["S-035", "S-036", "S-037"], "type": "outcome"}
+{"file": "jig/outcomes/O-013.md", "id": "O-013", "specifies": ["S-038", "S-039"], "type": "outcome"}
+{"file": "jig/outcomes/O-014.md", "id": "O-014", "specifies": ["S-040", "S-041"], "type": "outcome"}
+{"file": "jig/outcomes/O-015.md", "id": "O-015", "specifies": ["S-042", "S-043"], "type": "outcome"}
+{"file": "jig/bricks.yaml", "id": "B-cli", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate"]}
+{"file": "jig/bricks.yaml", "id": "B-decorators", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
+{"file": "jig/bricks.yaml", "id": "B-impl-graph", "name": "Implementation Graph", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
+{"file": "jig/bricks.yaml", "id": "B-languages", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
+{"file": "jig/bricks.yaml", "id": "B-validation", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
 {"source": "O-001", "target": "S-001", "type": "specifies"}
 {"source": "O-001", "target": "S-003", "type": "specifies"}
 {"source": "O-001", "target": "S-005", "type": "specifies"}
 {"source": "O-001", "target": "S-006", "type": "specifies"}
 {"source": "O-002", "target": "S-002", "type": "specifies"}
 {"source": "O-003", "target": "S-004", "type": "specifies"}
+{"source": "O-004", "target": "S-023", "type": "specifies"}
+{"source": "O-004", "target": "S-024", "type": "specifies"}
+{"source": "O-004", "target": "S-025", "type": "specifies"}
+{"source": "O-005", "target": "S-018", "type": "specifies"}
+{"source": "O-005", "target": "S-019", "type": "specifies"}
+{"source": "O-005", "target": "S-020", "type": "specifies"}
+{"source": "O-005", "target": "S-021", "type": "specifies"}
+{"source": "O-005", "target": "S-022", "type": "specifies"}
+{"source": "O-006", "target": "S-023", "type": "specifies"}
+{"source": "O-006", "target": "S-024", "type": "specifies"}
+{"source": "O-006", "target": "S-025", "type": "specifies"}
+{"source": "O-007", "target": "S-007", "type": "specifies"}
+{"source": "O-007", "target": "S-008", "type": "specifies"}
+{"source": "O-007", "target": "S-009", "type": "specifies"}
+{"source": "O-007", "target": "S-017", "type": "specifies"}
+{"source": "O-008", "target": "S-010", "type": "specifies"}
+{"source": "O-008", "target": "S-011", "type": "specifies"}
+{"source": "O-008", "target": "S-012", "type": "specifies"}
+{"source": "O-008", "target": "S-013", "type": "specifies"}
+{"source": "O-008", "target": "S-014", "type": "specifies"}
+{"source": "O-009", "target": "S-028", "type": "specifies"}
+{"source": "O-010", "target": "S-030", "type": "specifies"}
+{"source": "O-010", "target": "S-031", "type": "specifies"}
+{"source": "O-010", "target": "S-034", "type": "specifies"}
+{"source": "O-011", "target": "S-032", "type": "specifies"}
+{"source": "O-011", "target": "S-033", "type": "specifies"}
+{"source": "O-012", "target": "S-035", "type": "specifies"}
+{"source": "O-012", "target": "S-036", "type": "specifies"}
+{"source": "O-012", "target": "S-037", "type": "specifies"}
+{"source": "O-013", "target": "S-038", "type": "specifies"}
+{"source": "O-013", "target": "S-039", "type": "specifies"}
+{"source": "O-014", "target": "S-040", "type": "specifies"}
+{"source": "O-014", "target": "S-041", "type": "specifies"}
+{"source": "O-015", "target": "S-042", "type": "specifies"}
+{"source": "O-015", "target": "S-043", "type": "specifies"}
