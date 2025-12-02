@@ -156,7 +156,7 @@
 - Test suite comprehensive: 9 new tests (2 for S-036, 7 for S-037) + 20 existing = 29 passing
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: b13a5d8
 - PR: (TBD)
 
 ---
