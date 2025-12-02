@@ -78,14 +78,16 @@ def test_generate_intent_graph_basic(temp_project):
     """Test basic intent graph generation."""
     output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
 
-    result = generate_intent_graph(
+    result_path, node_count, edge_count = generate_intent_graph(
         project_root=temp_project,
         output_path=output_path,
         include_timestamp=False,
     )
 
-    assert result == output_path
+    assert result_path == output_path
     assert output_path.exists()
+    assert node_count == 4  # 2 specs + 1 outcome + 1 brick
+    assert edge_count == 2  # 2 specifies edges from O-001
 
     # Read and parse the generated file
     lines = output_path.read_text().strip().split("\n")

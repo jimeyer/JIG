@@ -19,7 +19,7 @@ def generate_intent_graph(
     project_root: Path,
     output_path: Optional[Path] = None,
     include_timestamp: bool = True,
-) -> Path:
+) -> tuple[Path, int, int]:
     """Generate intent-graph.ndjson from intent artifacts.
 
     Args:
@@ -30,7 +30,7 @@ def generate_intent_graph(
             Defaults to True.
 
     Returns:
-        Path to the generated intent graph file.
+        Tuple of (output_path, node_count, edge_count).
 
     Raises:
         FileNotFoundError: If required directories don't exist.
@@ -57,6 +57,10 @@ def generate_intent_graph(
     # Create edges from outcome.specifies relationships
     edges = _create_specifies_edges(outcome_nodes)
 
+    # Calculate counts
+    node_count = len(spec_nodes) + len(outcome_nodes) + len(brick_nodes)
+    edge_count = len(edges)
+
     # Generate metadata
     metadata = _generate_metadata(
         spec_count=len(spec_nodes),
@@ -75,7 +79,7 @@ def generate_intent_graph(
         edges=edges,
     )
 
-    return output_path
+    return output_path, node_count, edge_count
 
 
 def _load_specification_nodes(spec_dir: Path) -> List[Dict[str, Any]]:

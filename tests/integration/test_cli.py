@@ -59,7 +59,7 @@ def test_cli_impl_rebuild_basic(runner: CliRunner, project_root: Path) -> None:
 
     # Should succeed
     assert result.exit_code == 0
-    assert "Graph generated successfully" in result.output
+    assert "generated successfully" in result.output
 
     # Should create output file
     output_path = project_root / "jig" / "generated" / "implementation-graph.ndjson"
@@ -145,9 +145,9 @@ def test_cli_impl_rebuild_verbose(runner: CliRunner, project_root: Path) -> None
     # Should succeed
     assert result.exit_code == 0
 
-    # Should have verbose output (Building message is always shown)
-    assert "Building" in result.output
-    assert "Graph generated successfully" in result.output
+    # Should have verbose output (Generating message is always shown)
+    assert "Generating" in result.output
+    assert "generated successfully" in result.output
 
 
 @jig.verifies("S-006")
@@ -199,7 +199,7 @@ def test_cli_impl_rebuild_parse_error_lenient(runner: CliRunner, tmp_path: Path)
 
     # Should succeed (skipping bad file)
     assert result.exit_code == 0
-    assert "Graph generated successfully" in result.output
+    assert "generated successfully" in result.output
 
 
 @jig.verifies("S-003")

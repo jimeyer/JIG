@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 355, "generated": "2025-12-02T13:15:53.723478+00:00", "node_count": 240, "version": "1.0"}}
+{"_meta": {"edge_count": 360, "generated": "2025-12-02T18:45:22.118858+00:00", "node_count": 241, "version": "1.0"}}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
@@ -13,27 +13,28 @@
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.decorator", "language": "python", "line": 57, "name": "decorator", "signature": "decorator(func: F) -> F", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.implements", "language": "python", "line": 12, "name": "implements", "signature": "implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "id": "F-jig.__init__.verifies", "language": "python", "line": 39, "name": "verifies", "signature": "verifies(*spec_ids: str) -> Callable[[F], F]", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._apply_suggested_layers", "language": "python", "line": 467, "name": "_apply_suggested_layers", "signature": "_apply_suggested_layers(bricks_file: Path, bricks: list, suggested_layers: dict) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._assign_layers_topologically", "language": "python", "line": 342, "name": "_assign_layers_topologically", "signature": "_assign_layers_topologically(bricks, brick_dependencies)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_full", "language": "python", "line": 179, "name": "_display_full", "signature": "_display_full(layers_dict, brick_dependencies, brick_function_counts, has_cycles, bricks, verbose)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_suggestions", "language": "python", "line": 406, "name": "_display_suggestions", "signature": "_display_suggestions(bricks, suggested_layers, brick_dependencies)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_summary", "language": "python", "line": 157, "name": "_display_summary", "signature": "_display_summary(layers_dict, brick_function_counts, has_cycles, bricks)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._get_layer_name", "language": "python", "line": 228, "name": "_get_layer_name", "signature": "_get_layer_name(layer: int) -> str", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._has_cycles_in_brick_graph", "language": "python", "line": 130, "name": "_has_cycles_in_brick_graph", "signature": "_has_cycles_in_brick_graph(dependencies: dict) -> bool", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers.has_cycle_from", "language": "python", "line": 135, "name": "has_cycle_from", "signature": "has_cycle_from(node)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._apply_suggested_layers", "language": "python", "line": 540, "name": "_apply_suggested_layers", "signature": "_apply_suggested_layers(bricks_file: Path, bricks: list, suggested_layers: dict) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._assign_layers_topologically", "language": "python", "line": 415, "name": "_assign_layers_topologically", "signature": "_assign_layers_topologically(bricks, brick_dependencies)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_full", "language": "python", "line": 232, "name": "_display_full", "signature": "_display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_suggestions", "language": "python", "line": 479, "name": "_display_suggestions", "signature": "_display_suggestions(bricks, suggested_layers, brick_dependencies)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._display_summary", "language": "python", "line": 185, "name": "_display_summary", "signature": "_display_summary(layers_dict, brick_unit_counts, has_cycles, bricks)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._format_unit_counts", "language": "python", "line": 142, "name": "_format_unit_counts", "signature": "_format_unit_counts(counts: dict) -> str", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._get_layer_name", "language": "python", "line": 301, "name": "_get_layer_name", "signature": "_get_layer_name(layer: int) -> str", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers._has_cycles_in_brick_graph", "language": "python", "line": 158, "name": "_has_cycles_in_brick_graph", "signature": "_has_cycles_in_brick_graph(dependencies: dict) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers.has_cycle_from", "language": "python", "line": 163, "name": "has_cycle_from", "signature": "has_cycle_from(node)", "type": "function"}
 {"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers.layers_command", "implements": ["S-040"], "language": "python", "line": 17, "name": "layers_command", "signature": "layers_command(project_root: Path, summary: bool, verbose: bool) -> int", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers.suggest_layers_command", "implements": ["S-041"], "language": "python", "line": 241, "name": "suggest_layers_command", "signature": "suggest_layers_command(project_root: Path, apply: bool) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "id": "F-jig.cli.layers.suggest_layers_command", "implements": ["S-041"], "language": "python", "line": 314, "name": "suggest_layers_command", "signature": "suggest_layers_command(project_root: Path, apply: bool) -> int", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.cli", "language": "python", "line": 22, "name": "cli", "signature": "cli()", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.full", "language": "python", "line": 296, "name": "full", "signature": "full(project_root: Path, output_format: str) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.full", "language": "python", "line": 298, "name": "full", "signature": "full(project_root: Path, output_format: str) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.impl", "language": "python", "line": 28, "name": "impl", "signature": "impl()", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.intent", "language": "python", "line": 34, "name": "intent", "signature": "intent()", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.layers", "language": "python", "line": 329, "name": "layers", "signature": "layers(ctx, project_root: Path, summary: bool, verbose: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.layers", "language": "python", "line": 331, "name": "layers", "signature": "layers(ctx, project_root: Path, summary: bool, verbose: bool) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 108, "name": "rebuild", "signature": "rebuild(project_root: Path, source_dir: Path | None, exclude: tuple[str, ...], output: Path | None, verbose: bool, strict: bool, no_timestamp: bool, skip_validation: bool) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 188, "name": "rebuild", "signature": "rebuild(project_root: Path, output: Path | None, no_timestamp: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.suggest", "language": "python", "line": 357, "name": "suggest", "signature": "suggest(project_root: Path, apply: bool) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.suggest", "language": "python", "line": 359, "name": "suggest", "signature": "suggest(project_root: Path, apply: bool) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate", "language": "python", "line": 54, "name": "validate", "signature": "validate(ctx, project_root: Path, output_format: str)", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_bricks_cli", "language": "python", "line": 268, "name": "validate_bricks_cli", "signature": "validate_bricks_cli(project_root: Path, output_format: str) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_intent_cli", "language": "python", "line": 240, "name": "validate_intent_cli", "signature": "validate_intent_cli(project_root: Path, output_format: str) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_bricks_cli", "language": "python", "line": 270, "name": "validate_bricks_cli", "signature": "validate_bricks_cli(project_root: Path, output_format: str) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "id": "F-jig.cli.main.validate_intent_cli", "language": "python", "line": 242, "name": "validate_intent_cli", "signature": "validate_intent_cli(project_root: Path, output_format: str) -> None", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate._combine_results", "language": "python", "line": 95, "name": "_combine_results", "signature": "_combine_results(results: dict) -> 'ValidationResult'", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.auto_validate_decorators", "implements": ["S-027"], "language": "python", "line": 209, "name": "auto_validate_decorators", "signature": "auto_validate_decorators(project_root: Path) -> bool", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_bricks_command", "implements": ["S-024"], "language": "python", "line": 111, "name": "validate_bricks_command", "signature": "validate_bricks_command(project_root: Path, output_format: str) -> int", "type": "function"}
@@ -99,14 +100,14 @@
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter._sort_nodes", "language": "python", "line": 93, "name": "_sort_nodes", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "_sort_nodes(self, nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "implements": ["S-003"], "language": "python", "line": 37, "name": "write", "parent_class": "C-jig.impl_graph.ndjson_writer.NDJSONWriter", "signature": "write(self, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/ndjson_writer.py", "id": "F-jig.impl_graph.ndjson_writer.write_ndjson", "implements": ["S-003"], "language": "python", "line": 126, "name": "write_ndjson", "signature": "write_ndjson(graph: Graph, output_path: Path, include_timestamp: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._create_specifies_edges", "language": "python", "line": 203, "name": "_create_specifies_edges", "signature": "_create_specifies_edges(outcome_nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._generate_metadata", "language": "python", "line": 224, "name": "_generate_metadata", "signature": "_generate_metadata(spec_count: int, outcome_count: int, brick_count: int, include_timestamp: bool) -> Dict[str, Any]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_brick_nodes", "language": "python", "line": 150, "name": "_load_brick_nodes", "signature": "_load_brick_nodes(bricks_file: Path) -> List[Dict[str, Any]]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_outcome_nodes", "language": "python", "line": 113, "name": "_load_outcome_nodes", "signature": "_load_outcome_nodes(outcome_dir: Path) -> List[Dict[str, Any]]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_specification_nodes", "language": "python", "line": 81, "name": "_load_specification_nodes", "signature": "_load_specification_nodes(spec_dir: Path) -> List[Dict[str, Any]]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._parse_frontmatter", "language": "python", "line": 303, "name": "_parse_frontmatter", "signature": "_parse_frontmatter(file_path: Path) -> Optional[dict]", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._write_intent_graph", "language": "python", "line": 256, "name": "_write_intent_graph", "signature": "_write_intent_graph(output_path: Path, metadata: Dict[str, Any], spec_nodes: List[Dict[str, Any]], outcome_nodes: List[Dict[str, Any]], brick_nodes: List[Dict[str, Any]], edges: List[Dict[str, str]]) -> None", "type": "function"}
-{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator.generate_intent_graph", "implements": ["S-028"], "language": "python", "line": 18, "name": "generate_intent_graph", "signature": "generate_intent_graph(project_root: Path, output_path: Optional[Path], include_timestamp: bool) -> Path", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._create_specifies_edges", "language": "python", "line": 207, "name": "_create_specifies_edges", "signature": "_create_specifies_edges(outcome_nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._generate_metadata", "language": "python", "line": 228, "name": "_generate_metadata", "signature": "_generate_metadata(spec_count: int, outcome_count: int, brick_count: int, include_timestamp: bool) -> Dict[str, Any]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_brick_nodes", "language": "python", "line": 154, "name": "_load_brick_nodes", "signature": "_load_brick_nodes(bricks_file: Path) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_outcome_nodes", "language": "python", "line": 117, "name": "_load_outcome_nodes", "signature": "_load_outcome_nodes(outcome_dir: Path) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._load_specification_nodes", "language": "python", "line": 85, "name": "_load_specification_nodes", "signature": "_load_specification_nodes(spec_dir: Path) -> List[Dict[str, Any]]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._parse_frontmatter", "language": "python", "line": 307, "name": "_parse_frontmatter", "signature": "_parse_frontmatter(file_path: Path) -> Optional[dict]", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator._write_intent_graph", "language": "python", "line": 260, "name": "_write_intent_graph", "signature": "_write_intent_graph(output_path: Path, metadata: Dict[str, Any], spec_nodes: List[Dict[str, Any]], outcome_nodes: List[Dict[str, Any]], brick_nodes: List[Dict[str, Any]], edges: List[Dict[str, str]]) -> None", "type": "function"}
+{"async": false, "file": "src/jig/intent_graph/generator.py", "id": "F-jig.intent_graph.generator.generate_intent_graph", "implements": ["S-028"], "language": "python", "line": 18, "name": "generate_intent_graph", "signature": "generate_intent_graph(project_root: Path, output_path: Optional[Path], include_timestamp: bool) -> tuple[Path, int, int]", "type": "function"}
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks._detect_class_splitting", "language": "python", "line": 423, "name": "_detect_class_splitting", "signature": "_detect_class_splitting(functions: list[dict], function_to_bricks: dict[str, list[str]]) -> list[tuple[str, set[str]]]", "type": "function"}
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks._detect_cycles_dfs", "language": "python", "line": 806, "name": "_detect_cycles_dfs", "signature": "_detect_cycles_dfs(graph: dict[str, set[str]]) -> list[list[str]]", "type": "function"}
 {"async": false, "file": "src/jig/validation/bricks.py", "id": "F-jig.validation.bricks._expand_units_to_functions", "language": "python", "line": 385, "name": "_expand_units_to_functions", "signature": "_expand_units_to_functions(units: list[str], graph_nodes: list[dict]) -> set[str]", "type": "function"}
@@ -303,17 +304,21 @@
 {"source": "C-jig.validation.models.ValidationError", "target": "F-jig.validation.models.ValidationError.__str__", "type": "contains"}
 {"source": "C-jig.validation.models.ValidationResult", "target": "F-jig.validation.models.ValidationResult.__str__", "type": "contains"}
 {"source": "C-jig.validation.models.ValidationResult", "target": "F-jig.validation.models.ValidationResult.add_error", "type": "contains"}
-{"line": 191, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._get_layer_name", "type": "calls"}
-{"line": 151, "source": "F-jig.cli.layers._has_cycles_in_brick_graph", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
-{"line": 141, "source": "F-jig.cli.layers.has_cycle_from", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
-{"line": 125, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_full", "type": "calls"}
-{"line": 123, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_summary", "type": "calls"}
-{"line": 119, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
+{"line": 253, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 291, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 246, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._get_layer_name", "type": "calls"}
+{"line": 219, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 228, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 179, "source": "F-jig.cli.layers._has_cycles_in_brick_graph", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
+{"line": 169, "source": "F-jig.cli.layers.has_cycle_from", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
+{"line": 137, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_full", "type": "calls"}
+{"line": 135, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_summary", "type": "calls"}
+{"line": 131, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
 {"source": "F-jig.cli.layers.layers_command", "target": "S-040", "type": "implements"}
-{"line": 329, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._apply_suggested_layers", "type": "calls"}
-{"line": 317, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._assign_layers_topologically", "type": "calls"}
-{"line": 323, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._display_suggestions", "type": "calls"}
-{"line": 310, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
+{"line": 402, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._apply_suggested_layers", "type": "calls"}
+{"line": 390, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._assign_layers_topologically", "type": "calls"}
+{"line": 396, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._display_suggestions", "type": "calls"}
+{"line": 383, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
 {"source": "F-jig.cli.layers.suggest_layers_command", "target": "S-041", "type": "implements"}
 {"source": "F-jig.cli.validate.auto_validate_decorators", "target": "S-027", "type": "implements"}
 {"line": 129, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
@@ -344,14 +349,14 @@
 {"source": "F-jig.impl_graph.builder.build_graph", "target": "S-006", "type": "implements"}
 {"source": "F-jig.impl_graph.ndjson_writer.NDJSONWriter.write", "target": "S-003", "type": "implements"}
 {"source": "F-jig.impl_graph.ndjson_writer.write_ndjson", "target": "S-003", "type": "implements"}
-{"line": 127, "source": "F-jig.intent_graph.generator._load_outcome_nodes", "target": "F-jig.intent_graph.generator._parse_frontmatter", "type": "calls"}
-{"line": 95, "source": "F-jig.intent_graph.generator._load_specification_nodes", "target": "F-jig.intent_graph.generator._parse_frontmatter", "type": "calls"}
+{"line": 131, "source": "F-jig.intent_graph.generator._load_outcome_nodes", "target": "F-jig.intent_graph.generator._parse_frontmatter", "type": "calls"}
+{"line": 99, "source": "F-jig.intent_graph.generator._load_specification_nodes", "target": "F-jig.intent_graph.generator._parse_frontmatter", "type": "calls"}
 {"line": 58, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._create_specifies_edges", "type": "calls"}
-{"line": 61, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._generate_metadata", "type": "calls"}
+{"line": 65, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._generate_metadata", "type": "calls"}
 {"line": 55, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._load_brick_nodes", "type": "calls"}
 {"line": 52, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._load_outcome_nodes", "type": "calls"}
 {"line": 49, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._load_specification_nodes", "type": "calls"}
-{"line": 69, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._write_intent_graph", "type": "calls"}
+{"line": 73, "source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "F-jig.intent_graph.generator._write_intent_graph", "type": "calls"}
 {"source": "F-jig.intent_graph.generator.generate_intent_graph", "target": "S-028", "type": "implements"}
 {"line": 850, "source": "F-jig.validation.bricks._detect_cycles_dfs", "target": "F-jig.validation.bricks.dfs", "type": "calls"}
 {"line": 833, "source": "F-jig.validation.bricks.dfs", "target": "F-jig.validation.bricks._normalize_cycle", "type": "calls"}
@@ -404,6 +409,7 @@
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_full", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_suggestions", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_summary", "type": "contains"}
+{"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._format_unit_counts", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._get_layer_name", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers.has_cycle_from", "type": "contains"}

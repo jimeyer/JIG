@@ -143,7 +143,7 @@ def rebuild(
 
     try:
         # Build the graph
-        click.echo(f"Building implementation graph for {project_root}")
+        click.echo(f"Generating implementation graph for {project_root}")
 
         graph = build_graph(
             project_root=project_root,
@@ -156,7 +156,7 @@ def rebuild(
         )
 
         # Report results
-        click.echo(f"\n✓ Graph generated successfully:")
+        click.echo(f"\n✓ Implementation graph generated successfully:")
         click.echo(f"  - Nodes: {graph.node_count()}")
         click.echo(f"  - Edges: {graph.edge_count()}")
         click.echo(f"  - Output: {output}")
@@ -203,13 +203,15 @@ def rebuild(
     try:
         click.echo(f"Generating intent graph for {project_root}")
 
-        output_path = generate_intent_graph(
+        output_path, node_count, edge_count = generate_intent_graph(
             project_root=project_root,
             output_path=output,
             include_timestamp=not no_timestamp,
         )
 
         click.echo(f"\n✓ Intent graph generated successfully:")
+        click.echo(f"  - Nodes: {node_count}")
+        click.echo(f"  - Edges: {edge_count}")
         click.echo(f"  - Output: {output_path}")
 
     except FileNotFoundError as e:
