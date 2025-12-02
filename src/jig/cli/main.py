@@ -6,7 +6,7 @@ from pathlib import Path
 
 import click
 
-from jig.cli.layers import layers_command
+from jig.cli.layers import layers_command, suggest_layers_command
 from jig.cli.validate import (
     auto_validate_decorators,
     validate_bricks_command,
@@ -307,7 +307,8 @@ def full(project_root: Path, output_format: str) -> None:
     sys.exit(exit_code)
 
 
-@cli.command()
+@cli.group(invoke_without_command=True)
+@click.pass_context
 @click.option(
     "--project-root",
     type=click.Path(exists=True, file_okay=False, path_type=Path),
@@ -325,17 +326,45 @@ def full(project_root: Path, output_format: str) -> None:
     is_flag=True,
     help="Show detailed function lists",
 )
-def layers(project_root: Path, summary: bool, verbose: bool) -> None:
-    """Visualize brick layer structure.
+def layers(ctx, project_root: Path, summary: bool, verbose: bool) -> None:
+    """Visualize and manage brick layer structure.
 
     Shows bricks grouped by layer with their dependencies and function counts.
 
     Example:
         jigy layers                    # Show layer structure
         jigy layers --summary          # Show counts only
-        jigy layers --verbose          # Show full details
+        jigy layers suggest            # Suggest layer assignments
     """
-    exit_code = layers_command(project_root, summary, verbose)
+    # If no subcommand, run visualization
+    if ctx.invoked_subcommand is None:
+        exit_code = layers_command(project_root, summary, verbose)
+        sys.exit(exit_code)
+
+
+@layers.command()
+@click.option(
+    "--project-root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=Path.cwd(),
+    help="Root directory of the project (default: current directory)",
+)
+@click.option(
+    "--apply",
+    is_flag=True,
+    help="Apply suggested layers to bricks.yaml",
+)
+def suggest(project_root: Path, apply: bool) -> None:
+    """Suggest layer assignments based on dependency analysis.
+
+    Analyzes brick dependencies and suggests appropriate layer assignments
+    using topological sort. Compares suggestions with current layers.
+
+    Example:
+        jigy layers suggest              # Show suggestions
+        jigy layers suggest --apply      # Apply suggestions to bricks.yaml
+    """
+    exit_code = suggest_layers_command(project_root, apply)
     sys.exit(exit_code)
 
 
