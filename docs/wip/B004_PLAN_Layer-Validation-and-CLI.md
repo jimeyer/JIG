@@ -337,12 +337,12 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-041 is implemented (layer suggestion)
-- [ ] S-041 is verified by tests
-- [ ] Command analyzes brick dependencies and suggests layers
-- [ ] Uses topological sort to assign layers
-- [ ] Shows current vs suggested layers
-- [ ] Supports --apply flag to update bricks.yaml
+- [x] S-041 is implemented (layer suggestion)
+- [x] S-041 is verified by tests
+- [x] Command analyzes brick dependencies and suggests layers
+- [x] Uses topological sort to assign layers
+- [x] Shows current vs suggested layers
+- [x] Supports --apply flag to update bricks.yaml
 
 **Implementation Notes**:
 - Approach:
@@ -382,10 +382,14 @@
 - Test `jigy layers suggest --apply` on copy of bricks.yaml
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- Iterative layer assignment algorithm handles complex dependency graphs elegantly
+- Algorithm: start with no-dependency bricks at layer 0, propagate max(dep_layers)+1 until convergence
+- Clear visual feedback: ✓ MATCHES vs ⚠ MISMATCH helps identify architectural drift
+- Preserves both bricks.yaml formats during --apply (wrapper and bare list)
+- Confirmation prompt prevents accidental overwrites when applying suggestions
 
 **Links**:
-- Commit: (TBD)
+- Commit: 3ac606b
 - PR: (TBD)
 
 ---
