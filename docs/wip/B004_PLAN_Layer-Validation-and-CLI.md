@@ -451,7 +451,7 @@
 - 220 tests passing demonstrates solid integration across all work units
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: 19b7091
 - PR: (TBD)
 
 ---
