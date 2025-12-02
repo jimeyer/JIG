@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from jig.cli.layers import layers_command
 from jig.cli.validate import (
     auto_validate_decorators,
     validate_bricks_command,
@@ -306,6 +307,36 @@ def full(project_root: Path, output_format: str) -> None:
     sys.exit(exit_code)
 
 
+@cli.command()
+@click.option(
+    "--project-root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=Path.cwd(),
+    help="Root directory of the project (default: current directory)",
+)
+@click.option(
+    "--summary",
+    is_flag=True,
+    help="Show only layer counts (summary mode)",
+)
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    help="Show detailed function lists",
+)
+def layers(project_root: Path, summary: bool, verbose: bool) -> None:
+    """Visualize brick layer structure.
+
+    Shows bricks grouped by layer with their dependencies and function counts.
+
+    Example:
+        jigy layers                    # Show layer structure
+        jigy layers --summary          # Show counts only
+        jigy layers --verbose          # Show full details
+    """
+    exit_code = layers_command(project_root, summary, verbose)
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
