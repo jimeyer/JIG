@@ -35,12 +35,13 @@ def test_validate_brick_definitions_valid():
             ],
         )
 
-        # Create bricks.yaml (S-035: use kebab-case ID)
+        # Create bricks.yaml (S-035: use kebab-case ID, S-036: include layer)
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
 - id: B-authentication
   name: Authentication
+  layer: 0
   units:
     - M-auth.session
     - C-auth.tokens.Token
@@ -115,41 +116,49 @@ def test_validate_brick_definitions_valid_kebab_case_ids():
             """
 - id: B-auth
   name: Authentication
+  layer: 0
   units:
     - M-test
 
 - id: B-core-utils
   name: Core Utilities
+  layer: 0
   units:
     - M-test
 
 - id: B-rest-api
   name: REST API
+  layer: 1
   units:
     - M-test
 
 - id: B-cli-interface
   name: CLI Interface
+  layer: 2
   units:
     - M-test
 
 - id: B-a
   name: Short
+  layer: 0
   units:
     - M-test
 
 - id: B-user-management
   name: User Management
+  layer: 1
   units:
     - M-test
 
 - id: B-with-many-hyphens
   name: Many Hyphens
+  layer: 0
   units:
     - M-test
 
 - id: B-api-v2
   name: API Version 2
+  layer: 1
   units:
     - M-test
 """
@@ -626,3 +635,269 @@ def test_validate_brick_partition_class_expansion():
         result = validate_brick_partition(bricks_file, impl_graph)
         assert result.passed
         assert len(result.errors) == 0
+
+
+# Layer field validation tests (S-036, S-037)
+
+
+@jig.verifies("S-036")
+def test_validate_brick_definitions_valid_layer_field():
+    """Valid layer field passes validation."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [{"id": "M-test", "type": "module"}])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-foundation
+  name: Foundation
+  layer: 0
+  units:
+    - M-test
+
+- id: B-core
+  name: Core
+  layer: 1
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert result.passed, f"Expected validation to pass but got errors: {[e.message for e in result.errors]}"
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-036")
+def test_validate_brick_definitions_missing_layer_field():
+    """Missing layer field detected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  units:
+    - M-test
+  # layer field missing!
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("required" in err.message.lower() or "missing" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_valid_layer_values():
+    """Valid layer values (non-negative integers) pass validation."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [{"id": "M-test", "type": "module"}])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-layer0
+  name: Layer 0
+  layer: 0
+  units:
+    - M-test
+
+- id: B-layer1
+  name: Layer 1
+  layer: 1
+  units:
+    - M-test
+
+- id: B-layer2
+  name: Layer 2
+  layer: 2
+  units:
+    - M-test
+
+- id: B-layer10
+  name: Layer 10
+  layer: 10
+  units:
+    - M-test
+
+- id: B-layer100
+  name: Layer 100
+  layer: 100
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert result.passed, f"Expected validation to pass but got errors: {[e.message for e in result.errors]}"
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_invalid_layer_type_string():
+    """String layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: "0"
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("integer" in err.message.lower() or "type" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_invalid_layer_type_float():
+    """Float layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: 1.5
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("integer" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_invalid_layer_type_null():
+    """Null layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: null
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        # Null will be treated as missing, so it should trigger the missing field error
+        assert any("required" in err.message.lower() or "missing" in err.message.lower() or "integer" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_invalid_layer_type_list():
+    """List layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: []
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("integer" in err.message.lower() or "type" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_negative_layer():
+    """Negative layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: -1
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("negative" in err.message.lower() or "non-negative" in err.message.lower() or ">= 0" in err.message for err in result.errors)
+
+
+@jig.verifies("S-037")
+def test_validate_brick_definitions_large_negative_layer():
+    """Large negative layer value rejected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+
+        impl_graph = tmpdir / "implementation-graph.ndjson"
+        _create_implementation_graph(impl_graph, [])
+
+        bricks_file = tmpdir / "bricks.yaml"
+        bricks_file.write_text(
+            """
+- id: B-test
+  name: Test
+  layer: -10
+  units:
+    - M-test
+"""
+        )
+
+        result = validate_brick_definitions(bricks_file, impl_graph)
+        assert not result.passed
+        assert any("layer" in err.message.lower() and "B-test" in err.message for err in result.errors)
+        assert any("negative" in err.message.lower() or "non-negative" in err.message.lower() or ">= 0" in err.message for err in result.errors)

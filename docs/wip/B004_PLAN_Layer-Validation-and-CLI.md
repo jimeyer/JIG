@@ -23,7 +23,7 @@
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (Specifications S-035 through S-041)
 - [x] WU1: Brick ID format validation — tests ☑ / code ☑ / docs ☐
-- [ ] WU2: Layer field validation (presence & value) — tests ☐ / code ☐ / docs ☐
+- [x] WU2: Layer field validation (presence & value) — tests ☑ / code ☑ / docs ☐
 - [ ] WU3: Layer constraint validation — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Circular dependency detection — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: CLI `jigy layers` command — tests ☐ / code ☐ / docs ☐
@@ -117,11 +117,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-036 is implemented (layer field presence check)
-- [ ] S-037 is implemented (layer value validation)
-- [ ] S-036 and S-037 are verified by tests
-- [ ] Tests cover missing layer, invalid types, negative values
-- [ ] `jigy validate bricks` reports layer field violations
+- [x] S-036 is implemented (layer field presence check)
+- [x] S-037 is implemented (layer value validation)
+- [x] S-036 and S-037 are verified by tests
+- [x] Tests cover missing layer, invalid types, negative values
+- [x] `jigy validate bricks` reports layer field violations
 
 **Implementation Notes**:
 - Approach:
@@ -149,10 +149,14 @@
 - Create bricks.yaml with invalid layer values, verify error messages
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- Implementation cleanly integrated into existing validate_brick_definitions function
+- Type checking distinguishes int from float/string/null/list with isinstance(layer_value, int)
+- Clear error messages specify exact problem: missing field vs wrong type vs negative value
+- All 5 bricks in JIG codebase correctly flagged for missing layer field (plus ID format issues)
+- Test suite comprehensive: 9 new tests (2 for S-036, 7 for S-037) + 20 existing = 29 passing
 
 **Links**:
-- Commit: (TBD)
+- Commit: (TBD after commit)
 - PR: (TBD)
 
 ---

@@ -18,6 +18,8 @@ from jig.validation.models import ValidationError, ValidationResult
 
 @jig.implements("S-021")
 @jig.implements("S-035")
+@jig.implements("S-036")
+@jig.implements("S-037")
 def validate_brick_definitions(
     bricks_file: Path,
     impl_graph_file: Path,
@@ -27,9 +29,11 @@ def validate_brick_definitions(
 
     Checks:
     - Implementation graph exists
-    - Required fields: id, name, units
+    - Required fields: id, name, units, layer
     - ID format: B-[a-z0-9-]+ (kebab-case)
     - ID uniqueness
+    - Layer field presence (S-036)
+    - Layer value: non-negative integer (S-037)
     - Unit prefix: must start with M-, C-, or F-
     - Unit references exist in implementation graph
     - No excluded fields: depends_on, public_api, specs
@@ -129,6 +133,38 @@ def validate_brick_definitions(
                     field="units",
                 )
             )
+
+        # Check layer field presence (S-036)
+        if "layer" not in brick or brick.get("layer") is None:
+            result.add_error(
+                ValidationError(
+                    file=str(bricks_file),
+                    message=f"Brick '{brick_id}': Missing required field 'layer'. All bricks must have a layer field per A001 Section 4.",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="layer",
+                )
+            )
+        else:
+            # Check layer value type and range (S-037)
+            layer_value = brick.get("layer")
+            if not isinstance(layer_value, int):
+                result.add_error(
+                    ValidationError(
+                        file=str(bricks_file),
+                        message=f"Brick '{brick_id}': Invalid layer type '{type(layer_value).__name__}'. Layer must be a non-negative integer (e.g., 0, 1, 2).",
+                        code="INVALID_LAYER_TYPE",
+                        field="layer",
+                    )
+                )
+            elif layer_value < 0:
+                result.add_error(
+                    ValidationError(
+                        file=str(bricks_file),
+                        message=f"Brick '{brick_id}': Invalid layer value {layer_value}. Layer must be non-negative (>= 0).",
+                        code="INVALID_LAYER_VALUE",
+                        field="layer",
+                    )
+                )
 
         # Check ID format (S-035: kebab-case)
         if not brick_pattern.match(brick_id):
