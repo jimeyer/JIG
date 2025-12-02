@@ -26,7 +26,6 @@ def test_validate_specification_valid():
             """---
 id: S-001
 type: specification
-implements: [O-001]
 ---
 
 # Test Specification
@@ -188,6 +187,7 @@ def test_validate_outcome_valid():
             """---
 id: O-001
 type: outcome
+specifies: []
 ---
 
 # Test Outcome
