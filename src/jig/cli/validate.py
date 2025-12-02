@@ -9,6 +9,7 @@ import click
 
 import jig
 from jig.validation.bricks import (
+    validate_brick_cycles,
     validate_brick_definitions,
     validate_brick_layer_constraints,
     validate_brick_partition,
@@ -129,6 +130,11 @@ def validate_bricks_command(project_root: Path, output_format: str = "human") ->
     if definitions_result.passed:
         layer_constraints_result = validate_brick_layer_constraints(bricks_file, impl_graph)
         results["layer_constraints"] = layer_constraints_result
+
+    # Validate brick cycles (S-039)
+    # Always run - cycles are independent of layer values
+    cycles_result = validate_brick_cycles(bricks_file, impl_graph)
+    results["cycles"] = cycles_result
 
     # Format output
     if output_format == "json":

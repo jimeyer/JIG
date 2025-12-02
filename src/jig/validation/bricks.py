@@ -640,3 +640,227 @@ def validate_brick_layer_constraints(
     result.items_checked = len(brick_dependencies)
 
     return result
+
+
+@jig.implements("S-039")
+def validate_brick_cycles(
+    bricks_file: Path,
+    impl_graph_file: Path,
+) -> ValidationResult:
+    """
+    Detect circular dependencies in brick dependency graph.
+
+    All brick dependencies must form a directed acyclic graph (DAG).
+    Cycles are detected at all layers including layer 0.
+    """
+    result = ValidationResult(passed=True, phase_name="brick cycles")
+
+    # Load implementation graph
+    if not impl_graph_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Implementation graph not found: {impl_graph_file}. Run 'jigy impl rebuild' first.",
+                code="GRAPH_NOT_FOUND",
+            )
+        )
+        return result
+
+    graph_nodes = _load_graph_nodes(impl_graph_file)
+
+    # Load function call edges
+    call_edges = []
+    try:
+        with impl_graph_file.open() as f:
+            for line in f:
+                item = json.loads(line)
+                if item.get("type") == "calls":
+                    call_edges.append(item)
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Failed to load implementation graph: {e}",
+                code="INVALID_GRAPH",
+            )
+        )
+        return result
+
+    # Load bricks
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
+    try:
+        bricks_data = yaml.safe_load(bricks_file.read_text())
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Failed to parse bricks.yaml: {e}",
+                code="INVALID_YAML",
+            )
+        )
+        return result
+
+    # Handle both formats
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
+    if not isinstance(bricks_data, list):
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must contain a list of bricks",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    # Build function-to-brick mapping
+    function_to_brick = {}
+
+    for brick in bricks_data:
+        brick_id = brick.get("id", "unknown")
+        units = brick.get("units", [])
+
+        # Expand units to functions
+        expanded_functions = _expand_units_to_functions(units, graph_nodes)
+        for func_id in expanded_functions:
+            function_to_brick[func_id] = brick_id
+
+    # Build brick dependency graph (adjacency list)
+    brick_graph = defaultdict(set)  # brick_id -> set of brick_ids it depends on
+    brick_edges_map = defaultdict(list)  # (source_brick, target_brick) -> list of (source_func, target_func)
+
+    for edge in call_edges:
+        source_func = edge.get("source")
+        target_func = edge.get("target")
+
+        if not source_func or not target_func:
+            continue
+
+        source_brick = function_to_brick.get(source_func)
+        target_brick = function_to_brick.get(target_func)
+
+        # Both functions must be in bricks
+        if not source_brick or not target_brick:
+            continue
+
+        # Skip self-dependencies (same brick)
+        if source_brick == target_brick:
+            continue
+
+        # Add edge to graph
+        brick_graph[source_brick].add(target_brick)
+        brick_edges_map[(source_brick, target_brick)].append((source_func, target_func))
+
+    # Detect cycles using DFS
+    cycles = _detect_cycles_dfs(brick_graph)
+
+    # Report cycles
+    for cycle in cycles:
+        # Format cycle path
+        cycle_path = " → ".join(cycle)
+
+        # Collect function calls for this cycle
+        function_calls = []
+        for i in range(len(cycle)):
+            current_brick = cycle[i]
+            next_brick = cycle[(i + 1) % len(cycle)]
+
+            # Get function calls for this edge
+            edge_key = (current_brick, next_brick)
+            if edge_key in brick_edges_map:
+                for source_func, target_func in brick_edges_map[edge_key]:
+                    function_calls.append(f"    {source_func} → {target_func}")
+
+        function_calls_str = "\n".join(function_calls) if function_calls else "    (no function details available)"
+
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Circular dependency detected\n"
+                f"\n"
+                f"Cycle: {cycle_path}\n"
+                f"  Functions involved:\n"
+                f"{function_calls_str}\n"
+                f"\n"
+                f"Fix: Refactor to break the cycle by extracting shared functionality\n"
+                f"to a separate brick or removing one of the dependencies.",
+                code="CIRCULAR_DEPENDENCY",
+            )
+        )
+
+    result.items_checked = len(brick_graph)
+
+    return result
+
+
+def _detect_cycles_dfs(graph: dict[str, set[str]]) -> list[list[str]]:
+    """
+    Detect all cycles in directed graph using DFS.
+
+    Returns list of cycles, where each cycle is a list of node IDs.
+    """
+    visited = set()
+    rec_stack = set()
+    rec_stack_list = []  # To track path for cycle extraction
+    cycles = []
+    cycles_set = set()  # To avoid duplicate cycles
+
+    def dfs(node: str) -> None:
+        visited.add(node)
+        rec_stack.add(node)
+        rec_stack_list.append(node)
+
+        # Visit all neighbors
+        for neighbor in graph.get(node, set()):
+            if neighbor not in visited:
+                dfs(neighbor)
+            elif neighbor in rec_stack:
+                # Found a cycle! Extract the cycle path
+                cycle_start_idx = rec_stack_list.index(neighbor)
+                cycle = rec_stack_list[cycle_start_idx:] + [neighbor]
+
+                # Normalize cycle to avoid duplicates (start from smallest ID)
+                normalized = _normalize_cycle(cycle[:-1])  # Remove duplicate last element
+                cycle_key = tuple(normalized)
+
+                if cycle_key not in cycles_set:
+                    cycles_set.add(cycle_key)
+                    cycles.append(normalized)
+
+        rec_stack_list.pop()
+        rec_stack.remove(node)
+
+    # Run DFS from all nodes
+    all_nodes = set(graph.keys())
+    for neighbor_set in graph.values():
+        all_nodes.update(neighbor_set)
+
+    for node in all_nodes:
+        if node not in visited:
+            dfs(node)
+
+    return cycles
+
+
+def _normalize_cycle(cycle: list[str]) -> list[str]:
+    """
+    Normalize cycle to start from the lexicographically smallest node.
+
+    This ensures that cycles are detected uniquely regardless of starting point.
+    Example: [B-b, B-c, B-a] and [B-a, B-b, B-c] both normalize to [B-a, B-b, B-c]
+    """
+    if not cycle:
+        return cycle
+
+    min_idx = cycle.index(min(cycle))
+    return cycle[min_idx:] + cycle[:min_idx]
