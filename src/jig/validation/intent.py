@@ -278,6 +278,70 @@ def validate_outcome_completeness(outcome_dir: Path) -> ValidationResult:
     return result
 
 
+@jig.implements("S-043")
+def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> ValidationResult:
+    """
+    Validate that all specifications are referenced by at least one outcome.
+
+    Per S-043: All specifications SHALL be specified by at least one outcome.
+    Specifications without outcomes lack business justification.
+
+    Algorithm:
+    1. Load all outcomes and build reverse index: spec_id → [outcome_ids]
+    2. Load all specifications
+    3. Report specifications with empty reverse index (no outcomes point to them)
+
+    Checks:
+    - Each spec is referenced in at least one outcome's 'specifies' array
+    """
+    result = ValidationResult(passed=True, phase_name="specification coverage")
+
+    spec_files = sorted(spec_dir.glob("S-*.md"))
+    result.items_checked = len(spec_files)
+
+    # If no specs, validation passes (specs are not optional, but empty is valid during setup)
+    if len(spec_files) == 0:
+        return result
+
+    # Build reverse index: spec_id → list of outcomes that specify it
+    spec_to_outcomes = {}
+    for outcome_file in sorted(outcome_dir.glob("O-*.md")):
+        frontmatter = _parse_frontmatter(outcome_file)
+        if frontmatter is None:
+            continue
+
+        outcome_id = frontmatter.get("id")
+        specifies = frontmatter.get("specifies", [])
+
+        if isinstance(specifies, list):
+            for spec_id in specifies:
+                if spec_id not in spec_to_outcomes:
+                    spec_to_outcomes[spec_id] = []
+                spec_to_outcomes[spec_id].append(outcome_id)
+
+    # Check each specification
+    for spec_file in spec_files:
+        frontmatter = _parse_frontmatter(spec_file)
+        if frontmatter is None:
+            # Malformed frontmatter is caught by validate_specification_files
+            continue
+
+        spec_id = frontmatter.get("id")
+
+        # Check if spec is referenced by any outcome
+        if spec_id not in spec_to_outcomes or len(spec_to_outcomes[spec_id]) == 0:
+            result.add_error(
+                ValidationError(
+                    file=str(spec_file),
+                    message=f"Specification coverage: Specification '{spec_id}' is not specified by any outcome. All specifications must deliver value via at least one outcome.",
+                    code="ORPHANED_SPECIFICATION",
+                    field="specifies",
+                )
+            )
+
+    return result
+
+
 @jig.implements("S-020")
 def validate_decorator_files(
     source_dir: Path,

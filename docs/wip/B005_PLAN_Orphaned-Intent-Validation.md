@@ -20,7 +20,7 @@
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O-015, S-042, S-043)
 - [x] WU1: Outcome orphan detection — tests ☑ / code ☑ / docs ☐
-- [ ] WU2: Specification orphan detection — tests ☐ / code ☐ / docs ☐
+- [x] WU2: Specification orphan detection — tests ☑ / code ☑ / docs ☐
 - [ ] WU3: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
@@ -106,11 +106,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-043 is implemented by validation function
-- [ ] S-043 is verified by comprehensive tests
-- [ ] Tests cover specs with/without outcome references
-- [ ] Error messages list which specifications are orphaned
-- [ ] `jigy validate intent` reports orphaned specifications
+- [x] S-043 is implemented by validation function
+- [x] S-043 is verified by comprehensive tests
+- [x] Tests cover specs with/without outcome references
+- [x] Error messages list which specifications are orphaned
+- [x] `jigy validate intent` reports orphaned specifications
 
 **Implementation Notes**:
 - Approach:
@@ -137,10 +137,14 @@
 - Create test spec not referenced by any outcome and verify error reporting
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- TDD workflow (RED→GREEN) worked smoothly: 6 tests first, implementation passed all tests
+- Reverse index algorithm elegantly detects orphaned specs: build spec→outcomes map, check each spec has non-empty list
+- Validation correctly detected 5 orphaned specs in current codebase (S-015, S-016, S-026, S-027, S-029) - legitimate finding
+- Function name is `validate_specification_coverage` (not `_completeness`) to distinguish from outcome completeness
+- Integration into CLI required both spec_dir and outcome_dir existence check (validation only runs if both present)
 
 **Links**:
-- Commit: (TBD)
+- Commit: (TBD after commit)
 - PR: (TBD)
 
 ---

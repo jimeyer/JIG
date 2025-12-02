@@ -18,6 +18,7 @@ from jig.validation.intent import (
     validate_decorator_files,
     validate_outcome_completeness,
     validate_outcome_files,
+    validate_specification_coverage,
     validate_specification_files,
 )
 from jig.validation.reporting import format_as_json
@@ -52,6 +53,13 @@ def validate_intent_command(project_root: Path, output_format: str = "human") ->
         from jig.validation.models import ValidationResult
         results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
         results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
+
+    # Validate specification coverage (S-043)
+    if spec_dir.exists() and outcome_dir.exists():
+        results["specification_coverage"] = validate_specification_coverage(spec_dir, outcome_dir)
+    else:
+        from jig.validation.models import ValidationResult
+        results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
 
     # Validate decorators
     if src_dir.exists() and spec_dir.exists():

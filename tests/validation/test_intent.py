@@ -643,3 +643,284 @@ def test_validate_outcome_completeness_no_outcomes():
         assert result.passed
         assert len(result.errors) == 0
         assert result.items_checked == 0
+
+
+# --- S-043: Specification Coverage Validation ---
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_valid_single_outcome():
+    """Specification referenced by one outcome passes coverage validation."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Create spec
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec
+"""
+        )
+
+        # Create outcome that references the spec
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 1
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_valid_multiple_outcomes():
+    """Specification referenced by multiple outcomes passes coverage validation."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Create spec
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec
+"""
+        )
+
+        # Create multiple outcomes that reference the spec
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome 1
+"""
+        )
+
+        (outcome_dir / "O-002.md").write_text(
+            """---
+id: O-002
+type: outcome
+specifies: [S-001, S-002]
+---
+
+# Test Outcome 2
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 1
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_orphaned_spec():
+    """Specification not referenced by any outcome fails coverage validation."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Create two specs
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec 1
+"""
+        )
+
+        (spec_dir / "S-002.md").write_text(
+            """---
+id: S-002
+type: specification
+---
+
+# Test Spec 2 (orphaned)
+"""
+        )
+
+        # Create outcome that only references S-001
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "S-002" in result.errors[0].message
+        assert "not specified" in result.errors[0].message.lower() or "orphaned" in result.errors[0].message.lower()
+        assert result.items_checked == 2
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_multiple_orphaned():
+    """Multiple orphaned specifications all reported."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Create three specs
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec 1
+"""
+        )
+
+        (spec_dir / "S-002.md").write_text(
+            """---
+id: S-002
+type: specification
+---
+
+# Test Spec 2 (orphaned)
+"""
+        )
+
+        (spec_dir / "S-003.md").write_text(
+            """---
+id: S-003
+type: specification
+---
+
+# Test Spec 3 (orphaned)
+"""
+        )
+
+        # Create outcome that only references S-001
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 2
+        assert result.items_checked == 3
+        # Check that both S-002 and S-003 are reported
+        error_messages = " ".join([err.message for err in result.errors])
+        assert "S-002" in error_messages
+        assert "S-003" in error_messages
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_no_outcomes():
+    """All specs are orphaned when no outcomes exist."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # Create specs but no outcomes
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec 1
+"""
+        )
+
+        (spec_dir / "S-002.md").write_text(
+            """---
+id: S-002
+type: specification
+---
+
+# Test Spec 2
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 2
+        assert result.items_checked == 2
+        # Both specs should be reported as orphaned
+        error_messages = " ".join([err.message for err in result.errors])
+        assert "S-001" in error_messages
+        assert "S-002" in error_messages
+
+
+@jig.verifies("S-043")
+def test_validate_specification_coverage_no_specs():
+    """Validation passes when no specification files present."""
+    from jig.validation.intent import validate_specification_coverage
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        # No specs, but outcomes exist
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+specifies: []
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_specification_coverage(spec_dir, outcome_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+        assert result.items_checked == 0
