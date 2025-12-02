@@ -101,22 +101,37 @@ specifies: [S-001, S-002]
 **Structure:**
 ```yaml
 bricks:
-  - id: B-001
+  - id: B-auth-session
     name: Authentication & Session Management
+    layer: 1
     units:
       - M-auth.session
       - M-auth.tokens
 
-  - id: B-002
+  - id: B-cli
     name: Command Line Interface
+    layer: 2
     units:
       - M-cli.main
 ```
 
 **Field contract:**
-- `id` (string, REQUIRED): Format SHALL be `B-{number}` (e.g., `B-001`, `B-002`)
+- `id` (string, REQUIRED): Format SHALL be `B-{kebab-case-name}` (e.g., `B-auth`, `B-core-utils`, `B-cli`)
 - `name` (string, REQUIRED): Human-readable name for display
+- `layer` (integer, REQUIRED): Non-negative integer (0, 1, 2, ...) indicating architectural layer
 - `units` (array, REQUIRED): SHALL contain implementation graph node IDs using M-/C-/F- prefixes
+
+**ID format:**
+- SHALL use lowercase letters, numbers, and hyphens only
+- SHALL match pattern: `B-[a-z0-9-]+`
+- SHALL be semantic and descriptive (not sequential numbers)
+- Examples: `B-auth`, `B-user-management`, `B-rest-api`, `B-core-utils`
+
+**Layer semantics:**
+- `layer: 0` - Foundation bricks; MAY depend on other layer 0 bricks (no cycles) or external libraries
+- `layer: N` - Bricks that depend only on bricks at layers < N
+- All bricks MAY be layer 0 for flat architecture (no stratification)
+- Layer constraint: brick at layer N can only depend on bricks at layers 0..(N-1), or other layer 0 bricks if N=0
 
 **Units format:**
 - `M-{module.path}` - SHALL expand to all functions in module (e.g., `M-auth.session` → all `F-auth.session.*`)
@@ -220,13 +235,14 @@ Fields:
 
 **Brick Node:**
 ```json
-{"id":"B-001","type":"brick","name":"Authentication & Session Management","file":"jig/bricks.yaml"}
+{"id":"B-auth-session","type":"brick","name":"Authentication & Session Management","layer":1,"file":"jig/bricks.yaml"}
 ```
 
 Fields:
-- `id` (string, REQUIRED): Brick ID
+- `id` (string, REQUIRED): Brick ID (kebab-case format: `B-{name}`)
 - `type` (string, REQUIRED): SHALL be `"brick"`
 - `name` (string, REQUIRED): Human-readable name
+- `layer` (integer, REQUIRED): Architectural layer (0, 1, 2, ...)
 - `file` (string, REQUIRED): Always `"jig/bricks.yaml"`
 
 **Excluded fields:**
@@ -295,13 +311,15 @@ All IDs SHALL follow these formats:
 |------|--------|---------|-------|
 | Specification | `S-{number}` | `S-001`, `S-042` | Sequential numbering |
 | Outcome | `O-{number}` | `O-001`, `O-003` | Sequential numbering |
-| Brick | `B-{number}` | `B-001`, `B-002` | Sequential numbering |
+| Brick | `B-{kebab-case}` | `B-auth`, `B-core-utils`, `B-rest-api` | Semantic kebab-case name |
 | Function | `F-{path}` | `F-auth.session.authenticate` | Fully-qualified path |
 | Module | `M-{path}` | `M-auth.session` | Module path |
 | Class | `C-{path}` | `C-auth.tokens.TokenValidator` | Fully-qualified class path |
 | Test | `T-{path}` | `T-test_auth.test_token_expiration` | Test path |
 
-**Human-authored IDs** (S-, O-, B-) SHALL use sequential numbers without domain prefixes.
+**Human-authored IDs:**
+- Specifications (S-) and Outcomes (O-) SHALL use sequential numbers
+- Bricks (B-) SHALL use semantic kebab-case names
 
 **Code-derived IDs** (M-, C-, F-, T-) SHALL use fully-qualified paths from code structure.
 
@@ -338,7 +356,7 @@ project-root/
 The following data SHALL be computed on demand, NOT stored:
 
 **Derived from implementation graph:**
-- Brick dependencies (B-001 depends on B-003 if any F in B-001 calls any F in B-003)
+- Brick dependencies (e.g., B-auth depends on B-core-utils if any F in B-auth calls any F in B-core-utils)
 - Public APIs (F is public if called from outside its brick)
 - Brick assignments for functions (computed by expanding bricks.yaml units)
 
@@ -355,13 +373,20 @@ The following data SHALL be computed on demand, NOT stored:
 Implementations SHALL validate:
 
 1. **ID uniqueness:** All spec IDs, outcome IDs, and brick IDs SHALL be unique within their type
-2. **Reference integrity:** All `@jig.implements` SHALL reference existing spec IDs
-3. **Reference integrity:** All `@jig.verifies` SHALL reference existing spec/outcome IDs
-4. **Reference integrity:** All outcome `specifies` SHALL reference existing spec IDs
-5. **Brick partition:** Every function SHALL belong to exactly one brick (no overlaps, no gaps)
-6. **No class splitting:** All methods of a class SHALL belong to the same brick
-7. **Unit prefix validity:** All brick units SHALL start with M-, C-, or F- (extensible for other languages)
-8. **Unit existence:** All brick units SHALL reference nodes that exist in implementation graph
+2. **Brick ID format:** All brick IDs SHALL match pattern `B-[a-z0-9-]+` (kebab-case)
+3. **Reference integrity:** All `@jig.implements` SHALL reference existing spec IDs
+4. **Reference integrity:** All `@jig.verifies` SHALL reference existing spec/outcome IDs
+5. **Reference integrity:** All outcome `specifies` SHALL reference existing spec IDs
+6. **Brick partition:** Every function SHALL belong to exactly one brick (no overlaps, no gaps)
+7. **No class splitting:** All methods of a class SHALL belong to the same brick
+8. **Unit prefix validity:** All brick units SHALL start with M-, C-, or F- (extensible for other languages)
+9. **Unit existence:** All brick units SHALL reference nodes that exist in implementation graph
+10. **Layer field presence:** All bricks SHALL have a `layer` field (REQUIRED)
+11. **Layer validity:** All layer values SHALL be non-negative integers (>= 0)
+12. **Layer constraints:** For each brick B at layer L, all bricks that B depends on (derived from implementation graph) SHALL satisfy:
+    - If L > 0: dependency brick layer < L
+    - If L = 0: dependency brick layer = 0 (layer 0 bricks may depend on each other)
+13. **No circular dependencies:** Brick dependency graph SHALL be acyclic (DAG) at all layers including layer 0
 
 ### 11. Language Extension Contract
 
@@ -381,31 +406,37 @@ Implementations SHALL validate:
 ### What This Enables
 
 1. **Unambiguous foundation:** All tooling builds on precise, well-defined contracts
-2. **No circular dependencies:** Graphs generated independently, bricks defined separately, assignment computed at query time
-3. **Minimal maintenance:** Only store what cannot be computed; derive everything else
-4. **Clean git diffs:** NDJSON format, minimal required fields, no derived data
-5. **Language extensibility:** Foundation supports multiple languages via prefix extension
-6. **Tool automation:** Machine-readable contracts enable code generation, validation, analysis
+2. **Architectural layering:** Explicit stratification via layer numbers enables dependency discipline and work sequencing
+3. **No circular dependencies:** Graphs generated independently, bricks defined separately, layer constraints prevent cycles
+4. **Semantic brick IDs:** Kebab-case names make architecture visible at a glance (B-auth vs B-001)
+5. **Minimal maintenance:** Only store what cannot be computed; derive everything else
+6. **Clean git diffs:** NDJSON format, minimal required fields, no derived data
+7. **Language extensibility:** Foundation supports multiple languages via prefix extension
+8. **Tool automation:** Machine-readable contracts enable code generation, validation, analysis
 
 ### What This Constrains
 
 1. **No additional fields:** Artifacts SHALL NOT include fields beyond this contract (eliminates drift)
 2. **No manual brick assignment:** Functions SHALL NOT specify their brick (bricks.yaml is sole source)
 3. **No derived data storage:** Metrics SHALL NOT be stored in graphs (computed on demand)
-4. **No domain prefixes:** IDs SHALL use sequential numbers, not semantic names
+4. **Brick ID semantics:** Brick IDs SHALL use kebab-case semantic names (B-auth, not B-001)
 5. **Single brick file:** All bricks SHALL be defined in one `bricks.yaml` file
 6. **NDJSON only:** Graph files SHALL use NDJSON, not pretty-printed JSON
+7. **Layer constraints:** Brick dependencies SHALL respect layer hierarchy (enforced via validation)
 
 ### Migration Path
 
 Existing projects adopting jig SHALL follow:
 1. Create specification files with minimal frontmatter
 2. Generate implementation graph (no brick assignments)
-3. Define bricks in bricks.yaml using M-/C-/F- references
+3. Define bricks in bricks.yaml using:
+   - Semantic kebab-case IDs (B-auth, B-core-utils, not B-001, B-002)
+   - Layer assignments (suggest layers via dependency analysis or start with all layer 0)
+   - M-/C-/F- unit references
 4. Add @jig.implements decorators to code
 5. Add @jig.verifies decorators to tests
-6. Generate all graphs
-7. Validate partition and references
+6. Generate all graphs (intent, implementation, verification)
+7. Validate partition, references, and layer constraints
 
 ---
 
@@ -422,3 +453,4 @@ Tools, automation, and analysis SHALL treat this contract as normative and immut
 - **AG019:** Irreducible Core (S-F-T triangle)
 - **AG020:** Bricks as Partitions
 - **AG024:** Core Artifacts Contract (Refined) - detailed rationale
+- **AG029:** Brick Layers - architectural stratification and dependency constraints

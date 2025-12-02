@@ -1,32 +1,37 @@
 bricks:
-  - id: B-001
+  - id: B-decorators
     name: JIG Core Decorators
+    layer: 0
     units:
       - M-jig.__init__
 
-  - id: B-002
+  - id: B-cli
     name: CLI Interface
+    layer: 3
     units:
       - M-jig.cli.main
       - M-jig.cli.validate
 
-  - id: B-003
+  - id: B-validation
     name: Artifact Validation
+    layer: 0 
     units:
       - M-jig.validation.intent
       - M-jig.validation.bricks
       - M-jig.validation.models
       - M-jig.validation.reporting
 
-  - id: B-004
-    name: Implementation Graph Core
+  - id: B-impl-graph
+    name: Implementation Graph
+    layer: 2
     units:
       - M-jig.impl_graph.graph
       - M-jig.impl_graph.builder
       - M-jig.impl_graph.ndjson_writer
 
-  - id: B-005
+  - id: B-languages
     name: Language Analyzers
+    layer: 1
     units:
       - M-jig.impl_graph.analyzers.base
       - M-jig.impl_graph.analyzers.registry
