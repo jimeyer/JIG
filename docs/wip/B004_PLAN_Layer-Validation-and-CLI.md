@@ -24,7 +24,7 @@
 - [x] WU0: Create Intent nodes (Specifications S-035 through S-041)
 - [x] WU1: Brick ID format validation — tests ☑ / code ☑ / docs ☐
 - [x] WU2: Layer field validation (presence & value) — tests ☑ / code ☑ / docs ☐
-- [ ] WU3: Layer constraint validation — tests ☐ / code ☐ / docs ☐
+- [x] WU3: Layer constraint validation — tests ☑ / code ☑ / docs ☐
 - [ ] WU4: Circular dependency detection — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: CLI `jigy layers` command — tests ☐ / code ☐ / docs ☐
 - [ ] WU6: CLI `jigy layers suggest` command — tests ☐ / code ☐ / docs ☐
@@ -168,11 +168,11 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-038 is implemented (layer constraint checking)
-- [ ] S-038 is verified by comprehensive tests
-- [ ] Tests cover valid and invalid layer dependencies
-- [ ] Error messages show which brick violates constraints and how
-- [ ] `jigy validate bricks` reports layer violations with function-level detail
+- [x] S-038 is implemented (layer constraint checking)
+- [x] S-038 is verified by comprehensive tests
+- [x] Tests cover valid and invalid layer dependencies
+- [x] Error messages show which brick violates constraints and how
+- [x] `jigy validate bricks` reports layer violations with function-level detail
 
 **Implementation Notes**:
 - Approach:
@@ -203,10 +203,14 @@
 - Run `jigy validate bricks` and verify error messages show function calls
 
 **Reflect** (≤5 bullets):
-- (To be filled during execution)
+- New validation function cleanly separates layer constraint logic from definitions/partition
+- Function call edges from implementation graph enable precise dependency tracking
+- Layer constraint rules properly handle Layer 0 (allows L0→L0) vs other layers (requires strict downward deps)
+- Error messages include brick IDs, layers, AND function call details (source→target)
+- Validation conditionally runs only if definitions pass (avoids cascade errors when layer field missing)
 
 **Links**:
-- Commit: (TBD)
+- Commit: (TBD after commit)
 - PR: (TBD)
 
 ---

@@ -8,7 +8,11 @@ from pathlib import Path
 import click
 
 import jig
-from jig.validation.bricks import validate_brick_definitions, validate_brick_partition
+from jig.validation.bricks import (
+    validate_brick_definitions,
+    validate_brick_layer_constraints,
+    validate_brick_partition,
+)
 from jig.validation.intent import (
     validate_decorator_files,
     validate_outcome_files,
@@ -119,6 +123,12 @@ def validate_bricks_command(project_root: Path, output_format: str = "human") ->
     # Validate brick partition
     partition_result = validate_brick_partition(bricks_file, impl_graph)
     results["partition"] = partition_result
+
+    # Validate brick layer constraints (S-038)
+    # Only run if definitions passed (need layer field to be present)
+    if definitions_result.passed:
+        layer_constraints_result = validate_brick_layer_constraints(bricks_file, impl_graph)
+        results["layer_constraints"] = layer_constraints_result
 
     # Format output
     if output_format == "json":

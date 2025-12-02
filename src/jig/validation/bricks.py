@@ -454,3 +454,189 @@ def _detect_class_splitting(
             splits.append((class_id, brick_ids))
 
     return splits
+
+
+@jig.implements("S-038")
+def validate_brick_layer_constraints(
+    bricks_file: Path,
+    impl_graph_file: Path,
+) -> ValidationResult:
+    """
+    Validate brick layer constraints based on implementation graph.
+
+    Checks that brick dependencies respect layer hierarchy:
+    - Layer N can depend on layer < N
+    - Layer 0 can depend on layer 0
+    - Layer N (N > 0) cannot depend on same layer N
+
+    Dependencies are derived from function call edges in implementation graph.
+    """
+    result = ValidationResult(passed=True, phase_name="brick layer constraints")
+
+    # Load implementation graph
+    if not impl_graph_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Implementation graph not found: {impl_graph_file}. Run 'jigy impl rebuild' first.",
+                code="GRAPH_NOT_FOUND",
+            )
+        )
+        return result
+
+    graph_nodes = _load_graph_nodes(impl_graph_file)
+    functions = [node for node in graph_nodes if node.get("type") == "function"]
+
+    # Load function call edges
+    call_edges = []
+    try:
+        with impl_graph_file.open() as f:
+            for line in f:
+                item = json.loads(line)
+                if item.get("type") == "calls":
+                    call_edges.append(item)
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Failed to load implementation graph: {e}",
+                code="INVALID_GRAPH",
+            )
+        )
+        return result
+
+    # Load bricks
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
+    try:
+        bricks_data = yaml.safe_load(bricks_file.read_text())
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Failed to parse bricks.yaml: {e}",
+                code="INVALID_YAML",
+            )
+        )
+        return result
+
+    # Handle both formats
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
+    if not isinstance(bricks_data, list):
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must contain a list of bricks",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    # Build function-to-brick mapping
+    function_to_brick = {}
+    brick_layers = {}
+
+    for brick in bricks_data:
+        brick_id = brick.get("id", "unknown")
+        layer = brick.get("layer")
+        units = brick.get("units", [])
+
+        if layer is not None:
+            brick_layers[brick_id] = layer
+
+        # Expand units to functions
+        expanded_functions = _expand_units_to_functions(units, graph_nodes)
+        for func_id in expanded_functions:
+            function_to_brick[func_id] = brick_id
+
+    # Derive brick-to-brick dependencies from function calls
+    brick_dependencies = defaultdict(set)  # brick_id -> set of (dependency_brick_id, source_func, target_func)
+
+    for edge in call_edges:
+        source_func = edge.get("source")
+        target_func = edge.get("target")
+
+        if not source_func or not target_func:
+            continue
+
+        source_brick = function_to_brick.get(source_func)
+        target_brick = function_to_brick.get(target_func)
+
+        # Both functions must be in bricks
+        if not source_brick or not target_brick:
+            continue
+
+        # Skip self-dependencies (same brick)
+        if source_brick == target_brick:
+            continue
+
+        # Record dependency
+        brick_dependencies[source_brick].add((target_brick, source_func, target_func))
+
+    # Check layer constraints
+    for source_brick, dependencies in brick_dependencies.items():
+        source_layer = brick_layers.get(source_brick)
+
+        # Skip if source brick has no layer (will be caught by field validation)
+        if source_layer is None:
+            continue
+
+        for target_brick, source_func, target_func in dependencies:
+            target_layer = brick_layers.get(target_brick)
+
+            # Skip if target brick has no layer
+            if target_layer is None:
+                continue
+
+            # Check layer constraint
+            violation = False
+            reason = ""
+
+            if source_layer == 0:
+                # Layer 0 can only depend on layer 0
+                if target_layer != 0:
+                    violation = True
+                    reason = f"Layer 0 bricks can only depend on other layer 0 bricks, not layer {target_layer}"
+            else:
+                # Layer N (N > 0) can only depend on layer < N
+                if target_layer >= source_layer:
+                    violation = True
+                    if target_layer == source_layer:
+                        reason = f"Same-layer dependencies are only allowed at layer 0, not layer {source_layer}"
+                    else:
+                        reason = f"Layer {source_layer} cannot depend on layer {target_layer} (upward dependency)"
+
+            if violation:
+                # Find brick names for better error messages
+                source_brick_name = next(
+                    (b.get("name", source_brick) for b in bricks_data if b.get("id") == source_brick),
+                    source_brick,
+                )
+                target_brick_name = next(
+                    (b.get("name", target_brick) for b in bricks_data if b.get("id") == target_brick),
+                    target_brick,
+                )
+
+                result.add_error(
+                    ValidationError(
+                        file=str(bricks_file),
+                        message=f"Layer constraint violation: {source_brick} (layer {source_layer}) depends on {target_brick} (layer {target_layer})\n"
+                        f"  → {source_func} calls {target_func}\n"
+                        f"  → {reason}",
+                        code="LAYER_CONSTRAINT_VIOLATION",
+                    )
+                )
+
+    result.items_checked = len(brick_dependencies)
+
+    return result
