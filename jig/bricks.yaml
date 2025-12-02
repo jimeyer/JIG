@@ -7,10 +7,11 @@ bricks:
 
   - id: B-cli
     name: CLI Interface
-    layer: 3
+    layer: 1
     units:
       - M-jig.cli.main
       - M-jig.cli.validate
+      - M-jig.cli.layers
 
   - id: B-validation
     name: Artifact Validation
@@ -23,15 +24,22 @@ bricks:
 
   - id: B-impl-graph
     name: Implementation Graph
-    layer: 2
+    layer: 0
     units:
       - M-jig.impl_graph.graph
       - M-jig.impl_graph.builder
       - M-jig.impl_graph.ndjson_writer
 
+  - id: B-intent-graph
+    name: Intent Graph
+    layer: 0
+    units:
+      - M-jig.intent_graph.generator
+
+
   - id: B-languages
     name: Language Analyzers
-    layer: 1
+    layer: 0
     units:
       - M-jig.impl_graph.analyzers.base
       - M-jig.impl_graph.analyzers.registry

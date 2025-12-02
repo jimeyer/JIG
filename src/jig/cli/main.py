@@ -20,7 +20,7 @@ from jig.intent_graph.generator import generate_intent_graph
 @click.group()
 @click.version_option()
 def cli():
-    """JIG - Just-In-time Graph for alignment tracking."""
+    """JIG - JIG Intent Graph for Software Alignment."""
     pass
 
 

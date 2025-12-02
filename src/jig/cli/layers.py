@@ -105,26 +105,54 @@ def layers_command(project_root: Path, summary: bool = False, verbose: bool = Fa
             if source_brick and target_brick and source_brick != target_brick:
                 brick_dependencies[source_brick].add(target_brick)
 
-    # Count functions per brick
-    brick_function_counts = {}
+    # Count modules, classes, and functions per brick
+    brick_unit_counts = {}
     for brick in bricks:
         brick_id = brick.get("id")
+        module_count = sum(
+            1 for unit_id in brick.get("units", [])
+            if unit_id in nodes and nodes[unit_id].get("type") == "module"
+        )
+        class_count = sum(
+            1 for unit_id in brick.get("units", [])
+            if unit_id in nodes and nodes[unit_id].get("type") == "class"
+        )
         function_count = sum(
             1 for unit_id in brick.get("units", [])
             if unit_id in nodes and nodes[unit_id].get("type") == "function"
         )
-        brick_function_counts[brick_id] = function_count
+        brick_unit_counts[brick_id] = {
+            "modules": module_count,
+            "classes": class_count,
+            "functions": function_count
+        }
 
     # Check for cycles
     has_cycles = _has_cycles_in_brick_graph(brick_dependencies)
 
     # Display output
     if summary:
-        _display_summary(layers_dict, brick_function_counts, has_cycles, bricks)
+        _display_summary(layers_dict, brick_unit_counts, has_cycles, bricks)
     else:
-        _display_full(layers_dict, brick_dependencies, brick_function_counts, has_cycles, bricks, verbose)
+        _display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose)
 
     return 0
+
+
+def _format_unit_counts(counts: dict) -> str:
+    """Format unit counts as 'X Modules, Y Classes, Z Functions', omitting zero counts."""
+    parts = []
+    if counts.get("modules", 0) > 0:
+        n = counts["modules"]
+        parts.append(f"{n} Module{'s' if n != 1 else ''}")
+    if counts.get("classes", 0) > 0:
+        n = counts["classes"]
+        parts.append(f"{n} Class{'es' if n != 1 else ''}")
+    if counts.get("functions", 0) > 0:
+        n = counts["functions"]
+        parts.append(f"{n} Function{'s' if n != 1 else ''}")
+
+    return ", ".join(parts) if parts else "empty"
 
 
 def _has_cycles_in_brick_graph(dependencies: dict) -> bool:
@@ -154,36 +182,63 @@ def _has_cycles_in_brick_graph(dependencies: dict) -> bool:
     return False
 
 
-def _display_summary(layers_dict, brick_function_counts, has_cycles, bricks):
+def _display_summary(layers_dict, brick_unit_counts, has_cycles, bricks):
     """Display summary output (--summary)."""
     click.echo("Layer Summary")
     click.echo("━" * 60)
 
     total_bricks = len(bricks)
-    total_functions = sum(brick_function_counts.values())
+    total_modules = sum(counts.get("modules", 0) for counts in brick_unit_counts.values())
+    total_classes = sum(counts.get("classes", 0) for counts in brick_unit_counts.values())
+    total_functions = sum(counts.get("functions", 0) for counts in brick_unit_counts.values())
 
     # Display each layer
     for layer in sorted(layers_dict.keys()):
         layer_bricks = layers_dict[layer]
         layer_brick_count = len(layer_bricks)
-        layer_function_count = sum(
-            brick_function_counts.get(brick.get("id"), 0)
+
+        # Sum up counts for this layer
+        layer_modules = sum(
+            brick_unit_counts.get(brick.get("id"), {}).get("modules", 0)
             for brick in layer_bricks
         )
-        click.echo(f"Layer {layer}: {layer_brick_count} bricks, {layer_function_count} functions")
+        layer_classes = sum(
+            brick_unit_counts.get(brick.get("id"), {}).get("classes", 0)
+            for brick in layer_bricks
+        )
+        layer_functions = sum(
+            brick_unit_counts.get(brick.get("id"), {}).get("functions", 0)
+            for brick in layer_bricks
+        )
+
+        layer_counts = {
+            "modules": layer_modules,
+            "classes": layer_classes,
+            "functions": layer_functions
+        }
+        counts_str = _format_unit_counts(layer_counts)
+        click.echo(f"Layer {layer}: {layer_brick_count} bricks, {counts_str}")
 
     click.echo("━" * 60)
-    click.echo(f"Total: {total_bricks} bricks, {len(layers_dict)} layers, {total_functions} functions")
+    total_counts = {
+        "modules": total_modules,
+        "classes": total_classes,
+        "functions": total_functions
+    }
+    total_counts_str = _format_unit_counts(total_counts)
+    click.echo(f"Total: {total_bricks} bricks, {len(layers_dict)} layers, {total_counts_str}")
 
 
-def _display_full(layers_dict, brick_dependencies, brick_function_counts, has_cycles, bricks, verbose):
+def _display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose):
     """Display full output (default)."""
     click.echo("Brick Layer Structure")
     click.echo("━" * 60)
     click.echo()
 
     total_bricks = len(bricks)
-    total_functions = sum(brick_function_counts.values())
+    total_modules = sum(counts.get("modules", 0) for counts in brick_unit_counts.values())
+    total_classes = sum(counts.get("classes", 0) for counts in brick_unit_counts.values())
+    total_functions = sum(counts.get("functions", 0) for counts in brick_unit_counts.values())
 
     # Display each layer
     for layer in sorted(layers_dict.keys()):
@@ -194,9 +249,10 @@ def _display_full(layers_dict, brick_dependencies, brick_function_counts, has_cy
         for brick in layer_bricks:
             brick_id = brick.get("id")
             brick_name = brick.get("name", brick_id)
-            function_count = brick_function_counts.get(brick_id, 0)
+            brick_counts = brick_unit_counts.get(brick_id, {"modules": 0, "classes": 0, "functions": 0})
+            counts_str = _format_unit_counts(brick_counts)
 
-            click.echo(f"  {brick_id}: {brick_name} ({function_count} functions)")
+            click.echo(f"  {brick_id}: {brick_name} ({counts_str})")
 
             # Show dependencies
             deps = sorted(brick_dependencies.get(brick_id, []))
@@ -205,9 +261,20 @@ def _display_full(layers_dict, brick_dependencies, brick_function_counts, has_cy
                 click.echo(f"    ↓ depends on: {deps_str}")
 
             if verbose:
-                # Show function list
+                # Show unit lists
                 units = brick.get("units", [])
+                modules = [u for u in units if u.startswith("M-")]
+                classes = [u for u in units if u.startswith("C-")]
                 functions = [u for u in units if u.startswith("F-")]
+
+                if modules:
+                    click.echo(f"    Modules: {', '.join(modules[:5])}")
+                    if len(modules) > 5:
+                        click.echo(f"      ... and {len(modules) - 5} more")
+                if classes:
+                    click.echo(f"    Classes: {', '.join(classes[:5])}")
+                    if len(classes) > 5:
+                        click.echo(f"      ... and {len(classes) - 5} more")
                 if functions:
                     click.echo(f"    Functions: {', '.join(functions[:5])}")
                     if len(functions) > 5:
@@ -216,7 +283,13 @@ def _display_full(layers_dict, brick_dependencies, brick_function_counts, has_cy
         click.echo()
 
     click.echo("━" * 60)
-    click.echo(f"Total: {total_bricks} bricks, {len(layers_dict)} layers, {total_functions} functions")
+    total_counts = {
+        "modules": total_modules,
+        "classes": total_classes,
+        "functions": total_functions
+    }
+    total_counts_str = _format_unit_counts(total_counts)
+    click.echo(f"Total: {total_bricks} bricks, {len(layers_dict)} layers, {total_counts_str}")
 
     # Show DAG status
     if has_cycles:
