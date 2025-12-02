@@ -203,7 +203,7 @@
 - Validation correctly detected 5 real orphaned specs in codebase (S-015, S-016, S-026, S-027, S-029) - will fix later
 
 **Links**:
-- Commit: (TBD after commit)
+- Commit: 51ed45f
 - PR: (TBD)
 
 ---
