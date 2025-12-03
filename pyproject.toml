@@ -46,6 +46,9 @@ jigy = "jig.cli.main:cli"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+jig = ["agents/*.md"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"

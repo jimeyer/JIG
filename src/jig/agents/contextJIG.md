@@ -146,10 +146,11 @@ def test_token_expiration():
 ## CLI Commands
 
 ```bash
+jigy validate       # Check references, partition, layers
 jigy impl rebuild   # Generate implementation graph from code
 jigy intent rebuild # Generate intent graph from JIG artifacts
-jigy validate       # Check references, partition, layers
 jigy layers         # Show layer structure
+jigy rebuild        # Runs validate, rebuild, layers commands in order
 ```
 
 ---
@@ -219,12 +220,12 @@ project-root/
 
 ## Quick Reference
 
-| Task | Action |
-|------|--------|
-| Add new requirement | Create `jig/specifications/S-{next}.md` |
-| Group specs into value | Create `jig/outcomes/O-{next}.md` with `specifies: [...]` |
-| Mark function implements spec | Add `@jig.implements("S-001")` decorator |
-| Mark test verifies spec | Add `@jig.verifies("S-001")` decorator |
-| Assign functions to brick | Add module/class/function to `units` in `bricks.yaml` |
-| Check everything valid | Run `jigy validate` |
-| See alignment status | Run `jigy status` |
+| Task                          | Action                                                    |
+| ----------------------------- | --------------------------------------------------------- |
+| Add new requirement           | Create `jig/specifications/S-{next}.md`                   |
+| Group specs into value        | Create `jig/outcomes/O-{next}.md` with `specifies: [...]` |
+| Mark function implements spec | Add `@jig.implements("S-001")` decorator                  |
+| Mark test verifies spec       | Add `@jig.verifies("S-001")` decorator                    |
+| Assign functions to brick     | Add module/class/function to `units` in `bricks.yaml`     |
+| Check everything valid        | Run `jigy rebuild`                                        |
+
