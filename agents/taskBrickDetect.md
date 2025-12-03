@@ -40,7 +40,7 @@ This analysis validates the current partition and identifies opportunities for i
 ## Inputs
 
 ### 1. Implementation Graph
-**Location:** `/Users/jamesmeyer/Code/jig/jig/generated/implementation-graph.ndjson`
+**Location:** `jig/generated/implementation-graph.ndjson`
 
 **Format:** NDJSON (one JSON object per line)
 
@@ -84,7 +84,7 @@ This analysis validates the current partition and identifies opportunities for i
 - Implementation relationships (nodes with non-empty `implements` arrays)
 
 ### 2. Brick Definitions
-**Location:** `/Users/jamesmeyer/Code/jig/jig/bricks.yaml`
+**Location:** `jig/bricks.yaml`
 
 **Format:** YAML
 
@@ -319,7 +319,7 @@ For each pair of bricks (B₁, B₂), calculate:
 
 ### Output Format: Markdown Report
 
-**Location:** `docs/wip/B003_ANALYSIS-Brick-Validation-Report.md`
+**Location:** `jig/Brick-Evaluation-Report.md`
 
 **Required Sections:**
 
