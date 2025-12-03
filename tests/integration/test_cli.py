@@ -273,3 +273,172 @@ def test_cli_help_messages() -> None:
     assert result.exit_code == 0
     assert "project-root" in result.output
     assert "source-dir" in result.output or "output" in result.output
+
+
+@pytest.fixture
+def full_project(tmp_path: Path) -> Path:
+    """Create a complete test project with all JIG artifacts."""
+    project_root = tmp_path / "full_project"
+    src_dir = project_root / "src"
+    jig_dir = project_root / "jig"
+    specs_dir = jig_dir / "specifications"
+    outcomes_dir = jig_dir / "outcomes"
+
+    # Create directories
+    src_dir.mkdir(parents=True)
+    specs_dir.mkdir(parents=True)
+    outcomes_dir.mkdir(parents=True)
+
+    # Create a simple Python module
+    (src_dir / "example.py").write_text(
+        """
+import jig
+
+@jig.implements("S-001")
+def example_function():
+    '''Example function.'''
+    pass
+"""
+    )
+
+    # Create specification
+    (specs_dir / "S-001.md").write_text(
+        """---
+id: S-001
+type: specification
+---
+
+# Example Specification
+
+Example spec for testing.
+"""
+    )
+
+    # Create outcome
+    (outcomes_dir / "O-001.md").write_text(
+        """---
+id: O-001
+type: outcome
+specifies:
+  - S-001
+---
+
+# Example Outcome
+
+Example outcome for testing.
+"""
+    )
+
+    # Create bricks.yaml
+    (jig_dir / "bricks.yaml").write_text(
+        """bricks:
+  - id: B-example
+    name: Example Brick
+    layer: 0
+    units:
+      - M-example
+"""
+    )
+
+    return project_root
+
+
+def test_cli_rebuild_success(runner: CliRunner, full_project: Path) -> None:
+    """Test that rebuild runs all four steps successfully."""
+    result = runner.invoke(
+        cli,
+        [
+            "rebuild",
+            "--project-root",
+            str(full_project),
+        ],
+    )
+
+    # Should succeed
+    assert result.exit_code == 0, f"Command failed with output:\n{result.output}"
+
+    # Should show all four steps
+    assert "Step 1/4: Validating JIG artifacts" in result.output
+    assert "Step 2/4: Rebuilding implementation graph" in result.output
+    assert "Step 3/4: Rebuilding intent graph" in result.output
+    assert "Step 4/4: Displaying layer structure" in result.output
+
+    # Should show success message
+    assert "Complete! All JIG artifacts rebuilt successfully" in result.output
+
+    # Should create both graph files
+    impl_graph = full_project / "jig" / "generated" / "implementation-graph.ndjson"
+    intent_graph = full_project / "jig" / "generated" / "intent-graph.ndjson"
+    assert impl_graph.exists(), "Implementation graph not created"
+    assert intent_graph.exists(), "Intent graph not created"
+
+
+def test_cli_rebuild_with_verbose(runner: CliRunner, full_project: Path) -> None:
+    """Test rebuild with verbose flag."""
+    result = runner.invoke(
+        cli,
+        [
+            "rebuild",
+            "--project-root",
+            str(full_project),
+            "--verbose",
+        ],
+    )
+
+    # Should succeed
+    assert result.exit_code == 0
+
+    # Should show all steps
+    assert "Step 1/4" in result.output
+    assert "Step 2/4" in result.output
+    assert "Step 3/4" in result.output
+    assert "Step 4/4" in result.output
+
+
+def test_cli_rebuild_stops_on_validation_error(runner: CliRunner, tmp_path: Path) -> None:
+    """Test that rebuild stops when validation fails."""
+    project_root = tmp_path / "bad_project"
+    jig_dir = project_root / "jig"
+    specs_dir = jig_dir / "specifications"
+    specs_dir.mkdir(parents=True)
+
+    # Create invalid specification (missing type field)
+    (specs_dir / "S-001.md").write_text(
+        """---
+id: S-001
+---
+
+# Bad Spec
+"""
+    )
+
+    result = runner.invoke(
+        cli,
+        [
+            "rebuild",
+            "--project-root",
+            str(project_root),
+        ],
+    )
+
+    # Should fail
+    assert result.exit_code != 0
+
+    # Should show step 1
+    assert "Step 1/4: Validating" in result.output
+
+    # Should show validation failure
+    assert "Validation failed" in result.output or "Error" in result.output
+
+    # Should NOT continue to step 2
+    assert "Step 2/4" not in result.output
+
+
+def test_cli_rebuild_help(runner: CliRunner) -> None:
+    """Test that rebuild command has helpful documentation."""
+    result = runner.invoke(cli, ["rebuild", "--help"])
+
+    assert result.exit_code == 0
+    assert "rebuild" in result.output.lower()
+    assert "workflow" in result.output.lower()
+    assert "validate" in result.output.lower() or "Validate" in result.output
