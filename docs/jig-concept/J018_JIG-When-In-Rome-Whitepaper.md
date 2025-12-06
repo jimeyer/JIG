@@ -1,3 +1,4 @@
+
 # JIG: When in Rome
 ## A Language-Native Approach to Software Architecture Alignment
 
