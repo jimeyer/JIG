@@ -1,14 +1,14 @@
-# J024: Audit Agents
+# J025: Audit Agents
 
 **Status:** Proposal
 **Date:** 2025-12-06
-**Builds On:** J022 (Alignment Change Detection), J023 (Audit Strategies and Mechanisms)
+**Builds On:** J022 (Content Hashing), J023 (Audit Records and Triggers), J024 (Audit Strategies and Mechanisms)
 
 ---
 
 ## Context
 
-J022 introduced hash-based change detection to identify *when* alignment needs re-verification. J023 defined the output format and query patterns for audit results. This document addresses *how* to perform audits efficiently and *how* to evaluate audit strategies.
+J022 introduced content hashing for artifact identity. J023 defines audit records and trigger detection. J024 defined the output format and query patterns for audit results. This document addresses *how* to perform audits efficiently and *how* to evaluate audit strategies.
 
 ### The Core Question
 
@@ -23,7 +23,7 @@ Auditing alignment between specifications (S), implementations (F), and tests (T
 1. **Minimize LLM usage** without sacrificing audit quality
 2. **Use the right tool** for each audit sub-task
 3. **Leverage change detection** (J022) to avoid redundant work
-4. **Produce machine-readable output** (J023) for aggregation
+4. **Produce machine-readable output** (J024) for aggregation
 5. **Enable empirical evaluation** of strategy effectiveness
 
 ---
@@ -309,7 +309,7 @@ Run Level 3 or 4 depending on remaining confidence
 │  │  • Retrieves cached results if unchanged                │   │
 │  │  • Determines required audit depth                      │   │
 │  │  • Dispatches to appropriate layer                      │   │
-│  │  • Aggregates results into J023 format                  │   │
+│  │  • Aggregates results into J024 format                  │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                            │                                    │
 │         ┌──────────────────┼──────────────────┐                │
@@ -334,7 +334,7 @@ Run Level 3 or 4 depending on remaining confidence
 │  │  • Computes final alignment score                       │   │
 │  │  • Determines status (PERFECT, UNVERIFIED, etc.)        │   │
 │  │  • Collects issues with severity                        │   │
-│  │  • Outputs J023-compliant NDJSON                        │   │
+│  │  • Outputs J024-compliant NDJSON                        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -967,30 +967,40 @@ Actions:
 
 ## Part IV: Integration
 
-### With J022 (Change Detection)
+### With J022 (Content Hashing)
 
 ```
 J022 provides:
   - Hash for each spec, impl, test
-  - Detection of which pairs changed
-  - Audit log of previous decisions
+  - Content identity via jig_hash
 
-J024 uses:
-  - Hash changes to determine audit depth
+J025 uses:
+  - Hash values for change detection
+```
+
+### With J023 (Audit Records and Triggers)
+
+```
+J023 provides:
+  - Audit log of previous decisions
+  - Detection of which pairs changed (triggers)
+
+J025 uses:
+  - Trigger detection to determine audit depth
   - Previous audit results as cache
   - Audit log to track strategy decisions
 ```
 
-### With J023 (Audit Output)
+### With J024 (Audit Output)
 
 ```
-J023 defines:
+J024 defines:
   - NDJSON output format
   - Index aggregation schema
   - Query patterns
 
-J024 produces:
-  - Audit results in J023 format
+J025 produces:
+  - Audit results in J024 format
   - Strategy metadata in _meta record
   - Evaluation metrics for analysis
 ```
@@ -1035,8 +1045,9 @@ jigy config audit.sampling_rate 0.1
 
 ## References
 
-- **J022:** Alignment Change Detection (hash-based change tracking)
-- **J023:** Audit Strategies and Mechanisms (output format, query patterns)
+- **J022:** Content Hashing (content identity)
+- **J023:** Audit Records and Triggers (change detection, audit log)
+- **J024:** Audit Strategies and Mechanisms (output format, query patterns)
 - **J017:** JIG Concept v9 (S-F-T triangle, alignment measurement)
 - **A001:** Core Artifacts Contract (artifact schemas)
 
