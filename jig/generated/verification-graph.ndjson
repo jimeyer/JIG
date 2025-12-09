@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 310, "node_count": 340, "version": "1.0"}}
+{"_meta": {"edge_count": 310, "generated": "2025-12-09T04:39:03.394579+00:00", "node_count": 340, "version": "1.0"}}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "jig_hash": "a27e9703d315", "type": "test", "verifies": ["S-052", "S-053", "S-054"]}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_returns_sorted_nodes", "jig_hash": "774090f25e3d", "type": "test", "verifies": ["S-052"]}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_accepts_outcome_ids", "jig_hash": "c25116be4f0b", "type": "test", "verifies": ["S-053"]}

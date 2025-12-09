@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 447, "generated": "2025-12-09T04:14:17.678823+00:00", "node_count": 305, "version": "1.0"}}
+{"_meta": {"edge_count": 447, "generated": "2025-12-09T04:39:03.000481+00:00", "node_count": 305, "version": "1.0"}}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "git_blob": "990a12cff4d3", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "git_blob": "cb7bfbe4db90", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "git_blob": "cb7bfbe4db90", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
