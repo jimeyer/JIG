@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 318, "node_count": 348, "version": "1.0"}}
+{"_meta": {"edge_count": 310, "node_count": 340, "version": "1.0"}}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "jig_hash": "a27e9703d315", "type": "test", "verifies": ["S-052", "S-053", "S-054"]}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_returns_sorted_nodes", "jig_hash": "774090f25e3d", "type": "test", "verifies": ["S-052"]}
 {"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_accepts_outcome_ids", "jig_hash": "c25116be4f0b", "type": "test", "verifies": ["S-053"]}
@@ -339,14 +339,6 @@
 {"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "jig_hash": "8dac32bcc31c", "type": "test", "verifies": ["S-056"]}
 {"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "jig_hash": "13c71ca3c358", "type": "test", "verifies": ["S-056"]}
 {"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_shows_progress", "jig_hash": "effc6986e97f", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.TestWithClass.test_method", "jig_hash": "51f1704fdb1d", "type": "test", "verifies": ["S-003"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.TestWithClass.test_method_multiple", "jig_hash": "37cacb09353c", "type": "test", "verifies": ["S-004", "S-005"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_invalid_spec_id", "jig_hash": "796dd3345a6b", "type": "test", "verifies": []}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_multiple_specs", "jig_hash": "804ec78c6ecd", "type": "test", "verifies": ["S-001", "S-002"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_no_decorator", "jig_hash": "1872eddb5fd6", "type": "test", "verifies": []}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_short_form", "jig_hash": "323fb914e25f", "type": "test", "verifies": ["S-006"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_simple", "jig_hash": "f943a32fb60a", "type": "test", "verifies": ["S-001"]}
-{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_with_logic", "jig_hash": "2c0b6cab49f1", "type": "test", "verifies": ["S-007"]}
 {"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-052", "type": "verifies"}
 {"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-053", "type": "verifies"}
 {"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-054", "type": "verifies"}
@@ -657,11 +649,3 @@
 {"source": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "target": "S-056", "type": "verifies"}
 {"source": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "target": "S-056", "type": "verifies"}
 {"source": "T-test_verify.test_cli_verify_rebuild_shows_progress", "target": "S-056", "type": "verifies"}
-{"source": "T-test_with_verifies.TestWithClass.test_method", "target": "S-003", "type": "verifies"}
-{"source": "T-test_with_verifies.TestWithClass.test_method_multiple", "target": "S-004", "type": "verifies"}
-{"source": "T-test_with_verifies.TestWithClass.test_method_multiple", "target": "S-005", "type": "verifies"}
-{"source": "T-test_with_verifies.test_multiple_specs", "target": "S-001", "type": "verifies"}
-{"source": "T-test_with_verifies.test_multiple_specs", "target": "S-002", "type": "verifies"}
-{"source": "T-test_with_verifies.test_short_form", "target": "S-006", "type": "verifies"}
-{"source": "T-test_with_verifies.test_simple", "target": "S-001", "type": "verifies"}
-{"source": "T-test_with_verifies.test_with_logic", "target": "S-007", "type": "verifies"}

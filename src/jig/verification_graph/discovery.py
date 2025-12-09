@@ -25,6 +25,7 @@ DEFAULT_EXCLUDE_DIRS = frozenset({
     "dist",
     "build",
     "*.egg-info",
+    "fixtures",  # Test fixtures are not real tests
 })
 
 
