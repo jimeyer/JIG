@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import jig
+from jig.hashing import hash_function
 
 logger = logging.getLogger(__name__)
 
@@ -177,9 +178,10 @@ class PythonStructureVisitor(ast.NodeVisitor):
         if self.current_class:
             func_node["parent_class"] = self.current_class
 
-        # Add implements field if decorators found
+        # Add implements field and jig_hash if decorators found (S-050)
         if implements_specs:
             func_node["implements"] = implements_specs
+            func_node["jig_hash"] = hash_function(node)
 
         self.nodes.append(func_node)
 

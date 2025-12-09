@@ -6,6 +6,7 @@ functions, and their metadata from Python source files.
 Verifies S-001: Python code structure extracted via AST analysis.
 """
 
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -473,3 +474,174 @@ def test_python_analyzer_integration_all_fixtures(analyzer: PythonAnalyzer) -> N
         # All should have at least a module node
         modules = [n for n in result["nodes"] if n["type"] == "module"]
         assert len(modules) >= 1, f"Failed to find module in {fixture_name}"
+
+
+class TestImplementationGraphHashing:
+    """Tests for S-050: jig_hash on function nodes with implements."""
+
+    @jig.verifies("S-050")
+    def test_function_with_implements_has_jig_hash(self) -> None:
+        """Function nodes with @jig.implements have jig_hash field."""
+        code = '''
+import jig
+
+@jig.implements("S-001")
+def my_function():
+    """A function that implements S-001."""
+    return 42
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            functions = [n for n in result["nodes"] if n["type"] == "function"]
+            my_func = [f for f in functions if f["name"] == "my_function"][0]
+
+            assert "implements" in my_func
+            assert "S-001" in my_func["implements"]
+            assert "jig_hash" in my_func
+            assert len(my_func["jig_hash"]) == 12
+            assert all(c in "0123456789abcdef" for c in my_func["jig_hash"])
+        finally:
+            temp_path.unlink()
+
+    @jig.verifies("S-050")
+    def test_function_without_implements_no_jig_hash(self) -> None:
+        """Function nodes without @jig.implements do not have jig_hash field."""
+        code = '''
+def plain_function():
+    """A function without implements decorator."""
+    return 42
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            functions = [n for n in result["nodes"] if n["type"] == "function"]
+            plain_func = [f for f in functions if f["name"] == "plain_function"][0]
+
+            assert "implements" not in plain_func
+            assert "jig_hash" not in plain_func
+        finally:
+            temp_path.unlink()
+
+    @jig.verifies("S-050", "S-046")
+    def test_jig_hash_excludes_decorators(self) -> None:
+        """jig_hash is computed without decorators (per S-046)."""
+        # Two functions with same body but different decorator targets
+        code1 = '''
+import jig
+
+@jig.implements("S-001")
+def my_function():
+    return 42
+'''
+        code2 = '''
+import jig
+
+@jig.implements("S-002")
+def my_function():
+    return 42
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f1:
+            f1.write(code1)
+            path1 = Path(f1.name)
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f2:
+            f2.write(code2)
+            path2 = Path(f2.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+
+            result1 = analyzer.analyze_file(path1)
+            func1 = [n for n in result1["nodes"] if n["name"] == "my_function"][0]
+
+            result2 = analyzer.analyze_file(path2)
+            func2 = [n for n in result2["nodes"] if n["name"] == "my_function"][0]
+
+            # Hashes should be identical - decorator target doesn't affect hash
+            assert func1["jig_hash"] == func2["jig_hash"]
+
+            # But implements should be different
+            assert func1["implements"] != func2["implements"]
+        finally:
+            path1.unlink()
+            path2.unlink()
+
+    @jig.verifies("S-050", "S-046")
+    def test_jig_hash_changes_when_body_changes(self) -> None:
+        """jig_hash changes when function body changes."""
+        code1 = '''
+import jig
+
+@jig.implements("S-001")
+def my_function():
+    return 42
+'''
+        code2 = '''
+import jig
+
+@jig.implements("S-001")
+def my_function():
+    return 99
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f1:
+            f1.write(code1)
+            path1 = Path(f1.name)
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f2:
+            f2.write(code2)
+            path2 = Path(f2.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+
+            result1 = analyzer.analyze_file(path1)
+            func1 = [n for n in result1["nodes"] if n["name"] == "my_function"][0]
+
+            result2 = analyzer.analyze_file(path2)
+            func2 = [n for n in result2["nodes"] if n["name"] == "my_function"][0]
+
+            # Hashes should be different - body changed
+            assert func1["jig_hash"] != func2["jig_hash"]
+        finally:
+            path1.unlink()
+            path2.unlink()
+
+    @jig.verifies("S-050")
+    def test_async_function_with_implements_has_jig_hash(self) -> None:
+        """Async function nodes with @jig.implements have jig_hash field."""
+        code = '''
+import jig
+
+@jig.implements("S-001")
+async def async_function():
+    """An async function that implements S-001."""
+    return 42
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            functions = [n for n in result["nodes"] if n["type"] == "function"]
+            async_func = [f for f in functions if f["name"] == "async_function"][0]
+
+            assert async_func["async"] is True
+            assert "implements" in async_func
+            assert "jig_hash" in async_func
+            assert len(async_func["jig_hash"]) == 12
+        finally:
+            temp_path.unlink()
