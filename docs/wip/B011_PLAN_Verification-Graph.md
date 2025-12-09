@@ -53,7 +53,7 @@ Complete the S-F-T triangle by implementing the verification graph, which tracks
 - [x] WU1: Test Discovery — tests ✅ / code ✅ / docs ✅
 - [x] WU2: Test Analyzer — tests ✅ / code ✅ / docs ✅
 - [x] WU3: Verification Graph Builder — tests ✅ / code ✅ / docs ✅
-- [ ] WU4: CLI Integration — tests / code / docs
+- [x] WU4: CLI Integration — tests ✅ / code ✅ / docs ✅
 
 ---
 
@@ -488,13 +488,13 @@ cat /tmp/test-vg.ndjson | head -5
 **Est. New Code**: ~30 lines
 
 **Acceptance Criteria**:
-- [ ] `jigy verify rebuild` generates verification-graph.ndjson
-- [ ] `jigy verify rebuild --test-dir TESTS/` specifies test directory
-- [ ] `jigy verify rebuild --no-timestamp` for deterministic testing
-- [ ] `jigy rebuild` includes verification graph as final step
-- [ ] CLI tests verify command behavior
-- [ ] Progress output shows discovery/analysis/write phases
-- [ ] `@jig.implements("S-056")` decorator on CLI function
+- [x] `jigy verify rebuild` generates verification-graph.ndjson
+- [x] `jigy verify rebuild --test-dir TESTS/` specifies test directory
+- [x] `jigy verify rebuild --no-timestamp` for deterministic testing
+- [x] `jigy rebuild` includes verification graph as final step (step 4/5)
+- [x] CLI tests verify command behavior (8 tests)
+- [x] Progress output shows discovery/analysis/write phases
+- [x] `@jig.implements("S-056")` decorator on CLI function
 
 **Modified Files**:
 - `src/jig/cli/main.py` — Add `verify` subcommand group
@@ -568,10 +568,15 @@ jigy verify rebuild --no-timestamp
 ```
 
 **Reflect**:
-- (To be filled after execution)
+- TDD worked well: 8 tests written first, all passed after implementation
+- ~24 lines of verify.py + ~40 lines in main.py (under ~30 estimate for verify.py)
+- 100% coverage achieved on verify CLI (target was >80%)
+- CLI pattern matches impl/intent subcommands exactly
+- `jigy rebuild` now includes verification graph as step 4/5
+- Progress output matches S-056 spec: files discovered, tests found, edges extracted
 
 **Links**:
-- Commit: (pending)
+- Commit: (see git log)
 
 ---
 

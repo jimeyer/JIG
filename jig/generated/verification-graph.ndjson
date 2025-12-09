@@ -1,0 +1,667 @@
+{"_meta": {"edge_count": 318, "node_count": 348, "version": "1.0"}}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "jig_hash": "a27e9703d315", "type": "test", "verifies": ["S-052", "S-053", "S-054"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestAnalyzerIntegration.test_returns_sorted_nodes", "jig_hash": "774090f25e3d", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_accepts_outcome_ids", "jig_hash": "c25116be4f0b", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_empty_verifies_for_undecorated", "jig_hash": "ca4c6bc63c72", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_from_class_methods", "jig_hash": "da4fe2813f0a", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_multiple_specs", "jig_hash": "fb79f256a98c", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_short_form", "jig_hash": "ce21b9b54916", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_single_spec", "jig_hash": "09fe230362d8", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestExtractVerifiesDecorators.test_validates_spec_id_format", "jig_hash": "afac369ab4ca", "type": "test", "verifies": ["S-053"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_file_is_relative_path", "jig_hash": "2804eb33442a", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_id_format_function", "jig_hash": "f0c89787a0a2", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_id_format_method", "jig_hash": "004641e6b49e", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_node_excludes_brick", "jig_hash": "f6824b99009d", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_node_excludes_covers", "jig_hash": "08b066165ce0", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_node_excludes_line", "jig_hash": "7f80c6bbf1b3", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestNodeSchema.test_node_has_required_fields", "jig_hash": "4ef27d9c6142", "type": "test", "verifies": ["S-052"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestTestHashing.test_hash_changes_when_logic_changes", "jig_hash": "d113f50ee642", "type": "test", "verifies": ["S-054"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestTestHashing.test_hash_excludes_decorators", "jig_hash": "069bd393465b", "type": "test", "verifies": ["S-054"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestTestHashing.test_hash_is_12_hex_chars", "jig_hash": "a46353251552", "type": "test", "verifies": ["S-054"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestTestHashing.test_hash_stable_across_comments", "jig_hash": "2e5a23ee2ab9", "type": "test", "verifies": ["S-054"]}
+{"file": "tests/unit/verification_graph/test_analyzer.py", "id": "T-test_analyzer.TestTestHashing.test_hash_stable_across_whitespace", "jig_hash": "30649bcc0a8f", "type": "test", "verifies": ["S-054"]}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_analyzer_interface_has_required_methods", "jig_hash": "455720dd31bb", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_analyzer_with_multiple_extensions", "jig_hash": "a684643c269f", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_incomplete_analyzer_cannot_be_instantiated", "jig_hash": "108be1e63fa1", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_language_analyzer_interface", "jig_hash": "db3ea482cc95", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_mock_analyzer_consistent_language_name", "jig_hash": "f24e1dd9b99a", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_mock_analyzer_interface_compliance", "jig_hash": "97867c5ad76d", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_base.py", "id": "T-test_analyzer_base.test_mock_analyzer_returns_language_agnostic_format", "jig_hash": "9f9cb53e2874", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_global_registry_reset", "jig_hash": "442c0eedf3bc", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_global_registry_singleton", "jig_hash": "b62a32194c70", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_auto_detection", "jig_hash": "af3d9ae8a9c2", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_bad_extension_autocorrect", "jig_hash": "5ccb4743f62e", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_case_insensitive_extensions", "jig_hash": "e0a79303ea58", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_clear", "jig_hash": "2510cb44620f", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_empty_extensions_warning", "jig_hash": "a6dc2ff02437", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_end_to_end_integration", "jig_hash": "dbf061e50883", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_file_path_with_multiple_dots", "jig_hash": "0077c42c29d7", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_file_path_with_no_extension", "jig_hash": "5ac81e38e070", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_get_analyzer_by_language", "jig_hash": "981095de2ab0", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_initialization", "jig_hash": "aa3797fc42f2", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_multiple_analyzers", "jig_hash": "0349bf56db08", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_override_warning", "jig_hash": "714199038216", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_registration", "jig_hash": "9eecbcf4a848", "type": "test", "verifies": ["S-004"]}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_supported_extensions_sorted", "jig_hash": "38f024395ee6", "type": "test", "verifies": []}
+{"file": "tests/unit/test_analyzer_registry.py", "id": "T-test_analyzer_registry.test_registry_supported_languages_sorted", "jig_hash": "660da2065a15", "type": "test", "verifies": []}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_duplicate_ids", "jig_hash": "889fbef12e54", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_excluded_fields", "jig_hash": "a961ef25244a", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_empty_name", "jig_hash": "ef795a4fdaa5", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_float", "jig_hash": "04dec98066f8", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_list", "jig_hash": "df09cc0de424", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_null", "jig_hash": "e7e98ac6ef3f", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_string", "jig_hash": "2e72fd88a374", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_missing_prefix", "jig_hash": "872e444fb809", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_old_numeric_format", "jig_hash": "c2b7a84b6270", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_underscore", "jig_hash": "55b1b605c60b", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_unit_prefix", "jig_hash": "73babcde12fe", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_uppercase", "jig_hash": "72fe24386c50", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_invalid_wrong_prefix", "jig_hash": "62f9f5b898c5", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_large_negative_layer", "jig_hash": "0be90d366a44", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_missing_impl_graph", "jig_hash": "860a187efc39", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_missing_layer_field", "jig_hash": "348afa8a3309", "type": "test", "verifies": ["S-036"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_missing_required_field", "jig_hash": "94daf0583011", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_negative_layer", "jig_hash": "3a6c0f961f34", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_unit_not_in_graph", "jig_hash": "dadf1f0de125", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_valid", "jig_hash": "64f46f45cbfa", "type": "test", "verifies": ["S-021"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_valid_kebab_case_ids", "jig_hash": "a9864cb57a68", "type": "test", "verifies": ["S-035"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_valid_layer_field", "jig_hash": "4c4c89e74fbc", "type": "test", "verifies": ["S-036"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_definitions_valid_layer_values", "jig_hash": "5df1dcced2f1", "type": "test", "verifies": ["S-037"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_class_expansion", "jig_hash": "2216e146838a", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_class_splitting", "jig_hash": "d259ce01ba25", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_gap", "jig_hash": "11b16f85c9a2", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_module_expansion", "jig_hash": "27d8aef6c6bc", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_overlap", "jig_hash": "1880f83c3e24", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks.py", "id": "T-test_bricks.test_validate_brick_partition_valid", "jig_hash": "3151a562a746", "type": "test", "verifies": ["S-022"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_complex_graph_no_cycles", "jig_hash": "ced56f557ede", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_layer0_cycle", "jig_hash": "e8c51866e185", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_long_cycle", "jig_hash": "4b1887173e12", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_multiple_cycles", "jig_hash": "eb8f8787dff7", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_no_cycles_dag", "jig_hash": "30ed1a595bae", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_no_dependencies", "jig_hash": "695ec08afb16", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_self_loop", "jig_hash": "ba584c01fb94", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_simple_two_brick_cycle", "jig_hash": "b7f405847168", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_cycles.py", "id": "T-test_bricks_cycles.test_validate_cycles_three_brick_cycle", "jig_hash": "0e8d4fc23434", "type": "test", "verifies": ["S-039"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer0_to_layer1", "jig_hash": "f95fa1c81f53", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer1_to_layer1", "jig_hash": "9cf503269dc0", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer1_to_layer2", "jig_hash": "b214a2e95fe8", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer2_to_layer2", "jig_hash": "e6a1940fb731", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_multiple_violations", "jig_hash": "4b0cf3be2560", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_no_dependencies", "jig_hash": "40e7765ec76d", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_self_dependency_allowed", "jig_hash": "d6110dc71ec5", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer0_to_layer0", "jig_hash": "aa0e78faca1c", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer1_to_layer0", "jig_hash": "7331fb4b8a12", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer2_to_layer0", "jig_hash": "a38d593be745", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/validation/test_bricks_layers.py", "id": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer2_to_layer1", "jig_hash": "d96eb8832464", "type": "test", "verifies": ["S-038"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_build_graph_convenience_function", "jig_hash": "a5adfb0e3e0e", "type": "test", "verifies": ["S-001", "S-003"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_creates_ndjson", "jig_hash": "b96e056716fe", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_creates_verifies_edges", "jig_hash": "302041928695", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_default_output_path", "jig_hash": "cca1fe8737f5", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_deterministic", "jig_hash": "772184be92c5", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_edges_sorted", "jig_hash": "910cfdeffb70", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_empty_test_dir", "jig_hash": "77997b9e4558", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_has_metadata", "jig_hash": "f99e3c685662", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_includes_tests_without_verifies", "jig_hash": "3e8b45581301", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_multiple_files", "jig_hash": "6af3ba66e87d", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_nodes_sorted", "jig_hash": "fb937ff8c171", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/unit/verification_graph/test_builder.py", "id": "T-test_builder.test_build_verification_graph_returns_graph", "jig_hash": "a15dc8c9fe83", "type": "test", "verifies": ["S-055"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_builds_graph", "jig_hash": "17d2262bf4e5", "type": "test", "verifies": ["S-001", "S-002", "S-006"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_creates_implementation_edges", "jig_hash": "c3b6b0017e95", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_deterministic_file_ordering", "jig_hash": "54131d0744be", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_discovers_files", "jig_hash": "5d32fa72c9d4", "type": "test", "verifies": ["S-001", "S-006"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_empty_source_directory", "jig_hash": "1e78640b9c5d", "type": "test", "verifies": ["S-001", "S-003"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_excludes_patterns", "jig_hash": "70627d18b586", "type": "test", "verifies": ["S-001", "S-006"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_extracts_decorators", "jig_hash": "734ea997cf01", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_lenient_mode_skips_parse_errors", "jig_hash": "2f843d12ea3d", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_on_real_fixtures", "jig_hash": "af817c0f4f7a", "type": "test", "verifies": ["S-001", "S-002", "S-003"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_strict_mode_fails_on_parse_error", "jig_hash": "764fe903b8c1", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_uses_relative_paths", "jig_hash": "61eca9d41b6c", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_writes_ndjson", "jig_hash": "9cff7d543072", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_help_messages", "jig_hash": "5f7bdd6a64a2", "type": "test", "verifies": ["S-001", "S-003"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_basic", "jig_hash": "8d1a20bb0c16", "type": "test", "verifies": ["S-001", "S-003"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_custom_output", "jig_hash": "3c13b968cd08", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_output_format", "jig_hash": "817691627a28", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_parse_error_lenient", "jig_hash": "dfd1c8f8776e", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_parse_error_strict", "jig_hash": "59d13ec44642", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_verbose", "jig_hash": "272808cc59a0", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_with_exclude", "jig_hash": "bb7f55f72f86", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_help", "jig_hash": "d1c54e60fc2f", "type": "test", "verifies": []}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_stops_on_validation_error", "jig_hash": "f5c41b8746f8", "type": "test", "verifies": []}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_success", "jig_hash": "c2338745c06e", "type": "test", "verifies": []}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_with_verbose", "jig_hash": "6bdcae3101de", "type": "test", "verifies": []}
+{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_reports_node_edge_counts", "jig_hash": "61fb03c1fae7", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_accuracy_99_percent", "jig_hash": "76ebc1546c5d", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_invalid_id_warning", "jig_hash": "3b3d75d852ab", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_mixed_valid_invalid", "jig_hash": "56d34bdbc7f7", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_multiple_specs", "jig_hash": "973caa67f533", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_on_class", "jig_hash": "41c9bbbb4923", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_on_method", "jig_hash": "4f65de9b64f9", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_outcome_id", "jig_hash": "93134c28dff4", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_short_import", "jig_hash": "47ea8f673199", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_single_spec", "jig_hash": "ed5a6d88b198", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_implementation_edge_targets", "jig_hash": "5364eb16df6f", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_implementation_edges_created", "jig_hash": "61c8bb874d3b", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_no_decorator_no_implements_field", "jig_hash": "cda8cea01f44", "type": "test", "verifies": ["S-002"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_accuracy_metrics_calls", "jig_hash": "87133424ea23", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_accuracy_metrics_imports", "jig_hash": "dad8b5965d8a", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_call_line_numbers", "jig_hash": "a96b924f4d3b", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_containment_edges_still_work", "jig_hash": "23529c1656a6", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_edge_types_complete", "jig_hash": "cb87f65cafb8", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_external_module_nodes", "jig_hash": "8d1ccb9a91c4", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_external_vs_internal_module_detection", "jig_hash": "c9a262f414b2", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_function_call_edges_direct", "jig_hash": "076f07ff9669", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_function_call_edges_from_method", "jig_hash": "596fac30a741", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_function_call_no_method_inference", "jig_hash": "f5ef153b2ad1", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_import_edges_from_import", "jig_hash": "7140ecde2ec8", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_import_edges_stdlib", "jig_hash": "3087c63c922e", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_import_line_numbers", "jig_hash": "a6a2e9acc85d", "type": "test", "verifies": ["S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_inheritance_edges", "jig_hash": "44ad7926d7f9", "type": "test", "verifies": []}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_integration_all_edge_types", "jig_hash": "b1c1f4429cb5", "type": "test", "verifies": ["S-001", "S-005"]}
+{"file": "tests/unit/test_dependency_graph.py", "id": "T-test_dependency_graph.test_multiple_inheritance_edges", "jig_hash": "457011a1da29", "type": "test", "verifies": []}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_default_test_directory", "jig_hash": "fa61a98b10f4", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_deterministic_alphabetical_order", "jig_hash": "6d1fdd1ec4e0", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_discovers_nested_test_files", "jig_hash": "79ead4309335", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_discovers_test_prefix_pattern", "jig_hash": "4e57d931faba", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_discovers_test_suffix_pattern", "jig_hash": "0d4bf6711ead", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_empty_directory_returns_empty_list", "jig_hash": "08cc64ecdc99", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_excludes_node_modules", "jig_hash": "a7c3ffd3c9e7", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_excludes_pycache", "jig_hash": "8d353a04d168", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_excludes_venv", "jig_hash": "3abfc4a47ebf", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTestFiles.test_nonexistent_test_dir_returns_empty_list", "jig_hash": "1237cadffb74", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTests.test_deterministic_order", "jig_hash": "942f92c4b049", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTests.test_finds_test_functions", "jig_hash": "b351d7ff3a13", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTests.test_finds_test_methods_in_classes", "jig_hash": "b4a6a344cc62", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTests.test_generates_correct_test_ids", "jig_hash": "13dd934d6e81", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/unit/verification_graph/test_discovery.py", "id": "T-test_discovery.TestDiscoverTests.test_includes_file_path", "jig_hash": "d5c09e41c6d1", "type": "test", "verifies": ["S-051"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_deterministic_across_runs", "jig_hash": "4ee34d696a3e", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_brick_nodes", "jig_hash": "54fa93f5c15e", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_outcome_nodes", "jig_hash": "5b0a5ff72cb2", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_spec_nodes", "jig_hash": "946a9adcee96", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphHashing.test_brick_nodes_have_jig_hash", "jig_hash": "168a85f1a838", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphHashing.test_hash_deterministic_across_runs", "jig_hash": "0a0283c61e76", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphHashing.test_outcome_nodes_have_jig_hash", "jig_hash": "c77e73c7a8ad", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphHashing.test_spec_hash_changes_when_content_changes", "jig_hash": "d17abb16ab99", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphHashing.test_spec_nodes_have_jig_hash", "jig_hash": "f26619856a8f", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_basic", "jig_hash": "aa5664f8efaf", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_deterministic_output", "jig_hash": "b694459184cb", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_invalid_bricks_yaml", "jig_hash": "219d7775f68b", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_missing_bricks_file", "jig_hash": "0376cc21034f", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_no_outcomes", "jig_hash": "7511be88ba2d", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_sorted_output", "jig_hash": "2a669d5349e6", "type": "test", "verifies": []}
+{"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.test_generate_intent_graph_with_timestamp", "jig_hash": "5a171bb095c6", "type": "test", "verifies": []}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestComputeHash.test_deterministic", "jig_hash": "b2964a4ad225", "type": "test", "verifies": ["S-044"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestComputeHash.test_different_input_different_hash", "jig_hash": "d5bbfcc58f5b", "type": "test", "verifies": ["S-044"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestComputeHash.test_returns_12_hex_chars", "jig_hash": "bd8e6be38113", "type": "test", "verifies": ["S-044"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestComputeHash.test_utf8_content", "jig_hash": "2d2b9cbf0914", "type": "test", "verifies": ["S-044"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestGitBlobHash.test_returns_12_chars_for_tracked_file", "jig_hash": "106058fe4dad", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestGitBlobHash.test_returns_none_for_nonexistent_file", "jig_hash": "124701455a5a", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestGitBlobHash.test_returns_none_outside_git_repo", "jig_hash": "d8f002bf729c", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestGitBlobHash.test_truncated_to_12_chars", "jig_hash": "0a696b04fd18", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashBrick.test_canonical_json", "jig_hash": "5bc7496296b6", "type": "test", "verifies": ["S-048"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashBrick.test_changing_one_brick_independent", "jig_hash": "f2532607d717", "type": "test", "verifies": ["S-048"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashBrick.test_hashes_brick_dict", "jig_hash": "751fe1162b3d", "type": "test", "verifies": ["S-048"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashBrick.test_layer_change_affects_hash", "jig_hash": "be75a09a13dd", "type": "test", "verifies": ["S-048"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashBrick.test_units_change_affects_hash", "jig_hash": "5493bd5a6d9a", "type": "test", "verifies": ["S-048"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_async_excludes_decorators", "jig_hash": "e60c3a491998", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_async_function", "jig_hash": "5db239bb3bf4", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_excludes_decorators", "jig_hash": "5f45b16f718c", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_formatting_ignored", "jig_hash": "cf3e90daed65", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_includes_body", "jig_hash": "701f3c6a22c5", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_includes_function_name", "jig_hash": "7dc602c83713", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_includes_parameters", "jig_hash": "1068342d503c", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashFunction.test_includes_return_type", "jig_hash": "49215d2fd145", "type": "test", "verifies": ["S-046"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashIntentArtifact.test_file_without_frontmatter", "jig_hash": "56e2033f64cd", "type": "test", "verifies": ["S-045"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashIntentArtifact.test_line_ending_normalization", "jig_hash": "6c8baa10f3e4", "type": "test", "verifies": ["S-045"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashIntentArtifact.test_parses_frontmatter_and_body", "jig_hash": "8ba3a6119996", "type": "test", "verifies": ["S-045"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashIntentArtifact.test_trailing_whitespace_ignored", "jig_hash": "9be69d9b73f2", "type": "test", "verifies": ["S-045"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashTest.test_excludes_decorators", "jig_hash": "051e2082ee58", "type": "test", "verifies": ["S-047"]}
+{"file": "tests/unit/test_hashing.py", "id": "T-test_hashing.TestHashTest.test_same_algorithm_as_hash_function", "jig_hash": "090678061e7a", "type": "test", "verifies": ["S-047"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_invalid_spec_reference", "jig_hash": "92ed1455166b", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_invalid_syntax", "jig_hash": "a80f8873600f", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_multiple_specs", "jig_hash": "dfaf85ec54e4", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_valid_implements", "jig_hash": "c64aa3d659c2", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_verifies_outcome", "jig_hash": "b758e313c98d", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_decorator_verifies_spec", "jig_hash": "3e2fe0b45cce", "type": "test", "verifies": ["S-020"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_completeness_empty_specifies", "jig_hash": "9f869cd7f954", "type": "test", "verifies": ["S-042"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_completeness_multiple_empty", "jig_hash": "864df54c93d6", "type": "test", "verifies": ["S-042"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_completeness_no_outcomes", "jig_hash": "523fad31f412", "type": "test", "verifies": ["S-042"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_completeness_valid_multiple_specs", "jig_hash": "89baa5ed3e4e", "type": "test", "verifies": ["S-042"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_completeness_valid_single_spec", "jig_hash": "c31a9632f4ce", "type": "test", "verifies": ["S-042"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_excluded_field", "jig_hash": "91d9bea00b7b", "type": "test", "verifies": ["S-019"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_invalid_id_format", "jig_hash": "f1257d6bbcc9", "type": "test", "verifies": ["S-019"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_missing_required_field", "jig_hash": "a6802c84a906", "type": "test", "verifies": ["S-019"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_no_files", "jig_hash": "cbcb776f473d", "type": "test", "verifies": ["S-019"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_outcome_valid", "jig_hash": "be1bfc8fabbe", "type": "test", "verifies": ["S-019"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_multiple_orphaned", "jig_hash": "e365a8ee36ed", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_no_outcomes", "jig_hash": "7a8dd192562e", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_no_specs", "jig_hash": "265c61e954f7", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_orphaned_spec", "jig_hash": "a16105f9fad4", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_valid_multiple_outcomes", "jig_hash": "5926bc74cfa0", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_coverage_valid_single_outcome", "jig_hash": "68009a76ef8c", "type": "test", "verifies": ["S-043"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_duplicate_ids", "jig_hash": "868119c18612", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_excluded_fields", "jig_hash": "dde6abf11c99", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_id_filename_mismatch", "jig_hash": "053fa57a167a", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_invalid_id_format", "jig_hash": "065758f63a18", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_missing_required_field", "jig_hash": "3bd8215b270d", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/validation/test_intent.py", "id": "T-test_intent.test_validate_specification_valid", "jig_hash": "383f07493b28", "type": "test", "verifies": ["S-018"]}
+{"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_bidirectional_completeness", "jig_hash": "a01f45e387a4", "type": "test", "verifies": ["O-015"]}
+{"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_complete_valid_intent_graph", "jig_hash": "703d7255f828", "type": "test", "verifies": ["O-015"]}
+{"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_empty_intent_graph", "jig_hash": "377e2452dd24", "type": "test", "verifies": ["O-015"]}
+{"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_orphaned_outcome_workflow", "jig_hash": "0e3236733f02", "type": "test", "verifies": ["O-015"]}
+{"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_orphaned_specification_workflow", "jig_hash": "90dbd699bf88", "type": "test", "verifies": ["O-015"]}
+{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_cycle_detection_across_workflow", "jig_hash": "ea131cc6b1ae", "type": "test", "verifies": []}
+{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_full_layer_workflow_from_invalid_to_valid", "jig_hash": "c84258f7bafa", "type": "test", "verifies": []}
+{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_json_validation_output_integration", "jig_hash": "5d428f612f51", "type": "test", "verifies": []}
+{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_layer_violation_detection_and_suggestion", "jig_hash": "c90a69789c57", "type": "test", "verifies": []}
+{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_summary_mode_integration", "jig_hash": "d8b4efa56289", "type": "test", "verifies": []}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_basic_output", "jig_hash": "24d33c1af06e", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_dag_status", "jig_hash": "e175629785be", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_empty_layers", "jig_hash": "83def5b164d0", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_missing_graph", "jig_hash": "3b04c9fb32f4", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_multiple_layers", "jig_hash": "549f847b2c72", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_shows_dependencies", "jig_hash": "6fe6d6faa858", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_shows_function_counts", "jig_hash": "2050cc3b6db2", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_summary_option", "jig_hash": "90dd607facc7", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers.py", "id": "T-test_layers.test_layers_total_summary", "jig_hash": "ddea58cf7fc3", "type": "test", "verifies": ["S-040"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_apply_updates_file", "jig_hash": "94a00db8b139", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_apply_with_no_confirmation", "jig_hash": "744e6e7a2e68", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_diamond_dependency", "jig_hash": "f561876ae416", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_identifies_mismatches", "jig_hash": "9e842d6a60a3", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_missing_graph", "jig_hash": "8d1d9b3bf7aa", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_multi_level_dependencies", "jig_hash": "9b5b447a5185", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_no_dependencies", "jig_hash": "b8f2b4cce2aa", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_shows_current_vs_suggested", "jig_hash": "2030fd6592d8", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_simple_dependency", "jig_hash": "50783237057e", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/cli/test_layers_suggest.py", "id": "T-test_layers_suggest.test_layers_suggest_with_cycles", "jig_hash": "07af871a85b3", "type": "test", "verifies": ["S-041"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_deterministic_output", "jig_hash": "94af81e84a05", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_edge_sorting_deterministic", "jig_hash": "12a6736b7ca9", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_edges_after_nodes", "jig_hash": "a975c605f294", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_empty_graph", "jig_hash": "59f6c95dd68d", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_metadata_first", "jig_hash": "8abc0539a205", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_ndjson_format", "jig_hash": "a031afde266c", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_no_extra_whitespace", "jig_hash": "bc501a8aefb3", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_nodes_sorted_by_id", "jig_hash": "af2c366cd1df", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_output_directory_created", "jig_hash": "e57db9a70da3", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_round_trip_preserves_data", "jig_hash": "a6ab72922a80", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_sort_keys_in_json", "jig_hash": "f5e2a6ab6812", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_timestamp_optional", "jig_hash": "73ef0924e3b7", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_write_ndjson_convenience_function", "jig_hash": "cdc453409b68", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_class_nodes", "jig_hash": "69faf9e35a97", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_function_nodes", "jig_hash": "0429c781704a", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_present_for_tracked_files", "jig_hash": "63dceeda2cc6", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_same_for_all_nodes_in_file", "jig_hash": "f668c189e669", "type": "test", "verifies": ["S-049"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphHashing.test_async_function_with_implements_has_jig_hash", "jig_hash": "abf67e6516f3", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphHashing.test_function_with_implements_has_jig_hash", "jig_hash": "6bc6966eff21", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphHashing.test_function_without_implements_no_jig_hash", "jig_hash": "d86cac2b34f8", "type": "test", "verifies": ["S-050"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_changes_when_body_changes", "jig_hash": "d20920beea75", "type": "test", "verifies": ["S-050", "S-046"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_excludes_decorators", "jig_hash": "511a94fdf018", "type": "test", "verifies": ["S-050", "S-046"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_accuracy_metrics", "jig_hash": "224548f5ca74", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_async_functions", "jig_hash": "97898adb9e2c", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_class_with_methods", "jig_hash": "4243ecb157f9", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_empty_file", "jig_hash": "560b5c12d72b", "type": "test", "verifies": []}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_inheritance", "jig_hash": "74c564627426", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_integration_all_fixtures", "jig_hash": "f2d6840c571a", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_interface_compliance", "jig_hash": "8f0064c20900", "type": "test", "verifies": []}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_language_agnostic_output_format", "jig_hash": "8ea3f36c0df6", "type": "test", "verifies": []}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_module_name_derivation", "jig_hash": "586eb31fa9e6", "type": "test", "verifies": []}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_nested_classes", "jig_hash": "baa433edff85", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_node_id_format", "jig_hash": "e9d2cb0e7c8b", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_parse_error_handling", "jig_hash": "5ec630059e30", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_simple_module", "jig_hash": "f9a45d15d859", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.test_python_analyzer_type_hints", "jig_hash": "f5cddf82b328", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_as_json_is_valid_json", "jig_hash": "3889b5ead0d0", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_as_json_multiple_phases", "jig_hash": "061fab032fbf", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_as_json_success", "jig_hash": "129d2527efc4", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_as_json_with_errors", "jig_hash": "c4f19f681bf8", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_human_readable", "jig_hash": "3878d41df707", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_human_readable_with_errors", "jig_hash": "9595c3e32380", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_json_schema_consistency", "jig_hash": "40a1710461ec", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_impl_rebuild_auto_validates", "jig_hash": "594fe0ff2c51", "type": "test", "verifies": ["S-027"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_impl_rebuild_skip_validation", "jig_hash": "f8bd74d7d09b", "type": "test", "verifies": ["S-027"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_impl_rebuild_validates_only_decorators", "jig_hash": "36e18a732655", "type": "test", "verifies": ["S-027"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_bricks_json_format", "jig_hash": "fb341886c2a5", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_bricks_missing_graph", "jig_hash": "aa62424ea91a", "type": "test", "verifies": ["S-024"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_bricks_partition_gap", "jig_hash": "592f307128fd", "type": "test", "verifies": ["S-024"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_bricks_success", "jig_hash": "25ba87740bd9", "type": "test", "verifies": ["S-024"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_full_fails_on_intent_error", "jig_hash": "e24bd1d15051", "type": "test", "verifies": ["S-025"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_full_skips_bricks_if_no_graph", "jig_hash": "54d2fef945fd", "type": "test", "verifies": ["S-025"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_full_success", "jig_hash": "6e7061db7429", "type": "test", "verifies": ["S-025"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_intent_exit_codes", "jig_hash": "f4dcc6461986", "type": "test", "verifies": ["S-023"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_intent_failure", "jig_hash": "8498b4b6a0b0", "type": "test", "verifies": ["S-023"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_intent_json_format", "jig_hash": "81853686cdc8", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_intent_success", "jig_hash": "c861e280a2ca", "type": "test", "verifies": ["S-023"]}
+{"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_json_format_with_errors", "jig_hash": "8411d3c7831e", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_group_exists", "jig_hash": "a949fb296745", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_creates_file", "jig_hash": "561fbf461824", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_custom_test_dir", "jig_hash": "4ffc08edc842", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_empty_tests", "jig_hash": "9361fbdc8570", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_help", "jig_hash": "f05fbed27d80", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "jig_hash": "8dac32bcc31c", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "jig_hash": "13c71ca3c358", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_shows_progress", "jig_hash": "effc6986e97f", "type": "test", "verifies": ["S-056"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.TestWithClass.test_method", "jig_hash": "51f1704fdb1d", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.TestWithClass.test_method_multiple", "jig_hash": "37cacb09353c", "type": "test", "verifies": ["S-004", "S-005"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_invalid_spec_id", "jig_hash": "796dd3345a6b", "type": "test", "verifies": []}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_multiple_specs", "jig_hash": "804ec78c6ecd", "type": "test", "verifies": ["S-001", "S-002"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_no_decorator", "jig_hash": "1872eddb5fd6", "type": "test", "verifies": []}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_short_form", "jig_hash": "323fb914e25f", "type": "test", "verifies": ["S-006"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_simple", "jig_hash": "f943a32fb60a", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/fixtures/python/test_with_verifies.py", "id": "T-test_with_verifies.test_with_logic", "jig_hash": "2c0b6cab49f1", "type": "test", "verifies": ["S-007"]}
+{"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestAnalyzerIntegration.test_analyze_fixture_file", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer.TestAnalyzerIntegration.test_returns_sorted_nodes", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_accepts_outcome_ids", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_empty_verifies_for_undecorated", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_from_class_methods", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_multiple_specs", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_short_form", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_extracts_single_spec", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestExtractVerifiesDecorators.test_validates_spec_id_format", "target": "S-053", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_file_is_relative_path", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_id_format_function", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_id_format_method", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_node_excludes_brick", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_node_excludes_covers", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_node_excludes_line", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestNodeSchema.test_node_has_required_fields", "target": "S-052", "type": "verifies"}
+{"source": "T-test_analyzer.TestTestHashing.test_hash_changes_when_logic_changes", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer.TestTestHashing.test_hash_excludes_decorators", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer.TestTestHashing.test_hash_is_12_hex_chars", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer.TestTestHashing.test_hash_stable_across_comments", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer.TestTestHashing.test_hash_stable_across_whitespace", "target": "S-054", "type": "verifies"}
+{"source": "T-test_analyzer_base.test_incomplete_analyzer_cannot_be_instantiated", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_base.test_language_analyzer_interface", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_base.test_mock_analyzer_interface_compliance", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_base.test_mock_analyzer_returns_language_agnostic_format", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_registry.test_registry_auto_detection", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_registry.test_registry_end_to_end_integration", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_registry.test_registry_get_analyzer_by_language", "target": "S-004", "type": "verifies"}
+{"source": "T-test_analyzer_registry.test_registry_registration", "target": "S-004", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_duplicate_ids", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_excluded_fields", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_empty_name", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_float", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_list", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_null", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_layer_type_string", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_missing_prefix", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_old_numeric_format", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_underscore", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_unit_prefix", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_uppercase", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_invalid_wrong_prefix", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_large_negative_layer", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_missing_impl_graph", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_missing_layer_field", "target": "S-036", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_missing_required_field", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_negative_layer", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_unit_not_in_graph", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_valid", "target": "S-021", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_valid_kebab_case_ids", "target": "S-035", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_valid_layer_field", "target": "S-036", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_definitions_valid_layer_values", "target": "S-037", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_class_expansion", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_class_splitting", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_gap", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_module_expansion", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_overlap", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks.test_validate_brick_partition_valid", "target": "S-022", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_complex_graph_no_cycles", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_layer0_cycle", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_long_cycle", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_multiple_cycles", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_no_cycles_dag", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_no_dependencies", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_self_loop", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_simple_two_brick_cycle", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_cycles.test_validate_cycles_three_brick_cycle", "target": "S-039", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer0_to_layer1", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer1_to_layer1", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer1_to_layer2", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_invalid_layer2_to_layer2", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_multiple_violations", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_no_dependencies", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_self_dependency_allowed", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer0_to_layer0", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer1_to_layer0", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer2_to_layer0", "target": "S-038", "type": "verifies"}
+{"source": "T-test_bricks_layers.test_validate_layer_constraints_valid_layer2_to_layer1", "target": "S-038", "type": "verifies"}
+{"source": "T-test_builder.test_build_graph_convenience_function", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_build_graph_convenience_function", "target": "S-003", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_creates_ndjson", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_creates_verifies_edges", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_default_output_path", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_deterministic", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_edges_sorted", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_empty_test_dir", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_has_metadata", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_includes_tests_without_verifies", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_multiple_files", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_nodes_sorted", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_build_verification_graph_returns_graph", "target": "S-055", "type": "verifies"}
+{"source": "T-test_builder.test_builder_builds_graph", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_builds_graph", "target": "S-002", "type": "verifies"}
+{"source": "T-test_builder.test_builder_builds_graph", "target": "S-006", "type": "verifies"}
+{"source": "T-test_builder.test_builder_creates_implementation_edges", "target": "S-002", "type": "verifies"}
+{"source": "T-test_builder.test_builder_deterministic_file_ordering", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_discovers_files", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_discovers_files", "target": "S-006", "type": "verifies"}
+{"source": "T-test_builder.test_builder_empty_source_directory", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_empty_source_directory", "target": "S-003", "type": "verifies"}
+{"source": "T-test_builder.test_builder_excludes_patterns", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_excludes_patterns", "target": "S-006", "type": "verifies"}
+{"source": "T-test_builder.test_builder_extracts_decorators", "target": "S-002", "type": "verifies"}
+{"source": "T-test_builder.test_builder_lenient_mode_skips_parse_errors", "target": "S-006", "type": "verifies"}
+{"source": "T-test_builder.test_builder_on_real_fixtures", "target": "S-001", "type": "verifies"}
+{"source": "T-test_builder.test_builder_on_real_fixtures", "target": "S-002", "type": "verifies"}
+{"source": "T-test_builder.test_builder_on_real_fixtures", "target": "S-003", "type": "verifies"}
+{"source": "T-test_builder.test_builder_strict_mode_fails_on_parse_error", "target": "S-006", "type": "verifies"}
+{"source": "T-test_builder.test_builder_uses_relative_paths", "target": "S-003", "type": "verifies"}
+{"source": "T-test_builder.test_builder_writes_ndjson", "target": "S-003", "type": "verifies"}
+{"source": "T-test_cli.test_cli_help_messages", "target": "S-001", "type": "verifies"}
+{"source": "T-test_cli.test_cli_help_messages", "target": "S-003", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_basic", "target": "S-001", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_basic", "target": "S-003", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_custom_output", "target": "S-003", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_output_format", "target": "S-003", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_parse_error_lenient", "target": "S-006", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_parse_error_strict", "target": "S-006", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_verbose", "target": "S-001", "type": "verifies"}
+{"source": "T-test_cli.test_cli_impl_rebuild_with_exclude", "target": "S-001", "type": "verifies"}
+{"source": "T-test_cli.test_cli_reports_node_edge_counts", "target": "S-001", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_accuracy_99_percent", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_invalid_id_warning", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_mixed_valid_invalid", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_multiple_specs", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_on_class", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_on_method", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_outcome_id", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_short_import", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_decorator_single_spec", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_implementation_edge_targets", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_implementation_edges_created", "target": "S-002", "type": "verifies"}
+{"source": "T-test_decorator_extraction.test_no_decorator_no_implements_field", "target": "S-002", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_accuracy_metrics_imports", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_external_module_nodes", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_external_vs_internal_module_detection", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_import_edges_from_import", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_import_edges_stdlib", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_import_line_numbers", "target": "S-005", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_integration_all_edge_types", "target": "S-001", "type": "verifies"}
+{"source": "T-test_dependency_graph.test_integration_all_edge_types", "target": "S-005", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_default_test_directory", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_deterministic_alphabetical_order", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_discovers_nested_test_files", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_discovers_test_prefix_pattern", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_discovers_test_suffix_pattern", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_empty_directory_returns_empty_list", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_excludes_node_modules", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_excludes_pycache", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_excludes_venv", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTestFiles.test_nonexistent_test_dir_returns_empty_list", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTests.test_deterministic_order", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTests.test_finds_test_functions", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTests.test_finds_test_methods_in_classes", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTests.test_generates_correct_test_ids", "target": "S-051", "type": "verifies"}
+{"source": "T-test_discovery.TestDiscoverTests.test_includes_file_path", "target": "S-051", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_deterministic_across_runs", "target": "S-049", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_brick_nodes", "target": "S-049", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_outcome_nodes", "target": "S-049", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_spec_nodes", "target": "S-049", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphHashing.test_brick_nodes_have_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphHashing.test_hash_deterministic_across_runs", "target": "S-050", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphHashing.test_outcome_nodes_have_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphHashing.test_spec_hash_changes_when_content_changes", "target": "S-050", "type": "verifies"}
+{"source": "T-test_generator.TestIntentGraphHashing.test_spec_nodes_have_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_hashing.TestComputeHash.test_deterministic", "target": "S-044", "type": "verifies"}
+{"source": "T-test_hashing.TestComputeHash.test_different_input_different_hash", "target": "S-044", "type": "verifies"}
+{"source": "T-test_hashing.TestComputeHash.test_returns_12_hex_chars", "target": "S-044", "type": "verifies"}
+{"source": "T-test_hashing.TestComputeHash.test_utf8_content", "target": "S-044", "type": "verifies"}
+{"source": "T-test_hashing.TestGitBlobHash.test_returns_12_chars_for_tracked_file", "target": "S-049", "type": "verifies"}
+{"source": "T-test_hashing.TestGitBlobHash.test_returns_none_for_nonexistent_file", "target": "S-049", "type": "verifies"}
+{"source": "T-test_hashing.TestGitBlobHash.test_returns_none_outside_git_repo", "target": "S-049", "type": "verifies"}
+{"source": "T-test_hashing.TestGitBlobHash.test_truncated_to_12_chars", "target": "S-049", "type": "verifies"}
+{"source": "T-test_hashing.TestHashBrick.test_canonical_json", "target": "S-048", "type": "verifies"}
+{"source": "T-test_hashing.TestHashBrick.test_changing_one_brick_independent", "target": "S-048", "type": "verifies"}
+{"source": "T-test_hashing.TestHashBrick.test_hashes_brick_dict", "target": "S-048", "type": "verifies"}
+{"source": "T-test_hashing.TestHashBrick.test_layer_change_affects_hash", "target": "S-048", "type": "verifies"}
+{"source": "T-test_hashing.TestHashBrick.test_units_change_affects_hash", "target": "S-048", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_async_excludes_decorators", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_async_function", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_excludes_decorators", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_formatting_ignored", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_includes_body", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_includes_function_name", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_includes_parameters", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashFunction.test_includes_return_type", "target": "S-046", "type": "verifies"}
+{"source": "T-test_hashing.TestHashIntentArtifact.test_file_without_frontmatter", "target": "S-045", "type": "verifies"}
+{"source": "T-test_hashing.TestHashIntentArtifact.test_line_ending_normalization", "target": "S-045", "type": "verifies"}
+{"source": "T-test_hashing.TestHashIntentArtifact.test_parses_frontmatter_and_body", "target": "S-045", "type": "verifies"}
+{"source": "T-test_hashing.TestHashIntentArtifact.test_trailing_whitespace_ignored", "target": "S-045", "type": "verifies"}
+{"source": "T-test_hashing.TestHashTest.test_excludes_decorators", "target": "S-047", "type": "verifies"}
+{"source": "T-test_hashing.TestHashTest.test_same_algorithm_as_hash_function", "target": "S-047", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_invalid_spec_reference", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_invalid_syntax", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_multiple_specs", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_valid_implements", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_verifies_outcome", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_decorator_verifies_spec", "target": "S-020", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_completeness_empty_specifies", "target": "S-042", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_completeness_multiple_empty", "target": "S-042", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_completeness_no_outcomes", "target": "S-042", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_completeness_valid_multiple_specs", "target": "S-042", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_completeness_valid_single_spec", "target": "S-042", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_excluded_field", "target": "S-019", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_invalid_id_format", "target": "S-019", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_missing_required_field", "target": "S-019", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_no_files", "target": "S-019", "type": "verifies"}
+{"source": "T-test_intent.test_validate_outcome_valid", "target": "S-019", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_multiple_orphaned", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_no_outcomes", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_no_specs", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_orphaned_spec", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_valid_multiple_outcomes", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_coverage_valid_single_outcome", "target": "S-043", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_duplicate_ids", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_excluded_fields", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_id_filename_mismatch", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_invalid_id_format", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_missing_required_field", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent.test_validate_specification_valid", "target": "S-018", "type": "verifies"}
+{"source": "T-test_intent_completeness.test_bidirectional_completeness", "target": "O-015", "type": "verifies"}
+{"source": "T-test_intent_completeness.test_complete_valid_intent_graph", "target": "O-015", "type": "verifies"}
+{"source": "T-test_intent_completeness.test_empty_intent_graph", "target": "O-015", "type": "verifies"}
+{"source": "T-test_intent_completeness.test_orphaned_outcome_workflow", "target": "O-015", "type": "verifies"}
+{"source": "T-test_intent_completeness.test_orphaned_specification_workflow", "target": "O-015", "type": "verifies"}
+{"source": "T-test_layers.test_layers_basic_output", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_dag_status", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_empty_layers", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_missing_graph", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_multiple_layers", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_shows_dependencies", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_shows_function_counts", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_summary_option", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers.test_layers_total_summary", "target": "S-040", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_apply_updates_file", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_apply_with_no_confirmation", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_diamond_dependency", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_identifies_mismatches", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_missing_graph", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_multi_level_dependencies", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_no_dependencies", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_shows_current_vs_suggested", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_simple_dependency", "target": "S-041", "type": "verifies"}
+{"source": "T-test_layers_suggest.test_layers_suggest_with_cycles", "target": "S-041", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_deterministic_output", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_edge_sorting_deterministic", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_edges_after_nodes", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_empty_graph", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_metadata_first", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_ndjson_format", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_no_extra_whitespace", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_nodes_sorted_by_id", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_output_directory_created", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_round_trip_preserves_data", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_sort_keys_in_json", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_timestamp_optional", "target": "S-003", "type": "verifies"}
+{"source": "T-test_ndjson_writer.test_write_ndjson_convenience_function", "target": "S-003", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_class_nodes", "target": "S-049", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_function_nodes", "target": "S-049", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_present_for_tracked_files", "target": "S-049", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_same_for_all_nodes_in_file", "target": "S-049", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_async_function_with_implements_has_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_function_with_implements_has_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_function_without_implements_no_jig_hash", "target": "S-050", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_changes_when_body_changes", "target": "S-046", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_changes_when_body_changes", "target": "S-050", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_excludes_decorators", "target": "S-046", "type": "verifies"}
+{"source": "T-test_python_analyzer.TestImplementationGraphHashing.test_jig_hash_excludes_decorators", "target": "S-050", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_accuracy_metrics", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_async_functions", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_class_with_methods", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_inheritance", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_integration_all_fixtures", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_nested_classes", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_node_id_format", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_parse_error_handling", "target": "S-006", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_simple_module", "target": "S-001", "type": "verifies"}
+{"source": "T-test_python_analyzer.test_python_analyzer_type_hints", "target": "S-001", "type": "verifies"}
+{"source": "T-test_reporting.test_format_as_json_is_valid_json", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_format_as_json_multiple_phases", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_format_as_json_success", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_format_as_json_with_errors", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_format_human_readable", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_format_human_readable_with_errors", "target": "S-026", "type": "verifies"}
+{"source": "T-test_reporting.test_json_schema_consistency", "target": "S-026", "type": "verifies"}
+{"source": "T-test_validate.test_impl_rebuild_auto_validates", "target": "S-027", "type": "verifies"}
+{"source": "T-test_validate.test_impl_rebuild_skip_validation", "target": "S-027", "type": "verifies"}
+{"source": "T-test_validate.test_impl_rebuild_validates_only_decorators", "target": "S-027", "type": "verifies"}
+{"source": "T-test_validate.test_validate_bricks_json_format", "target": "S-026", "type": "verifies"}
+{"source": "T-test_validate.test_validate_bricks_missing_graph", "target": "S-024", "type": "verifies"}
+{"source": "T-test_validate.test_validate_bricks_partition_gap", "target": "S-024", "type": "verifies"}
+{"source": "T-test_validate.test_validate_bricks_success", "target": "S-024", "type": "verifies"}
+{"source": "T-test_validate.test_validate_full_fails_on_intent_error", "target": "S-025", "type": "verifies"}
+{"source": "T-test_validate.test_validate_full_skips_bricks_if_no_graph", "target": "S-025", "type": "verifies"}
+{"source": "T-test_validate.test_validate_full_success", "target": "S-025", "type": "verifies"}
+{"source": "T-test_validate.test_validate_intent_exit_codes", "target": "S-023", "type": "verifies"}
+{"source": "T-test_validate.test_validate_intent_failure", "target": "S-023", "type": "verifies"}
+{"source": "T-test_validate.test_validate_intent_json_format", "target": "S-026", "type": "verifies"}
+{"source": "T-test_validate.test_validate_intent_success", "target": "S-023", "type": "verifies"}
+{"source": "T-test_validate.test_validate_json_format_with_errors", "target": "S-026", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_group_exists", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_creates_file", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_custom_test_dir", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_empty_tests", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_help", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "target": "S-056", "type": "verifies"}
+{"source": "T-test_verify.test_cli_verify_rebuild_shows_progress", "target": "S-056", "type": "verifies"}
+{"source": "T-test_with_verifies.TestWithClass.test_method", "target": "S-003", "type": "verifies"}
+{"source": "T-test_with_verifies.TestWithClass.test_method_multiple", "target": "S-004", "type": "verifies"}
+{"source": "T-test_with_verifies.TestWithClass.test_method_multiple", "target": "S-005", "type": "verifies"}
+{"source": "T-test_with_verifies.test_multiple_specs", "target": "S-001", "type": "verifies"}
+{"source": "T-test_with_verifies.test_multiple_specs", "target": "S-002", "type": "verifies"}
+{"source": "T-test_with_verifies.test_short_form", "target": "S-006", "type": "verifies"}
+{"source": "T-test_with_verifies.test_simple", "target": "S-001", "type": "verifies"}
+{"source": "T-test_with_verifies.test_with_logic", "target": "S-007", "type": "verifies"}

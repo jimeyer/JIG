@@ -13,6 +13,7 @@ from jig.cli.validate import (
     validate_full_command,
     validate_intent_command,
 )
+from jig.cli.verify import verify_rebuild_command
 from jig.impl_graph.builder import build_graph
 from jig.intent_graph.generator import generate_intent_graph
 
@@ -36,6 +37,12 @@ def intent():
     pass
 
 
+@cli.group()
+def verify():
+    """Verification graph commands."""
+    pass
+
+
 @cli.command()
 @click.option(
     "--project-root",
@@ -56,7 +63,8 @@ def rebuild(project_root: Path, verbose: bool) -> None:
     1. Validate artifacts
     2. Rebuild implementation graph
     3. Rebuild intent graph
-    4. Display layer structure
+    4. Rebuild verification graph
+    5. Display layer structure
 
     Example:
         jigy rebuild
@@ -68,7 +76,7 @@ def rebuild(project_root: Path, verbose: bool) -> None:
 
     # Step 1: Validate
     click.echo("=" * 60)
-    click.echo("Step 1/4: Validating JIG artifacts...")
+    click.echo("Step 1/5: Validating JIG artifacts...")
     click.echo("=" * 60)
     exit_code = validate_full_command(project_root, "human")
     if exit_code != 0:
@@ -77,7 +85,7 @@ def rebuild(project_root: Path, verbose: bool) -> None:
 
     # Step 2: Rebuild implementation graph
     click.echo("\n" + "=" * 60)
-    click.echo("Step 2/4: Rebuilding implementation graph...")
+    click.echo("Step 2/5: Rebuilding implementation graph...")
     click.echo("=" * 60)
     try:
         impl_output = project_root / "jig" / "generated" / "implementation-graph.ndjson"
@@ -100,7 +108,7 @@ def rebuild(project_root: Path, verbose: bool) -> None:
 
     # Step 3: Rebuild intent graph
     click.echo("\n" + "=" * 60)
-    click.echo("Step 3/4: Rebuilding intent graph...")
+    click.echo("Step 3/5: Rebuilding intent graph...")
     click.echo("=" * 60)
     try:
         output_path, node_count, edge_count = generate_intent_graph(
@@ -116,9 +124,31 @@ def rebuild(project_root: Path, verbose: bool) -> None:
         click.echo(f"\n✗ Intent rebuild failed: {e}", err=True)
         sys.exit(1)
 
-    # Step 4: Display layers
+    # Step 4: Rebuild verification graph
     click.echo("\n" + "=" * 60)
-    click.echo("Step 4/4: Displaying layer structure...")
+    click.echo("Step 4/5: Rebuilding verification graph...")
+    click.echo("=" * 60)
+    try:
+        from jig.verification_graph.builder import build_verification_graph
+
+        verify_output = project_root / "jig" / "generated" / "verification-graph.ndjson"
+        verify_graph = build_verification_graph(
+            project_root=project_root,
+            test_dir=None,  # Uses default
+            output_path=verify_output,
+            include_timestamp=True,
+        )
+        click.echo(f"\n✓ Verification graph generated successfully:")
+        click.echo(f"  - Nodes: {verify_graph.node_count()}")
+        click.echo(f"  - Edges: {verify_graph.edge_count()}")
+        click.echo(f"  - Output: {verify_output}")
+    except Exception as e:
+        click.echo(f"\n✗ Verification rebuild failed: {e}", err=True)
+        sys.exit(1)
+
+    # Step 5: Display layers
+    click.echo("\n" + "=" * 60)
+    click.echo("Step 5/5: Displaying layer structure...")
     click.echo("=" * 60)
     exit_code = layers_command(project_root, summary=False, verbose=verbose)
     if exit_code != 0:
@@ -317,6 +347,47 @@ def rebuild(
         sys.exit(1)
     except Exception as e:
         click.echo(f"\n✗ Unexpected error: {e}", err=True)
+        sys.exit(1)
+
+
+@verify.command()
+@click.option(
+    "--project-root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=Path.cwd(),
+    help="Root directory of the project (default: current directory)",
+)
+@click.option(
+    "--test-dir",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=None,
+    help="Test directory to scan (default: <project-root>/tests)",
+)
+@click.option(
+    "--no-timestamp",
+    is_flag=True,
+    help="Exclude timestamp from metadata (for deterministic output)",
+)
+def rebuild(
+    project_root: Path,
+    test_dir: Path | None,
+    no_timestamp: bool,
+) -> None:
+    """Rebuild verification graph from test files.
+
+    Scans test files for @jig.verifies decorators and generates
+    an NDJSON verification graph.
+
+    Example:
+        jigy verify rebuild
+        jigy verify rebuild --test-dir custom_tests/
+        jigy verify rebuild --no-timestamp
+    """
+    try:
+        exit_code = verify_rebuild_command(project_root, test_dir, no_timestamp)
+        sys.exit(exit_code)
+    except Exception as e:
+        click.echo(f"\n✗ Error: {e}", err=True)
         sys.exit(1)
 
 
