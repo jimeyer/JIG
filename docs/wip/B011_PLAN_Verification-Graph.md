@@ -50,7 +50,7 @@ Complete the S-F-T triangle by implementing the verification graph, which tracks
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O/S) and update A001
-- [ ] WU1: Test Discovery — tests / code / docs
+- [x] WU1: Test Discovery — tests ✅ / code ✅ / docs ✅
 - [ ] WU2: Test Analyzer — tests / code / docs
 - [ ] WU3: Verification Graph Builder — tests / code / docs
 - [ ] WU4: CLI Integration — tests / code / docs
@@ -130,12 +130,12 @@ ls jig/specifications/S-05*.md
 **Est. New Code**: ~50 lines
 
 **Acceptance Criteria**:
-- [ ] `discover_test_files()` finds `test_*.py` and `*_test.py` patterns
-- [ ] `discover_tests()` finds `def test_*` and `class Test*` methods
-- [ ] Excludes `__pycache__`, `.venv`, `node_modules`
-- [ ] Returns deterministic ordering (sorted by path)
-- [ ] Unit tests with >80% coverage
-- [ ] `@jig.implements("S-051")` decorator on discovery function
+- [x] `discover_test_files()` finds `test_*.py` and `*_test.py` patterns
+- [x] `discover_tests()` finds `def test_*` and `class Test*` methods
+- [x] Excludes `__pycache__`, `.venv`, `node_modules`
+- [x] Returns deterministic ordering (sorted by path)
+- [x] Unit tests with >80% coverage (93.55% achieved)
+- [x] `@jig.implements("S-051")` decorator on discovery function
 
 **New Files**:
 - `src/jig/verification_graph/__init__.py`
@@ -202,10 +202,14 @@ python -c "from jig.verification_graph.discovery import discover_test_files; pri
 ```
 
 **Reflect**:
-- (To be filled after execution)
+- TDD worked well: 15 tests written first, all passed after implementation
+- ~60 lines of new code (slightly over estimate due to docstrings)
+- 93.55% coverage achieved (target was >80%)
+- AST parsing for test discovery is cleaner than regex matching
+- `TestInfo` dataclass provides good structure for downstream WU2/WU3
 
 **Links**:
-- Commit: (pending)
+- Commit: (see git log)
 
 ---
 
