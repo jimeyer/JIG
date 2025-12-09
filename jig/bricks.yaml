@@ -12,6 +12,7 @@ bricks:
       - M-jig.cli.main
       - M-jig.cli.validate
       - M-jig.cli.layers
+      - M-jig.cli.verify
 
   - id: B-validation
     name: Artifact Validation
@@ -55,7 +56,6 @@ bricks:
     name: Verification Graph
     layer: 1
     units:
-      - M-jig.verification_graph
       - M-jig.verification_graph.discovery
       - M-jig.verification_graph.analyzer
       - M-jig.verification_graph.builder
