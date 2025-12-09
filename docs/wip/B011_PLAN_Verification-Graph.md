@@ -52,7 +52,7 @@ Complete the S-F-T triangle by implementing the verification graph, which tracks
 - [x] WU0: Create Intent nodes (O/S) and update A001
 - [x] WU1: Test Discovery — tests ✅ / code ✅ / docs ✅
 - [x] WU2: Test Analyzer — tests ✅ / code ✅ / docs ✅
-- [ ] WU3: Verification Graph Builder — tests / code / docs
+- [x] WU3: Verification Graph Builder — tests ✅ / code ✅ / docs ✅
 - [ ] WU4: CLI Integration — tests / code / docs
 
 ---
@@ -360,14 +360,14 @@ pytest tests/unit/verification_graph/test_analyzer.py -v --cov=jig.verification_
 **Est. New Code**: ~40 lines (thin orchestration layer)
 
 **Acceptance Criteria**:
-- [ ] Orchestrates discovery → analysis → serialization
-- [ ] Generates `jig/generated/verification-graph.ndjson`
-- [ ] Uses existing `Graph` class (no new dataclass)
-- [ ] Uses existing `write_ndjson()` for output
-- [ ] Deterministic output (sorted by test ID)
-- [ ] Includes metadata line with node/edge counts
-- [ ] Integration tests verify end-to-end
-- [ ] `@jig.implements("S-055")` decorator on builder function
+- [x] Orchestrates discovery → analysis → serialization
+- [x] Generates `jig/generated/verification-graph.ndjson`
+- [x] Uses existing `Graph` class (no new dataclass)
+- [x] Uses existing `write_ndjson()` for output
+- [x] Deterministic output (sorted by test ID)
+- [x] Includes metadata line with node/edge counts
+- [x] Integration tests verify end-to-end
+- [x] `@jig.implements("S-055")` decorator on builder function
 
 **New Files**:
 - `src/jig/verification_graph/builder.py`
@@ -462,10 +462,14 @@ cat /tmp/test-vg.ndjson | head -5
 ```
 
 **Reflect**:
-- (To be filled after execution)
+- TDD worked well: 11 tests written first, all passed after implementation
+- ~22 lines of builder code (well under ~40 line estimate)
+- 100% coverage achieved on builder (target was >80%)
+- Code reuse: 100% reuse of `Graph`, `write_ndjson()` from impl_graph
+- Thin orchestration layer as designed—discovery/analyzer do the heavy lifting
 
 **Links**:
-- Commit: (pending)
+- Commit: (see git log)
 
 ---
 
