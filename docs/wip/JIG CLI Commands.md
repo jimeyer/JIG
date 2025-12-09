@@ -19,15 +19,18 @@ Here's a flat table of all JIG CLI commands:
 |          |            |                                                                                                                                                        |
 |          |            |                                                                                                                                                        |
 
-| Command       | Subcommand | Options/Arguments | notes                              |
-| ------------- | ---------- | ----------------- | ---------------------------------- |
-| jigy          |            |                   |                                    |
-| jigy rebuild  |            |                   | does all                           |
-| jigy rebuild  | intent     |                   |                                    |
-| jigy rebuild  | impl       |                   |                                    |
-| jigy rebuild  | verify     |                   |                                    |
-| jigy validate |            |                   |                                    |
-| jigy validate | intent     |                   |                                    |
-| jigy validate | bricks     |                   | show                               |
-| jigy update?  |            |                   | do rebuild and validate and bricks |
+FUTURE PROPOSED:
+
+| Command       | Subcommand | Options/Arguments | notes                               |
+| ------------- | ---------- | ----------------- | ----------------------------------- |
+| jigy          |            |                   |                                     |
+| jigy rebuild  |            |                   | rebuilds everything                 |
+| jigy rebuild  | intent     |                   |                                     |
+| jigy rebuild  | impl       |                   |                                     |
+| jigy rebuild  | verify     |                   |                                     |
+| jigy validate |            |                   | validates everything                |
+| jigy validate | intent     |                   |                                     |
+| jigy validate | bricks     |                   |                                     |
+| jigy layers?  |            |                   | show bricks and layers?             |
+| jigy update?  |            |                   | do rebuild and validate and bricks? |
 

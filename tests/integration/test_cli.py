@@ -344,7 +344,7 @@ Example outcome for testing.
 
 
 def test_cli_rebuild_success(runner: CliRunner, full_project: Path) -> None:
-    """Test that rebuild runs all four steps successfully."""
+    """Test that rebuild runs all five steps successfully."""
     result = runner.invoke(
         cli,
         [
@@ -357,20 +357,23 @@ def test_cli_rebuild_success(runner: CliRunner, full_project: Path) -> None:
     # Should succeed
     assert result.exit_code == 0, f"Command failed with output:\n{result.output}"
 
-    # Should show all four steps
-    assert "Step 1/4: Validating JIG artifacts" in result.output
-    assert "Step 2/4: Rebuilding implementation graph" in result.output
-    assert "Step 3/4: Rebuilding intent graph" in result.output
-    assert "Step 4/4: Displaying layer structure" in result.output
+    # Should show all five steps
+    assert "Step 1/5: Validating JIG artifacts" in result.output
+    assert "Step 2/5: Rebuilding implementation graph" in result.output
+    assert "Step 3/5: Rebuilding intent graph" in result.output
+    assert "Step 4/5: Rebuilding verification graph" in result.output
+    assert "Step 5/5: Displaying layer structure" in result.output
 
     # Should show success message
     assert "Complete! All JIG artifacts rebuilt successfully" in result.output
 
-    # Should create both graph files
+    # Should create all graph files
     impl_graph = full_project / "jig" / "generated" / "implementation-graph.ndjson"
     intent_graph = full_project / "jig" / "generated" / "intent-graph.ndjson"
+    verify_graph = full_project / "jig" / "generated" / "verification-graph.ndjson"
     assert impl_graph.exists(), "Implementation graph not created"
     assert intent_graph.exists(), "Intent graph not created"
+    assert verify_graph.exists(), "Verification graph not created"
 
 
 def test_cli_rebuild_with_verbose(runner: CliRunner, full_project: Path) -> None:
@@ -389,10 +392,11 @@ def test_cli_rebuild_with_verbose(runner: CliRunner, full_project: Path) -> None
     assert result.exit_code == 0
 
     # Should show all steps
-    assert "Step 1/4" in result.output
-    assert "Step 2/4" in result.output
-    assert "Step 3/4" in result.output
-    assert "Step 4/4" in result.output
+    assert "Step 1/5" in result.output
+    assert "Step 2/5" in result.output
+    assert "Step 3/5" in result.output
+    assert "Step 4/5" in result.output
+    assert "Step 5/5" in result.output
 
 
 def test_cli_rebuild_stops_on_validation_error(runner: CliRunner, tmp_path: Path) -> None:
@@ -425,13 +429,13 @@ id: S-001
     assert result.exit_code != 0
 
     # Should show step 1
-    assert "Step 1/4: Validating" in result.output
+    assert "Step 1/5: Validating" in result.output
 
     # Should show validation failure
     assert "Validation failed" in result.output or "Error" in result.output
 
     # Should NOT continue to step 2
-    assert "Step 2/4" not in result.output
+    assert "Step 2/5" not in result.output
 
 
 def test_cli_rebuild_help(runner: CliRunner) -> None:
