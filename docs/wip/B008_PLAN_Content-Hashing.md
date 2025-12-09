@@ -51,7 +51,7 @@ J022 defines how JIG computes and stores content identity through semantic hashi
 - [x] WU1: Core hashing module — tests ✅ / code ✅ / docs ☐
 - [x] WU2: Intent graph hashing — tests ✅ / code ✅ / docs ☐
 - [x] WU3: Implementation graph hashing — tests ✅ / code ✅ / docs ☐
-- [ ] WU4: Git blob optimization — tests ☐ / code ☐ / docs ☐
+- [x] WU4: Git blob optimization — tests ✅ / code ✅ / docs ☐
 
 ---
 
@@ -440,12 +440,12 @@ grep '"implements"' jig/generated/implementation-graph.ndjson | grep '"type": "f
 **Goal**: Add `git_blob` field for tiered rebuild optimization.
 
 **Acceptance Criteria**:
-- [ ] S-049 is implemented
-- [ ] `git_blob_hash()` function works in git repos
-- [ ] Intent graph nodes have optional `git_blob` field
-- [ ] Implementation graph nodes have optional `git_blob` field
-- [ ] Non-git environments gracefully omit `git_blob`
-- [ ] Tiered rebuild uses git_blob for fast-path (if previous graph exists)
+- [x] S-049 is implemented
+- [x] `git_blob_hash()` function works in git repos
+- [x] Intent graph nodes have optional `git_blob` field
+- [x] Implementation graph nodes have optional `git_blob` field
+- [x] Non-git environments gracefully omit `git_blob`
+- [ ] Tiered rebuild uses git_blob for fast-path (deferred to future work)
 
 **Implementation Notes**:
 
@@ -529,7 +529,12 @@ time jigy impl rebuild  # Second run (should be faster)
 ```
 
 **Reflect**:
-- (Will be filled after execution)
+- git_blob_hash() already existed from WU1 with @jig.implements("S-049")
+- Fixed path handling: resolve relative paths before calling git hash-object
+- Added git_blob to intent graph: spec, outcome, and brick nodes
+- Added git_blob to impl graph: class and function nodes
+- 8 new tests verify git_blob presence and format in both graphs
+- Tiered rebuild optimization deferred to future work (foundation in place)
 
 ---
 

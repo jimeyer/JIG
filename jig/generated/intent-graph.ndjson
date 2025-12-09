@@ -1,78 +1,78 @@
-{"_meta": {"brick_count": 7, "generated": "2025-12-09T01:15:51.156857+00:00", "outcome_count": 17, "spec_count": 50, "version": "1.0"}}
-{"file": "jig/specifications/S-001.md", "id": "S-001", "jig_hash": "7c42c7de04b6", "type": "specification"}
-{"file": "jig/specifications/S-002.md", "id": "S-002", "jig_hash": "e2cf1142bac9", "type": "specification"}
-{"file": "jig/specifications/S-003.md", "id": "S-003", "jig_hash": "52ba9ea5a9ff", "type": "specification"}
-{"file": "jig/specifications/S-004.md", "id": "S-004", "jig_hash": "f99f67775e2d", "type": "specification"}
-{"file": "jig/specifications/S-005.md", "id": "S-005", "jig_hash": "100af3378c97", "type": "specification"}
-{"file": "jig/specifications/S-006.md", "id": "S-006", "jig_hash": "45352555b8a2", "type": "specification"}
-{"file": "jig/specifications/S-007.md", "id": "S-007", "jig_hash": "0042a50ef681", "type": "specification"}
-{"file": "jig/specifications/S-008.md", "id": "S-008", "jig_hash": "21e967b3f165", "type": "specification"}
-{"file": "jig/specifications/S-009.md", "id": "S-009", "jig_hash": "377c19920595", "type": "specification"}
-{"file": "jig/specifications/S-010.md", "id": "S-010", "jig_hash": "f8ee9b96d3a8", "type": "specification"}
-{"file": "jig/specifications/S-011.md", "id": "S-011", "jig_hash": "629961e335df", "type": "specification"}
-{"file": "jig/specifications/S-012.md", "id": "S-012", "jig_hash": "200a668a6884", "type": "specification"}
-{"file": "jig/specifications/S-013.md", "id": "S-013", "jig_hash": "a4ee8dedf0ca", "type": "specification"}
-{"file": "jig/specifications/S-014.md", "id": "S-014", "jig_hash": "1c8aadc23e01", "type": "specification"}
-{"file": "jig/specifications/S-015.md", "id": "S-015", "jig_hash": "1eef20a8393f", "type": "specification"}
-{"file": "jig/specifications/S-016.md", "id": "S-016", "jig_hash": "1171a7e951e4", "type": "specification"}
-{"file": "jig/specifications/S-017.md", "id": "S-017", "jig_hash": "71a5dc978166", "type": "specification"}
-{"file": "jig/specifications/S-018.md", "id": "S-018", "jig_hash": "57c97698ac25", "type": "specification"}
-{"file": "jig/specifications/S-019.md", "id": "S-019", "jig_hash": "b2e4876e145e", "type": "specification"}
-{"file": "jig/specifications/S-020.md", "id": "S-020", "jig_hash": "cae4490735b0", "type": "specification"}
-{"file": "jig/specifications/S-021.md", "id": "S-021", "jig_hash": "5e0a975e39ed", "type": "specification"}
-{"file": "jig/specifications/S-022.md", "id": "S-022", "jig_hash": "f37ce5482ae8", "type": "specification"}
-{"file": "jig/specifications/S-023.md", "id": "S-023", "jig_hash": "ae1dc8aed7b1", "type": "specification"}
-{"file": "jig/specifications/S-024.md", "id": "S-024", "jig_hash": "0e337a491534", "type": "specification"}
-{"file": "jig/specifications/S-025.md", "id": "S-025", "jig_hash": "5b8cb2adbcd5", "type": "specification"}
-{"file": "jig/specifications/S-026.md", "id": "S-026", "jig_hash": "18d85f2f6bdf", "type": "specification"}
-{"file": "jig/specifications/S-027.md", "id": "S-027", "jig_hash": "cd393ac5c155", "type": "specification"}
-{"file": "jig/specifications/S-028.md", "id": "S-028", "jig_hash": "b0658b621199", "type": "specification"}
-{"file": "jig/specifications/S-029.md", "id": "S-029", "jig_hash": "987f160303e0", "type": "specification"}
-{"file": "jig/specifications/S-030.md", "id": "S-030", "jig_hash": "f42150431577", "type": "specification"}
-{"file": "jig/specifications/S-031.md", "id": "S-031", "jig_hash": "e5ce4371ad10", "type": "specification"}
-{"file": "jig/specifications/S-032.md", "id": "S-032", "jig_hash": "be5c1650cc8f", "type": "specification"}
-{"file": "jig/specifications/S-033.md", "id": "S-033", "jig_hash": "bd7318924f54", "type": "specification"}
-{"file": "jig/specifications/S-034.md", "id": "S-034", "jig_hash": "79cc32ed2a1d", "type": "specification"}
-{"file": "jig/specifications/S-035.md", "id": "S-035", "jig_hash": "055320bd5232", "type": "specification"}
-{"file": "jig/specifications/S-036.md", "id": "S-036", "jig_hash": "358b1be29b8a", "type": "specification"}
-{"file": "jig/specifications/S-037.md", "id": "S-037", "jig_hash": "eade491fe018", "type": "specification"}
-{"file": "jig/specifications/S-038.md", "id": "S-038", "jig_hash": "87d05bc06561", "type": "specification"}
-{"file": "jig/specifications/S-039.md", "id": "S-039", "jig_hash": "508d9a16c2b7", "type": "specification"}
-{"file": "jig/specifications/S-040.md", "id": "S-040", "jig_hash": "8f9318dfc53c", "type": "specification"}
-{"file": "jig/specifications/S-041.md", "id": "S-041", "jig_hash": "f8e23a471d93", "type": "specification"}
-{"file": "jig/specifications/S-042.md", "id": "S-042", "jig_hash": "9c1b7f54bb83", "type": "specification"}
-{"file": "jig/specifications/S-043.md", "id": "S-043", "jig_hash": "1a33f89dc435", "type": "specification"}
-{"file": "jig/specifications/S-044.md", "id": "S-044", "jig_hash": "8365bc9f05f1", "type": "specification"}
-{"file": "jig/specifications/S-045.md", "id": "S-045", "jig_hash": "89c000243d56", "type": "specification"}
-{"file": "jig/specifications/S-046.md", "id": "S-046", "jig_hash": "89be039e0ca0", "type": "specification"}
-{"file": "jig/specifications/S-047.md", "id": "S-047", "jig_hash": "e38d77f0b2d8", "type": "specification"}
-{"file": "jig/specifications/S-048.md", "id": "S-048", "jig_hash": "307f1e0ea5f7", "type": "specification"}
-{"file": "jig/specifications/S-049.md", "id": "S-049", "jig_hash": "34f91a406217", "type": "specification"}
-{"file": "jig/specifications/S-050.md", "id": "S-050", "jig_hash": "f2d4d51bfb74", "type": "specification"}
-{"file": "jig/outcomes/O-001.md", "id": "O-001", "jig_hash": "5dfbcf187eca", "specifies": ["S-001", "S-003", "S-005", "S-006"], "type": "outcome"}
-{"file": "jig/outcomes/O-002.md", "id": "O-002", "jig_hash": "32822d9777d7", "specifies": ["S-002"], "type": "outcome"}
-{"file": "jig/outcomes/O-003.md", "id": "O-003", "jig_hash": "094ccfc7f4dd", "specifies": ["S-004"], "type": "outcome"}
-{"file": "jig/outcomes/O-004.md", "id": "O-004", "jig_hash": "64c7a3711dd7", "specifies": ["S-023", "S-024", "S-025", "S-027"], "type": "outcome"}
-{"file": "jig/outcomes/O-005.md", "id": "O-005", "jig_hash": "df84ce3c41f6", "specifies": ["S-018", "S-019", "S-020", "S-021", "S-022"], "type": "outcome"}
-{"file": "jig/outcomes/O-006.md", "id": "O-006", "jig_hash": "9b9fd60d6720", "specifies": ["S-023", "S-024", "S-025"], "type": "outcome"}
-{"file": "jig/outcomes/O-007.md", "id": "O-007", "jig_hash": "1b69b2f1e4fa", "specifies": ["S-007", "S-008", "S-009", "S-017", "S-015", "S-016", "S-029"], "type": "outcome"}
-{"file": "jig/outcomes/O-008.md", "id": "O-008", "jig_hash": "dbd61b8ed3ff", "specifies": ["S-010", "S-011", "S-012", "S-013", "S-014"], "type": "outcome"}
-{"file": "jig/outcomes/O-009.md", "id": "O-009", "jig_hash": "edf1dd9d8906", "specifies": ["S-028"], "type": "outcome"}
-{"file": "jig/outcomes/O-010.md", "id": "O-010", "jig_hash": "446e12909d76", "specifies": ["S-030", "S-031", "S-034"], "type": "outcome"}
-{"file": "jig/outcomes/O-011.md", "id": "O-011", "jig_hash": "9462bea0dd89", "specifies": ["S-032", "S-033"], "type": "outcome"}
-{"file": "jig/outcomes/O-012.md", "id": "O-012", "jig_hash": "bcadfb46aa77", "specifies": ["S-035", "S-036", "S-037"], "type": "outcome"}
-{"file": "jig/outcomes/O-013.md", "id": "O-013", "jig_hash": "c1dd6653919f", "specifies": ["S-038", "S-039"], "type": "outcome"}
-{"file": "jig/outcomes/O-014.md", "id": "O-014", "jig_hash": "100a0c3ec6a8", "specifies": ["S-040", "S-041"], "type": "outcome"}
-{"file": "jig/outcomes/O-015.md", "id": "O-015", "jig_hash": "44660783f3b2", "specifies": ["S-042", "S-043"], "type": "outcome"}
-{"file": "jig/outcomes/O-016.md", "id": "O-016", "jig_hash": "34c581efb814", "specifies": ["S-026"], "type": "outcome"}
-{"file": "jig/outcomes/O-017.md", "id": "O-017", "jig_hash": "7f854efd9cc0", "specifies": ["S-044", "S-045", "S-046", "S-047", "S-048", "S-049", "S-050"], "type": "outcome"}
-{"file": "jig/bricks.yaml", "id": "B-cli", "jig_hash": "ef3e4b714335", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate", "M-jig.cli.layers"]}
-{"file": "jig/bricks.yaml", "id": "B-decorators", "jig_hash": "8910c3d27292", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
-{"file": "jig/bricks.yaml", "id": "B-hashing", "jig_hash": "cc0fc773aa37", "name": "Content Hashing", "type": "brick", "units": ["M-jig.hashing"]}
-{"file": "jig/bricks.yaml", "id": "B-impl-graph", "jig_hash": "ce73dbe5593b", "name": "Implementation Graph", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
-{"file": "jig/bricks.yaml", "id": "B-intent-graph", "jig_hash": "457c60b2ba3e", "name": "Intent Graph", "type": "brick", "units": ["M-jig.intent_graph.generator"]}
-{"file": "jig/bricks.yaml", "id": "B-languages", "jig_hash": "58376407eb07", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
-{"file": "jig/bricks.yaml", "id": "B-validation", "jig_hash": "ce0c8608a88c", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
+{"_meta": {"brick_count": 7, "generated": "2025-12-09T01:32:58.409738+00:00", "outcome_count": 17, "spec_count": 50, "version": "1.0"}}
+{"file": "jig/specifications/S-001.md", "git_blob": "76df99b09d5c", "id": "S-001", "jig_hash": "7c42c7de04b6", "type": "specification"}
+{"file": "jig/specifications/S-002.md", "git_blob": "0ae8b4a29f65", "id": "S-002", "jig_hash": "e2cf1142bac9", "type": "specification"}
+{"file": "jig/specifications/S-003.md", "git_blob": "1d0f1304d101", "id": "S-003", "jig_hash": "52ba9ea5a9ff", "type": "specification"}
+{"file": "jig/specifications/S-004.md", "git_blob": "8c4cba7d73b0", "id": "S-004", "jig_hash": "f99f67775e2d", "type": "specification"}
+{"file": "jig/specifications/S-005.md", "git_blob": "e70936cf0c8b", "id": "S-005", "jig_hash": "100af3378c97", "type": "specification"}
+{"file": "jig/specifications/S-006.md", "git_blob": "209f02bc9afc", "id": "S-006", "jig_hash": "45352555b8a2", "type": "specification"}
+{"file": "jig/specifications/S-007.md", "git_blob": "174459422256", "id": "S-007", "jig_hash": "0042a50ef681", "type": "specification"}
+{"file": "jig/specifications/S-008.md", "git_blob": "6c67a79dea42", "id": "S-008", "jig_hash": "21e967b3f165", "type": "specification"}
+{"file": "jig/specifications/S-009.md", "git_blob": "8ccc52dbb86b", "id": "S-009", "jig_hash": "377c19920595", "type": "specification"}
+{"file": "jig/specifications/S-010.md", "git_blob": "7c3ebf556c3b", "id": "S-010", "jig_hash": "f8ee9b96d3a8", "type": "specification"}
+{"file": "jig/specifications/S-011.md", "git_blob": "7e9fce00337f", "id": "S-011", "jig_hash": "629961e335df", "type": "specification"}
+{"file": "jig/specifications/S-012.md", "git_blob": "511dfe578fe9", "id": "S-012", "jig_hash": "200a668a6884", "type": "specification"}
+{"file": "jig/specifications/S-013.md", "git_blob": "55c617b86630", "id": "S-013", "jig_hash": "a4ee8dedf0ca", "type": "specification"}
+{"file": "jig/specifications/S-014.md", "git_blob": "39d76dd3cf44", "id": "S-014", "jig_hash": "1c8aadc23e01", "type": "specification"}
+{"file": "jig/specifications/S-015.md", "git_blob": "b6e1c0602f41", "id": "S-015", "jig_hash": "1eef20a8393f", "type": "specification"}
+{"file": "jig/specifications/S-016.md", "git_blob": "83dba508e924", "id": "S-016", "jig_hash": "1171a7e951e4", "type": "specification"}
+{"file": "jig/specifications/S-017.md", "git_blob": "b33e63c3b125", "id": "S-017", "jig_hash": "71a5dc978166", "type": "specification"}
+{"file": "jig/specifications/S-018.md", "git_blob": "252c5367d527", "id": "S-018", "jig_hash": "57c97698ac25", "type": "specification"}
+{"file": "jig/specifications/S-019.md", "git_blob": "6526b43fe5af", "id": "S-019", "jig_hash": "b2e4876e145e", "type": "specification"}
+{"file": "jig/specifications/S-020.md", "git_blob": "9386e221c767", "id": "S-020", "jig_hash": "cae4490735b0", "type": "specification"}
+{"file": "jig/specifications/S-021.md", "git_blob": "a68a7cf12bf6", "id": "S-021", "jig_hash": "5e0a975e39ed", "type": "specification"}
+{"file": "jig/specifications/S-022.md", "git_blob": "0b4bc5754f53", "id": "S-022", "jig_hash": "f37ce5482ae8", "type": "specification"}
+{"file": "jig/specifications/S-023.md", "git_blob": "dd1d5b98b0f4", "id": "S-023", "jig_hash": "ae1dc8aed7b1", "type": "specification"}
+{"file": "jig/specifications/S-024.md", "git_blob": "dd4d481219d9", "id": "S-024", "jig_hash": "0e337a491534", "type": "specification"}
+{"file": "jig/specifications/S-025.md", "git_blob": "95a0dc697236", "id": "S-025", "jig_hash": "5b8cb2adbcd5", "type": "specification"}
+{"file": "jig/specifications/S-026.md", "git_blob": "d263c6798520", "id": "S-026", "jig_hash": "18d85f2f6bdf", "type": "specification"}
+{"file": "jig/specifications/S-027.md", "git_blob": "844ed099cd6e", "id": "S-027", "jig_hash": "cd393ac5c155", "type": "specification"}
+{"file": "jig/specifications/S-028.md", "git_blob": "8c988ced9442", "id": "S-028", "jig_hash": "b0658b621199", "type": "specification"}
+{"file": "jig/specifications/S-029.md", "git_blob": "cc5d83a065e5", "id": "S-029", "jig_hash": "987f160303e0", "type": "specification"}
+{"file": "jig/specifications/S-030.md", "git_blob": "962c86ef74d4", "id": "S-030", "jig_hash": "f42150431577", "type": "specification"}
+{"file": "jig/specifications/S-031.md", "git_blob": "5eeb7d21886a", "id": "S-031", "jig_hash": "e5ce4371ad10", "type": "specification"}
+{"file": "jig/specifications/S-032.md", "git_blob": "01b4d20260ec", "id": "S-032", "jig_hash": "be5c1650cc8f", "type": "specification"}
+{"file": "jig/specifications/S-033.md", "git_blob": "fb4f6973961a", "id": "S-033", "jig_hash": "bd7318924f54", "type": "specification"}
+{"file": "jig/specifications/S-034.md", "git_blob": "5f4f27f477ab", "id": "S-034", "jig_hash": "79cc32ed2a1d", "type": "specification"}
+{"file": "jig/specifications/S-035.md", "git_blob": "b363337b542f", "id": "S-035", "jig_hash": "055320bd5232", "type": "specification"}
+{"file": "jig/specifications/S-036.md", "git_blob": "67bd1f227298", "id": "S-036", "jig_hash": "358b1be29b8a", "type": "specification"}
+{"file": "jig/specifications/S-037.md", "git_blob": "2087a4019377", "id": "S-037", "jig_hash": "eade491fe018", "type": "specification"}
+{"file": "jig/specifications/S-038.md", "git_blob": "5c68fb4ae952", "id": "S-038", "jig_hash": "87d05bc06561", "type": "specification"}
+{"file": "jig/specifications/S-039.md", "git_blob": "018ceea5e3b2", "id": "S-039", "jig_hash": "508d9a16c2b7", "type": "specification"}
+{"file": "jig/specifications/S-040.md", "git_blob": "bec143c30b24", "id": "S-040", "jig_hash": "8f9318dfc53c", "type": "specification"}
+{"file": "jig/specifications/S-041.md", "git_blob": "ae6818b793de", "id": "S-041", "jig_hash": "f8e23a471d93", "type": "specification"}
+{"file": "jig/specifications/S-042.md", "git_blob": "2b4ff5cc7833", "id": "S-042", "jig_hash": "9c1b7f54bb83", "type": "specification"}
+{"file": "jig/specifications/S-043.md", "git_blob": "0db83d494ebc", "id": "S-043", "jig_hash": "1a33f89dc435", "type": "specification"}
+{"file": "jig/specifications/S-044.md", "git_blob": "74aa62b2b093", "id": "S-044", "jig_hash": "8365bc9f05f1", "type": "specification"}
+{"file": "jig/specifications/S-045.md", "git_blob": "0e4fabe4ebf9", "id": "S-045", "jig_hash": "89c000243d56", "type": "specification"}
+{"file": "jig/specifications/S-046.md", "git_blob": "d812d0f5c073", "id": "S-046", "jig_hash": "89be039e0ca0", "type": "specification"}
+{"file": "jig/specifications/S-047.md", "git_blob": "ad08f80a4ce0", "id": "S-047", "jig_hash": "e38d77f0b2d8", "type": "specification"}
+{"file": "jig/specifications/S-048.md", "git_blob": "822bdbb7b925", "id": "S-048", "jig_hash": "307f1e0ea5f7", "type": "specification"}
+{"file": "jig/specifications/S-049.md", "git_blob": "ba75cab09dbb", "id": "S-049", "jig_hash": "34f91a406217", "type": "specification"}
+{"file": "jig/specifications/S-050.md", "git_blob": "1b793f3e8802", "id": "S-050", "jig_hash": "f2d4d51bfb74", "type": "specification"}
+{"file": "jig/outcomes/O-001.md", "git_blob": "f4e36295831e", "id": "O-001", "jig_hash": "5dfbcf187eca", "specifies": ["S-001", "S-003", "S-005", "S-006"], "type": "outcome"}
+{"file": "jig/outcomes/O-002.md", "git_blob": "412844dcb997", "id": "O-002", "jig_hash": "32822d9777d7", "specifies": ["S-002"], "type": "outcome"}
+{"file": "jig/outcomes/O-003.md", "git_blob": "40600998b6b0", "id": "O-003", "jig_hash": "094ccfc7f4dd", "specifies": ["S-004"], "type": "outcome"}
+{"file": "jig/outcomes/O-004.md", "git_blob": "226400461756", "id": "O-004", "jig_hash": "64c7a3711dd7", "specifies": ["S-023", "S-024", "S-025", "S-027"], "type": "outcome"}
+{"file": "jig/outcomes/O-005.md", "git_blob": "46c5ef1795ce", "id": "O-005", "jig_hash": "df84ce3c41f6", "specifies": ["S-018", "S-019", "S-020", "S-021", "S-022"], "type": "outcome"}
+{"file": "jig/outcomes/O-006.md", "git_blob": "342fd70a5b86", "id": "O-006", "jig_hash": "9b9fd60d6720", "specifies": ["S-023", "S-024", "S-025"], "type": "outcome"}
+{"file": "jig/outcomes/O-007.md", "git_blob": "1207df23a987", "id": "O-007", "jig_hash": "1b69b2f1e4fa", "specifies": ["S-007", "S-008", "S-009", "S-017", "S-015", "S-016", "S-029"], "type": "outcome"}
+{"file": "jig/outcomes/O-008.md", "git_blob": "206387061d35", "id": "O-008", "jig_hash": "dbd61b8ed3ff", "specifies": ["S-010", "S-011", "S-012", "S-013", "S-014"], "type": "outcome"}
+{"file": "jig/outcomes/O-009.md", "git_blob": "f133d9fb1eb8", "id": "O-009", "jig_hash": "edf1dd9d8906", "specifies": ["S-028"], "type": "outcome"}
+{"file": "jig/outcomes/O-010.md", "git_blob": "b1c867e559bf", "id": "O-010", "jig_hash": "446e12909d76", "specifies": ["S-030", "S-031", "S-034"], "type": "outcome"}
+{"file": "jig/outcomes/O-011.md", "git_blob": "3ea89743aac4", "id": "O-011", "jig_hash": "9462bea0dd89", "specifies": ["S-032", "S-033"], "type": "outcome"}
+{"file": "jig/outcomes/O-012.md", "git_blob": "08cc1e0629cf", "id": "O-012", "jig_hash": "bcadfb46aa77", "specifies": ["S-035", "S-036", "S-037"], "type": "outcome"}
+{"file": "jig/outcomes/O-013.md", "git_blob": "5151ab814f11", "id": "O-013", "jig_hash": "c1dd6653919f", "specifies": ["S-038", "S-039"], "type": "outcome"}
+{"file": "jig/outcomes/O-014.md", "git_blob": "ae89cb3d77e6", "id": "O-014", "jig_hash": "100a0c3ec6a8", "specifies": ["S-040", "S-041"], "type": "outcome"}
+{"file": "jig/outcomes/O-015.md", "git_blob": "62a75dc39eec", "id": "O-015", "jig_hash": "44660783f3b2", "specifies": ["S-042", "S-043"], "type": "outcome"}
+{"file": "jig/outcomes/O-016.md", "git_blob": "558cccee6da1", "id": "O-016", "jig_hash": "34c581efb814", "specifies": ["S-026"], "type": "outcome"}
+{"file": "jig/outcomes/O-017.md", "git_blob": "faa27760a5db", "id": "O-017", "jig_hash": "7f854efd9cc0", "specifies": ["S-044", "S-045", "S-046", "S-047", "S-048", "S-049", "S-050"], "type": "outcome"}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-cli", "jig_hash": "ef3e4b714335", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate", "M-jig.cli.layers"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-decorators", "jig_hash": "8910c3d27292", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-hashing", "jig_hash": "cc0fc773aa37", "name": "Content Hashing", "type": "brick", "units": ["M-jig.hashing"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-impl-graph", "jig_hash": "ce73dbe5593b", "name": "Implementation Graph", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-intent-graph", "jig_hash": "457c60b2ba3e", "name": "Intent Graph", "type": "brick", "units": ["M-jig.intent_graph.generator"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-languages", "jig_hash": "58376407eb07", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
+{"file": "jig/bricks.yaml", "git_blob": "d4d27d94187b", "id": "B-validation", "jig_hash": "ce0c8608a88c", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
 {"source": "O-001", "target": "S-001", "type": "specifies"}
 {"source": "O-001", "target": "S-003", "type": "specifies"}
 {"source": "O-001", "target": "S-005", "type": "specifies"}

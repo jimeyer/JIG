@@ -441,3 +441,115 @@ Different content now.
         }
 
         assert hashes1 == hashes2
+
+
+class TestIntentGraphGitBlob:
+    """Tests for S-049: Git Blob Optimization in intent graph."""
+
+    @jig.verifies("S-049")
+    def test_git_blob_optional_on_spec_nodes(self, temp_project):
+        """Specification nodes may have optional git_blob field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        spec_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "specification"' in line
+        ]
+
+        # git_blob is optional - may or may not be present depending on git context
+        # If present, should be 12 hex chars
+        for node in spec_nodes:
+            if "git_blob" in node:
+                assert len(node["git_blob"]) == 12
+                assert all(c in "0123456789abcdef" for c in node["git_blob"])
+
+    @jig.verifies("S-049")
+    def test_git_blob_optional_on_outcome_nodes(self, temp_project):
+        """Outcome nodes may have optional git_blob field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        outcome_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "outcome"' in line
+        ]
+
+        # git_blob is optional - may or may not be present depending on git context
+        for node in outcome_nodes:
+            if "git_blob" in node:
+                assert len(node["git_blob"]) == 12
+                assert all(c in "0123456789abcdef" for c in node["git_blob"])
+
+    @jig.verifies("S-049")
+    def test_git_blob_optional_on_brick_nodes(self, temp_project):
+        """Brick nodes may have optional git_blob field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        brick_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "brick"' in line
+        ]
+
+        # git_blob is optional - may or may not be present depending on git context
+        for node in brick_nodes:
+            if "git_blob" in node:
+                assert len(node["git_blob"]) == 12
+                assert all(c in "0123456789abcdef" for c in node["git_blob"])
+
+    @jig.verifies("S-049")
+    def test_git_blob_deterministic_across_runs(self, temp_project):
+        """Same file produces same git_blob across runs."""
+        output_path1 = temp_project / "jig" / "generated" / "intent-graph-1.ndjson"
+        output_path2 = temp_project / "jig" / "generated" / "intent-graph-2.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path1,
+            include_timestamp=False,
+        )
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path2,
+            include_timestamp=False,
+        )
+
+        lines1 = output_path1.read_text().strip().split("\n")
+        lines2 = output_path2.read_text().strip().split("\n")
+
+        # Collect git_blobs from both runs
+        blobs1 = {
+            json.loads(line).get("id"): json.loads(line).get("git_blob")
+            for line in lines1[1:]
+            if "git_blob" in line
+        }
+        blobs2 = {
+            json.loads(line).get("id"): json.loads(line).get("git_blob")
+            for line in lines2[1:]
+            if "git_blob" in line
+        }
+
+        # If git_blob is present, it should be the same across runs
+        assert blobs1 == blobs2

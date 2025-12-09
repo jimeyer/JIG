@@ -143,17 +143,19 @@ def git_blob_hash(file: Path) -> str | None:
     Returns None if not in a git repo or file not tracked.
 
     Args:
-        file: Path to file
+        file: Path to file (can be relative or absolute)
 
     Returns:
         12-character git blob hash, or None
     """
     try:
+        # Resolve to absolute path to handle both relative and absolute inputs
+        resolved_file = file.resolve() if not file.is_absolute() else file
         result = subprocess.run(
-            ["git", "hash-object", str(file)],
+            ["git", "hash-object", str(resolved_file)],
             capture_output=True,
             text=True,
-            cwd=file.parent,
+            cwd=resolved_file.parent,
             timeout=5,
         )
         if result.returncode == 0 and result.stdout.strip():

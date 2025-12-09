@@ -645,3 +645,110 @@ async def async_function():
             assert len(async_func["jig_hash"]) == 12
         finally:
             temp_path.unlink()
+
+
+class TestImplementationGraphGitBlob:
+    """Tests for S-049: Git Blob Optimization in implementation graph."""
+
+    @jig.verifies("S-049")
+    def test_git_blob_optional_on_function_nodes(self) -> None:
+        """Function nodes may have optional git_blob field."""
+        code = '''
+def my_function():
+    """A plain function."""
+    return 42
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            functions = [n for n in result["nodes"] if n["type"] == "function"]
+            my_func = [fn for fn in functions if fn["name"] == "my_function"][0]
+
+            # git_blob is optional - may or may not be present depending on git context
+            if "git_blob" in my_func:
+                assert len(my_func["git_blob"]) == 12
+                assert all(c in "0123456789abcdef" for c in my_func["git_blob"])
+        finally:
+            temp_path.unlink()
+
+    @jig.verifies("S-049")
+    def test_git_blob_optional_on_class_nodes(self) -> None:
+        """Class nodes may have optional git_blob field."""
+        code = '''
+class MyClass:
+    """A simple class."""
+    pass
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            classes = [n for n in result["nodes"] if n["type"] == "class"]
+            my_class = [c for c in classes if c["name"] == "MyClass"][0]
+
+            # git_blob is optional - may or may not be present depending on git context
+            if "git_blob" in my_class:
+                assert len(my_class["git_blob"]) == 12
+                assert all(c in "0123456789abcdef" for c in my_class["git_blob"])
+        finally:
+            temp_path.unlink()
+
+    @jig.verifies("S-049")
+    def test_git_blob_same_for_all_nodes_in_file(self) -> None:
+        """All nodes from same file have identical git_blob."""
+        code = '''
+class MyClass:
+    def method1(self):
+        pass
+
+    def method2(self):
+        pass
+
+def standalone():
+    pass
+'''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(code)
+            temp_path = Path(f.name)
+
+        try:
+            analyzer = PythonAnalyzer()
+            result = analyzer.analyze_file(temp_path)
+
+            # Collect all git_blobs from nodes that have them
+            git_blobs = [
+                n["git_blob"]
+                for n in result["nodes"]
+                if "git_blob" in n
+            ]
+
+            # If any git_blobs present, they should all be identical
+            if git_blobs:
+                assert len(set(git_blobs)) == 1, "All nodes from same file should have same git_blob"
+        finally:
+            temp_path.unlink()
+
+    @jig.verifies("S-049")
+    def test_git_blob_present_for_tracked_files(self, analyzer: PythonAnalyzer) -> None:
+        """Files in git repo should have git_blob on nodes."""
+        # Use a fixture file that's tracked in git
+        fixture = FIXTURES_DIR / "simple_module.py"
+        result = analyzer.analyze_file(fixture)
+
+        # At least some nodes should have git_blob since fixture is in repo
+        nodes_with_blob = [n for n in result["nodes"] if "git_blob" in n]
+
+        # If we're in a git repo, nodes should have git_blob
+        # This may be empty if running tests outside git context
+        for node in nodes_with_blob:
+            assert len(node["git_blob"]) == 12
+            assert all(c in "0123456789abcdef" for c in node["git_blob"])

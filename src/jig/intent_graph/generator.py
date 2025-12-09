@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 import jig
-from jig.hashing import hash_brick, hash_intent_artifact
+from jig.hashing import git_blob_hash, hash_brick, hash_intent_artifact
 
 
 @jig.implements("S-028", "S-050")
@@ -115,6 +115,11 @@ def _load_specification_nodes(spec_dir: Path) -> List[Dict[str, Any]]:
             "jig_hash": hash_intent_artifact(spec_file),
         }
 
+        # Add optional git_blob for tiered rebuild optimization (S-049)
+        git_blob = git_blob_hash(spec_file)
+        if git_blob:
+            spec_node["git_blob"] = git_blob
+
         spec_nodes.append(spec_node)
 
     return spec_nodes
@@ -153,6 +158,11 @@ def _load_outcome_nodes(outcome_dir: Path) -> List[Dict[str, Any]]:
             "specifies": frontmatter.get("specifies", []),
         }
 
+        # Add optional git_blob for tiered rebuild optimization (S-049)
+        git_blob = git_blob_hash(outcome_file)
+        if git_blob:
+            outcome_node["git_blob"] = git_blob
+
         outcome_nodes.append(outcome_node)
 
     return outcome_nodes
@@ -189,6 +199,9 @@ def _load_brick_nodes(bricks_file: Path) -> List[Dict[str, Any]]:
             f"Invalid bricks.yaml format: expected dict with 'bricks' key or list, got {type(bricks_data)}"
         )
 
+    # Compute git_blob once for the bricks file (S-049)
+    bricks_git_blob = git_blob_hash(bricks_file)
+
     brick_nodes = []
     for brick in bricks:
         brick_id = brick.get("id")
@@ -206,6 +219,10 @@ def _load_brick_nodes(bricks_file: Path) -> List[Dict[str, Any]]:
             "jig_hash": hash_brick(brick),
             "units": brick_units,
         }
+
+        # Add optional git_blob for tiered rebuild optimization (S-049)
+        if bricks_git_blob:
+            brick_node["git_blob"] = bricks_git_blob
 
         brick_nodes.append(brick_node)
 

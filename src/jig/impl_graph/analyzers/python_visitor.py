@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import jig
-from jig.hashing import hash_function
+from jig.hashing import git_blob_hash, hash_function
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,8 @@ class PythonStructureVisitor(ast.NodeVisitor):
         self.current_class: Optional[str] = None
         self.class_stack: List[str] = []  # For tracking nested classes
         self.current_function: Optional[str] = None  # For tracking function context
+        # Compute git_blob once per file for tiered rebuild optimization (S-049)
+        self._git_blob: Optional[str] = git_blob_hash(file_path)
 
     def get_nodes(self) -> List[Dict[str, Any]]:
         """Return the collected nodes.
@@ -106,6 +108,10 @@ class PythonStructureVisitor(ast.NodeVisitor):
         # Add implements field if decorators found
         if implements_specs:
             class_node["implements"] = implements_specs
+
+        # Add optional git_blob for tiered rebuild optimization (S-049)
+        if self._git_blob:
+            class_node["git_blob"] = self._git_blob
 
         self.nodes.append(class_node)
 
@@ -182,6 +188,10 @@ class PythonStructureVisitor(ast.NodeVisitor):
         if implements_specs:
             func_node["implements"] = implements_specs
             func_node["jig_hash"] = hash_function(node)
+
+        # Add optional git_blob for tiered rebuild optimization (S-049)
+        if self._git_blob:
+            func_node["git_blob"] = self._git_blob
 
         self.nodes.append(func_node)
 
