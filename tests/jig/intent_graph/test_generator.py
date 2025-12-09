@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+import jig
 from jig.intent_graph.generator import generate_intent_graph
 
 
@@ -283,3 +284,160 @@ def test_generate_intent_graph_sorted_output(temp_project):
     # Edges should be sorted by (source, target, type)
     edge_tuples = [(e["source"], e["target"], e["type"]) for e in edges]
     assert edge_tuples == sorted(edge_tuples)
+
+
+class TestIntentGraphHashing:
+    """Tests for S-050: Graph Schema Hash Fields."""
+
+    @jig.verifies("S-050")
+    def test_spec_nodes_have_jig_hash(self, temp_project):
+        """Specification nodes have jig_hash field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        spec_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "specification"' in line
+        ]
+
+        assert len(spec_nodes) == 2
+        for node in spec_nodes:
+            assert "jig_hash" in node
+            assert len(node["jig_hash"]) == 12
+            assert all(c in "0123456789abcdef" for c in node["jig_hash"])
+
+    @jig.verifies("S-050")
+    def test_outcome_nodes_have_jig_hash(self, temp_project):
+        """Outcome nodes have jig_hash field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        outcome_nodes = [
+            json.loads(line) for line in lines[1:] if '"type": "outcome"' in line
+        ]
+
+        assert len(outcome_nodes) == 1
+        for node in outcome_nodes:
+            assert "jig_hash" in node
+            assert len(node["jig_hash"]) == 12
+            assert all(c in "0123456789abcdef" for c in node["jig_hash"])
+
+    @jig.verifies("S-050")
+    def test_brick_nodes_have_jig_hash(self, temp_project):
+        """Brick nodes have jig_hash field."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        brick_nodes = [
+            json.loads(line) for line in lines[1:] if '"type": "brick"' in line
+        ]
+
+        assert len(brick_nodes) == 1
+        for node in brick_nodes:
+            assert "jig_hash" in node
+            assert len(node["jig_hash"]) == 12
+            assert all(c in "0123456789abcdef" for c in node["jig_hash"])
+
+    @jig.verifies("S-050")
+    def test_spec_hash_changes_when_content_changes(self, temp_project):
+        """Hash changes when specification content changes."""
+        output_path = temp_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        # Generate first graph
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        spec_nodes_before = {
+            json.loads(line)["id"]: json.loads(line)["jig_hash"]
+            for line in lines[1:]
+            if '"type": "specification"' in line
+        }
+
+        # Modify S-001 content
+        spec_file = temp_project / "jig" / "specifications" / "S-001.md"
+        spec_file.write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Spec 1 MODIFIED
+
+Different content now.
+"""
+        )
+
+        # Generate again
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        spec_nodes_after = {
+            json.loads(line)["id"]: json.loads(line)["jig_hash"]
+            for line in lines[1:]
+            if '"type": "specification"' in line
+        }
+
+        # S-001 hash should change, S-002 should stay same
+        assert spec_nodes_before["S-001"] != spec_nodes_after["S-001"]
+        assert spec_nodes_before["S-002"] == spec_nodes_after["S-002"]
+
+    @jig.verifies("S-050")
+    def test_hash_deterministic_across_runs(self, temp_project):
+        """Same content produces same hash across runs."""
+        output_path1 = temp_project / "jig" / "generated" / "intent-graph-1.ndjson"
+        output_path2 = temp_project / "jig" / "generated" / "intent-graph-2.ndjson"
+
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path1,
+            include_timestamp=False,
+        )
+        generate_intent_graph(
+            project_root=temp_project,
+            output_path=output_path2,
+            include_timestamp=False,
+        )
+
+        # Parse hashes from both
+        lines1 = output_path1.read_text().strip().split("\n")
+        lines2 = output_path2.read_text().strip().split("\n")
+
+        hashes1 = {
+            json.loads(line).get("id"): json.loads(line).get("jig_hash")
+            for line in lines1[1:]
+            if "jig_hash" in line
+        }
+        hashes2 = {
+            json.loads(line).get("id"): json.loads(line).get("jig_hash")
+            for line in lines2[1:]
+            if "jig_hash" in line
+        }
+
+        assert hashes1 == hashes2

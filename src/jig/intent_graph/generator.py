@@ -12,9 +12,10 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 import jig
+from jig.hashing import hash_brick, hash_intent_artifact
 
 
-@jig.implements("S-028")
+@jig.implements("S-028", "S-050")
 def generate_intent_graph(
     project_root: Path,
     output_path: Optional[Path] = None,
@@ -107,7 +108,12 @@ def _load_specification_nodes(spec_dir: Path) -> List[Dict[str, Any]]:
         # Relative path from project root (assumes spec_dir is <project>/jig/specifications)
         relative_path = f"jig/specifications/{spec_file.name}"
 
-        spec_node = {"id": spec_id, "type": "specification", "file": relative_path}
+        spec_node = {
+            "id": spec_id,
+            "type": "specification",
+            "file": relative_path,
+            "jig_hash": hash_intent_artifact(spec_file),
+        }
 
         spec_nodes.append(spec_node)
 
@@ -143,6 +149,7 @@ def _load_outcome_nodes(outcome_dir: Path) -> List[Dict[str, Any]]:
             "id": outcome_id,
             "type": "outcome",
             "file": relative_path,
+            "jig_hash": hash_intent_artifact(outcome_file),
             "specifies": frontmatter.get("specifies", []),
         }
 
@@ -196,6 +203,7 @@ def _load_brick_nodes(bricks_file: Path) -> List[Dict[str, Any]]:
             "type": "brick",
             "name": brick_name,
             "file": "jig/bricks.yaml",
+            "jig_hash": hash_brick(brick),
             "units": brick_units,
         }
 
