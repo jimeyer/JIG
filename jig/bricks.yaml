@@ -50,3 +50,12 @@ bricks:
       - M-jig.impl_graph.analyzers.registry
       - M-jig.impl_graph.analyzers.python
       - M-jig.impl_graph.analyzers.python_visitor
+
+  - id: B-verification-graph
+    name: Verification Graph
+    layer: 1
+    units:
+      - M-jig.verification_graph
+      - M-jig.verification_graph.discovery
+      - M-jig.verification_graph.analyzer
+      - M-jig.verification_graph.builder

@@ -282,15 +282,15 @@ MAY be included for navigation. Format: `M-{module.path}` and `C-{class.path}`.
 #### 6.3 Verification Graph
 
 **Generated from:**
-- Test discovery (pytest, unittest)
-- Coverage analysis (pytest-cov, coverage.py)
+- Test discovery (pytest conventions: `test_*.py`, `*_test.py`)
 - `@jig.verifies` decorators
+- AST-based content hashing (per S-047)
 
 **Node schema:**
 
 **Test Node:**
 ```json
-{"id":"T-test_auth.test_token_expiration","type":"test","file":"tests/unit/test_auth.py","verifies":["S-001"],"covers":["F-auth.session.authenticate","F-auth.tokens.validate"]}
+{"id":"T-test_auth.test_token_expiration","type":"test","file":"tests/unit/test_auth.py","verifies":["S-001"],"jig_hash":"a1b2c3d4e5f6"}
 ```
 
 Fields:
@@ -298,10 +298,14 @@ Fields:
 - `type` (string, REQUIRED): SHALL be `"test"`
 - `file` (string, REQUIRED): Relative path to test file
 - `verifies` (array, REQUIRED): Array of spec/outcome IDs from `@jig.verifies`. SHALL be empty `[]` if none.
-- `covers` (array, REQUIRED): Array of function IDs executed by this test (from coverage). SHALL be empty `[]` if none.
+- `jig_hash` (string, REQUIRED): Content hash of test function body (per S-047)
 
 **Excluded fields:**
-- `brick` - SHALL NOT be present (derived from covered functions)
+- `brick` - SHALL NOT be present (derived at query time from bricks.yaml)
+- `covers` - T→F coverage edges are recorded in audit-log.ndjson (see J023), not verification graph
+- `line` - Brittle across refactors, computable on demand from AST
+
+**Design Note:** The verification graph is purely static (no test execution required). T→F coverage requires running tests with coverage instrumentation and is handled by the Audit system (J023, J024, J026).
 
 ### 7. ID Format Contract
 
