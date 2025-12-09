@@ -48,7 +48,7 @@ J022 defines how JIG computes and stores content identity through semantic hashi
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O/S)
-- [ ] WU1: Core hashing module — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Core hashing module — tests ✅ / code ✅ / docs ☐
 - [ ] WU2: Intent graph hashing — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Implementation graph hashing — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: Git blob optimization — tests ☐ / code ☐ / docs ☐
@@ -114,13 +114,14 @@ Enable JIG to detect when artifacts change by computing stable content fingerpri
 **Goal**: Create `src/jig/hashing.py` with all hash functions per J022.
 
 **Acceptance Criteria**:
-- [ ] S-044 is implemented by `compute_hash()`
-- [ ] S-045 is implemented by `hash_intent_artifact()`
-- [ ] S-046 is implemented by `hash_function()`
-- [ ] S-047 is implemented by `hash_test()` (same as hash_function)
-- [ ] S-048 is implemented by `hash_brick()`
-- [ ] Tests verify determinism and cross-platform stability
-- [ ] `jigy status` shows alignment
+- [x] S-044 is implemented by `compute_hash()`
+- [x] S-045 is implemented by `hash_intent_artifact()`
+- [x] S-046 is implemented by `hash_function()`
+- [x] S-047 is implemented by `hash_test()` (same as hash_function)
+- [x] S-048 is implemented by `hash_brick()`
+- [x] S-049 is implemented by `git_blob_hash()`
+- [x] Tests verify determinism and cross-platform stability (27 tests)
+- [x] `jigy validate` passes
 
 **Implementation Notes**:
 
@@ -272,7 +273,10 @@ pytest tests/unit/test_hashing.py -v
 ```
 
 **Reflect**:
-- (Will be filled after execution)
+- AST node cloning requires `ast.copy_location()` + `ast.fix_missing_locations()` for `ast.unparse()` to work
+- All 6 hash functions have @jig.implements decorators tracked in implementation graph
+- 27 tests cover determinism, normalization, and edge cases
+- Brick definition added and validated successfully
 
 ---
 

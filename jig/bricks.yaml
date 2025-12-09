@@ -36,6 +36,11 @@ bricks:
     units:
       - M-jig.intent_graph.generator
 
+  - id: B-hashing
+    name: Content Hashing
+    layer: 0
+    units:
+      - M-jig.hashing
 
   - id: B-languages
     name: Language Analyzers

@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 361, "node_count": 242, "version": "1.0"}}
+{"_meta": {"edge_count": 385, "generated": "2025-12-09T01:12:23.221432+00:00", "node_count": 257, "version": "1.0"}}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
@@ -41,6 +41,12 @@
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_bricks_command", "implements": ["S-024"], "language": "python", "line": 111, "name": "validate_bricks_command", "signature": "validate_bricks_command(project_root: Path, output_format: str) -> int", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_full_command", "implements": ["S-025"], "language": "python", "line": 174, "name": "validate_full_command", "signature": "validate_full_command(project_root: Path, output_format: str) -> int", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "id": "F-jig.cli.validate.validate_intent_command", "implements": ["S-023"], "language": "python", "line": 28, "name": "validate_intent_command", "signature": "validate_intent_command(project_root: Path, output_format: str) -> int", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.compute_hash", "implements": ["S-044"], "language": "python", "line": 20, "name": "compute_hash", "signature": "compute_hash(content: str) -> str", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.git_blob_hash", "implements": ["S-049"], "language": "python", "line": 140, "name": "git_blob_hash", "signature": "git_blob_hash(file: Path) -> str | None", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.hash_brick", "implements": ["S-048"], "language": "python", "line": 126, "name": "hash_brick", "signature": "hash_brick(brick_dict: dict) -> str", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.hash_function", "implements": ["S-046"], "language": "python", "line": 69, "name": "hash_function", "signature": "hash_function(node: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> str", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.hash_intent_artifact", "implements": ["S-045"], "language": "python", "line": 33, "name": "hash_intent_artifact", "signature": "hash_intent_artifact(path: Path) -> str", "type": "function"}
+{"async": false, "file": "src/jig/hashing.py", "id": "F-jig.hashing.hash_test", "implements": ["S-047"], "language": "python", "line": 111, "name": "hash_test", "signature": "hash_test(node: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> str", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.analyze_file", "language": "python", "line": 52, "name": "analyze_file", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "analyze_file(self, file_path: Path) -> Dict[str, List[Dict[str, Any]]]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.file_extensions", "language": "python", "line": 41, "name": "file_extensions", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "file_extensions(self) -> List[str]", "type": "function"}
 {"async": false, "file": "src/jig/impl_graph/analyzers/base.py", "id": "F-jig.impl_graph.analyzers.base.LanguageAnalyzer.language_name", "language": "python", "line": 32, "name": "language_name", "parent_class": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "signature": "language_name(self) -> str", "type": "function"}
@@ -140,6 +146,7 @@
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
+{"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
@@ -148,6 +155,8 @@
 {"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
 {"id": "M-datetime", "language": "python", "name": "datetime", "type": "external_module"}
 {"id": "M-datetime", "language": "python", "name": "datetime", "type": "external_module"}
+{"id": "M-hashlib", "language": "python", "name": "hashlib", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
@@ -168,6 +177,7 @@
 {"file": "src/jig/cli/main.py", "id": "M-jig.cli.main", "language": "python", "name": "jig.cli.main", "type": "module"}
 {"id": "M-jig.cli.validate", "language": "python", "name": "jig.cli.validate", "type": "external_module"}
 {"file": "src/jig/cli/validate.py", "id": "M-jig.cli.validate", "language": "python", "name": "jig.cli.validate", "type": "module"}
+{"file": "src/jig/hashing.py", "id": "M-jig.hashing", "language": "python", "name": "jig.hashing", "type": "module"}
 {"file": "src/jig/impl_graph/__init__.py", "id": "M-jig.impl_graph.__init__", "language": "python", "name": "jig.impl_graph.__init__", "type": "module"}
 {"file": "src/jig/impl_graph/analyzers/__init__.py", "id": "M-jig.impl_graph.analyzers.__init__", "language": "python", "name": "jig.impl_graph.analyzers.__init__", "type": "module"}
 {"file": "src/jig/impl_graph/analyzers/__main__.py", "id": "M-jig.impl_graph.analyzers.__main__", "language": "python", "name": "jig.impl_graph.analyzers.__main__", "type": "module"}
@@ -201,11 +211,13 @@
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
@@ -221,6 +233,7 @@
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
+{"id": "M-subprocess", "language": "python", "name": "subprocess", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
@@ -237,6 +250,8 @@
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
@@ -330,6 +345,16 @@
 {"source": "F-jig.cli.validate.validate_full_command", "target": "S-025", "type": "implements"}
 {"line": 74, "source": "F-jig.cli.validate.validate_intent_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
 {"source": "F-jig.cli.validate.validate_intent_command", "target": "S-023", "type": "implements"}
+{"source": "F-jig.hashing.compute_hash", "target": "S-044", "type": "implements"}
+{"source": "F-jig.hashing.git_blob_hash", "target": "S-049", "type": "implements"}
+{"line": 136, "source": "F-jig.hashing.hash_brick", "target": "F-jig.hashing.compute_hash", "type": "calls"}
+{"source": "F-jig.hashing.hash_brick", "target": "S-048", "type": "implements"}
+{"line": 107, "source": "F-jig.hashing.hash_function", "target": "F-jig.hashing.compute_hash", "type": "calls"}
+{"source": "F-jig.hashing.hash_function", "target": "S-046", "type": "implements"}
+{"line": 65, "source": "F-jig.hashing.hash_intent_artifact", "target": "F-jig.hashing.compute_hash", "type": "calls"}
+{"source": "F-jig.hashing.hash_intent_artifact", "target": "S-045", "type": "implements"}
+{"line": 122, "source": "F-jig.hashing.hash_test", "target": "F-jig.hashing.hash_function", "type": "calls"}
+{"source": "F-jig.hashing.hash_test", "target": "S-047", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.ParseError._format_message", "target": "S-006", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer._is_internal_module", "target": "S-005", "type": "implements"}
 {"source": "F-jig.impl_graph.analyzers.python.PythonAnalyzer.analyze_file", "target": "S-001", "type": "implements"}
@@ -471,6 +496,20 @@
 {"line": 24, "source": "M-jig.cli.validate", "target": "M-jig.validation.reporting", "type": "imports"}
 {"line": 6, "source": "M-jig.cli.validate", "target": "M-pathlib", "type": "imports"}
 {"line": 5, "source": "M-jig.cli.validate", "target": "M-sys", "type": "imports"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.compute_hash", "type": "contains"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.git_blob_hash", "type": "contains"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.hash_brick", "type": "contains"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.hash_function", "type": "contains"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.hash_intent_artifact", "type": "contains"}
+{"source": "M-jig.hashing", "target": "F-jig.hashing.hash_test", "type": "contains"}
+{"line": 7, "source": "M-jig.hashing", "target": "M-ast", "type": "imports"}
+{"line": 8, "source": "M-jig.hashing", "target": "M-hashlib", "type": "imports"}
+{"line": 16, "source": "M-jig.hashing", "target": "M-jig", "type": "imports"}
+{"line": 9, "source": "M-jig.hashing", "target": "M-json", "type": "imports"}
+{"line": 11, "source": "M-jig.hashing", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.hashing", "target": "M-subprocess", "type": "imports"}
+{"line": 12, "source": "M-jig.hashing", "target": "M-typing", "type": "imports"}
+{"line": 14, "source": "M-jig.hashing", "target": "M-yaml", "type": "imports"}
 {"source": "M-jig.impl_graph.analyzers.base", "target": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "type": "contains"}
 {"line": 8, "source": "M-jig.impl_graph.analyzers.base", "target": "M-abc", "type": "imports"}
 {"line": 8, "source": "M-jig.impl_graph.analyzers.base", "target": "M-abc", "type": "imports"}
