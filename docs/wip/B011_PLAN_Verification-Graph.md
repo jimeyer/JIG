@@ -51,7 +51,7 @@ Complete the S-F-T triangle by implementing the verification graph, which tracks
 
 - [x] WU0: Create Intent nodes (O/S) and update A001
 - [x] WU1: Test Discovery — tests ✅ / code ✅ / docs ✅
-- [ ] WU2: Test Analyzer — tests / code / docs
+- [x] WU2: Test Analyzer — tests ✅ / code ✅ / docs ✅
 - [ ] WU3: Verification Graph Builder — tests / code / docs
 - [ ] WU4: CLI Integration — tests / code / docs
 
@@ -229,15 +229,15 @@ python -c "from jig.verification_graph.discovery import discover_test_files; pri
 **Est. New Code**: ~100 lines
 
 **Acceptance Criteria**:
-- [ ] Parses `@jig.verifies("S-001")` single spec
-- [ ] Parses `@jig.verifies("S-001", "S-002")` multiple specs
-- [ ] Parses `@verifies("S-001")` short form (if imported)
-- [ ] Validates spec ID format (`^[SO]-\d+$`)
-- [ ] Logs warning for invalid spec IDs (does not fail)
-- [ ] Computes `jig_hash` using existing `hash_function()`
-- [ ] Returns T nodes conforming to S-052 schema
-- [ ] Unit tests with >80% coverage
-- [ ] `@jig.implements` decorators on analyzer functions
+- [x] Parses `@jig.verifies("S-001")` single spec
+- [x] Parses `@jig.verifies("S-001", "S-002")` multiple specs
+- [x] Parses `@verifies("S-001")` short form (if imported)
+- [x] Validates spec ID format (`^[SO]-\d+$`)
+- [x] Logs warning for invalid spec IDs (does not fail)
+- [x] Computes `jig_hash` using existing `hash_test()` from hashing.py
+- [x] Returns T nodes conforming to S-052 schema
+- [x] Unit tests with >80% coverage (90.28% achieved)
+- [x] `@jig.implements("S-052", "S-053", "S-054")` decorator on analyze_file()
 
 **New Files**:
 - `src/jig/verification_graph/analyzer.py`
@@ -329,14 +329,18 @@ class TestAnalyzer:
 
 **Human Verification**:
 ```bash
-pytest tests/unit/verification_graph/test_analyzer.py -v --cov=src/jig/verification_graph/analyzer
+pytest tests/unit/verification_graph/test_analyzer.py -v --cov=jig.verification_graph.analyzer
 ```
 
 **Reflect**:
-- (To be filled after execution)
+- TDD worked well: 21 tests written first, all passed after implementation
+- ~72 lines of analyzer code (under ~100 line estimate)
+- 90.28% coverage achieved (target was >80%)
+- Code reuse: `hash_test()` from hashing.py, pattern from `_extract_implements_decorators`
+- Test fixture file useful for integration testing
 
 **Links**:
-- Commit: (pending)
+- Commit: (see git log)
 
 ---
 
