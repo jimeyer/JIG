@@ -55,11 +55,12 @@ def hash_intent_artifact(path: Path) -> str:
         frontmatter = {}
         body = content.strip()
 
-    # Canonical representation
+    # Canonical representation (default=str handles date objects from YAML)
     canonical = json.dumps(
         {"body": body, "frontmatter": frontmatter},
         sort_keys=True,
         separators=(",", ":"),
+        default=str,
     )
 
     return compute_hash(canonical)
