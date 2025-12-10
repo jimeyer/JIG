@@ -23,7 +23,7 @@
 
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O/S)
-- [ ] WU1: Configuration file discovery — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ☐
 - [ ] WU2: TOML parsing and schema validation — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Path configuration with defaults — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: CLI integration — tests ☐ / code ☐ / docs ☐
@@ -64,11 +64,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-062 is implemented by discovery function(s)
-- [ ] S-062 is verified by comprehensive tests
-- [ ] Tests cover all discovery locations (jig.toml, .jig.toml, pyproject.toml)
-- [ ] Tests cover missing config (returns None, uses defaults later)
-- [ ] Clear error messages for file access errors
+- [x] S-062 is implemented by discovery function(s)
+- [x] S-062 is verified by comprehensive tests
+- [x] Tests cover all discovery locations (jig.toml, .jig.toml, pyproject.toml)
+- [x] Tests cover missing config (returns None, uses defaults later)
+- [x] Clear error messages for file access errors
 
 **Implementation Notes**:
 - Approach:
@@ -99,10 +99,14 @@
 - Remove jig.toml, verify fallback to defaults
 
 **Reflect** (≤5 bullets):
-- (To be filled after implementation)
+- TDD approach worked well: tests defined behavior before implementation
+- Used tomllib (Python 3.11+) with tomli fallback for compatibility
+- pyproject.toml handling requires parsing to check for [tool.jig] section
+- 11 tests cover all priority orders, parent directory search, and edge cases
+- Full test suite (352 tests) passes with no regressions
 
 **Links**:
-- Commit: (TBD)
+- Commit: (see below)
 - PR: (TBD)
 
 ---
