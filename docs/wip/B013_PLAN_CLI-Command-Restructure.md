@@ -37,7 +37,7 @@
 - [x] WU3: Create Align Command — tests ☑ / code ☑
 - [x] WU4: Restructure Show Commands — tests ☑ / code ☑
 - [x] WU5: Simplify Validate Commands — tests ☑ / code ☑
-- [ ] WU6: Update Help & Root Command — tests ☐ / code ☐
+- [x] WU6: Update Help & Root Command — tests ☑ / code ☑
 - [ ] WU7: Clean Break - Remove Old Commands — tests ☐ / code ☐
 
 ---
@@ -293,13 +293,13 @@ jigy validate --format json
 **Planned Effort**: 45 minutes
 
 **Acceptance Criteria**:
-- [ ] S-061 fully implemented
-- [ ] S-061 verified by tests
-- [ ] `jigy` (bare) shows help and exits 0
-- [ ] `jigy --version` shows version
-- [ ] `jigy --help` shows help
-- [ ] No other global options exist
-- [ ] Help text is concise and matches A002
+- [x] S-061 fully implemented
+- [x] S-061 verified by tests
+- [x] `jigy` (bare) shows help and exits 0
+- [x] `jigy --version` shows version
+- [x] `jigy --help` shows help
+- [x] No other global options exist
+- [x] Help text is concise and matches A002
 
 **Implementation Notes**:
 - Modify: `src/jig/cli/main.py`
@@ -327,7 +327,10 @@ jigy --unknown-flag
 ```
 
 **Reflect**:
-- (To be filled during execution)
+- Straightforward implementation using Click's `invoke_without_command=True`
+- Test file created as `test_cli_root.py` (not `test_cli.py` as originally planned) for clarity
+- All 7 tests verify S-061 behavior
+- Concise docstring "JIG — Keep specs, code, and tests aligned." per A002
 
 ---
 

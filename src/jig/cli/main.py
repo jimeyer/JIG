@@ -32,11 +32,14 @@ from jig.impl_graph.builder import build_graph
 from jig.intent_graph.generator import generate_intent_graph
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.version_option()
-def cli():
-    """JIG - JIG Intent Graph for Software Alignment."""
-    pass
+@click.pass_context
+@jig.implements("S-061")
+def cli(ctx):
+    """JIG — Keep specs, code, and tests aligned."""
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
 @cli.group()
