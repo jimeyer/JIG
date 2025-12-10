@@ -40,6 +40,14 @@ bricks:
     units:
       - M-jig.intent_graph.generator
 
+  - id: B-config
+    name: Configuration
+    layer: 0
+    units:
+      - M-jig.config.discovery
+      - M-jig.config.parser
+      - M-jig.config.schema
+
   - id: B-hashing
     name: Content Hashing
     layer: 0
