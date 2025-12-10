@@ -24,7 +24,7 @@
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O/S)
 - [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ☐
-- [ ] WU2: TOML parsing and schema validation — tests ☐ / code ☐ / docs ☐
+- [x] WU2: TOML parsing and schema validation — tests ✅ / code ✅ / docs ☐
 - [ ] WU3: Path configuration with defaults — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: CLI integration — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
@@ -118,12 +118,12 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-063 is implemented by parsing function(s)
-- [ ] S-063 is verified by comprehensive tests
-- [ ] Tests cover valid TOML parsing
-- [ ] Tests cover invalid TOML (syntax errors)
-- [ ] Tests cover pyproject.toml [tool.jig] extraction
-- [ ] Clear error messages with file location
+- [x] S-063 is implemented by parsing function(s)
+- [x] S-063 is verified by comprehensive tests
+- [x] Tests cover valid TOML parsing
+- [x] Tests cover invalid TOML (syntax errors)
+- [x] Tests cover pyproject.toml [tool.jig] extraction
+- [x] Clear error messages with file location
 
 **Implementation Notes**:
 - Approach:
@@ -155,10 +155,14 @@
 - Create invalid TOML, verify error message is clear
 
 **Reflect** (≤5 bullets):
-- (To be filled after implementation)
+- ConfigError exception class provides clear error context with file path
+- pyproject.toml extraction isolates [tool.jig] section cleanly
+- Parser preserves all TOML types (strings, ints, bools, floats, arrays)
+- Unknown keys preserved at parse time - validation deferred to schema layer (WU3)
+- 10 tests cover valid parsing, error cases, and edge cases
 
 **Links**:
-- Commit: (TBD)
+- Commit: (see below)
 - PR: (TBD)
 
 ---
