@@ -1,6 +1,5 @@
-"""Tests for rebuild CLI commands."""
+"""Tests for align CLI command."""
 
-import tempfile
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -82,89 +81,99 @@ def test_example():
     )
 
 
-@jig.verifies("S-058")
-def test_rebuild_impl():
-    """jigy rebuild impl rebuilds implementation graph."""
+@jig.verifies("S-059")
+def test_align_success():
+    """jigy align runs full workflow and returns success."""
     runner = CliRunner()
     with runner.isolated_filesystem() as tmpdir:
         root = Path(tmpdir)
         create_minimal_jig_project(root)
 
-        result = runner.invoke(cli, ["rebuild", "impl"])
+        result = runner.invoke(cli, ["align"])
 
         assert result.exit_code == 0
-        assert "impl:" in result.output
-        assert (root / "jig" / "generated" / "implementation-graph.ndjson").exists()
-
-
-@jig.verifies("S-058")
-def test_rebuild_intent():
-    """jigy rebuild intent rebuilds intent graph."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_minimal_jig_project(root)
-
-        result = runner.invoke(cli, ["rebuild", "intent"])
-
-        assert result.exit_code == 0
-        assert "intent:" in result.output
-        assert (root / "jig" / "generated" / "intent-graph.ndjson").exists()
-
-
-@jig.verifies("S-058")
-def test_rebuild_verify():
-    """jigy rebuild verify rebuilds verification graph."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_minimal_jig_project(root)
-
-        result = runner.invoke(cli, ["rebuild", "verify"])
-
-        assert result.exit_code == 0
-        assert "verify:" in result.output
-        assert (root / "jig" / "generated" / "verification-graph.ndjson").exists()
-
-
-@jig.verifies("S-058")
-def test_rebuild_all():
-    """jigy rebuild (no args) rebuilds all three graphs."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_minimal_jig_project(root)
-
-        result = runner.invoke(cli, ["rebuild"])
-
-        assert result.exit_code == 0
+        assert "Rebuilding graphs..." in result.output
         assert "impl:" in result.output
         assert "verify:" in result.output
         assert "intent:" in result.output
+        assert "Validating..." in result.output
+        assert "Summary:" in result.output
+        assert "ALIGNED" in result.output
+
+
+@jig.verifies("S-059")
+def test_align_creates_all_graphs():
+    """jigy align creates all three graph files."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["align"])
+
+        assert result.exit_code == 0
         assert (root / "jig" / "generated" / "implementation-graph.ndjson").exists()
         assert (root / "jig" / "generated" / "verification-graph.ndjson").exists()
         assert (root / "jig" / "generated" / "intent-graph.ndjson").exists()
 
 
-@jig.verifies("S-058")
-def test_rebuild_no_options():
-    """Rebuild commands have no options (uses discovery)."""
+@jig.verifies("S-059")
+def test_align_output_format():
+    """jigy align output matches expected format per A002."""
     runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
 
-    # Check that --project-root is not accepted
-    result = runner.invoke(cli, ["rebuild", "impl", "--project-root", "."])
-    assert result.exit_code != 0
-    assert "no such option" in result.output.lower() or "error" in result.output.lower()
+        result = runner.invoke(cli, ["align"])
+
+        assert result.exit_code == 0
+        # Check for expected output format
+        lines = result.output.strip().split("\n")
+        assert any("Rebuilding graphs..." in line for line in lines)
+        assert any("impl:" in line for line in lines)
+        assert any("verify:" in line for line in lines)
+        assert any("intent:" in line for line in lines)
+        assert any("Validating..." in line for line in lines)
+        assert any("intent: OK" in line for line in lines)
+        assert any("bricks: OK" in line for line in lines)
+        assert any("Summary:" in line for line in lines)
+        assert any("Specs:" in line for line in lines)
+        assert any("Status: ALIGNED" in line for line in lines)
 
 
-@jig.verifies("S-058")
-def test_rebuild_not_in_project():
-    """Rebuild commands fail with clear error when not in JIG project."""
+@jig.verifies("S-059")
+def test_align_validation_failure_stops():
+    """jigy align returns non-zero on validation failure."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        # Create invalid spec (missing id)
+        (root / "jig" / "specifications" / "S-002.md").write_text(
+            """---
+type: specification
+---
+
+# Invalid Spec (no id)
+"""
+        )
+
+        result = runner.invoke(cli, ["align"])
+
+        # Should fail during validation
+        assert result.exit_code != 0
+
+
+@jig.verifies("S-059")
+def test_align_not_in_project():
+    """jigy align fails with clear error when not in JIG project."""
     runner = CliRunner()
     with runner.isolated_filesystem():
         # No jig/ directory created
 
-        result = runner.invoke(cli, ["rebuild", "impl"])
+        result = runner.invoke(cli, ["align"])
 
         assert result.exit_code != 0
         assert "Not in a JIG project" in result.output or "jig/ directory" in result.output

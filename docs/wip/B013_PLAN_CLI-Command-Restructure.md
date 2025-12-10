@@ -34,7 +34,7 @@
 - [x] WU0: Create Intent nodes (O/S) — specs ☑
 - [x] WU1: Project Root Discovery — tests ☑ / code ☑
 - [x] WU2: Restructure Rebuild Commands — tests ☑ / code ☑
-- [ ] WU3: Create Align Command — tests ☐ / code ☐
+- [x] WU3: Create Align Command — tests ☑ / code ☑
 - [ ] WU4: Restructure Show Commands — tests ☐ / code ☐
 - [ ] WU5: Simplify Validate Commands — tests ☐ / code ☐
 - [ ] WU6: Update Help & Root Command — tests ☐ / code ☐
@@ -153,12 +153,12 @@ jigy rebuild
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-059 implemented by `align` command
-- [ ] S-059 verified by tests
-- [ ] Rebuilds all graphs (impl → verify → intent)
-- [ ] Validates all artifacts
-- [ ] Displays summary per A002 format
-- [ ] Exit 0 if aligned, non-zero on failure
+- [x] S-059 implemented by `align` command
+- [x] S-059 verified by tests
+- [x] Rebuilds all graphs (impl → verify → intent)
+- [x] Validates all artifacts
+- [x] Displays summary per A002 format
+- [x] Exit 0 if aligned, non-zero on failure
 
 **Implementation Notes**:
 - Modify: `src/jig/cli/main.py`

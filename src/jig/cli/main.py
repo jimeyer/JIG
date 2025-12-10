@@ -10,6 +10,7 @@ import jig
 from jig.cli.discovery import ProjectNotFoundError, find_project_root
 from jig.cli.layers import layers_command, suggest_layers_command
 from jig.cli.rebuild import (
+    align_command,
     rebuild_all_command,
     rebuild_impl_command,
     rebuild_intent_command,
@@ -117,6 +118,27 @@ def rebuild_verify_cli() -> None:
         sys.exit(1)
 
     exit_code = rebuild_verify_command(project_root)
+    sys.exit(exit_code)
+
+
+@cli.command()
+@jig.implements("S-059")
+def align() -> None:
+    """Run full alignment workflow.
+
+    Rebuilds all graphs, validates artifacts, and displays summary.
+    This is the "do everything" command for keeping JIG in sync.
+
+    Example:
+        jigy align
+    """
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = align_command(project_root)
     sys.exit(exit_code)
 
 
