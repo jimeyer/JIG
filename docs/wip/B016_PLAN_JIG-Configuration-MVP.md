@@ -25,7 +25,7 @@
 - [x] WU0: Create Intent nodes (O/S)
 - [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ☐
 - [x] WU2: TOML parsing and schema validation — tests ✅ / code ✅ / docs ☐
-- [ ] WU3: Path configuration with defaults — tests ☐ / code ☐ / docs ☐
+- [x] WU3: Path configuration with defaults — tests ✅ / code ✅ / docs ☐
 - [ ] WU4: CLI integration — tests ☐ / code ☐ / docs ☐
 - [ ] WU5: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
 
@@ -174,12 +174,12 @@
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-064 is implemented by config class/dataclass
-- [ ] S-064 is verified by comprehensive tests
-- [ ] Tests cover all path settings
-- [ ] Tests cover default values when not specified
-- [ ] Tests cover partial configuration (some paths set, others default)
-- [ ] Config object provides resolved absolute paths
+- [x] S-064 is implemented by config class/dataclass
+- [x] S-064 is verified by comprehensive tests
+- [x] Tests cover all path settings
+- [x] Tests cover default values when not specified
+- [x] Tests cover partial configuration (some paths set, others default)
+- [x] Config object provides resolved absolute paths
 
 **Implementation Notes**:
 - Approach:
@@ -212,10 +212,14 @@
 - Load config, verify tests path changed, others defaulted
 
 **Reflect** (≤5 bullets):
-- (To be filled after implementation)
+- Dataclasses provide clean API: PathsConfig and JigConfig are simple and type-safe
+- Nested path resolution (specs/outcomes relative to jig_root) works correctly
+- load_config() integrates discovery + parsing + defaults in single call
+- Config metadata (project_root, config_file_path, has_config_file) aids debugging
+- 12 tests cover defaults, overrides, partial config, priority, and metadata
 
 **Links**:
-- Commit: (TBD)
+- Commit: (see below)
 - PR: (TBD)
 
 ---
