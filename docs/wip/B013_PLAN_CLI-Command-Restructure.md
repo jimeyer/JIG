@@ -33,7 +33,7 @@
 
 - [x] WU0: Create Intent nodes (O/S) — specs ☑
 - [x] WU1: Project Root Discovery — tests ☑ / code ☑
-- [ ] WU2: Restructure Rebuild Commands — tests ☐ / code ☐
+- [x] WU2: Restructure Rebuild Commands — tests ☑ / code ☑
 - [ ] WU3: Create Align Command — tests ☐ / code ☐
 - [ ] WU4: Restructure Show Commands — tests ☐ / code ☐
 - [ ] WU5: Simplify Validate Commands — tests ☐ / code ☐
@@ -110,13 +110,13 @@ python -c "from jig.cli.discovery import find_project_root; print(find_project_r
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-058 implemented by new `rebuild` command group
-- [ ] S-058 verified by tests
-- [ ] `jigy rebuild` rebuilds all three graphs
-- [ ] `jigy rebuild impl` rebuilds implementation graph
-- [ ] `jigy rebuild intent` rebuilds intent graph
-- [ ] `jigy rebuild verify` rebuilds verification graph
-- [ ] No options on any rebuild command (uses discovery + defaults)
+- [x] S-058 implemented by new `rebuild` command group
+- [x] S-058 verified by tests
+- [x] `jigy rebuild` rebuilds all three graphs
+- [x] `jigy rebuild impl` rebuilds implementation graph
+- [x] `jigy rebuild intent` rebuilds intent graph
+- [x] `jigy rebuild verify` rebuilds verification graph
+- [x] No options on any rebuild command (uses discovery + defaults)
 
 **Implementation Notes**:
 - Modify: `src/jig/cli/main.py`

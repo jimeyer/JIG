@@ -13,6 +13,8 @@ bricks:
       - M-jig.cli.validate
       - M-jig.cli.layers
       - M-jig.cli.verify
+      - M-jig.cli.discovery
+      - M-jig.cli.rebuild
 
   - id: B-validation
     name: Artifact Validation

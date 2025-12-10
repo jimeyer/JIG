@@ -6,7 +6,15 @@ from pathlib import Path
 
 import click
 
+import jig
+from jig.cli.discovery import ProjectNotFoundError, find_project_root
 from jig.cli.layers import layers_command, suggest_layers_command
+from jig.cli.rebuild import (
+    rebuild_all_command,
+    rebuild_impl_command,
+    rebuild_intent_command,
+    rebuild_verify_command,
+)
 from jig.cli.validate import (
     auto_validate_decorators,
     validate_bricks_command,
@@ -43,7 +51,77 @@ def verify():
     pass
 
 
-@cli.command()
+# New verb-first rebuild command group (S-058)
+@cli.group(name="rebuild", invoke_without_command=True)
+@click.pass_context
+@jig.implements("S-058")
+def rebuild_group(ctx) -> None:
+    """Rebuild JIG graphs.
+
+    Rebuilds implementation, verification, and/or intent graphs.
+
+    Example:
+        jigy rebuild           # Rebuild all graphs
+        jigy rebuild impl      # Rebuild implementation graph only
+        jigy rebuild intent    # Rebuild intent graph only
+        jigy rebuild verify    # Rebuild verification graph only
+    """
+    if ctx.invoked_subcommand is None:
+        # No subcommand = rebuild all
+        try:
+            project_root = find_project_root()
+        except ProjectNotFoundError as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+
+        exit_code = rebuild_all_command(project_root)
+        sys.exit(exit_code)
+
+
+@rebuild_group.command(name="impl")
+@jig.implements("S-058")
+def rebuild_impl_cli() -> None:
+    """Rebuild implementation graph."""
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = rebuild_impl_command(project_root)
+    sys.exit(exit_code)
+
+
+@rebuild_group.command(name="intent")
+@jig.implements("S-058")
+def rebuild_intent_cli() -> None:
+    """Rebuild intent graph."""
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = rebuild_intent_command(project_root)
+    sys.exit(exit_code)
+
+
+@rebuild_group.command(name="verify")
+@jig.implements("S-058")
+def rebuild_verify_cli() -> None:
+    """Rebuild verification graph."""
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = rebuild_verify_command(project_root)
+    sys.exit(exit_code)
+
+
+# Old rebuild command (to be removed in WU7)
+@cli.command(name="rebuild-old")
 @click.option(
     "--project-root",
     type=click.Path(exists=True, file_okay=False, path_type=Path),
