@@ -35,7 +35,7 @@
 - [x] WU1: Project Root Discovery — tests ☑ / code ☑
 - [x] WU2: Restructure Rebuild Commands — tests ☑ / code ☑
 - [x] WU3: Create Align Command — tests ☑ / code ☑
-- [ ] WU4: Restructure Show Commands — tests ☐ / code ☐
+- [x] WU4: Restructure Show Commands — tests ☑ / code ☑
 - [ ] WU5: Simplify Validate Commands — tests ☐ / code ☐
 - [ ] WU6: Update Help & Root Command — tests ☐ / code ☐
 - [ ] WU7: Clean Break - Remove Old Commands — tests ☐ / code ☐
@@ -204,12 +204,12 @@ jigy align
 **Planned Effort**: 90 minutes
 
 **Acceptance Criteria**:
-- [ ] S-060 implemented by `show` command group
-- [ ] S-060 verified by tests
-- [ ] `jigy show` displays bricks + layers overview
-- [ ] `jigy show layers` displays layer hierarchy
-- [ ] `jigy show bricks` displays brick details
-- [ ] No options (uses discovery)
+- [x] S-060 implemented by `show` command group
+- [x] S-060 verified by tests
+- [x] `jigy show` displays bricks + layers overview
+- [x] `jigy show layers` displays layer hierarchy
+- [x] `jigy show bricks` displays brick details
+- [x] No options (uses discovery)
 
 **Implementation Notes**:
 - Modify: `src/jig/cli/main.py`
