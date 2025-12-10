@@ -1,4 +1,4 @@
-{"_meta": {"brick_count": 8, "generated": "2025-12-10T00:09:50.425389+00:00", "outcome_count": 18, "spec_count": 56, "version": "1.0"}}
+{"_meta": {"brick_count": 8, "generated": "2025-12-10T04:21:23.370808+00:00", "outcome_count": 19, "spec_count": 61, "version": "1.0"}}
 {"file": "jig/specifications/S-001.md", "git_blob": "76df99b09d5c", "id": "S-001", "jig_hash": "7c42c7de04b6", "type": "specification"}
 {"file": "jig/specifications/S-002.md", "git_blob": "0ae8b4a29f65", "id": "S-002", "jig_hash": "e2cf1142bac9", "type": "specification"}
 {"file": "jig/specifications/S-003.md", "git_blob": "1d0f1304d101", "id": "S-003", "jig_hash": "52ba9ea5a9ff", "type": "specification"}
@@ -55,6 +55,11 @@
 {"file": "jig/specifications/S-054.md", "git_blob": "e56da1888abb", "id": "S-054", "jig_hash": "07f742c66415", "type": "specification"}
 {"file": "jig/specifications/S-055.md", "git_blob": "25d8cc64297b", "id": "S-055", "jig_hash": "f137354a59dc", "type": "specification"}
 {"file": "jig/specifications/S-056.md", "git_blob": "f091fabd05b0", "id": "S-056", "jig_hash": "b14a29ce11bc", "type": "specification"}
+{"file": "jig/specifications/S-057.md", "git_blob": "7a750e3a47e1", "id": "S-057", "jig_hash": "9c0bfd5e7bda", "type": "specification"}
+{"file": "jig/specifications/S-058.md", "git_blob": "54fe3f88051d", "id": "S-058", "jig_hash": "064f74747341", "type": "specification"}
+{"file": "jig/specifications/S-059.md", "git_blob": "4fd5dfec6a27", "id": "S-059", "jig_hash": "dbd2d4d0e85c", "type": "specification"}
+{"file": "jig/specifications/S-060.md", "git_blob": "f6d11766ee6d", "id": "S-060", "jig_hash": "9e2b7a6b6362", "type": "specification"}
+{"file": "jig/specifications/S-061.md", "git_blob": "9695952aaa8b", "id": "S-061", "jig_hash": "e608de764a7d", "type": "specification"}
 {"file": "jig/outcomes/O-001.md", "git_blob": "f4e36295831e", "id": "O-001", "jig_hash": "5dfbcf187eca", "specifies": ["S-001", "S-003", "S-005", "S-006"], "type": "outcome"}
 {"file": "jig/outcomes/O-002.md", "git_blob": "412844dcb997", "id": "O-002", "jig_hash": "32822d9777d7", "specifies": ["S-002"], "type": "outcome"}
 {"file": "jig/outcomes/O-003.md", "git_blob": "40600998b6b0", "id": "O-003", "jig_hash": "094ccfc7f4dd", "specifies": ["S-004"], "type": "outcome"}
@@ -73,14 +78,15 @@
 {"file": "jig/outcomes/O-016.md", "git_blob": "558cccee6da1", "id": "O-016", "jig_hash": "34c581efb814", "specifies": ["S-026"], "type": "outcome"}
 {"file": "jig/outcomes/O-017.md", "git_blob": "faa27760a5db", "id": "O-017", "jig_hash": "7f854efd9cc0", "specifies": ["S-044", "S-045", "S-046", "S-047", "S-048", "S-049", "S-050"], "type": "outcome"}
 {"file": "jig/outcomes/O-018.md", "git_blob": "0bab68678e38", "id": "O-018", "jig_hash": "4bd26d46d1d6", "specifies": ["S-051", "S-052", "S-053", "S-054", "S-055", "S-056"], "type": "outcome"}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-cli", "jig_hash": "999fad9a1e3a", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate", "M-jig.cli.layers", "M-jig.cli.verify"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-decorators", "jig_hash": "8910c3d27292", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-hashing", "jig_hash": "cc0fc773aa37", "name": "Content Hashing", "type": "brick", "units": ["M-jig.hashing"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-impl-graph", "jig_hash": "ce73dbe5593b", "name": "Implementation Graph", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-intent-graph", "jig_hash": "457c60b2ba3e", "name": "Intent Graph", "type": "brick", "units": ["M-jig.intent_graph.generator"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-languages", "jig_hash": "58376407eb07", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-validation", "jig_hash": "ce0c8608a88c", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
-{"file": "jig/bricks.yaml", "git_blob": "9b901ff577a2", "id": "B-verification-graph", "jig_hash": "543245dbb4c4", "name": "Verification Graph", "type": "brick", "units": ["M-jig.verification_graph.discovery", "M-jig.verification_graph.analyzer", "M-jig.verification_graph.builder"]}
+{"file": "jig/outcomes/O-019.md", "git_blob": "f570622a4a4f", "id": "O-019", "jig_hash": "4d4c310b65b1", "specifies": ["S-057", "S-058", "S-059", "S-060", "S-061"], "type": "outcome"}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-cli", "jig_hash": "3ad542e92280", "name": "CLI Interface", "type": "brick", "units": ["M-jig.cli.main", "M-jig.cli.validate", "M-jig.cli.layers", "M-jig.cli.verify", "M-jig.cli.discovery", "M-jig.cli.rebuild", "M-jig.cli.show"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-decorators", "jig_hash": "8910c3d27292", "name": "JIG Core Decorators", "type": "brick", "units": ["M-jig.__init__"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-hashing", "jig_hash": "cc0fc773aa37", "name": "Content Hashing", "type": "brick", "units": ["M-jig.hashing"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-impl-graph", "jig_hash": "ce73dbe5593b", "name": "Implementation Graph", "type": "brick", "units": ["M-jig.impl_graph.graph", "M-jig.impl_graph.builder", "M-jig.impl_graph.ndjson_writer"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-intent-graph", "jig_hash": "457c60b2ba3e", "name": "Intent Graph", "type": "brick", "units": ["M-jig.intent_graph.generator"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-languages", "jig_hash": "58376407eb07", "name": "Language Analyzers", "type": "brick", "units": ["M-jig.impl_graph.analyzers.base", "M-jig.impl_graph.analyzers.registry", "M-jig.impl_graph.analyzers.python", "M-jig.impl_graph.analyzers.python_visitor"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-validation", "jig_hash": "ce0c8608a88c", "name": "Artifact Validation", "type": "brick", "units": ["M-jig.validation.intent", "M-jig.validation.bricks", "M-jig.validation.models", "M-jig.validation.reporting"]}
+{"file": "jig/bricks.yaml", "git_blob": "36652e76cdf6", "id": "B-verification-graph", "jig_hash": "543245dbb4c4", "name": "Verification Graph", "type": "brick", "units": ["M-jig.verification_graph.discovery", "M-jig.verification_graph.analyzer", "M-jig.verification_graph.builder"]}
 {"source": "O-001", "target": "S-001", "type": "specifies"}
 {"source": "O-001", "target": "S-003", "type": "specifies"}
 {"source": "O-001", "target": "S-005", "type": "specifies"}
@@ -140,3 +146,8 @@
 {"source": "O-018", "target": "S-054", "type": "specifies"}
 {"source": "O-018", "target": "S-055", "type": "specifies"}
 {"source": "O-018", "target": "S-056", "type": "specifies"}
+{"source": "O-019", "target": "S-057", "type": "specifies"}
+{"source": "O-019", "target": "S-058", "type": "specifies"}
+{"source": "O-019", "target": "S-059", "type": "specifies"}
+{"source": "O-019", "target": "S-060", "type": "specifies"}
+{"source": "O-019", "target": "S-061", "type": "specifies"}

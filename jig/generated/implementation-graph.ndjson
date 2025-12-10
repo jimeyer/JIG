@@ -1,4 +1,5 @@
-{"_meta": {"edge_count": 447, "generated": "2025-12-10T00:09:49.967122+00:00", "node_count": 305, "version": "1.0"}}
+{"_meta": {"edge_count": 508, "generated": "2025-12-10T04:21:22.924982+00:00", "node_count": 333, "version": "1.0"}}
+{"bases": ["Exception"], "file": "src/jig/cli/discovery.py", "git_blob": "eef8be26bdec", "id": "C-jig.cli.discovery.ProjectNotFoundError", "language": "python", "line": 8, "name": "ProjectNotFoundError", "type": "class"}
 {"bases": ["ABC"], "file": "src/jig/impl_graph/analyzers/base.py", "git_blob": "990a12cff4d3", "id": "C-jig.impl_graph.analyzers.base.LanguageAnalyzer", "implements": ["S-004"], "language": "python", "line": 16, "name": "LanguageAnalyzer", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/impl_graph/analyzers/python.py", "git_blob": "cb7bfbe4db90", "id": "C-jig.impl_graph.analyzers.python.ParseError", "implements": ["S-006"], "language": "python", "line": 23, "name": "ParseError", "type": "class"}
 {"bases": ["LanguageAnalyzer"], "file": "src/jig/impl_graph/analyzers/python.py", "git_blob": "cb7bfbe4db90", "id": "C-jig.impl_graph.analyzers.python.PythonAnalyzer", "language": "python", "line": 57, "name": "PythonAnalyzer", "type": "class"}
@@ -15,31 +16,38 @@
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.decorator", "language": "python", "line": 57, "name": "decorator", "signature": "decorator(func: F) -> F", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.implements", "language": "python", "line": 12, "name": "implements", "signature": "implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.verifies", "language": "python", "line": 39, "name": "verifies", "signature": "verifies(*spec_ids: str) -> Callable[[F], F]", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._apply_suggested_layers", "language": "python", "line": 540, "name": "_apply_suggested_layers", "signature": "_apply_suggested_layers(bricks_file: Path, bricks: list, suggested_layers: dict) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._assign_layers_topologically", "language": "python", "line": 415, "name": "_assign_layers_topologically", "signature": "_assign_layers_topologically(bricks, brick_dependencies)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._display_full", "language": "python", "line": 232, "name": "_display_full", "signature": "_display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._display_suggestions", "language": "python", "line": 479, "name": "_display_suggestions", "signature": "_display_suggestions(bricks, suggested_layers, brick_dependencies)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._display_summary", "language": "python", "line": 185, "name": "_display_summary", "signature": "_display_summary(layers_dict, brick_unit_counts, has_cycles, bricks)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._format_unit_counts", "language": "python", "line": 142, "name": "_format_unit_counts", "signature": "_format_unit_counts(counts: dict) -> str", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._get_layer_name", "language": "python", "line": 301, "name": "_get_layer_name", "signature": "_get_layer_name(layer: int) -> str", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers._has_cycles_in_brick_graph", "language": "python", "line": 158, "name": "_has_cycles_in_brick_graph", "signature": "_has_cycles_in_brick_graph(dependencies: dict) -> bool", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers.has_cycle_from", "language": "python", "line": 163, "name": "has_cycle_from", "signature": "has_cycle_from(node)", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers.layers_command", "implements": ["S-040"], "jig_hash": "37206fb7e872", "language": "python", "line": 17, "name": "layers_command", "signature": "layers_command(project_root: Path, summary: bool, verbose: bool) -> int", "type": "function"}
-{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "c549682361d9", "id": "F-jig.cli.layers.suggest_layers_command", "implements": ["S-041"], "jig_hash": "88a816fdffd6", "language": "python", "line": 314, "name": "suggest_layers_command", "signature": "suggest_layers_command(project_root: Path, apply: bool) -> int", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.cli", "language": "python", "line": 23, "name": "cli", "signature": "cli()", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.full", "language": "python", "line": 464, "name": "full", "signature": "full(project_root: Path, output_format: str) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.impl", "language": "python", "line": 29, "name": "impl", "signature": "impl()", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.intent", "language": "python", "line": 35, "name": "intent", "signature": "intent()", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.layers", "language": "python", "line": 497, "name": "layers", "signature": "layers(ctx, project_root: Path, summary: bool, verbose: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 59, "name": "rebuild", "signature": "rebuild(project_root: Path, verbose: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 233, "name": "rebuild", "signature": "rebuild(project_root: Path, source_dir: Path | None, exclude: tuple[str, ...], output: Path | None, verbose: bool, strict: bool, no_timestamp: bool, skip_validation: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 313, "name": "rebuild", "signature": "rebuild(project_root: Path, output: Path | None, no_timestamp: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.rebuild", "language": "python", "line": 371, "name": "rebuild", "signature": "rebuild(project_root: Path, test_dir: Path | None, no_timestamp: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.suggest", "language": "python", "line": 525, "name": "suggest", "signature": "suggest(project_root: Path, apply: bool) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.validate", "language": "python", "line": 179, "name": "validate", "signature": "validate(ctx, project_root: Path, output_format: str)", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.validate_bricks_cli", "language": "python", "line": 436, "name": "validate_bricks_cli", "signature": "validate_bricks_cli(project_root: Path, output_format: str) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.validate_intent_cli", "language": "python", "line": 408, "name": "validate_intent_cli", "signature": "validate_intent_cli(project_root: Path, output_format: str) -> None", "type": "function"}
-{"async": false, "file": "src/jig/cli/main.py", "git_blob": "0f1bc7a69316", "id": "F-jig.cli.main.verify", "language": "python", "line": 41, "name": "verify", "signature": "verify()", "type": "function"}
+{"async": false, "file": "src/jig/cli/discovery.py", "git_blob": "eef8be26bdec", "id": "F-jig.cli.discovery.find_project_root", "implements": ["S-057"], "jig_hash": "299a5f4957ab", "language": "python", "line": 15, "name": "find_project_root", "signature": "find_project_root(start_dir: Path | None) -> Path", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers._display_full", "language": "python", "line": 231, "name": "_display_full", "signature": "_display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers._display_summary", "language": "python", "line": 184, "name": "_display_summary", "signature": "_display_summary(layers_dict, brick_unit_counts, has_cycles, bricks)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers._format_unit_counts", "language": "python", "line": 141, "name": "_format_unit_counts", "signature": "_format_unit_counts(counts: dict) -> str", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers._get_layer_name", "language": "python", "line": 300, "name": "_get_layer_name", "signature": "_get_layer_name(layer: int) -> str", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers._has_cycles_in_brick_graph", "language": "python", "line": 157, "name": "_has_cycles_in_brick_graph", "signature": "_has_cycles_in_brick_graph(dependencies: dict) -> bool", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers.has_cycle_from", "language": "python", "line": 162, "name": "has_cycle_from", "signature": "has_cycle_from(node)", "type": "function"}
+{"async": false, "file": "src/jig/cli/layers.py", "git_blob": "e8aba153f7d4", "id": "F-jig.cli.layers.layers_command", "implements": ["S-040"], "jig_hash": "37206fb7e872", "language": "python", "line": 16, "name": "layers_command", "signature": "layers_command(project_root: Path, summary: bool, verbose: bool) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.align", "implements": ["S-059"], "jig_hash": "c3331bb98874", "language": "python", "line": 109, "name": "align", "signature": "align() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.cli", "implements": ["S-061"], "jig_hash": "e1919325a706", "language": "python", "line": 32, "name": "cli", "signature": "cli(ctx)", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.full", "implements": ["S-061"], "jig_hash": "e94174f1f9b4", "language": "python", "line": 252, "name": "full", "signature": "full() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.rebuild_group", "implements": ["S-058"], "jig_hash": "18fd066da8bc", "language": "python", "line": 42, "name": "rebuild_group", "signature": "rebuild_group(ctx) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.rebuild_impl_cli", "implements": ["S-058"], "jig_hash": "2f375f0925e6", "language": "python", "line": 67, "name": "rebuild_impl_cli", "signature": "rebuild_impl_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.rebuild_intent_cli", "implements": ["S-058"], "jig_hash": "34dd246a7940", "language": "python", "line": 81, "name": "rebuild_intent_cli", "signature": "rebuild_intent_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.rebuild_verify_cli", "implements": ["S-058"], "jig_hash": "6174e463d46b", "language": "python", "line": 95, "name": "rebuild_verify_cli", "signature": "rebuild_verify_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.show_bricks_cli", "implements": ["S-060"], "jig_hash": "90a8cafec5a3", "language": "python", "line": 170, "name": "show_bricks_cli", "signature": "show_bricks_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.show_group", "implements": ["S-060"], "jig_hash": "951cc71d487d", "language": "python", "line": 132, "name": "show_group", "signature": "show_group(ctx) -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.show_layers_cli", "implements": ["S-060"], "jig_hash": "88d6c7a92117", "language": "python", "line": 156, "name": "show_layers_cli", "signature": "show_layers_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.validate", "implements": ["S-061"], "jig_hash": "71e3d5e7079f", "language": "python", "line": 185, "name": "validate", "signature": "validate(ctx)", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.validate_bricks_cli", "implements": ["S-061"], "jig_hash": "1a75bd7aca1c", "language": "python", "line": 231, "name": "validate_bricks_cli", "signature": "validate_bricks_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/main.py", "git_blob": "c970750f8bb3", "id": "F-jig.cli.main.validate_intent_cli", "implements": ["S-061"], "jig_hash": "388d85c8d007", "language": "python", "line": 210, "name": "validate_intent_cli", "signature": "validate_intent_cli() -> None", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild._count_implemented_specs", "language": "python", "line": 253, "name": "_count_implemented_specs", "signature": "_count_implemented_specs(impl_graph_path: Path, spec_dir: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild._count_verified_specs", "language": "python", "line": 279, "name": "_count_verified_specs", "signature": "_count_verified_specs(verify_graph_path: Path, spec_dir: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild.align_command", "implements": ["S-059"], "jig_hash": "7cf247c58d84", "language": "python", "line": 123, "name": "align_command", "signature": "align_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild.rebuild_all_command", "implements": ["S-058"], "jig_hash": "59f69ea124fa", "language": "python", "line": 98, "name": "rebuild_all_command", "signature": "rebuild_all_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild.rebuild_impl_command", "implements": ["S-058"], "jig_hash": "df350321c939", "language": "python", "line": 12, "name": "rebuild_impl_command", "signature": "rebuild_impl_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild.rebuild_intent_command", "implements": ["S-058"], "jig_hash": "0a6c1a9d9d8b", "language": "python", "line": 47, "name": "rebuild_intent_command", "signature": "rebuild_intent_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/rebuild.py", "git_blob": "bd46b281759a", "id": "F-jig.cli.rebuild.rebuild_verify_command", "implements": ["S-058"], "jig_hash": "8250415b73f4", "language": "python", "line": 71, "name": "rebuild_verify_command", "signature": "rebuild_verify_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/show.py", "git_blob": "748e86299245", "id": "F-jig.cli.show._get_layer_name", "language": "python", "line": 246, "name": "_get_layer_name", "signature": "_get_layer_name(layer: int) -> str", "type": "function"}
+{"async": false, "file": "src/jig/cli/show.py", "git_blob": "748e86299245", "id": "F-jig.cli.show.show_bricks_command", "implements": ["S-060"], "jig_hash": "762e1946c569", "language": "python", "line": 168, "name": "show_bricks_command", "signature": "show_bricks_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/show.py", "git_blob": "748e86299245", "id": "F-jig.cli.show.show_layers_command", "implements": ["S-060"], "jig_hash": "54cecd6be394", "language": "python", "line": 76, "name": "show_layers_command", "signature": "show_layers_command(project_root: Path) -> int", "type": "function"}
+{"async": false, "file": "src/jig/cli/show.py", "git_blob": "748e86299245", "id": "F-jig.cli.show.show_overview_command", "implements": ["S-060"], "jig_hash": "a0dc6463f521", "language": "python", "line": 15, "name": "show_overview_command", "signature": "show_overview_command(project_root: Path) -> int", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "git_blob": "fb0ab1d2fcfa", "id": "F-jig.cli.validate._combine_results", "language": "python", "line": 95, "name": "_combine_results", "signature": "_combine_results(results: dict) -> 'ValidationResult'", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "git_blob": "fb0ab1d2fcfa", "id": "F-jig.cli.validate.auto_validate_decorators", "implements": ["S-027"], "jig_hash": "80765624643f", "language": "python", "line": 209, "name": "auto_validate_decorators", "signature": "auto_validate_decorators(project_root: Path) -> bool", "type": "function"}
 {"async": false, "file": "src/jig/cli/validate.py", "git_blob": "fb0ab1d2fcfa", "id": "F-jig.cli.validate.validate_bricks_command", "implements": ["S-024"], "jig_hash": "609238694cc6", "language": "python", "line": 111, "name": "validate_bricks_command", "signature": "validate_bricks_command(project_root: Path, output_format: str) -> int", "type": "function"}
@@ -168,6 +176,9 @@
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
+{"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
+{"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
+{"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
 {"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
 {"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
 {"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
@@ -193,14 +204,25 @@
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
+{"id": "M-jig", "language": "python", "name": "jig", "type": "external_module"}
 {"file": "src/jig/__init__.py", "id": "M-jig.__init__", "language": "python", "name": "jig.__init__", "type": "module"}
 {"file": "src/jig/cli/__init__.py", "id": "M-jig.cli.__init__", "language": "python", "name": "jig.cli.__init__", "type": "module"}
+{"file": "src/jig/cli/discovery.py", "id": "M-jig.cli.discovery", "language": "python", "name": "jig.cli.discovery", "type": "module"}
+{"id": "M-jig.cli.discovery", "language": "python", "name": "jig.cli.discovery", "type": "external_module"}
+{"id": "M-jig.cli.discovery", "language": "python", "name": "jig.cli.discovery", "type": "external_module"}
+{"id": "M-jig.cli.discovery", "language": "python", "name": "jig.cli.discovery", "type": "external_module"}
 {"file": "src/jig/cli/layers.py", "id": "M-jig.cli.layers", "language": "python", "name": "jig.cli.layers", "type": "module"}
-{"id": "M-jig.cli.layers", "language": "python", "name": "jig.cli.layers", "type": "external_module"}
 {"file": "src/jig/cli/main.py", "id": "M-jig.cli.main", "language": "python", "name": "jig.cli.main", "type": "module"}
+{"id": "M-jig.cli.rebuild", "language": "python", "name": "jig.cli.rebuild", "type": "external_module"}
+{"file": "src/jig/cli/rebuild.py", "id": "M-jig.cli.rebuild", "language": "python", "name": "jig.cli.rebuild", "type": "module"}
+{"id": "M-jig.cli.show", "language": "python", "name": "jig.cli.show", "type": "external_module"}
+{"file": "src/jig/cli/show.py", "id": "M-jig.cli.show", "language": "python", "name": "jig.cli.show", "type": "module"}
+{"id": "M-jig.cli.validate", "language": "python", "name": "jig.cli.validate", "type": "external_module"}
 {"id": "M-jig.cli.validate", "language": "python", "name": "jig.cli.validate", "type": "external_module"}
 {"file": "src/jig/cli/validate.py", "id": "M-jig.cli.validate", "language": "python", "name": "jig.cli.validate", "type": "module"}
-{"id": "M-jig.cli.verify", "language": "python", "name": "jig.cli.verify", "type": "external_module"}
 {"file": "src/jig/cli/verify.py", "id": "M-jig.cli.verify", "language": "python", "name": "jig.cli.verify", "type": "module"}
 {"file": "src/jig/hashing.py", "id": "M-jig.hashing", "language": "python", "name": "jig.hashing", "type": "module"}
 {"id": "M-jig.hashing", "language": "python", "name": "jig.hashing", "type": "external_module"}
@@ -224,7 +246,9 @@
 {"file": "src/jig/intent_graph/generator.py", "id": "M-jig.intent_graph.generator", "language": "python", "name": "jig.intent_graph.generator", "type": "module"}
 {"file": "src/jig/validation/__init__.py", "id": "M-jig.validation.__init__", "language": "python", "name": "jig.validation.__init__", "type": "module"}
 {"id": "M-jig.validation.bricks", "language": "python", "name": "jig.validation.bricks", "type": "external_module"}
+{"id": "M-jig.validation.bricks", "language": "python", "name": "jig.validation.bricks", "type": "external_module"}
 {"file": "src/jig/validation/bricks.py", "id": "M-jig.validation.bricks", "language": "python", "name": "jig.validation.bricks", "type": "module"}
+{"id": "M-jig.validation.intent", "language": "python", "name": "jig.validation.intent", "type": "external_module"}
 {"id": "M-jig.validation.intent", "language": "python", "name": "jig.validation.intent", "type": "external_module"}
 {"file": "src/jig/validation/intent.py", "id": "M-jig.validation.intent", "language": "python", "name": "jig.validation.intent", "type": "module"}
 {"id": "M-jig.validation.models", "language": "python", "name": "jig.validation.models", "type": "external_module"}
@@ -251,12 +275,15 @@
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
-{"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
+{"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
 {"id": "M-pathlib", "language": "python", "name": "pathlib", "type": "external_module"}
@@ -282,7 +309,6 @@
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
-{"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
@@ -299,6 +325,8 @@
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
 {"id": "M-typing", "language": "python", "name": "typing", "type": "external_module"}
+{"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
+{"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
 {"id": "M-yaml", "language": "python", "name": "yaml", "type": "external_module"}
@@ -373,22 +401,46 @@
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer._extract_verifies_decorators", "type": "contains"}
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer._validate_spec_id", "type": "contains"}
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer.analyze_file", "type": "contains"}
-{"line": 253, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
-{"line": 291, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
-{"line": 246, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._get_layer_name", "type": "calls"}
-{"line": 219, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
-{"line": 228, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
-{"line": 179, "source": "F-jig.cli.layers._has_cycles_in_brick_graph", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
-{"line": 169, "source": "F-jig.cli.layers.has_cycle_from", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
-{"line": 137, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_full", "type": "calls"}
-{"line": 135, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_summary", "type": "calls"}
-{"line": 131, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
+{"source": "F-jig.cli.discovery.find_project_root", "target": "S-057", "type": "implements"}
+{"line": 252, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 290, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 245, "source": "F-jig.cli.layers._display_full", "target": "F-jig.cli.layers._get_layer_name", "type": "calls"}
+{"line": 218, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 227, "source": "F-jig.cli.layers._display_summary", "target": "F-jig.cli.layers._format_unit_counts", "type": "calls"}
+{"line": 178, "source": "F-jig.cli.layers._has_cycles_in_brick_graph", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
+{"line": 168, "source": "F-jig.cli.layers.has_cycle_from", "target": "F-jig.cli.layers.has_cycle_from", "type": "calls"}
+{"line": 136, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_full", "type": "calls"}
+{"line": 134, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._display_summary", "type": "calls"}
+{"line": 130, "source": "F-jig.cli.layers.layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
 {"source": "F-jig.cli.layers.layers_command", "target": "S-040", "type": "implements"}
-{"line": 402, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._apply_suggested_layers", "type": "calls"}
-{"line": 390, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._assign_layers_topologically", "type": "calls"}
-{"line": 396, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._display_suggestions", "type": "calls"}
-{"line": 383, "source": "F-jig.cli.layers.suggest_layers_command", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "calls"}
-{"source": "F-jig.cli.layers.suggest_layers_command", "target": "S-041", "type": "implements"}
+{"source": "F-jig.cli.main.align", "target": "S-059", "type": "implements"}
+{"source": "F-jig.cli.main.cli", "target": "S-061", "type": "implements"}
+{"source": "F-jig.cli.main.full", "target": "S-061", "type": "implements"}
+{"source": "F-jig.cli.main.rebuild_group", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.main.rebuild_impl_cli", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.main.rebuild_intent_cli", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.main.rebuild_verify_cli", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.main.show_bricks_cli", "target": "S-060", "type": "implements"}
+{"source": "F-jig.cli.main.show_group", "target": "S-060", "type": "implements"}
+{"source": "F-jig.cli.main.show_layers_cli", "target": "S-060", "type": "implements"}
+{"source": "F-jig.cli.main.validate", "target": "S-061", "type": "implements"}
+{"source": "F-jig.cli.main.validate_bricks_cli", "target": "S-061", "type": "implements"}
+{"source": "F-jig.cli.main.validate_intent_cli", "target": "S-061", "type": "implements"}
+{"line": 244, "source": "F-jig.cli.rebuild.align_command", "target": "F-jig.cli.rebuild._count_implemented_specs", "type": "calls"}
+{"line": 245, "source": "F-jig.cli.rebuild.align_command", "target": "F-jig.cli.rebuild._count_verified_specs", "type": "calls"}
+{"source": "F-jig.cli.rebuild.align_command", "target": "S-059", "type": "implements"}
+{"line": 107, "source": "F-jig.cli.rebuild.rebuild_all_command", "target": "F-jig.cli.rebuild.rebuild_impl_command", "type": "calls"}
+{"line": 115, "source": "F-jig.cli.rebuild.rebuild_all_command", "target": "F-jig.cli.rebuild.rebuild_intent_command", "type": "calls"}
+{"line": 111, "source": "F-jig.cli.rebuild.rebuild_all_command", "target": "F-jig.cli.rebuild.rebuild_verify_command", "type": "calls"}
+{"source": "F-jig.cli.rebuild.rebuild_all_command", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.rebuild.rebuild_impl_command", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.rebuild.rebuild_intent_command", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.rebuild.rebuild_verify_command", "target": "S-058", "type": "implements"}
+{"source": "F-jig.cli.show.show_bricks_command", "target": "S-060", "type": "implements"}
+{"line": 146, "source": "F-jig.cli.show.show_layers_command", "target": "F-jig.cli.show._get_layer_name", "type": "calls"}
+{"source": "F-jig.cli.show.show_layers_command", "target": "S-060", "type": "implements"}
+{"line": 68, "source": "F-jig.cli.show.show_overview_command", "target": "F-jig.cli.show._get_layer_name", "type": "calls"}
+{"source": "F-jig.cli.show.show_overview_command", "target": "S-060", "type": "implements"}
 {"source": "F-jig.cli.validate.auto_validate_decorators", "target": "S-027", "type": "implements"}
 {"line": 129, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
 {"line": 153, "source": "F-jig.cli.validate.validate_bricks_command", "target": "F-jig.cli.validate._combine_results", "type": "calls"}
@@ -493,52 +545,89 @@
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
-{"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._apply_suggested_layers", "type": "contains"}
-{"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._assign_layers_topologically", "type": "contains"}
+{"source": "M-jig.cli.discovery", "target": "C-jig.cli.discovery.ProjectNotFoundError", "type": "contains"}
+{"source": "M-jig.cli.discovery", "target": "F-jig.cli.discovery.find_project_root", "type": "contains"}
+{"line": 5, "source": "M-jig.cli.discovery", "target": "M-jig", "type": "imports"}
+{"line": 3, "source": "M-jig.cli.discovery", "target": "M-pathlib", "type": "imports"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_full", "type": "contains"}
-{"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_suggestions", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._display_summary", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._format_unit_counts", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._get_layer_name", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers._has_cycles_in_brick_graph", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers.has_cycle_from", "type": "contains"}
 {"source": "M-jig.cli.layers", "target": "F-jig.cli.layers.layers_command", "type": "contains"}
-{"source": "M-jig.cli.layers", "target": "F-jig.cli.layers.suggest_layers_command", "type": "contains"}
-{"line": 10, "source": "M-jig.cli.layers", "target": "M-click", "type": "imports"}
-{"line": 7, "source": "M-jig.cli.layers", "target": "M-collections", "type": "imports"}
-{"line": 13, "source": "M-jig.cli.layers", "target": "M-jig", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.layers", "target": "M-click", "type": "imports"}
+{"line": 6, "source": "M-jig.cli.layers", "target": "M-collections", "type": "imports"}
+{"line": 12, "source": "M-jig.cli.layers", "target": "M-jig", "type": "imports"}
 {"line": 5, "source": "M-jig.cli.layers", "target": "M-json", "type": "imports"}
-{"line": 8, "source": "M-jig.cli.layers", "target": "M-pathlib", "type": "imports"}
-{"line": 6, "source": "M-jig.cli.layers", "target": "M-sys", "type": "imports"}
-{"line": 11, "source": "M-jig.cli.layers", "target": "M-yaml", "type": "imports"}
+{"line": 7, "source": "M-jig.cli.layers", "target": "M-pathlib", "type": "imports"}
+{"line": 10, "source": "M-jig.cli.layers", "target": "M-yaml", "type": "imports"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.align", "type": "contains"}
 {"source": "M-jig.cli.main", "target": "F-jig.cli.main.cli", "type": "contains"}
 {"source": "M-jig.cli.main", "target": "F-jig.cli.main.full", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.impl", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.intent", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.layers", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.suggest", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild_group", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild_impl_cli", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild_intent_cli", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.rebuild_verify_cli", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.show_bricks_cli", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.show_group", "type": "contains"}
+{"source": "M-jig.cli.main", "target": "F-jig.cli.main.show_layers_cli", "type": "contains"}
 {"source": "M-jig.cli.main", "target": "F-jig.cli.main.validate", "type": "contains"}
 {"source": "M-jig.cli.main", "target": "F-jig.cli.main.validate_bricks_cli", "type": "contains"}
 {"source": "M-jig.cli.main", "target": "F-jig.cli.main.validate_intent_cli", "type": "contains"}
-{"source": "M-jig.cli.main", "target": "F-jig.cli.main.verify", "type": "contains"}
-{"line": 7, "source": "M-jig.cli.main", "target": "M-click", "type": "imports"}
-{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.layers", "type": "imports"}
-{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.layers", "type": "imports"}
-{"line": 10, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
-{"line": 10, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
-{"line": 10, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
-{"line": 10, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
-{"line": 16, "source": "M-jig.cli.main", "target": "M-jig.cli.verify", "type": "imports"}
-{"line": 17, "source": "M-jig.cli.main", "target": "M-jig.impl_graph.builder", "type": "imports"}
-{"line": 18, "source": "M-jig.cli.main", "target": "M-jig.intent_graph.generator", "type": "imports"}
-{"line": 105, "source": "M-jig.cli.main", "target": "M-jig.verification_graph.builder", "type": "imports"}
-{"line": 3, "source": "M-jig.cli.main", "target": "M-logging", "type": "imports"}
-{"line": 5, "source": "M-jig.cli.main", "target": "M-pathlib", "type": "imports"}
-{"line": 4, "source": "M-jig.cli.main", "target": "M-sys", "type": "imports"}
+{"line": 5, "source": "M-jig.cli.main", "target": "M-click", "type": "imports"}
+{"line": 7, "source": "M-jig.cli.main", "target": "M-jig", "type": "imports"}
+{"line": 8, "source": "M-jig.cli.main", "target": "M-jig.cli.discovery", "type": "imports"}
+{"line": 8, "source": "M-jig.cli.main", "target": "M-jig.cli.discovery", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.rebuild", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.rebuild", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.rebuild", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.rebuild", "type": "imports"}
+{"line": 9, "source": "M-jig.cli.main", "target": "M-jig.cli.rebuild", "type": "imports"}
+{"line": 16, "source": "M-jig.cli.main", "target": "M-jig.cli.show", "type": "imports"}
+{"line": 16, "source": "M-jig.cli.main", "target": "M-jig.cli.show", "type": "imports"}
+{"line": 16, "source": "M-jig.cli.main", "target": "M-jig.cli.show", "type": "imports"}
+{"line": 21, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
+{"line": 21, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
+{"line": 21, "source": "M-jig.cli.main", "target": "M-jig.cli.validate", "type": "imports"}
+{"line": 3, "source": "M-jig.cli.main", "target": "M-sys", "type": "imports"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild._count_implemented_specs", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild._count_verified_specs", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild.align_command", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild.rebuild_all_command", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild.rebuild_impl_command", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild.rebuild_intent_command", "type": "contains"}
+{"source": "M-jig.cli.rebuild", "target": "F-jig.cli.rebuild.rebuild_verify_command", "type": "contains"}
+{"line": 5, "source": "M-jig.cli.rebuild", "target": "M-click", "type": "imports"}
+{"line": 7, "source": "M-jig.cli.rebuild", "target": "M-jig", "type": "imports"}
+{"line": 8, "source": "M-jig.cli.rebuild", "target": "M-jig.cli.discovery", "type": "imports"}
+{"line": 21, "source": "M-jig.cli.rebuild", "target": "M-jig.cli.validate", "type": "imports"}
+{"line": 132, "source": "M-jig.cli.rebuild", "target": "M-jig.cli.validate", "type": "imports"}
+{"line": 22, "source": "M-jig.cli.rebuild", "target": "M-jig.impl_graph.builder", "type": "imports"}
+{"line": 133, "source": "M-jig.cli.rebuild", "target": "M-jig.impl_graph.builder", "type": "imports"}
+{"line": 56, "source": "M-jig.cli.rebuild", "target": "M-jig.intent_graph.generator", "type": "imports"}
+{"line": 134, "source": "M-jig.cli.rebuild", "target": "M-jig.intent_graph.generator", "type": "imports"}
+{"line": 135, "source": "M-jig.cli.rebuild", "target": "M-jig.validation.bricks", "type": "imports"}
+{"line": 135, "source": "M-jig.cli.rebuild", "target": "M-jig.validation.bricks", "type": "imports"}
+{"line": 136, "source": "M-jig.cli.rebuild", "target": "M-jig.validation.intent", "type": "imports"}
+{"line": 136, "source": "M-jig.cli.rebuild", "target": "M-jig.validation.intent", "type": "imports"}
+{"line": 80, "source": "M-jig.cli.rebuild", "target": "M-jig.verification_graph.builder", "type": "imports"}
+{"line": 140, "source": "M-jig.cli.rebuild", "target": "M-jig.verification_graph.builder", "type": "imports"}
+{"line": 255, "source": "M-jig.cli.rebuild", "target": "M-json", "type": "imports"}
+{"line": 281, "source": "M-jig.cli.rebuild", "target": "M-json", "type": "imports"}
+{"line": 3, "source": "M-jig.cli.rebuild", "target": "M-pathlib", "type": "imports"}
+{"line": 227, "source": "M-jig.cli.rebuild", "target": "M-yaml", "type": "imports"}
+{"source": "M-jig.cli.show", "target": "F-jig.cli.show._get_layer_name", "type": "contains"}
+{"source": "M-jig.cli.show", "target": "F-jig.cli.show.show_bricks_command", "type": "contains"}
+{"source": "M-jig.cli.show", "target": "F-jig.cli.show.show_layers_command", "type": "contains"}
+{"source": "M-jig.cli.show", "target": "F-jig.cli.show.show_overview_command", "type": "contains"}
+{"line": 7, "source": "M-jig.cli.show", "target": "M-click", "type": "imports"}
+{"line": 4, "source": "M-jig.cli.show", "target": "M-collections", "type": "imports"}
+{"line": 10, "source": "M-jig.cli.show", "target": "M-jig", "type": "imports"}
+{"line": 11, "source": "M-jig.cli.show", "target": "M-jig.cli.discovery", "type": "imports"}
+{"line": 3, "source": "M-jig.cli.show", "target": "M-json", "type": "imports"}
+{"line": 5, "source": "M-jig.cli.show", "target": "M-pathlib", "type": "imports"}
+{"line": 8, "source": "M-jig.cli.show", "target": "M-yaml", "type": "imports"}
 {"source": "M-jig.cli.validate", "target": "F-jig.cli.validate._combine_results", "type": "contains"}
 {"source": "M-jig.cli.validate", "target": "F-jig.cli.validate.auto_validate_decorators", "type": "contains"}
 {"source": "M-jig.cli.validate", "target": "F-jig.cli.validate.validate_bricks_command", "type": "contains"}

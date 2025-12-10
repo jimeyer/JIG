@@ -5,6 +5,15 @@ import sys
 import click
 
 import jig
+
+
+class OrderedGroup(click.Group):
+    """A Click group that preserves command order."""
+
+    def list_commands(self, ctx):
+        return list(self.commands.keys())
+
+
 from jig.cli.discovery import ProjectNotFoundError, find_project_root
 from jig.cli.rebuild import (
     align_command,
@@ -25,7 +34,7 @@ from jig.cli.validate import (
 )
 
 
-@click.group(invoke_without_command=True)
+@click.group(cls=OrderedGroup, invoke_without_command=True)
 @click.version_option()
 @click.pass_context
 @jig.implements("S-061")
@@ -125,60 +134,6 @@ def align() -> None:
     sys.exit(exit_code)
 
 
-# Show command group (S-060)
-@cli.group(name="show", invoke_without_command=True)
-@click.pass_context
-@jig.implements("S-060")
-def show_group(ctx) -> None:
-    """Display JIG structure information.
-
-    Shows bricks, layers, and other structural details.
-
-    Example:
-        jigy show           # Show overview
-        jigy show layers    # Show layer hierarchy
-        jigy show bricks    # Show brick details
-    """
-    if ctx.invoked_subcommand is None:
-        # No subcommand = show overview
-        try:
-            project_root = find_project_root()
-        except ProjectNotFoundError as e:
-            click.echo(f"Error: {e}", err=True)
-            sys.exit(1)
-
-        exit_code = show_overview_command(project_root)
-        sys.exit(exit_code)
-
-
-@show_group.command(name="layers")
-@jig.implements("S-060")
-def show_layers_cli() -> None:
-    """Display layer hierarchy."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = show_layers_command(project_root)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="bricks")
-@jig.implements("S-060")
-def show_bricks_cli() -> None:
-    """Display brick details."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = show_bricks_command(project_root)
-    sys.exit(exit_code)
-
-
 @cli.group(invoke_without_command=True)
 @click.pass_context
 @jig.implements("S-061")
@@ -265,6 +220,60 @@ def full() -> None:
         sys.exit(1)
 
     exit_code = validate_full_command(project_root, "human")
+    sys.exit(exit_code)
+
+
+# Show command group (S-060)
+@cli.group(name="show", invoke_without_command=True)
+@click.pass_context
+@jig.implements("S-060")
+def show_group(ctx) -> None:
+    """Display JIG structure information.
+
+    Shows bricks, layers, and other structural details.
+
+    Example:
+        jigy show           # Show overview
+        jigy show layers    # Show layer hierarchy
+        jigy show bricks    # Show brick details
+    """
+    if ctx.invoked_subcommand is None:
+        # No subcommand = show overview
+        try:
+            project_root = find_project_root()
+        except ProjectNotFoundError as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+
+        exit_code = show_overview_command(project_root)
+        sys.exit(exit_code)
+
+
+@show_group.command(name="layers")
+@jig.implements("S-060")
+def show_layers_cli() -> None:
+    """Display layer hierarchy."""
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = show_layers_command(project_root)
+    sys.exit(exit_code)
+
+
+@show_group.command(name="bricks")
+@jig.implements("S-060")
+def show_bricks_cli() -> None:
+    """Display brick details."""
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = show_bricks_command(project_root)
     sys.exit(exit_code)
 
 
