@@ -12,7 +12,7 @@
 
 ### Outcomes
 
-- **O-018**: Intuitive CLI Experience — Users interact with JIG through a memorable, verb-first command structure requiring zero configuration
+- **O-019**: Intuitive CLI Experience — Users interact with JIG through a memorable, verb-first command structure requiring zero configuration
 
 ### Specifications
 
@@ -31,7 +31,7 @@
 
 ## Work Unit Checklist
 
-- [ ] WU0: Create Intent nodes (O/S) — specs ☐
+- [x] WU0: Create Intent nodes (O/S) — specs ☑
 - [ ] WU1: Project Root Discovery — tests ☐ / code ☐
 - [ ] WU2: Restructure Rebuild Commands — tests ☐ / code ☐
 - [ ] WU3: Create Align Command — tests ☐ / code ☐
@@ -49,13 +49,13 @@
 **Goal**: Capture all Outcomes and Specifications before writing any code.
 
 **Acceptance Criteria**:
-- [ ] O-018 created in `jig/outcomes/O-018.md`
-- [ ] S-057 through S-061 created in `jig/specifications/`
-- [ ] All files have proper YAML frontmatter
-- [ ] `jigy validate` passes
+- [x] O-019 created in `jig/outcomes/O-019.md`
+- [x] S-057 through S-061 created in `jig/specifications/`
+- [x] All files have proper YAML frontmatter
+- [x] `jigy validate` passes
 
 **Created Nodes**:
-- O-018: Intuitive CLI Experience
+- O-019: Intuitive CLI Experience
 - S-057: Project Root Auto-Discovery
 - S-058: Verb-First Rebuild Commands
 - S-059: Align Command
@@ -469,7 +469,7 @@ _(To be filled after all work units complete)_
 **Metrics**:
 - Work Units: 8 (including WU0)
 - Specifications Created: 5 (S-057 through S-061)
-- Outcomes Created: 1 (O-018)
+- Outcomes Created: 1 (O-019)
 
 **Key Decisions**:
 -
