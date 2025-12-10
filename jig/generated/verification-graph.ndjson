@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 328, "generated": "2025-12-10T04:21:23.008307+00:00", "node_count": 359, "version": "1.0"}}
+{"_meta": {"edge_count": 352, "generated": "2025-12-10T17:17:54.906314+00:00", "node_count": 376, "version": "1.0"}}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_creates_all_graphs", "jig_hash": "baa371da8a15", "type": "test", "verifies": ["S-059"]}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_not_in_project", "jig_hash": "3be1b387fb7b", "type": "test", "verifies": ["S-059"]}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_output_format", "jig_hash": "25f96b0adc96", "type": "test", "verifies": ["S-059"]}
@@ -122,19 +122,16 @@
 {"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_strict_mode_fails_on_parse_error", "jig_hash": "764fe903b8c1", "type": "test", "verifies": ["S-006"]}
 {"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_uses_relative_paths", "jig_hash": "61eca9d41b6c", "type": "test", "verifies": ["S-003"]}
 {"file": "tests/integration/test_builder.py", "id": "T-test_builder.test_builder_writes_ndjson", "jig_hash": "9cff7d543072", "type": "test", "verifies": ["S-003"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_help_messages", "jig_hash": "5f7bdd6a64a2", "type": "test", "verifies": ["S-001", "S-003"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_basic", "jig_hash": "8d1a20bb0c16", "type": "test", "verifies": ["S-001", "S-003"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_custom_output", "jig_hash": "3c13b968cd08", "type": "test", "verifies": ["S-003"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_output_format", "jig_hash": "817691627a28", "type": "test", "verifies": ["S-003"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_parse_error_lenient", "jig_hash": "dfd1c8f8776e", "type": "test", "verifies": ["S-006"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_parse_error_strict", "jig_hash": "59d13ec44642", "type": "test", "verifies": ["S-006"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_verbose", "jig_hash": "272808cc59a0", "type": "test", "verifies": ["S-001"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_impl_rebuild_with_exclude", "jig_hash": "bb7f55f72f86", "type": "test", "verifies": ["S-001"]}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_help", "jig_hash": "d1c54e60fc2f", "type": "test", "verifies": []}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_stops_on_validation_error", "jig_hash": "7e11b2ebccd5", "type": "test", "verifies": []}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_success", "jig_hash": "04352649410b", "type": "test", "verifies": []}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_rebuild_with_verbose", "jig_hash": "308364abef48", "type": "test", "verifies": []}
-{"file": "tests/integration/test_cli.py", "id": "T-test_cli.test_cli_reports_node_edge_counts", "jig_hash": "61fb03c1fae7", "type": "test", "verifies": ["S-001"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_commands_work_without_config_file", "jig_hash": "57b76c5895df", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_config_loaded_once_per_invocation", "jig_hash": "2264d55120fb", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_full_workflow_with_config", "jig_hash": "3eb93f7163cd", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_invalid_toml_shows_clear_error", "jig_hash": "de34dccf040e", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_partial_config_uses_defaults_for_unset", "jig_hash": "2d57c0a8fa12", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_pyproject_toml_config_works", "jig_hash": "bee7b20510ad", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_rebuild_uses_configured_paths", "jig_hash": "7bc01f7a204d", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_show_uses_configured_bricks_path", "jig_hash": "a5a4214cc094", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_validate_uses_config_paths", "jig_hash": "4c29287049fa", "type": "test", "verifies": ["S-065"]}
+{"file": "tests/config/test_cli_integration.py", "id": "T-test_cli_integration.test_validate_uses_configured_source_path", "jig_hash": "a77a2484154d", "type": "test", "verifies": ["S-065"]}
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_bare_command_shows_help_exits_zero", "jig_hash": "ab2f8adda589", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_cli_docstring_is_concise", "jig_hash": "ecdc8b8fef20", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_help_option_works", "jig_hash": "ab2b6f10129f", "type": "test", "verifies": ["S-061"]}
@@ -191,6 +188,17 @@
 {"file": "tests/cli/test_discovery.py", "id": "T-test_discovery.test_find_project_root_in_grandparent", "jig_hash": "9cb7c798c38b", "type": "test", "verifies": ["S-057"]}
 {"file": "tests/cli/test_discovery.py", "id": "T-test_discovery.test_find_project_root_in_parent", "jig_hash": "39e6b7bf027a", "type": "test", "verifies": ["S-057"]}
 {"file": "tests/cli/test_discovery.py", "id": "T-test_discovery.test_find_project_root_not_found", "jig_hash": "86ec7266d286", "type": "test", "verifies": ["S-057"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_finds_hidden_jig_toml", "jig_hash": "5c406695cf69", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_finds_jig_toml_in_current_directory", "jig_hash": "55cbc0a315e2", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_finds_pyproject_toml_with_tool_jig", "jig_hash": "e3eda3fecd1e", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_hidden_jig_toml_takes_priority_over_pyproject", "jig_hash": "047d9c3c02fa", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_ignores_pyproject_without_tool_jig", "jig_hash": "ac547201e069", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_jig_toml_takes_priority_over_hidden", "jig_hash": "ae54fa2a6bd8", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_jig_toml_takes_priority_over_pyproject", "jig_hash": "c4d0a2d4597a", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_returns_none_when_no_config", "jig_hash": "94db92f20b83", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_searches_parent_directories", "jig_hash": "5629d8ba69ff", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_stops_at_filesystem_root", "jig_hash": "fd1fbc7bb9e1", "type": "test", "verifies": ["S-062"]}
+{"file": "tests/config/test_discovery.py", "id": "T-test_discovery.test_uses_cwd_as_default_start_dir", "jig_hash": "2962a1650cc6", "type": "test", "verifies": ["S-062"]}
 {"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_deterministic_across_runs", "jig_hash": "4ee34d696a3e", "type": "test", "verifies": ["S-049"]}
 {"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_brick_nodes", "jig_hash": "54fa93f5c15e", "type": "test", "verifies": ["S-049"]}
 {"file": "tests/jig/intent_graph/test_generator.py", "id": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_outcome_nodes", "jig_hash": "5b0a5ff72cb2", "type": "test", "verifies": ["S-049"]}
@@ -267,11 +275,6 @@
 {"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_empty_intent_graph", "jig_hash": "377e2452dd24", "type": "test", "verifies": ["O-015"]}
 {"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_orphaned_outcome_workflow", "jig_hash": "0e3236733f02", "type": "test", "verifies": ["O-015"]}
 {"file": "tests/integration/test_intent_completeness.py", "id": "T-test_intent_completeness.test_orphaned_specification_workflow", "jig_hash": "90dbd699bf88", "type": "test", "verifies": ["O-015"]}
-{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_cycle_detection_across_workflow", "jig_hash": "ea131cc6b1ae", "type": "test", "verifies": []}
-{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_full_layer_workflow_from_invalid_to_valid", "jig_hash": "c84258f7bafa", "type": "test", "verifies": []}
-{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_json_validation_output_integration", "jig_hash": "5d428f612f51", "type": "test", "verifies": []}
-{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_layer_violation_detection_and_suggestion", "jig_hash": "c90a69789c57", "type": "test", "verifies": []}
-{"file": "tests/integration/test_layer_workflow.py", "id": "T-test_layer_workflow.test_summary_mode_integration", "jig_hash": "d8b4efa56289", "type": "test", "verifies": []}
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_deterministic_output", "jig_hash": "94af81e84a05", "type": "test", "verifies": ["S-003"]}
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_edge_sorting_deterministic", "jig_hash": "12a6736b7ca9", "type": "test", "verifies": ["S-003"]}
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_edges_after_nodes", "jig_hash": "a975c605f294", "type": "test", "verifies": ["S-003"]}
@@ -285,6 +288,16 @@
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_sort_keys_in_json", "jig_hash": "f5e2a6ab6812", "type": "test", "verifies": ["S-003"]}
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_timestamp_optional", "jig_hash": "73ef0924e3b7", "type": "test", "verifies": ["S-003"]}
 {"file": "tests/unit/test_ndjson_writer.py", "id": "T-test_ndjson_writer.test_write_ndjson_convenience_function", "jig_hash": "cdc453409b68", "type": "test", "verifies": ["S-003"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_empty_file_returns_empty_dict", "jig_hash": "adaadfd0ed88", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_extracts_tool_jig_from_pyproject", "jig_hash": "f683b0d3ab94", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_file_not_found_raises_config_error", "jig_hash": "e14221b7d482", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_invalid_toml_raises_config_error", "jig_hash": "03de9e7ac34c", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_parses_hidden_jig_toml", "jig_hash": "72c7d60c5bae", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_parses_jig_toml_without_jig_section", "jig_hash": "a36e5ead799d", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_parses_valid_jig_toml", "jig_hash": "0d8fbb59a74a", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_preserves_all_value_types", "jig_hash": "ef64c07526f3", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_pyproject_without_tool_jig_raises_config_error", "jig_hash": "76bf02e1ea2b", "type": "test", "verifies": ["S-063"]}
+{"file": "tests/config/test_parser.py", "id": "T-test_parser.test_unknown_keys_in_config", "jig_hash": "73d9054c0439", "type": "test", "verifies": ["S-063"]}
 {"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_class_nodes", "jig_hash": "69faf9e35a97", "type": "test", "verifies": ["S-049"]}
 {"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_function_nodes", "jig_hash": "0429c781704a", "type": "test", "verifies": ["S-049"]}
 {"file": "tests/unit/test_python_analyzer.py", "id": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_present_for_tracked_files", "jig_hash": "63dceeda2cc6", "type": "test", "verifies": ["S-049"]}
@@ -331,6 +344,18 @@
 {"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_human_readable", "jig_hash": "3878d41df707", "type": "test", "verifies": ["S-026"]}
 {"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_format_human_readable_with_errors", "jig_hash": "9595c3e32380", "type": "test", "verifies": ["S-026"]}
 {"file": "tests/validation/test_reporting.py", "id": "T-test_reporting.test_json_schema_consistency", "jig_hash": "40a1710461ec", "type": "test", "verifies": ["S-026"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_config_from_pyproject_toml", "jig_hash": "5eff56fb9215", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_config_has_metadata", "jig_hash": "bc39dee900d5", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_config_without_file_has_metadata", "jig_hash": "b0dcfcb8bc5c", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_default_paths_when_no_config", "jig_hash": "1eea64668bad", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_jig_toml_takes_priority", "jig_hash": "57081b60cc91", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_loads_hidden_jig_toml", "jig_hash": "c95b271e6d90", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_override_jig_root_affects_nested_paths", "jig_hash": "df6c53d28e5f", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_override_nested_path_independently", "jig_hash": "30aaad8d2378", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_override_source_path", "jig_hash": "8ce075be61dd", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_override_tests_path", "jig_hash": "b3bdd795cb2c", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_partial_config_merges_with_defaults", "jig_hash": "cda0077238f2", "type": "test", "verifies": ["S-064"]}
+{"file": "tests/config/test_schema.py", "id": "T-test_schema.test_paths_are_absolute", "jig_hash": "e0f435b2e67f", "type": "test", "verifies": ["S-064"]}
 {"file": "tests/cli/test_show.py", "id": "T-test_show.test_show_bricks", "jig_hash": "3eadc80c9d9b", "type": "test", "verifies": ["S-060"]}
 {"file": "tests/cli/test_show.py", "id": "T-test_show.test_show_layers", "jig_hash": "0af3f48d66ef", "type": "test", "verifies": ["S-060"]}
 {"file": "tests/cli/test_show.py", "id": "T-test_show.test_show_no_bricks_file", "jig_hash": "d6b7414639a6", "type": "test", "verifies": ["S-060"]}
@@ -350,14 +375,6 @@
 {"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_no_format_option", "jig_hash": "e79399e8454c", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_no_project_root_option", "jig_hash": "3239fd5731ac", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_validate.py", "id": "T-test_validate.test_validate_not_in_project", "jig_hash": "4a89c5444a1f", "type": "test", "verifies": ["S-061"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_group_exists", "jig_hash": "a949fb296745", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_creates_file", "jig_hash": "561fbf461824", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_custom_test_dir", "jig_hash": "4ffc08edc842", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_empty_tests", "jig_hash": "9361fbdc8570", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_help", "jig_hash": "f05fbed27d80", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "jig_hash": "8dac32bcc31c", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "jig_hash": "13c71ca3c358", "type": "test", "verifies": ["S-056"]}
-{"file": "tests/unit/cli/test_verify.py", "id": "T-test_verify.test_cli_verify_rebuild_shows_progress", "jig_hash": "effc6986e97f", "type": "test", "verifies": ["S-056"]}
 {"source": "T-test_align.test_align_creates_all_graphs", "target": "S-059", "type": "verifies"}
 {"source": "T-test_align.test_align_not_in_project", "target": "S-059", "type": "verifies"}
 {"source": "T-test_align.test_align_output_format", "target": "S-059", "type": "verifies"}
@@ -475,17 +492,16 @@
 {"source": "T-test_builder.test_builder_strict_mode_fails_on_parse_error", "target": "S-006", "type": "verifies"}
 {"source": "T-test_builder.test_builder_uses_relative_paths", "target": "S-003", "type": "verifies"}
 {"source": "T-test_builder.test_builder_writes_ndjson", "target": "S-003", "type": "verifies"}
-{"source": "T-test_cli.test_cli_help_messages", "target": "S-001", "type": "verifies"}
-{"source": "T-test_cli.test_cli_help_messages", "target": "S-003", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_basic", "target": "S-001", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_basic", "target": "S-003", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_custom_output", "target": "S-003", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_output_format", "target": "S-003", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_parse_error_lenient", "target": "S-006", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_parse_error_strict", "target": "S-006", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_verbose", "target": "S-001", "type": "verifies"}
-{"source": "T-test_cli.test_cli_impl_rebuild_with_exclude", "target": "S-001", "type": "verifies"}
-{"source": "T-test_cli.test_cli_reports_node_edge_counts", "target": "S-001", "type": "verifies"}
+{"source": "T-test_cli_integration.test_commands_work_without_config_file", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_config_loaded_once_per_invocation", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_full_workflow_with_config", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_invalid_toml_shows_clear_error", "target": "S-063", "type": "verifies"}
+{"source": "T-test_cli_integration.test_partial_config_uses_defaults_for_unset", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_pyproject_toml_config_works", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_rebuild_uses_configured_paths", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_show_uses_configured_bricks_path", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_validate_uses_config_paths", "target": "S-065", "type": "verifies"}
+{"source": "T-test_cli_integration.test_validate_uses_configured_source_path", "target": "S-065", "type": "verifies"}
 {"source": "T-test_cli_root.test_bare_command_shows_help_exits_zero", "target": "S-061", "type": "verifies"}
 {"source": "T-test_cli_root.test_cli_docstring_is_concise", "target": "S-061", "type": "verifies"}
 {"source": "T-test_cli_root.test_help_option_works", "target": "S-061", "type": "verifies"}
@@ -534,6 +550,17 @@
 {"source": "T-test_discovery.test_find_project_root_in_grandparent", "target": "S-057", "type": "verifies"}
 {"source": "T-test_discovery.test_find_project_root_in_parent", "target": "S-057", "type": "verifies"}
 {"source": "T-test_discovery.test_find_project_root_not_found", "target": "S-057", "type": "verifies"}
+{"source": "T-test_discovery.test_finds_hidden_jig_toml", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_finds_jig_toml_in_current_directory", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_finds_pyproject_toml_with_tool_jig", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_hidden_jig_toml_takes_priority_over_pyproject", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_ignores_pyproject_without_tool_jig", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_jig_toml_takes_priority_over_hidden", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_jig_toml_takes_priority_over_pyproject", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_returns_none_when_no_config", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_searches_parent_directories", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_stops_at_filesystem_root", "target": "S-062", "type": "verifies"}
+{"source": "T-test_discovery.test_uses_cwd_as_default_start_dir", "target": "S-062", "type": "verifies"}
 {"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_deterministic_across_runs", "target": "S-049", "type": "verifies"}
 {"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_brick_nodes", "target": "S-049", "type": "verifies"}
 {"source": "T-test_generator.TestIntentGraphGitBlob.test_git_blob_optional_on_outcome_nodes", "target": "S-049", "type": "verifies"}
@@ -616,6 +643,16 @@
 {"source": "T-test_ndjson_writer.test_sort_keys_in_json", "target": "S-003", "type": "verifies"}
 {"source": "T-test_ndjson_writer.test_timestamp_optional", "target": "S-003", "type": "verifies"}
 {"source": "T-test_ndjson_writer.test_write_ndjson_convenience_function", "target": "S-003", "type": "verifies"}
+{"source": "T-test_parser.test_empty_file_returns_empty_dict", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_extracts_tool_jig_from_pyproject", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_file_not_found_raises_config_error", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_invalid_toml_raises_config_error", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_parses_hidden_jig_toml", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_parses_jig_toml_without_jig_section", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_parses_valid_jig_toml", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_preserves_all_value_types", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_pyproject_without_tool_jig_raises_config_error", "target": "S-063", "type": "verifies"}
+{"source": "T-test_parser.test_unknown_keys_in_config", "target": "S-063", "type": "verifies"}
 {"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_class_nodes", "target": "S-049", "type": "verifies"}
 {"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_optional_on_function_nodes", "target": "S-049", "type": "verifies"}
 {"source": "T-test_python_analyzer.TestImplementationGraphGitBlob.test_git_blob_present_for_tracked_files", "target": "S-049", "type": "verifies"}
@@ -650,6 +687,18 @@
 {"source": "T-test_reporting.test_format_human_readable", "target": "S-026", "type": "verifies"}
 {"source": "T-test_reporting.test_format_human_readable_with_errors", "target": "S-026", "type": "verifies"}
 {"source": "T-test_reporting.test_json_schema_consistency", "target": "S-026", "type": "verifies"}
+{"source": "T-test_schema.test_config_from_pyproject_toml", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_config_has_metadata", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_config_without_file_has_metadata", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_default_paths_when_no_config", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_jig_toml_takes_priority", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_loads_hidden_jig_toml", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_override_jig_root_affects_nested_paths", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_override_nested_path_independently", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_override_source_path", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_override_tests_path", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_partial_config_merges_with_defaults", "target": "S-064", "type": "verifies"}
+{"source": "T-test_schema.test_paths_are_absolute", "target": "S-064", "type": "verifies"}
 {"source": "T-test_show.test_show_bricks", "target": "S-060", "type": "verifies"}
 {"source": "T-test_show.test_show_layers", "target": "S-060", "type": "verifies"}
 {"source": "T-test_show.test_show_no_bricks_file", "target": "S-060", "type": "verifies"}
@@ -678,11 +727,3 @@
 {"source": "T-test_validate.test_validate_no_format_option", "target": "S-061", "type": "verifies"}
 {"source": "T-test_validate.test_validate_no_project_root_option", "target": "S-061", "type": "verifies"}
 {"source": "T-test_validate.test_validate_not_in_project", "target": "S-061", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_group_exists", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_creates_file", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_custom_test_dir", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_empty_tests", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_help", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_no_timestamp", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_returns_zero_on_success", "target": "S-056", "type": "verifies"}
-{"source": "T-test_verify.test_cli_verify_rebuild_shows_progress", "target": "S-056", "type": "verifies"}
