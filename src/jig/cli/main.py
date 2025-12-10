@@ -322,24 +322,27 @@ def rebuild(project_root: Path, verbose: bool) -> None:
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
-@click.option(
-    "--project-root",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    default=Path.cwd(),
-    help="Root directory of the project (default: current directory)",
-)
-@click.option(
-    "--format",
-    "output_format",
-    type=click.Choice(["human", "json"], case_sensitive=False),
-    default="human",
-    help="Output format (default: human-readable)",
-)
-def validate(ctx, project_root: Path, output_format: str):
-    """Validate JIG artifacts."""
+@jig.implements("S-061")
+def validate(ctx):
+    """Validate JIG artifacts.
+
+    Validates specifications, outcomes, decorators, and bricks.
+
+    Example:
+        jigy validate           # Run full validation
+        jigy validate intent    # Validate intent only
+        jigy validate bricks    # Validate bricks only
+        jigy validate full      # Run full validation (explicit)
+    """
     # If no subcommand, run full validation
     if ctx.invoked_subcommand is None:
-        exit_code = validate_full_command(project_root, output_format)
+        try:
+            project_root = find_project_root()
+        except ProjectNotFoundError as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+
+        exit_code = validate_full_command(project_root, "human")
         sys.exit(exit_code)
 
 
@@ -551,86 +554,65 @@ def rebuild(
 
 
 @validate.command(name="intent")
-@click.option(
-    "--project-root",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    default=Path.cwd(),
-    help="Root directory of the project (default: current directory)",
-)
-@click.option(
-    "--format",
-    "output_format",
-    type=click.Choice(["human", "json"], case_sensitive=False),
-    default="human",
-    help="Output format (default: human-readable)",
-)
-def validate_intent_cli(project_root: Path, output_format: str) -> None:
+@jig.implements("S-061")
+def validate_intent_cli() -> None:
     """Validate intent artifacts (specifications, outcomes, decorators).
 
     Validates human-authored artifacts before any graph generation.
     Can run without graphs existing.
 
     Example:
-        jig validate intent
-        jig validate intent --format json
+        jigy validate intent
     """
-    exit_code = validate_intent_command(project_root, output_format)
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = validate_intent_command(project_root, "human")
     sys.exit(exit_code)
 
 
 @validate.command(name="bricks")
-@click.option(
-    "--project-root",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    default=Path.cwd(),
-    help="Root directory of the project (default: current directory)",
-)
-@click.option(
-    "--format",
-    "output_format",
-    type=click.Choice(["human", "json"], case_sensitive=False),
-    default="human",
-    help="Output format (default: human-readable)",
-)
-def validate_bricks_cli(project_root: Path, output_format: str) -> None:
+@jig.implements("S-061")
+def validate_bricks_cli() -> None:
     """Validate brick definitions and partition constraints.
 
     Validates brick definitions against implementation graph.
     Requires implementation graph to exist.
 
     Example:
-        jig validate bricks
-        jig validate bricks --format json
+        jigy validate bricks
     """
-    exit_code = validate_bricks_command(project_root, output_format)
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = validate_bricks_command(project_root, "human")
     sys.exit(exit_code)
 
 
 @validate.command()
-@click.option(
-    "--project-root",
-    type=click.Path(exists=True, file_okay=False, path_type=Path),
-    default=Path.cwd(),
-    help="Root directory of the project (default: current directory)",
-)
-@click.option(
-    "--format",
-    "output_format",
-    type=click.Choice(["human", "json"], case_sensitive=False),
-    default="human",
-    help="Output format (default: human-readable)",
-)
-def full(project_root: Path, output_format: str) -> None:
+@jig.implements("S-061")
+def full() -> None:
     """Run full validation (intent + bricks if graph exists).
 
     Validates all artifacts. Runs intent validation always,
     and brick validation if implementation graph exists.
 
     Example:
-        jig validate full
-        jig validate full --format json
+        jigy validate full
     """
-    exit_code = validate_full_command(project_root, output_format)
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code = validate_full_command(project_root, "human")
     sys.exit(exit_code)
 
 

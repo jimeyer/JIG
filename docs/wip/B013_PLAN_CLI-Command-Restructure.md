@@ -36,7 +36,7 @@
 - [x] WU2: Restructure Rebuild Commands — tests ☑ / code ☑
 - [x] WU3: Create Align Command — tests ☑ / code ☑
 - [x] WU4: Restructure Show Commands — tests ☑ / code ☑
-- [ ] WU5: Simplify Validate Commands — tests ☐ / code ☐
+- [x] WU5: Simplify Validate Commands — tests ☑ / code ☑
 - [ ] WU6: Update Help & Root Command — tests ☐ / code ☐
 - [ ] WU7: Clean Break - Remove Old Commands — tests ☐ / code ☐
 
@@ -249,13 +249,13 @@ jigy show bricks
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-061 partially implemented for validate commands
-- [ ] S-061 verified by tests
-- [ ] `jigy validate` works without options
-- [ ] `jigy validate intent` works without options
-- [ ] `jigy validate bricks` works without options
-- [ ] `jigy validate full` works without options
-- [ ] Human-readable output only
+- [x] S-061 partially implemented for validate commands
+- [x] S-061 verified by tests
+- [x] `jigy validate` works without options
+- [x] `jigy validate intent` works without options
+- [x] `jigy validate bricks` works without options
+- [x] `jigy validate full` works without options
+- [x] Human-readable output only
 
 **Implementation Notes**:
 - Modify: `src/jig/cli/main.py`
