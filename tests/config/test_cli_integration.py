@@ -300,3 +300,116 @@ def example_function():
 
     # Should work with pyproject.toml config
     assert result.exit_code == 0
+
+
+@jig.verifies("S-063")
+def test_invalid_toml_shows_clear_error(project_dir):
+    """Verify invalid TOML config shows clear error message."""
+    # Create invalid TOML
+    config_file = project_dir / "jig.toml"
+    config_file.write_text("""[jig.paths
+source = "lib"
+""")  # Missing closing bracket
+
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        os.chdir(project_dir)
+        result = runner.invoke(cli, ["validate", "intent"])
+
+    # Should fail - the exception message contains "Invalid TOML"
+    assert result.exit_code != 0
+    # Check the exception type/message
+    assert result.exception is not None
+    assert "Invalid TOML" in str(result.exception) or "ConfigError" in str(type(result.exception))
+
+
+@jig.verifies("S-065")
+def test_full_workflow_with_config(project_dir):
+    """End-to-end test: create config, run all commands, verify behavior."""
+    # Set up custom project structure
+    (project_dir / "lib").mkdir()
+    (project_dir / "my_tests").mkdir()
+    (project_dir / "custom_jig").mkdir()
+    (project_dir / "custom_jig" / "specifications").mkdir()
+    (project_dir / "custom_jig" / "outcomes").mkdir()
+    (project_dir / "custom_jig" / "generated").mkdir()
+
+    # Create specification
+    spec_file = project_dir / "custom_jig" / "specifications" / "S-100.md"
+    spec_file.write_text("""---
+id: S-100
+type: specification
+---
+
+# Workflow Test Spec
+
+Test specification for full workflow.
+
+**Acceptance Criteria:**
+- Can run full workflow
+""")
+
+    # Create outcome
+    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-100.md"
+    outcome_file.write_text("""---
+id: O-100
+type: outcome
+specifies:
+  - S-100
+---
+
+# Workflow Test Outcome
+
+Test outcome for full workflow.
+""")
+
+    # Create source file
+    src_file = project_dir / "lib" / "workflow.py"
+    src_file.write_text("""import jig
+
+@jig.implements("S-100")
+def workflow_function():
+    '''Implementation for workflow test.'''
+    pass
+""")
+
+    # Create test file
+    test_file = project_dir / "my_tests" / "test_workflow.py"
+    test_file.write_text("""import jig
+
+@jig.verifies("S-100")
+def test_workflow():
+    pass
+""")
+
+    # Create config
+    config_file = project_dir / "jig.toml"
+    config_file.write_text("""[jig.paths]
+source = "lib"
+tests = "my_tests"
+jig_root = "custom_jig"
+""")
+
+    runner = CliRunner()
+
+    with runner.isolated_filesystem():
+        os.chdir(project_dir)
+
+        # Step 1: Validate intent
+        result = runner.invoke(cli, ["validate", "intent"])
+        assert result.exit_code == 0, f"validate intent failed: {result.output}"
+
+        # Step 2: Rebuild impl graph
+        result = runner.invoke(cli, ["rebuild", "impl"])
+        assert result.exit_code == 0, f"rebuild impl failed: {result.output}"
+        assert "impl:" in result.output
+
+        # Step 3: Rebuild verify graph
+        result = runner.invoke(cli, ["rebuild", "verify"])
+        assert result.exit_code == 0, f"rebuild verify failed: {result.output}"
+        assert "verify:" in result.output
+
+    # Verify generated files are in custom location
+    assert (project_dir / "custom_jig" / "generated" / "implementation-graph.ndjson").exists()
+    assert (project_dir / "custom_jig" / "generated" / "verification-graph.ndjson").exists()

@@ -23,11 +23,11 @@
 
 ## Work Unit Checklist
 - [x] WU0: Create Intent nodes (O/S)
-- [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ☐
-- [x] WU2: TOML parsing and schema validation — tests ✅ / code ✅ / docs ☐
-- [x] WU3: Path configuration with defaults — tests ✅ / code ✅ / docs ☐
-- [x] WU4: CLI integration — tests ✅ / code ✅ / docs ☐
-- [ ] WU5: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
+- [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ✅
+- [x] WU2: TOML parsing and schema validation — tests ✅ / code ✅ / docs ✅
+- [x] WU3: Path configuration with defaults — tests ✅ / code ✅ / docs ✅
+- [x] WU4: CLI integration — tests ✅ / code ✅ / docs ✅
+- [x] WU5: Integration testing & documentation — tests ✅ / code ✅ / docs ✅
 
 ## Work Units
 
@@ -327,10 +327,14 @@
 - Test example jig.toml works as documented
 
 **Reflect** (≤5 bullets):
-- (To be filled after implementation)
+- Added 2 more integration tests: invalid TOML error handling, full workflow end-to-end
+- Created comprehensive docs/configuration.md with examples, troubleshooting, migration guide
+- Added example jig.toml files in docs/examples/ (full and minimal versions)
+- Created README.md with quick start, commands reference, and configuration section
+- All 384 tests pass (10 config integration tests total)
 
 **Links**:
-- Commit: (TBD)
+- Commit: (see below)
 - PR: (TBD)
 
 ---

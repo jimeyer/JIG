@@ -1,0 +1,40 @@
+# JIG Configuration File
+#
+# This file configures JIG paths for your project.
+# All paths are relative to the project root.
+#
+# Place this file in your project root as:
+#   - jig.toml (recommended)
+#   - .jig.toml (hidden)
+#   - Or add [tool.jig] section to pyproject.toml
+
+[jig.paths]
+# Source code directory (relative to project root)
+# Default: "src"
+source = "src"
+
+# Test files directory (relative to project root)
+# Default: "test"
+tests = "test"
+
+# JIG artifacts root directory (relative to project root)
+# Default: "jig"
+jig_root = "jig"
+
+# The following paths are relative to jig_root:
+
+# Specifications directory
+# Default: "specifications"
+specifications = "specifications"
+
+# Outcomes directory
+# Default: "outcomes"
+outcomes = "outcomes"
+
+# Bricks definition file
+# Default: "bricks.yaml"
+bricks = "bricks.yaml"
+
+# Generated graphs directory
+# Default: "generated"
+generated = "generated"

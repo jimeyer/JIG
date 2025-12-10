@@ -1,0 +1,8 @@
+# Minimal JIG Configuration
+#
+# Only specify paths that differ from defaults.
+# Unspecified paths use default values.
+
+[jig.paths]
+# Example: use "tests" instead of default "test"
+tests = "tests"
