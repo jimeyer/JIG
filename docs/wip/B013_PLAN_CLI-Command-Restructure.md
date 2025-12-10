@@ -32,7 +32,7 @@
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O/S) — specs ☑
-- [ ] WU1: Project Root Discovery — tests ☐ / code ☐
+- [x] WU1: Project Root Discovery — tests ☑ / code ☑
 - [ ] WU2: Restructure Rebuild Commands — tests ☐ / code ☐
 - [ ] WU3: Create Align Command — tests ☐ / code ☐
 - [ ] WU4: Restructure Show Commands — tests ☐ / code ☐
@@ -74,11 +74,11 @@
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] S-057 implemented by `find_project_root()` function
-- [ ] S-057 verified by tests
-- [ ] Walks up from current directory looking for `jig/`
-- [ ] Returns project root path (parent of `jig/`)
-- [ ] Raises clear error if not found
+- [x] S-057 implemented by `find_project_root()` function
+- [x] S-057 verified by tests
+- [x] Walks up from current directory looking for `jig/`
+- [x] Returns project root path (parent of `jig/`)
+- [x] Raises clear error if not found
 
 **Implementation Notes**:
 - New file: `src/jig/cli/discovery.py`
