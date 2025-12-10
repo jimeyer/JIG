@@ -26,7 +26,7 @@
 - [x] WU1: Configuration file discovery — tests ✅ / code ✅ / docs ☐
 - [x] WU2: TOML parsing and schema validation — tests ✅ / code ✅ / docs ☐
 - [x] WU3: Path configuration with defaults — tests ✅ / code ✅ / docs ☐
-- [ ] WU4: CLI integration — tests ☐ / code ☐ / docs ☐
+- [x] WU4: CLI integration — tests ✅ / code ✅ / docs ☐
 - [ ] WU5: Integration testing & documentation — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
@@ -270,10 +270,14 @@
 - Remove jig.toml - should fail to find tests (or use default)
 
 **Reflect** (≤5 bullets):
-- (To be filled after implementation)
+- Config loaded via get_config() helper in main.py, cached in Click context for reuse
+- All CLI commands now accept JigConfig instead of Path, providing consistent path resolution
+- Updated 4 CLI modules (main.py, validate.py, rebuild.py, show.py, layers.py) to use config paths
+- 8 new integration tests verify config-CLI integration across validate, rebuild, and show commands
+- All 382 tests pass with no regressions
 
 **Links**:
-- Commit: (TBD)
+- Commit: (see below)
 - PR: (TBD)
 
 ---

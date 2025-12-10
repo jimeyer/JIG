@@ -6,14 +6,15 @@ import click
 
 import jig
 from jig.cli.discovery import find_project_root
+from jig.config import JigConfig
 
 
-@jig.implements("S-058")
-def rebuild_impl_command(project_root: Path) -> int:
+@jig.implements("S-058", "S-065")
+def rebuild_impl_command(config: JigConfig) -> int:
     """Rebuild implementation graph.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success).
@@ -24,14 +25,14 @@ def rebuild_impl_command(project_root: Path) -> int:
     click.echo(f"Rebuilding implementation graph...")
 
     # Auto-validate decorators first
-    if not auto_validate_decorators(project_root):
+    if not auto_validate_decorators(config):
         return 1
 
-    output_path = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    output_path = config.paths.generated / "implementation-graph.ndjson"
 
     graph = build_graph(
-        project_root=project_root,
-        source_dir=None,
+        project_root=config.project_root,
+        source_dir=config.paths.source,
         output_path=output_path,
         exclude_patterns=None,
         verbose=False,
@@ -43,12 +44,12 @@ def rebuild_impl_command(project_root: Path) -> int:
     return 0
 
 
-@jig.implements("S-058")
-def rebuild_intent_command(project_root: Path) -> int:
+@jig.implements("S-058", "S-065")
+def rebuild_intent_command(config: JigConfig) -> int:
     """Rebuild intent graph.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success).
@@ -57,9 +58,10 @@ def rebuild_intent_command(project_root: Path) -> int:
 
     click.echo(f"Rebuilding intent graph...")
 
+    output_path = config.paths.generated / "intent-graph.ndjson"
     output_path, node_count, edge_count = generate_intent_graph(
-        project_root=project_root,
-        output_path=None,
+        project_root=config.project_root,
+        output_path=output_path,
         include_timestamp=True,
     )
 
@@ -67,12 +69,12 @@ def rebuild_intent_command(project_root: Path) -> int:
     return 0
 
 
-@jig.implements("S-058")
-def rebuild_verify_command(project_root: Path) -> int:
+@jig.implements("S-058", "S-065")
+def rebuild_verify_command(config: JigConfig) -> int:
     """Rebuild verification graph.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success).
@@ -81,11 +83,11 @@ def rebuild_verify_command(project_root: Path) -> int:
 
     click.echo(f"Rebuilding verification graph...")
 
-    output_path = project_root / "jig" / "generated" / "verification-graph.ndjson"
+    output_path = config.paths.generated / "verification-graph.ndjson"
 
     graph = build_verification_graph(
-        project_root=project_root,
-        test_dir=None,
+        project_root=config.project_root,
+        test_dir=config.paths.tests,
         output_path=output_path,
         include_timestamp=True,
     )
@@ -94,37 +96,37 @@ def rebuild_verify_command(project_root: Path) -> int:
     return 0
 
 
-@jig.implements("S-058")
-def rebuild_all_command(project_root: Path) -> int:
+@jig.implements("S-058", "S-065")
+def rebuild_all_command(config: JigConfig) -> int:
     """Rebuild all three graphs in order: impl -> verify -> intent.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
-    exit_code = rebuild_impl_command(project_root)
+    exit_code = rebuild_impl_command(config)
     if exit_code != 0:
         return exit_code
 
-    exit_code = rebuild_verify_command(project_root)
+    exit_code = rebuild_verify_command(config)
     if exit_code != 0:
         return exit_code
 
-    exit_code = rebuild_intent_command(project_root)
+    exit_code = rebuild_intent_command(config)
     if exit_code != 0:
         return exit_code
 
     return 0
 
 
-@jig.implements("S-059")
-def align_command(project_root: Path) -> int:
+@jig.implements("S-059", "S-065")
+def align_command(config: JigConfig) -> int:
     """Run full alignment workflow: rebuild all graphs, validate, display summary.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 if aligned, non-zero on failure).
@@ -142,15 +144,15 @@ def align_command(project_root: Path) -> int:
     click.echo("Rebuilding graphs...")
 
     # Step 1: Auto-validate decorators
-    if not auto_validate_decorators(project_root):
+    if not auto_validate_decorators(config):
         return 1
 
     # Step 2: Rebuild impl graph
-    impl_output = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    impl_output = config.paths.generated / "implementation-graph.ndjson"
     try:
         impl_graph = build_graph(
-            project_root=project_root,
-            source_dir=None,
+            project_root=config.project_root,
+            source_dir=config.paths.source,
             output_path=impl_output,
             exclude_patterns=None,
             verbose=False,
@@ -163,11 +165,11 @@ def align_command(project_root: Path) -> int:
         return 1
 
     # Step 3: Rebuild verify graph
-    verify_output = project_root / "jig" / "generated" / "verification-graph.ndjson"
+    verify_output = config.paths.generated / "verification-graph.ndjson"
     try:
         verify_graph = build_verification_graph(
-            project_root=project_root,
-            test_dir=None,
+            project_root=config.project_root,
+            test_dir=config.paths.tests,
             output_path=verify_output,
             include_timestamp=True,
         )
@@ -178,14 +180,15 @@ def align_command(project_root: Path) -> int:
 
     # Step 4: Rebuild intent graph
     try:
+        intent_output = config.paths.generated / "intent-graph.ndjson"
         intent_output, intent_nodes, intent_edges = generate_intent_graph(
-            project_root=project_root,
-            output_path=None,
+            project_root=config.project_root,
+            output_path=intent_output,
             include_timestamp=True,
         )
         # Count specs and outcomes from the graph
-        spec_dir = project_root / "jig" / "specifications"
-        outcome_dir = project_root / "jig" / "outcomes"
+        spec_dir = config.paths.specifications
+        outcome_dir = config.paths.outcomes
         spec_count = len(list(spec_dir.glob("*.md"))) if spec_dir.exists() else 0
         outcome_count = len(list(outcome_dir.glob("*.md"))) if outcome_dir.exists() else 0
         click.echo(f"  intent: {spec_count} specs, {outcome_count} outcomes")
@@ -197,8 +200,8 @@ def align_command(project_root: Path) -> int:
     click.echo("\nValidating...")
 
     # Validate intent
-    spec_dir = project_root / "jig" / "specifications"
-    outcome_dir = project_root / "jig" / "outcomes"
+    spec_dir = config.paths.specifications
+    outcome_dir = config.paths.outcomes
 
     intent_ok = True
     if spec_dir.exists():
@@ -217,7 +220,7 @@ def align_command(project_root: Path) -> int:
         return 1
 
     # Validate bricks
-    bricks_file = project_root / "jig" / "bricks.yaml"
+    bricks_file = config.paths.bricks
     if bricks_file.exists():
         def_result = validate_brick_definitions(bricks_file, impl_output)
         part_result = validate_brick_partition(bricks_file, impl_output)

@@ -9,20 +9,21 @@ import yaml
 
 import jig
 from jig.cli.discovery import find_project_root
+from jig.config import JigConfig
 
 
-@jig.implements("S-060")
-def show_overview_command(project_root: Path) -> int:
+@jig.implements("S-060", "S-065")
+def show_overview_command(config: JigConfig) -> int:
     """Display bricks + layers overview.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
-    bricks_file = project_root / "jig" / "bricks.yaml"
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
     if not bricks_file.exists():
         click.echo("No bricks.yaml found.")
@@ -72,18 +73,18 @@ def show_overview_command(project_root: Path) -> int:
     return 0
 
 
-@jig.implements("S-060")
-def show_layers_command(project_root: Path) -> int:
+@jig.implements("S-060", "S-065")
+def show_layers_command(config: JigConfig) -> int:
     """Display layer hierarchy.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
-    bricks_file = project_root / "jig" / "bricks.yaml"
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
     if not bricks_file.exists():
         click.echo("No bricks.yaml found.")
@@ -164,18 +165,18 @@ def show_layers_command(project_root: Path) -> int:
     return 0
 
 
-@jig.implements("S-060")
-def show_bricks_command(project_root: Path) -> int:
+@jig.implements("S-060", "S-065")
+def show_bricks_command(config: JigConfig) -> int:
     """Display brick details.
 
     Args:
-        project_root: Root directory of the project.
+        config: JIG configuration with resolved paths.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
-    bricks_file = project_root / "jig" / "bricks.yaml"
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
     if not bricks_file.exists():
         click.echo("No bricks.yaml found.")

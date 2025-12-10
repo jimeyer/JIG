@@ -1,10 +1,13 @@
 """Main CLI entry point for JIG."""
 
 import sys
+from pathlib import Path
+from typing import Optional
 
 import click
 
 import jig
+from jig.config import ConfigError, JigConfig, load_config
 
 
 class OrderedGroup(click.Group):
@@ -15,6 +18,20 @@ class OrderedGroup(click.Group):
 
 
 from jig.cli.discovery import ProjectNotFoundError, find_project_root
+
+
+def get_config(ctx: click.Context) -> JigConfig:
+    """Get JigConfig from Click context, loading if needed."""
+    if "config" not in ctx.obj:
+        try:
+            project_root = find_project_root()
+        except ProjectNotFoundError as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+        ctx.obj["config"] = load_config(project_root)
+    return ctx.obj["config"]
+
+
 from jig.cli.rebuild import (
     align_command,
     rebuild_all_command,
@@ -37,9 +54,10 @@ from jig.cli.validate import (
 @click.group(cls=OrderedGroup, invoke_without_command=True)
 @click.version_option()
 @click.pass_context
-@jig.implements("S-061")
+@jig.implements("S-061", "S-065")
 def cli(ctx):
     """JIG — Keep specs, code, and tests aligned."""
+    ctx.ensure_object(dict)
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -47,7 +65,7 @@ def cli(ctx):
 # Verb-first rebuild command group (S-058)
 @cli.group(name="rebuild", invoke_without_command=True)
 @click.pass_context
-@jig.implements("S-058")
+@jig.implements("S-058", "S-065")
 def rebuild_group(ctx) -> None:
     """Rebuild JIG graphs.
 
@@ -61,61 +79,45 @@ def rebuild_group(ctx) -> None:
     """
     if ctx.invoked_subcommand is None:
         # No subcommand = rebuild all
-        try:
-            project_root = find_project_root()
-        except ProjectNotFoundError as e:
-            click.echo(f"Error: {e}", err=True)
-            sys.exit(1)
-
-        exit_code = rebuild_all_command(project_root)
+        config = get_config(ctx)
+        exit_code = rebuild_all_command(config)
         sys.exit(exit_code)
 
 
 @rebuild_group.command(name="impl")
-@jig.implements("S-058")
-def rebuild_impl_cli() -> None:
+@click.pass_context
+@jig.implements("S-058", "S-065")
+def rebuild_impl_cli(ctx) -> None:
     """Rebuild implementation graph."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = rebuild_impl_command(project_root)
+    config = get_config(ctx)
+    exit_code = rebuild_impl_command(config)
     sys.exit(exit_code)
 
 
 @rebuild_group.command(name="intent")
-@jig.implements("S-058")
-def rebuild_intent_cli() -> None:
+@click.pass_context
+@jig.implements("S-058", "S-065")
+def rebuild_intent_cli(ctx) -> None:
     """Rebuild intent graph."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = rebuild_intent_command(project_root)
+    config = get_config(ctx)
+    exit_code = rebuild_intent_command(config)
     sys.exit(exit_code)
 
 
 @rebuild_group.command(name="verify")
-@jig.implements("S-058")
-def rebuild_verify_cli() -> None:
+@click.pass_context
+@jig.implements("S-058", "S-065")
+def rebuild_verify_cli(ctx) -> None:
     """Rebuild verification graph."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = rebuild_verify_command(project_root)
+    config = get_config(ctx)
+    exit_code = rebuild_verify_command(config)
     sys.exit(exit_code)
 
 
 @cli.command()
-@jig.implements("S-059")
-def align() -> None:
+@click.pass_context
+@jig.implements("S-059", "S-065")
+def align(ctx) -> None:
     """Run full alignment workflow.
 
     Rebuilds all graphs, validates artifacts, and displays summary.
@@ -124,19 +126,14 @@ def align() -> None:
     Example:
         jigy align
     """
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = align_command(project_root)
+    config = get_config(ctx)
+    exit_code = align_command(config)
     sys.exit(exit_code)
 
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
-@jig.implements("S-061")
+@jig.implements("S-061", "S-065")
 def validate(ctx):
     """Validate JIG artifacts.
 
@@ -150,19 +147,15 @@ def validate(ctx):
     """
     # If no subcommand, run full validation
     if ctx.invoked_subcommand is None:
-        try:
-            project_root = find_project_root()
-        except ProjectNotFoundError as e:
-            click.echo(f"Error: {e}", err=True)
-            sys.exit(1)
-
-        exit_code = validate_full_command(project_root, "human")
+        config = get_config(ctx)
+        exit_code = validate_full_command(config, "human")
         sys.exit(exit_code)
 
 
 @validate.command(name="intent")
-@jig.implements("S-061")
-def validate_intent_cli() -> None:
+@click.pass_context
+@jig.implements("S-061", "S-065")
+def validate_intent_cli(ctx) -> None:
     """Validate intent artifacts (specifications, outcomes, decorators).
 
     Validates human-authored artifacts before any graph generation.
@@ -171,19 +164,15 @@ def validate_intent_cli() -> None:
     Example:
         jigy validate intent
     """
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = validate_intent_command(project_root, "human")
+    config = get_config(ctx)
+    exit_code = validate_intent_command(config, "human")
     sys.exit(exit_code)
 
 
 @validate.command(name="bricks")
-@jig.implements("S-061")
-def validate_bricks_cli() -> None:
+@click.pass_context
+@jig.implements("S-061", "S-065")
+def validate_bricks_cli(ctx) -> None:
     """Validate brick definitions and partition constraints.
 
     Validates brick definitions against implementation graph.
@@ -192,19 +181,15 @@ def validate_bricks_cli() -> None:
     Example:
         jigy validate bricks
     """
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = validate_bricks_command(project_root, "human")
+    config = get_config(ctx)
+    exit_code = validate_bricks_command(config, "human")
     sys.exit(exit_code)
 
 
 @validate.command()
-@jig.implements("S-061")
-def full() -> None:
+@click.pass_context
+@jig.implements("S-061", "S-065")
+def full(ctx) -> None:
     """Run full validation (intent + bricks if graph exists).
 
     Validates all artifacts. Runs intent validation always,
@@ -213,20 +198,15 @@ def full() -> None:
     Example:
         jigy validate full
     """
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = validate_full_command(project_root, "human")
+    config = get_config(ctx)
+    exit_code = validate_full_command(config, "human")
     sys.exit(exit_code)
 
 
 # Show command group (S-060)
 @cli.group(name="show", invoke_without_command=True)
 @click.pass_context
-@jig.implements("S-060")
+@jig.implements("S-060", "S-065")
 def show_group(ctx) -> None:
     """Display JIG structure information.
 
@@ -239,41 +219,28 @@ def show_group(ctx) -> None:
     """
     if ctx.invoked_subcommand is None:
         # No subcommand = show overview
-        try:
-            project_root = find_project_root()
-        except ProjectNotFoundError as e:
-            click.echo(f"Error: {e}", err=True)
-            sys.exit(1)
-
-        exit_code = show_overview_command(project_root)
+        config = get_config(ctx)
+        exit_code = show_overview_command(config)
         sys.exit(exit_code)
 
 
 @show_group.command(name="layers")
-@jig.implements("S-060")
-def show_layers_cli() -> None:
+@click.pass_context
+@jig.implements("S-060", "S-065")
+def show_layers_cli(ctx) -> None:
     """Display layer hierarchy."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = show_layers_command(project_root)
+    config = get_config(ctx)
+    exit_code = show_layers_command(config)
     sys.exit(exit_code)
 
 
 @show_group.command(name="bricks")
-@jig.implements("S-060")
-def show_bricks_cli() -> None:
+@click.pass_context
+@jig.implements("S-060", "S-065")
+def show_bricks_cli(ctx) -> None:
     """Display brick details."""
-    try:
-        project_root = find_project_root()
-    except ProjectNotFoundError as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-
-    exit_code = show_bricks_command(project_root)
+    config = get_config(ctx)
+    exit_code = show_bricks_command(config)
     sys.exit(exit_code)
 
 

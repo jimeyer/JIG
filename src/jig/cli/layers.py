@@ -5,22 +5,24 @@ Layers CLI commands for brick layer visualization.
 import json
 from collections import defaultdict
 from pathlib import Path
+from typing import Union
 
 import click
 import yaml
 
 import jig
+from jig.config import JigConfig
 
 
-@jig.implements("S-040")
-def layers_command(project_root: Path, summary: bool = False, verbose: bool = False) -> int:
+@jig.implements("S-040", "S-065")
+def layers_command(config: JigConfig, summary: bool = False, verbose: bool = False) -> int:
     """
     Visualize brick layer structure.
 
     Returns exit code: 0 (success), 1 (error).
     """
-    bricks_file = project_root / "jig" / "bricks.yaml"
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
     # Check if files exist
     if not impl_graph.exists():

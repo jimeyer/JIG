@@ -4,10 +4,12 @@ Validation CLI commands.
 
 import sys
 from pathlib import Path
+from typing import Union
 
 import click
 
 import jig
+from jig.config import JigConfig
 from jig.validation.bricks import (
     validate_brick_cycles,
     validate_brick_definitions,
@@ -24,16 +26,16 @@ from jig.validation.intent import (
 from jig.validation.reporting import format_as_json
 
 
-@jig.implements("S-023")
-def validate_intent_command(project_root: Path, output_format: str = "human") -> int:
+@jig.implements("S-023", "S-065")
+def validate_intent_command(config: JigConfig, output_format: str = "human") -> int:
     """
     Validate intent artifacts (specifications, outcomes, decorators).
 
     Returns exit code: 0 (success), 1 (validation failures).
     """
-    spec_dir = project_root / "jig" / "specifications"
-    outcome_dir = project_root / "jig" / "outcomes"
-    src_dir = project_root / "src"
+    spec_dir = config.paths.specifications
+    outcome_dir = config.paths.outcomes
+    src_dir = config.paths.source
 
     results = {}
 
@@ -107,15 +109,15 @@ def _combine_results(results: dict) -> "ValidationResult":
     return combined
 
 
-@jig.implements("S-024")
-def validate_bricks_command(project_root: Path, output_format: str = "human") -> int:
+@jig.implements("S-024", "S-065")
+def validate_bricks_command(config: JigConfig, output_format: str = "human") -> int:
     """
     Validate brick definitions and partition against implementation graph.
 
     Returns exit code: 0 (success), 1 (validation failures), 2 (errors).
     """
-    bricks_file = project_root / "jig" / "bricks.yaml"
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
     results = {}
 
@@ -170,8 +172,8 @@ def validate_bricks_command(project_root: Path, output_format: str = "human") ->
     return 0 if all_passed else 1
 
 
-@jig.implements("S-025")
-def validate_full_command(project_root: Path, output_format: str = "human") -> int:
+@jig.implements("S-025", "S-065")
+def validate_full_command(config: JigConfig, output_format: str = "human") -> int:
     """
     Run full validation (intent + bricks if graph exists).
 
@@ -181,14 +183,14 @@ def validate_full_command(project_root: Path, output_format: str = "human") -> i
     if output_format != "json":
         click.echo("=== Validating Intent ===\n")
 
-    intent_exit_code = validate_intent_command(project_root, output_format)
+    intent_exit_code = validate_intent_command(config, output_format)
 
     # Conditionally run brick validation if implementation graph exists
-    impl_graph = project_root / "jig" / "generated" / "implementation-graph.ndjson"
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
     if impl_graph.exists():
         if output_format != "json":
             click.echo("\n=== Validating Bricks ===\n")
-        brick_exit_code = validate_bricks_command(project_root, output_format)
+        brick_exit_code = validate_bricks_command(config, output_format)
     else:
         if output_format != "json":
             click.echo("\n=== Skipping Brick Validation ===")
@@ -205,16 +207,16 @@ def validate_full_command(project_root: Path, output_format: str = "human") -> i
     return 0 if (intent_exit_code == 0 and brick_exit_code == 0) else 1
 
 
-@jig.implements("S-027")
-def auto_validate_decorators(project_root: Path) -> bool:
+@jig.implements("S-027", "S-065")
+def auto_validate_decorators(config: JigConfig) -> bool:
     """
     Auto-validate decorators before graph rebuild.
 
     Returns True if validation passed, False otherwise.
     """
-    spec_dir = project_root / "jig" / "specifications"
-    outcome_dir = project_root / "jig" / "outcomes"
-    src_dir = project_root / "src"
+    spec_dir = config.paths.specifications
+    outcome_dir = config.paths.outcomes
+    src_dir = config.paths.source
 
     if not src_dir.exists() or not spec_dir.exists():
         # No source or specs to validate
