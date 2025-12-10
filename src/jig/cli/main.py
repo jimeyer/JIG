@@ -60,10 +60,10 @@ def rebuild(project_root: Path, verbose: bool) -> None:
     """Run complete JIG rebuild workflow.
 
     Executes all standard JIG commands in sequence:
-    1. Validate artifacts
-    2. Rebuild implementation graph
-    3. Rebuild intent graph
-    4. Rebuild verification graph
+    1. Rebuild implementation graph
+    2. Rebuild verification graph
+    3. Validate artifacts
+    4. Rebuild intent graph
     5. Display layer structure
 
     Example:
@@ -74,18 +74,9 @@ def rebuild(project_root: Path, verbose: bool) -> None:
     if verbose:
         logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    # Step 1: Validate
+    # Step 1: Rebuild implementation graph
     click.echo("=" * 60)
-    click.echo("Step 1/5: Validating JIG artifacts...")
-    click.echo("=" * 60)
-    exit_code = validate_full_command(project_root, "human")
-    if exit_code != 0:
-        click.echo("\n✗ Validation failed. Stopping rebuild.", err=True)
-        sys.exit(exit_code)
-
-    # Step 2: Rebuild implementation graph
-    click.echo("\n" + "=" * 60)
-    click.echo("Step 2/5: Rebuilding implementation graph...")
+    click.echo("Step 1/5: Rebuilding implementation graph...")
     click.echo("=" * 60)
     try:
         impl_output = project_root / "jig" / "generated" / "implementation-graph.ndjson"
@@ -106,27 +97,9 @@ def rebuild(project_root: Path, verbose: bool) -> None:
         click.echo(f"\n✗ Implementation rebuild failed: {e}", err=True)
         sys.exit(1)
 
-    # Step 3: Rebuild intent graph
+    # Step 2: Rebuild verification graph
     click.echo("\n" + "=" * 60)
-    click.echo("Step 3/5: Rebuilding intent graph...")
-    click.echo("=" * 60)
-    try:
-        output_path, node_count, edge_count = generate_intent_graph(
-            project_root=project_root,
-            output_path=None,  # Uses default
-            include_timestamp=True,
-        )
-        click.echo(f"\n✓ Intent graph generated successfully:")
-        click.echo(f"  - Nodes: {node_count}")
-        click.echo(f"  - Edges: {edge_count}")
-        click.echo(f"  - Output: {output_path}")
-    except Exception as e:
-        click.echo(f"\n✗ Intent rebuild failed: {e}", err=True)
-        sys.exit(1)
-
-    # Step 4: Rebuild verification graph
-    click.echo("\n" + "=" * 60)
-    click.echo("Step 4/5: Rebuilding verification graph...")
+    click.echo("Step 2/5: Rebuilding verification graph...")
     click.echo("=" * 60)
     try:
         from jig.verification_graph.builder import build_verification_graph
@@ -144,6 +117,33 @@ def rebuild(project_root: Path, verbose: bool) -> None:
         click.echo(f"  - Output: {verify_output}")
     except Exception as e:
         click.echo(f"\n✗ Verification rebuild failed: {e}", err=True)
+        sys.exit(1)
+
+    # Step 3: Validate artifacts
+    click.echo("\n" + "=" * 60)
+    click.echo("Step 3/5: Validating JIG artifacts...")
+    click.echo("=" * 60)
+    exit_code = validate_full_command(project_root, "human")
+    if exit_code != 0:
+        click.echo("\n✗ Validation failed. Stopping rebuild.", err=True)
+        sys.exit(exit_code)
+
+    # Step 4: Rebuild intent graph
+    click.echo("\n" + "=" * 60)
+    click.echo("Step 4/5: Rebuilding intent graph...")
+    click.echo("=" * 60)
+    try:
+        output_path, node_count, edge_count = generate_intent_graph(
+            project_root=project_root,
+            output_path=None,  # Uses default
+            include_timestamp=True,
+        )
+        click.echo(f"\n✓ Intent graph generated successfully:")
+        click.echo(f"  - Nodes: {node_count}")
+        click.echo(f"  - Edges: {edge_count}")
+        click.echo(f"  - Output: {output_path}")
+    except Exception as e:
+        click.echo(f"\n✗ Intent rebuild failed: {e}", err=True)
         sys.exit(1)
 
     # Step 5: Display layers
