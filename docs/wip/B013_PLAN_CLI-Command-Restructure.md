@@ -38,7 +38,7 @@
 - [x] WU4: Restructure Show Commands — tests ☑ / code ☑
 - [x] WU5: Simplify Validate Commands — tests ☑ / code ☑
 - [x] WU6: Update Help & Root Command — tests ☑ / code ☑
-- [ ] WU7: Clean Break - Remove Old Commands — tests ☐ / code ☐
+- [x] WU7: Clean Break - Remove Old Commands — tests ☑ / code ☑
 
 ---
 
@@ -341,15 +341,15 @@ jigy --unknown-flag
 **Planned Effort**: 60 minutes
 
 **Acceptance Criteria**:
-- [ ] `impl` group removed entirely
-- [ ] `intent` group removed entirely
-- [ ] `verify` group removed entirely
-- [ ] `layers` group removed entirely
-- [ ] `layers suggest` command removed
-- [ ] All removed options deleted (no commented code)
-- [ ] Old tests deleted and replaced
-- [ ] `jigy impl rebuild` fails with "unknown command"
-- [ ] `jigy layers` fails with "unknown command"
+- [x] `impl` group removed entirely
+- [x] `intent` group removed entirely
+- [x] `verify` group removed entirely
+- [x] `layers` group removed entirely
+- [x] `layers suggest` command removed
+- [x] All removed options deleted (no commented code)
+- [x] Old tests deleted and replaced
+- [x] `jigy impl rebuild` fails with "unknown command"
+- [x] `jigy layers` fails with "unknown command"
 
 **Implementation Notes**:
 - Delete old groups from `src/jig/cli/main.py`
@@ -378,7 +378,12 @@ jigy layers suggest
 ```
 
 **Reflect**:
-- (To be filled during execution)
+- Removed ~450 lines from main.py (impl, intent, verify, layers groups + rebuild-old)
+- Removed ~250 lines from layers.py (suggest_layers_command and helpers)
+- Deleted test_layers.py and test_layers_suggest.py
+- Removed 3 tests from test_validate.py that tested old `impl rebuild` command
+- Added test_removed_commands.py with 10 tests verifying old commands fail
+- Final CLI: align, rebuild, show, validate only
 
 ---
 
