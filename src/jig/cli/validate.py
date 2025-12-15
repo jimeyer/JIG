@@ -64,8 +64,14 @@ def validate_intent_command(config: JigConfig, output_format: str = "human") -> 
         results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
 
     # Validate decorators
+    test_dir = config.paths.tests
     if src_dir.exists() and spec_dir.exists():
-        results["decorators"] = validate_decorator_files(src_dir, spec_dir, outcome_dir if outcome_dir.exists() else None)
+        results["decorators"] = validate_decorator_files(
+            src_dir,
+            spec_dir,
+            outcome_dir if outcome_dir.exists() else None,
+            test_dir if test_dir.exists() else None,
+        )
     else:
         from jig.validation.models import ValidationResult
         results["decorators"] = ValidationResult(passed=True, phase_name="decorators", items_checked=0)
@@ -217,12 +223,18 @@ def auto_validate_decorators(config: JigConfig) -> bool:
     spec_dir = config.paths.specifications
     outcome_dir = config.paths.outcomes
     src_dir = config.paths.source
+    test_dir = config.paths.tests
 
     if not src_dir.exists() or not spec_dir.exists():
         # No source or specs to validate
         return True
 
-    result = validate_decorator_files(src_dir, spec_dir, outcome_dir if outcome_dir.exists() else None)
+    result = validate_decorator_files(
+        src_dir,
+        spec_dir,
+        outcome_dir if outcome_dir.exists() else None,
+        test_dir if test_dir.exists() else None,
+    )
 
     if not result.passed:
         click.echo("\n✗ Validation failed before graph generation:")

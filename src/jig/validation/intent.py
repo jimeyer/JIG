@@ -147,6 +147,7 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
 
     seen_ids = {}
     outcome_pattern = re.compile(r"^O-\d+$")
+    total_spec_references = 0
 
     for outcome_file in outcome_files:
         # Parse YAML frontmatter
@@ -229,6 +230,14 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
                     field="brick",
                 )
             )
+
+        # Count spec references
+        specifies = frontmatter.get("specifies", [])
+        if isinstance(specifies, list):
+            total_spec_references += len(specifies)
+
+    # Set detail for display
+    result.detail = f"{len(outcome_files)} files, {total_spec_references} spec references"
 
     return result
 
@@ -320,6 +329,9 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
                 spec_to_outcomes[spec_id].append(outcome_id)
 
     # Check each specification
+    covered_count = 0
+    orphaned_count = 0
+
     for spec_file in spec_files:
         frontmatter = _parse_frontmatter(spec_file)
         if frontmatter is None:
@@ -330,6 +342,7 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
 
         # Check if spec is referenced by any outcome
         if spec_id not in spec_to_outcomes or len(spec_to_outcomes[spec_id]) == 0:
+            orphaned_count += 1
             result.add_error(
                 ValidationError(
                     file=str(spec_file),
@@ -338,6 +351,11 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
                     field="specifies",
                 )
             )
+        else:
+            covered_count += 1
+
+    # Set detail for display
+    result.detail = f"{len(spec_files)} specs: {covered_count} covered, {orphaned_count} orphaned"
 
     return result
 
@@ -347,6 +365,7 @@ def validate_decorator_files(
     source_dir: Path,
     spec_dir: Path,
     outcome_dir: Optional[Path] = None,
+    test_dir: Optional[Path] = None,
 ) -> ValidationResult:
     """
     Validate @jig.implements and @jig.verifies decorators reference valid IDs.
@@ -363,10 +382,25 @@ def validate_decorator_files(
     valid_outcome_ids = _load_outcome_ids(outcome_dir) if outcome_dir else set()
     valid_ids = valid_spec_ids | valid_outcome_ids
 
-    # Find all Python files
+    # Find all Python files in source directory
     python_files = list(source_dir.rglob("*.py"))
-    result.items_checked = len(python_files)
 
+    # Also find Python files in test directory if it exists
+    # Exclude fixture directories
+    test_python_files = []
+    if test_dir and test_dir.exists():
+        test_python_files = [
+            f for f in test_dir.rglob("*.py")
+            if "fixtures" not in f.parts and "fixture" not in f.parts
+        ]
+
+    result.items_checked = len(python_files) + len(test_python_files)
+
+    # Track decorated function counts
+    function_count = 0
+    test_count = 0
+
+    # Process source files
     for py_file in python_files:
         try:
             source = py_file.read_text()
@@ -375,7 +409,9 @@ def validate_decorator_files(
             # Visit all function definitions
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
-                    _validate_function_decorators(node, py_file, valid_ids, result)
+                    has_jig_decorator = _validate_function_decorators(node, py_file, valid_ids, result)
+                    if has_jig_decorator:
+                        function_count += 1
 
         except SyntaxError as e:
             result.add_error(
@@ -394,6 +430,41 @@ def validate_decorator_files(
                     code="PARSE_ERROR",
                 )
             )
+
+    # Process test files
+    for py_file in test_python_files:
+        try:
+            source = py_file.read_text()
+            tree = ast.parse(source, filename=str(py_file))
+
+            # Visit all function definitions
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    has_jig_decorator = _validate_function_decorators(node, py_file, valid_ids, result)
+                    if has_jig_decorator:
+                        test_count += 1
+
+        except SyntaxError as e:
+            result.add_error(
+                ValidationError(
+                    file=str(py_file),
+                    line=e.lineno,
+                    message=f"Python syntax error: {e.msg}",
+                    code="SYNTAX_ERROR",
+                )
+            )
+        except Exception as e:
+            result.add_error(
+                ValidationError(
+                    file=str(py_file),
+                    message=f"Error parsing file: {e}",
+                    code="PARSE_ERROR",
+                )
+            )
+
+    # Set detail for display
+    total_files = len(python_files) + len(test_python_files)
+    result.detail = f"{total_files} files: {function_count} functions, {test_count} tests"
 
     return result
 
@@ -439,12 +510,19 @@ def _validate_function_decorators(
     file_path: Path,
     valid_ids: set[str],
     result: ValidationResult,
-) -> None:
-    """Validate decorators on a function definition."""
+) -> bool:
+    """
+    Validate decorators on a function definition.
+
+    Returns True if the function has any jig decorators, False otherwise.
+    """
+    has_jig_decorator = False
+
     for decorator in func_node.decorator_list:
         # Check for @jig.implements and @jig.verifies
         if isinstance(decorator, ast.Call):
             if _is_jig_decorator(decorator, "implements") or _is_jig_decorator(decorator, "verifies"):
+                has_jig_decorator = True
                 # Check all arguments are string literals
                 for arg in decorator.args:
                     if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
@@ -471,6 +549,8 @@ def _validate_function_decorators(
                                 code="INVALID_DECORATOR_ARGUMENT",
                             )
                         )
+
+    return has_jig_decorator
 
 
 def _is_jig_decorator(call_node: ast.Call, decorator_name: str) -> bool:

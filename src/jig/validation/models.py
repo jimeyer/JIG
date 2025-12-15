@@ -32,6 +32,7 @@ class ValidationResult:
     errors: list[ValidationError] = field(default_factory=list)
     phase_name: str = ""
     items_checked: int = 0
+    detail: Optional[str] = None  # Optional additional detail for display
 
     def add_error(self, error: ValidationError) -> None:
         """Add an error to the result."""
@@ -39,7 +40,13 @@ class ValidationResult:
         self.passed = False
 
     def __str__(self) -> str:
-        if self.passed:
-            return f"✓ Validating {self.phase_name} ({self.items_checked} files)"
+        # Build the display string
+        if self.detail:
+            display = f"{self.detail}"
         else:
-            return f"✗ Validating {self.phase_name} ({self.items_checked} files)"
+            display = f"{self.items_checked} files"
+
+        if self.passed:
+            return f"✓ Validating {self.phase_name} ({display})"
+        else:
+            return f"✗ Validating {self.phase_name} ({display})"
