@@ -36,7 +36,7 @@ B-cli (layer 1)
 - [x] WU0: Create Intent nodes (O-021, S-066, S-067) — bricks.yaml deferred to WU1
 - [x] WU1: CLI + coverage collection — tests ☑ / code ☑ / docs ☑
 - [x] WU2: T→F extraction — tests ☑ / code ☑ / docs ☑
-- [ ] WU3: Record file writer — tests ☐ / code ☐ / docs ☐
+- [x] WU3: Record file writer — tests ☑ / code ☑ / docs ☑
 - [ ] WU4: End-to-end integration — tests ☐ / code ☐ / docs ☐
 
 ## Work Units
@@ -236,11 +236,11 @@ python -c "from jig.audit.coverage import extract_tf_edges; print(extract_tf_edg
 **Implements**: S-067 (Coverage Record Format)
 
 **Acceptance Criteria**:
-- [ ] Record file created at `jig/audits/records/coverage-YYYY-MM-DD.ndjson`
-- [ ] Each line is valid JSON with edge, from, to, result fields
-- [ ] Lines sorted by from.id then to.id
-- [ ] jig_hash included for both test and function nodes
-- [ ] `.coverage` deleted after successful processing
+- [x] Record file created at `jig/audits/records/coverage-YYYY-MM-DD.ndjson`
+- [x] Each line is valid JSON with edge, from, to, result fields
+- [x] Lines sorted by from.id then to.id
+- [x] jig_hash included for both test and function nodes
+- [x] `.coverage` deleted after successful processing
 
 **Implementation Notes**:
 - Approach:

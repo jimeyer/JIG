@@ -77,3 +77,4 @@ bricks:
     layer: 1
     units:
       - M-jig.audit.coverage
+      - M-jig.audit.record_writer
