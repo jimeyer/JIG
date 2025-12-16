@@ -8,11 +8,11 @@
 ## Known Intent (Created Before Coding)
 
 **Outcomes**:
-- O-005: Verifiable Test-to-Implementation Coverage
+- O-021: Verifiable Test-to-Implementation Coverage
 
 **Specifications**:
-- S-030: T→F Edge Collection via Coverage
-- S-031: Coverage Record Format
+- S-066: T→F Edge Collection via Coverage
+- S-067: Coverage Record Format
 
 **Bricks Affected**:
 
@@ -33,7 +33,7 @@ B-cli (layer 1)
 
 ## Work Unit Checklist
 
-- [ ] WU0: Create Intent nodes (O-005, S-030, S-031) and update bricks.yaml
+- [x] WU0: Create Intent nodes (O-021, S-066, S-067) — bricks.yaml deferred to WU1
 - [ ] WU1: CLI + coverage collection — tests ☐ / code ☐ / docs ☐
 - [ ] WU2: T→F extraction — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Record file writer — tests ☐ / code ☐ / docs ☐
@@ -46,19 +46,19 @@ B-cli (layer 1)
 **Goal**: Define outcome, specifications, and register new brick before writing code.
 
 **Acceptance Criteria**:
-- [ ] O-005 created in `jig/outcomes/`
-- [ ] S-030 and S-031 created in `jig/specifications/`
-- [ ] B-audit brick added to `jig/bricks.yaml`
-- [ ] `jigy validate` passes
+- [x] O-021 created in `jig/outcomes/`
+- [x] S-066 and S-067 created in `jig/specifications/`
+- [ ] B-audit brick added to `jig/bricks.yaml` (deferred until modules exist in WU1)
+- [x] `jigy validate` passes
 
 **Outcome to Create:**
 
-**O-005: Verifiable Test-to-Implementation Coverage**
+**O-021: Verifiable Test-to-Implementation Coverage**
 ```markdown
 ---
-id: O-005
+id: O-021
 type: outcome
-specifies: [S-030, S-031]
+specifies: [S-066, S-067]
 ---
 
 # Verifiable Test-to-Implementation Coverage
@@ -78,12 +78,11 @@ implementation—preventing false confidence in test suites.
 
 **Specifications to Create:**
 
-**S-030: T→F Edge Collection via Coverage**
+**S-066: T→F Edge Collection via Coverage**
 ```markdown
 ---
-id: S-030
+id: S-066
 type: specification
-implements: [O-005]
 ---
 
 # T→F Edge Collection via Coverage
@@ -101,12 +100,11 @@ the test suite with coverage instrumentation.
 unlike F→S and T→S which require semantic judgment.
 ```
 
-**S-031: Coverage Record Format**
+**S-067: Coverage Record Format**
 ```markdown
 ---
-id: S-031
+id: S-067
 type: specification
-implements: [O-005]
 ---
 
 # Coverage Record Format
@@ -152,7 +150,7 @@ comparing coverage across runs. Content hashes enable staleness detection.
 
 **Goal**: Add `jigy audit coverage` command that runs pytest with coverage instrumentation.
 
-**Implements**: S-030 (T→F Edge Collection via Coverage)
+**Implements**: S-066 (T→F Edge Collection via Coverage)
 
 **Acceptance Criteria**:
 - [ ] `jigy audit coverage` command exists and is callable
@@ -171,13 +169,13 @@ comparing coverage across runs. Content hashes enable staleness detection.
   - `src/jig/cli/audit.py` (new) — CLI command in B-cli
   - `src/jig/audit/__init__.py` (new) — B-audit package
   - `src/jig/audit/coverage.py` (new) — coverage collection logic
-- Decorators: `@jig.implements("S-030")`
+- Decorators: `@jig.implements("S-066")`
 
 **Test Plan**:
 - Unit tests: Command construction, directory creation
 - Integration test: Run on fixture project, verify .coverage created
 - Test file: `test/audit/test_coverage.py`
-- Decorators: `@jig.verifies("S-030")`
+- Decorators: `@jig.verifies("S-066")`
 
 **Human Verification**:
 ```bash
@@ -193,7 +191,7 @@ ls jig/audits/records/        # Directory should exist
 
 **Goal**: Parse `.coverage` database and map to function IDs using implementation graph.
 
-**Implements**: S-030 (T→F Edge Collection via Coverage)
+**Implements**: S-066 (T→F Edge Collection via Coverage)
 
 **Acceptance Criteria**:
 - [ ] Read `.coverage` SQLite database
@@ -212,7 +210,7 @@ ls jig/audits/records/        # Directory should exist
   6. Collapse parametrized test variants to single test ID
 - Files:
   - `src/jig/audit/coverage.py` — extend with parsing logic
-- Decorators: `@jig.implements("S-030")`
+- Decorators: `@jig.implements("S-066")`
 
 **Test Plan**:
 - Unit tests:
@@ -221,7 +219,7 @@ ls jig/audits/records/        # Directory should exist
   - Handle nested functions (map to outermost)
   - Handle parametrized tests (collapse variants)
 - Test file: `test/audit/test_coverage.py`
-- Decorators: `@jig.verifies("S-030")`
+- Decorators: `@jig.verifies("S-066")`
 
 **Human Verification**:
 ```bash
@@ -235,7 +233,7 @@ python -c "from jig.audit.coverage import extract_tf_edges; print(extract_tf_edg
 
 **Goal**: Write T→F edges to NDJSON record file with proper format.
 
-**Implements**: S-031 (Coverage Record Format)
+**Implements**: S-067 (Coverage Record Format)
 
 **Acceptance Criteria**:
 - [ ] Record file created at `jig/audits/records/coverage-YYYY-MM-DD.ndjson`
@@ -254,7 +252,7 @@ python -c "from jig.audit.coverage import extract_tf_edges; print(extract_tf_edg
   6. Delete `.coverage`
 - Files:
   - `src/jig/audit/record_writer.py` (new)
-- Decorators: `@jig.implements("S-031")`
+- Decorators: `@jig.implements("S-067")`
 
 **Test Plan**:
 - Unit tests:
@@ -263,7 +261,7 @@ python -c "from jig.audit.coverage import extract_tf_edges; print(extract_tf_edg
   - jig_hash inclusion
   - File cleanup after write
 - Test file: `test/audit/test_record_writer.py`
-- Decorators: `@jig.verifies("S-031")`
+- Decorators: `@jig.verifies("S-067")`
 
 **Human Verification**:
 ```bash
@@ -281,7 +279,7 @@ grep "T-test_" jig/audits/records/coverage-*.ndjson | head -3
 
 **Goal**: Wire all components together and verify complete pipeline.
 
-**Implements**: S-030, S-031 (integration of both specs)
+**Implements**: S-066, S-067 (integration of both specs)
 
 **Acceptance Criteria**:
 - [ ] `jigy audit coverage` produces valid record file end-to-end
@@ -300,13 +298,13 @@ grep "T-test_" jig/audits/records/coverage-*.ndjson | head -3
 - Files:
   - `src/jig/cli/audit.py` — wire components
   - `src/jig/audit/coverage.py` — add run_coverage_audit() orchestrator
-- Decorators: `@jig.implements("S-030")`, `@jig.implements("S-031")`
+- Decorators: `@jig.implements("S-066")`, `@jig.implements("S-067")`
 
 **Test Plan**:
 - Integration test: Full pipeline on fixture project
 - Error handling tests: Missing impl graph, missing verify graph, test failures
 - Test file: `test/audit/test_coverage_integration.py`
-- Decorators: `@jig.verifies("S-030")`, `@jig.verifies("S-031")`
+- Decorators: `@jig.verifies("S-066")`, `@jig.verifies("S-067")`
 
 **Human Verification**:
 ```bash
@@ -374,10 +372,10 @@ test/audit/
 
 jig/
 ├── outcomes/
-│   └── O-005.md         # NEW: Verifiable Test-to-Implementation Coverage
+│   └── O-021.md         # NEW: Verifiable Test-to-Implementation Coverage
 ├── specifications/
-│   ├── S-030.md         # NEW: T→F Edge Collection
-│   └── S-031.md         # NEW: Coverage Record Format
+│   ├── S-066.md         # NEW: T→F Edge Collection
+│   └── S-067.md         # NEW: Coverage Record Format
 ├── bricks.yaml          # Updated: add B-audit brick
 └── audits/
     └── records/         # Created by command
