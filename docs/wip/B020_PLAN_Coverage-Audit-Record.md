@@ -37,7 +37,7 @@ B-cli (layer 1)
 - [x] WU1: CLI + coverage collection — tests ☑ / code ☑ / docs ☑
 - [x] WU2: T→F extraction — tests ☑ / code ☑ / docs ☑
 - [x] WU3: Record file writer — tests ☑ / code ☑ / docs ☑
-- [ ] WU4: End-to-end integration — tests ☐ / code ☐ / docs ☐
+- [x] WU4: End-to-end integration — tests ☑ / code ☑ / docs ☑
 
 ## Work Units
 
@@ -282,12 +282,12 @@ grep "T-test_" jig/audits/records/coverage-*.ndjson | head -3
 **Implements**: S-066, S-067 (integration of both specs)
 
 **Acceptance Criteria**:
-- [ ] `jigy audit coverage` produces valid record file end-to-end
-- [ ] Record file grep-able for test and function queries
-- [ ] Missing implementation graph produces helpful error
-- [ ] Missing verification graph produces helpful error
-- [ ] Multiple runs overwrite same-day record
-- [ ] Basic progress/summary output displayed
+- [x] `jigy audit coverage` produces valid record file end-to-end
+- [x] Record file grep-able for test and function queries
+- [x] Missing implementation graph produces helpful error
+- [x] Missing verification graph produces helpful error
+- [x] Multiple runs overwrite same-day record
+- [x] Basic progress/summary output displayed
 
 **Implementation Notes**:
 - Approach:

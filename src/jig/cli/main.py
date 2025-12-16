@@ -264,13 +264,12 @@ def audit_group(ctx) -> None:
 
 @audit_group.command(name="coverage")
 @click.pass_context
-@jig.implements("S-066")
+@jig.implements("S-066", "S-067")
 def audit_coverage_cli(ctx) -> None:
-    """Run coverage audit to collect T→F edges.
+    """Run full coverage audit pipeline.
 
-    Executes pytest with coverage instrumentation to determine which
-    tests execute which functions. Results are stored in the .coverage
-    file for later processing.
+    Runs tests with coverage, extracts T→F edges, and writes
+    results to jig/audits/records/coverage-YYYY-MM-DD.ndjson.
 
     Example:
         jigy audit coverage
