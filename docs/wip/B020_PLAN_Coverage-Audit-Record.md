@@ -34,7 +34,7 @@ B-cli (layer 1)
 ## Work Unit Checklist
 
 - [x] WU0: Create Intent nodes (O-021, S-066, S-067) — bricks.yaml deferred to WU1
-- [ ] WU1: CLI + coverage collection — tests ☐ / code ☐ / docs ☐
+- [x] WU1: CLI + coverage collection — tests ☑ / code ☑ / docs ☑
 - [ ] WU2: T→F extraction — tests ☐ / code ☐ / docs ☐
 - [ ] WU3: Record file writer — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: End-to-end integration — tests ☐ / code ☐ / docs ☐
@@ -48,7 +48,7 @@ B-cli (layer 1)
 **Acceptance Criteria**:
 - [x] O-021 created in `jig/outcomes/`
 - [x] S-066 and S-067 created in `jig/specifications/`
-- [ ] B-audit brick added to `jig/bricks.yaml` (deferred until modules exist in WU1)
+- [x] B-audit brick added to `jig/bricks.yaml` (completed in WU1)
 - [x] `jigy validate` passes
 
 **Outcome to Create:**
@@ -153,11 +153,11 @@ comparing coverage across runs. Content hashes enable staleness detection.
 **Implements**: S-066 (T→F Edge Collection via Coverage)
 
 **Acceptance Criteria**:
-- [ ] `jigy audit coverage` command exists and is callable
-- [ ] Pytest runs with `--cov=src --cov-context=test`
-- [ ] Coverage data written to `.coverage` file
-- [ ] Creates `jig/audits/records/` directory if missing
-- [ ] Test failures captured (exit code 1) but coverage still collected
+- [x] `jigy audit coverage` command exists and is callable
+- [x] Pytest runs with `--cov=src --cov-context=test`
+- [x] Coverage data written to `.coverage` file
+- [x] Creates `jig/audits/records/` directory if missing
+- [x] Test failures captured (exit code 1) but coverage still collected
 
 **Implementation Notes**:
 - Approach:

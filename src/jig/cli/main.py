@@ -32,6 +32,7 @@ def get_config(ctx: click.Context) -> JigConfig:
     return ctx.obj["config"]
 
 
+from jig.cli.audit import coverage_command
 from jig.cli.rebuild import (
     align_command,
     rebuild_all_command,
@@ -241,6 +242,41 @@ def show_bricks_cli(ctx) -> None:
     """Display brick details."""
     config = get_config(ctx)
     exit_code = show_bricks_command(config)
+    sys.exit(exit_code)
+
+
+# Audit command group (S-066)
+@cli.group(name="audit", invoke_without_command=True)
+@click.pass_context
+@jig.implements("S-066")
+def audit_group(ctx) -> None:
+    """Run audits to collect alignment evidence.
+
+    Audits collect objective data about code relationships through
+    execution-based analysis.
+
+    Example:
+        jigy audit coverage    # Run coverage audit for T→F edges
+    """
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+
+
+@audit_group.command(name="coverage")
+@click.pass_context
+@jig.implements("S-066")
+def audit_coverage_cli(ctx) -> None:
+    """Run coverage audit to collect T→F edges.
+
+    Executes pytest with coverage instrumentation to determine which
+    tests execute which functions. Results are stored in the .coverage
+    file for later processing.
+
+    Example:
+        jigy audit coverage
+    """
+    config = get_config(ctx)
+    exit_code = coverage_command(config)
     sys.exit(exit_code)
 
 
