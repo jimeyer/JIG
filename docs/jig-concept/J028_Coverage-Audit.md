@@ -3,7 +3,7 @@
 **Status:** Proposal
 **Date:** 2025-12-16
 **Extends:** J026 (Audit Architecture Simplification)
-**Part of:** J026 T→F audit support
+**Refines:** J023 (Audit Records and Triggers) for T→F edges
 
 ---
 
@@ -27,7 +27,7 @@ The three fast graphs (intent, implementation, verification) are built by parsin
 
 1. **Slow** — Requires running the test suite with coverage instrumentation
 2. **Execution-dependent** — Results depend on runtime behavior, not just source
-3. **Ephemeral source data** — Raw coverage data is intermediate; the audit log is the record
+3. **Ephemeral source data** — Raw coverage data is intermediate; the audit record is the result
 
 Coverage fits the audit model: collect evidence, make a determination, record the result.
 
@@ -35,15 +35,47 @@ Coverage fits the audit model: collect evidence, make a determination, record th
 
 1. **Simple T→F edges** — Binary "covered" or "not_covered" per test/function pair
 2. **Mid-altitude granularity** — "Did test T execute ≥1 line of function F?"
-3. **Grep-able report** — One T→F pair per line for easy filtering
-4. **Ephemeral raw data** — Discard `.coverage` after processing; audit log is source of truth
-5. **J026 compatible** — T→F edges use the standard audit log schema
+3. **Grep-able record** — One T→F pair per line for easy filtering
+4. **Ephemeral raw data** — Discard `.coverage` after processing
+5. **Two-level storage** — Audit log entry points to detailed record file
 
 ---
 
 ## Decision
 
-### 1. Command: `jigy audit coverage`
+### 1. Two-Level Audit Model
+
+Coverage audits use a **two-level model** that separates the audit activity from its detailed results:
+
+```
+jig/audits/
+├── audit-log.ndjson              # One entry per audit activity
+└── records/
+    └── coverage-2025-12-16.ndjson  # Detailed T→F edges (NDJSON)
+```
+
+**Why two levels?**
+
+| Approach | Coverage Run | Problem |
+|----------|--------------|---------|
+| Per-edge rows | 1000 T→F edges = 1000 rows | Log bloat, redundant metadata |
+| Per-activity | 1 row pointing to record | Clean log, detail in record |
+
+The audit log stays compact (one entry per coverage run). The record file contains the detailed T→F edges.
+
+**Contrast with semantic audits (F→S, T→S):**
+
+| Audit Type | Log Points To | File Type | Contains |
+|------------|---------------|-----------|----------|
+| Coverage (T→F) | `record` | NDJSON | T→F edges (structured data) |
+| Semantic (F→S, T→S) | `report` | Markdown | Reasoning + frontmatter (prose) |
+
+Coverage produces structured data → NDJSON record.
+Semantic audits produce reasoning → Markdown report.
+
+---
+
+### 2. Command: `jigy audit coverage`
 
 Per A002 (CLI Command Architecture), coverage audit uses verb-first with noun subcommand:
 
@@ -54,8 +86,8 @@ jigy audit coverage    # Run coverage analysis, record T→F edges
 **Behavior:**
 1. Run test suite with coverage instrumentation
 2. Parse coverage data to extract T→F relationships
-3. Write T→F edges to `jig/audits/audit-log.ndjson`
-4. Write human-readable report to `jig/audits/audit-coverage-YYYY-MM-DD.md`
+3. Write detailed T→F edges to `jig/audits/records/coverage-YYYY-MM-DD.ndjson`
+4. Append one activity entry to `jig/audits/audit-log.ndjson`
 5. Discard raw coverage data
 
 **Exit codes:**
@@ -65,7 +97,7 @@ jigy audit coverage    # Run coverage analysis, record T→F edges
 
 ---
 
-### 2. T→F Edge Definition
+### 3. T→F Edge Definition
 
 A T→F edge exists when **test T executed at least one line of function F**.
 
@@ -87,113 +119,169 @@ This is a solid mid-altitude first pass. More granular tooling can be built on t
 
 ---
 
-### 3. Audit Log Schema (per J026)
+### 4. Audit Log Entry Schema
 
-T→F edges are recorded in `jig/audits/audit-log.ndjson` using the J026 schema:
+The audit log entry for a coverage run:
 
 ```json
 {
-  "edge": "T→F",
+  "id": "coverage-2025-12-16",
+  "type": "coverage",
   "git_commit": "abc1234",
-  "from": {
-    "id": "T-test_auth.test_login",
-    "jig_hash": "a1b2c3d4e5f6"
+  "timestamp": "2025-12-16T14:32:00Z",
+  "method": "pytest-cov",
+  "summary": {
+    "tests": 89,
+    "functions": 312,
+    "edges": 847
   },
-  "to": {
-    "id": "F-auth.authenticate",
-    "jig_hash": "b2c3d4e5f6a7"
-  },
-  "report": {
-    "result": "covered",
-    "confidence": 1.0,
-    "method": "pytest-cov",
-    "file": "audit-coverage-2025-12-16.md"
-  }
+  "record": "records/coverage-2025-12-16.ndjson"
 }
 ```
 
-**Field notes:**
-- `edge`: Always `"T→F"` for coverage audits
-- `git_commit`: Current HEAD at audit time
-- `from.id`: Test node ID (matches verification graph)
-- `from.jig_hash`: Test's content hash (from J022)
-- `to.id`: Function node ID (matches implementation graph)
-- `to.jig_hash`: Function's content hash (from J022)
-- `report.result`: `"covered"` or `"not_covered"`
-- `report.confidence`: Always `1.0` (coverage is deterministic)
-- `report.method`: `"pytest-cov"` (or other coverage tool)
-- `report.file`: Path to human-readable report
+**Field definitions:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier for this audit activity |
+| `type` | enum | `"coverage"` for T→F coverage audits |
+| `git_commit` | string | Git commit at audit time |
+| `timestamp` | ISO 8601 | When audit was performed |
+| `method` | string | Coverage tool used (e.g., `"pytest-cov"`) |
+| `summary` | object | Counts: tests, functions, edges |
+| `record` | string | Path to detailed record file (NDJSON) |
+
+**Note:** Coverage uses `record` (NDJSON). Semantic audits use `report` (Markdown). These are mutually exclusive fields.
 
 ---
 
-### 4. Report Format
+### 5. Record File Format
 
-The report is stored at `jig/audits/audit-coverage-YYYY-MM-DD.md`.
+The record file contains detailed T→F edges in **NDJSON format** (one edge per line):
 
-**Design principle:** One T→F pair per line, grep-able.
+**Location:** `jig/audits/records/coverage-YYYY-MM-DD.ndjson`
 
-```markdown
-# Coverage Audit Report
-
-**Date:** 2025-12-16T14:32:00Z
-**Commit:** abc1234
-**Method:** pytest-cov
-**Tests:** 89
-**Functions:** 312
-**T→F edges:** 847
-
----
-
-T-test_auth.test_login: F-auth.authenticate
-T-test_auth.test_login: F-auth.validate_token
-T-test_auth.test_login: F-auth.hash_password
-T-test_auth.test_logout: F-auth.invalidate_session
-T-test_auth.test_logout: F-auth.clear_cookie
-T-test_crdt.test_merge: F-crdt.lww.merge
-T-test_crdt.test_merge: F-crdt.lww.timestamp_compare
-T-test_crdt.test_converge: F-crdt.lww.merge
-T-test_crdt.test_converge: F-crdt.primitives.deep_merge
-...
+**Format:**
+```ndjson
+{"edge":"T→F","from":{"id":"T-test_auth.test_login","jig_hash":"a1b2c3"},"to":{"id":"F-auth.authenticate","jig_hash":"d4e5f6"},"result":"covered"}
+{"edge":"T→F","from":{"id":"T-test_auth.test_login","jig_hash":"a1b2c3"},"to":{"id":"F-auth.validate_token","jig_hash":"e5f6a7"},"result":"covered"}
+{"edge":"T→F","from":{"id":"T-test_auth.test_logout","jig_hash":"b2c3d4"},"to":{"id":"F-auth.invalidate_session","jig_hash":"f6a7b8"},"result":"covered"}
 ```
 
-**Usage:**
+**Edge record fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `edge` | enum | Always `"T→F"` for coverage |
+| `from.id` | string | Test node ID |
+| `from.jig_hash` | string | Test content hash at audit time |
+| `to.id` | string | Function node ID |
+| `to.jig_hash` | string | Function content hash at audit time |
+| `result` | enum | `"covered"` or `"not_covered"` |
+
+**Grep-ability preserved:**
 ```bash
 # What does test_login cover?
-grep "T-test_auth.test_login:" jig/audits/audit-coverage-*.md
+grep "T-test_auth.test_login" jig/audits/records/coverage-*.ndjson
 
 # What tests cover authenticate?
-grep "F-auth.authenticate$" jig/audits/audit-coverage-*.md
+grep "F-auth.authenticate" jig/audits/records/coverage-*.ndjson
+
+# Convert to simple format
+jq -r '"\(.from.id): \(.to.id)"' records/coverage-2025-12-16.ndjson
 
 # Count edges
-wc -l < jig/audits/audit-coverage-2025-12-16.md
+wc -l < jig/audits/records/coverage-2025-12-16.ndjson
 
 # Diff between runs
-diff audit-coverage-2025-12-15.md audit-coverage-2025-12-16.md
+diff records/coverage-2025-12-15.ndjson records/coverage-2025-12-16.ndjson
 ```
 
-**Sorting:** Lines are sorted by test ID (T), then by function ID (F).
+**Sorting:** Lines are sorted by test ID (from.id), then by function ID (to.id).
 
 ---
 
-### 5. Raw Coverage Data Lifecycle
+### 6. Trigger Detection for T→F Edges
+
+T→F trigger detection works differently from F→S and T→S because edges are stored in record files, not directly in the log.
+
+**Algorithm:**
+
+```python
+def detect_tf_triggers(
+    current_impl_graph: Graph,
+    current_verif_graph: Graph,
+    latest_coverage_record: Path
+) -> list[Trigger]:
+    """
+    Detect T→F edges needing re-audit.
+
+    Compare current node hashes to hashes in latest coverage record.
+    """
+    triggers = []
+
+    # Load latest coverage record
+    if not latest_coverage_record.exists():
+        # No coverage audit yet - all potential T→F edges are "new"
+        return [Trigger(type="new", ...)]
+
+    recorded_edges = load_ndjson(latest_coverage_record)
+    recorded_by_key = {
+        (r['from']['id'], r['to']['id']): r
+        for r in recorded_edges
+    }
+
+    # Check each test/function pair
+    for test in current_verif_graph.tests():
+        for func in current_impl_graph.functions():
+            key = (test.id, func.id)
+            recorded = recorded_by_key.get(key)
+
+            if recorded is None:
+                # New pair (test or function added since last coverage)
+                triggers.append(Trigger(key, reason='new'))
+            elif recorded['from']['jig_hash'] != test.jig_hash:
+                triggers.append(Trigger(key, reason='test_changed'))
+            elif recorded['to']['jig_hash'] != func.jig_hash:
+                triggers.append(Trigger(key, reason='function_changed'))
+
+    return triggers
+```
+
+**Trigger reasons for T→F:**
+
+| Reason | Meaning | Action |
+|--------|---------|--------|
+| `new` | No coverage record exists | Run `jigy audit coverage` |
+| `test_changed` | Test jig_hash changed | Re-run coverage |
+| `function_changed` | Function jig_hash changed | Re-run coverage |
+
+**Practical implication:** Any code change to a test or function triggers a full coverage re-run. This is acceptable because:
+- Coverage runs are typically part of CI anyway
+- Partial coverage updates are complex and error-prone
+- Full runs ensure consistency
+
+---
+
+### 7. Raw Coverage Data Lifecycle
 
 Raw coverage data (`.coverage` file, JSON exports) is **ephemeral**:
 
 ```
-[pytest --cov]  →  [.coverage]  →  [parse T→F]  →  [audit-log.ndjson]
+[pytest --cov]  →  [.coverage]  →  [parse T→F]  →  [record file]
                        ↓                              ↓
-                  (discard)                     (source of truth)
+                  (discard)                    (source of truth)
 ```
 
 **Rationale:**
 - Raw coverage data is large and redundant once T→F edges are extracted
-- The audit log is the canonical record
+- The record file is the canonical record
 - Like `pytest --cov` overwrites `.coverage` each run, we don't accumulate raw data
 - If more granular data is needed later, re-run coverage
 
 ---
 
-### 6. Coverage Collection Strategy
+### 8. Coverage Collection Strategy
 
 **Default implementation (pytest-cov):**
 
@@ -237,7 +325,7 @@ def extract_tf_edges(coverage_data: CoverageData) -> list[tuple[str, str]]:
 
 ---
 
-### 7. Integration with Existing Graphs
+### 9. Integration with Existing Graphs
 
 Coverage audit requires the implementation graph to exist (to map lines → functions):
 
@@ -254,9 +342,9 @@ jigy audit coverage   # Uses impl graph to resolve F nodes
 
 ---
 
-### 8. Handling Edge Cases
+### 10. Handling Edge Cases
 
-#### 8.1 Test Covers Function Not in Graph
+#### 10.1 Test Covers Function Not in Graph
 
 If a test covers a function that isn't in the implementation graph (no `@jig.implements`):
 
@@ -264,21 +352,21 @@ If a test covers a function that isn't in the implementation graph (no `@jig.imp
 - The function ID is still generated: `F-{module}.{function_name}`
 - These edges are useful for coverage visibility even without spec alignment
 
-#### 8.2 Nested Functions / Closures
+#### 10.2 Nested Functions / Closures
 
 Coverage at line level may hit inner functions. For simplicity:
 
 - Map to the **outermost function** containing the line
 - Inner functions don't get separate F nodes (they're part of the parent)
 
-#### 8.3 Test Fixtures and Conftest
+#### 10.3 Test Fixtures and Conftest
 
 Coverage from fixtures is attributed to the test that invoked them:
 
 - `conftest.py` functions covered during `test_foo` → edges from `T-test_foo`
 - This matches pytest's execution model
 
-#### 8.4 Parametrized Tests
+#### 10.4 Parametrized Tests
 
 Parametrized tests (e.g., `test_foo[case1]`, `test_foo[case2]`) are collapsed:
 
@@ -290,12 +378,22 @@ Parametrized tests (e.g., `test_foo[case1]`, `test_foo[case2]`) are collapsed:
 
 ## Resulting Artifacts
 
+### File Structure
+
+```
+jig/audits/
+├── audit-log.ndjson                    # Audit activity log
+└── records/
+    ├── coverage-2025-12-15.ndjson      # Previous coverage record
+    └── coverage-2025-12-16.ndjson      # Latest coverage record
+```
+
 ### Files Written
 
 | File | Content |
 |------|---------|
-| `jig/audits/audit-log.ndjson` | Appended T→F edge records |
-| `jig/audits/audit-coverage-YYYY-MM-DD.md` | Human-readable T→F listing |
+| `jig/audits/audit-log.ndjson` | One entry appended per coverage run |
+| `jig/audits/records/coverage-YYYY-MM-DD.ndjson` | All T→F edges from this run |
 
 ### Files Read
 
@@ -308,7 +406,7 @@ Parametrized tests (e.g., `test_foo[case1]`, `test_foo[case2]`) are collapsed:
 
 | File | Reason |
 |------|--------|
-| `.coverage` | Ephemeral; audit log is source of truth |
+| `.coverage` | Ephemeral; record file is source of truth |
 
 ---
 
@@ -349,8 +447,8 @@ jigy audit history F-auth.authenticate
 1. Coverage collection wrapper (pytest-cov invocation)
 2. Coverage data parser (extract T→F from `.coverage`)
 3. Line-to-function mapper (using implementation graph)
-4. Audit log writer (J026 schema)
-5. Report generator (grep-able format)
+4. Record file writer (NDJSON format)
+5. Audit log entry writer
 
 ### Phase 2: CLI Integration
 
@@ -362,7 +460,7 @@ jigy audit history F-auth.authenticate
 
 1. Error handling (test failures, missing graphs)
 2. Progress output during coverage run
-3. Summary statistics in report header
+3. Summary statistics in log entry
 
 ---
 
@@ -371,26 +469,27 @@ jigy audit history F-auth.authenticate
 ```
 jigy audit coverage:
   - Runs test suite with coverage
-  - Produces T→F edges in audit-log.ndjson
-  - Produces grep-able report
+  - Produces record file with T→F edges
+  - Appends one entry to audit log
   - Discards raw coverage data
 
-Report format:
-  - One T: F per line
+Record format:
+  - NDJSON, one edge per line
   - Sorted by test, then function
   - Grep-able for both T and F queries
+  - Contains jig_hash for trigger detection
 
 Integration:
   - jigy audit shows T→F status
   - jigy audit history shows T→F edges
-  - T→F trigger detection works (hash comparison)
+  - T→F trigger detection works (compare to latest record)
 ```
 
 ---
 
 ## Open Questions
 
-1. **Multiple runs per day?** Report naming uses YYYY-MM-DD. If run multiple times, overwrite or append timestamp? (Suggest: overwrite, audit log has full history anyway)
+1. **Multiple runs per day?** Record naming uses YYYY-MM-DD. If run multiple times, overwrite or add timestamp suffix? (Suggest: overwrite, previous run is superseded)
 
 2. **Partial coverage runs?** Should we support running coverage on a subset of tests? (Suggest: future scope, full suite first)
 
@@ -400,11 +499,12 @@ Integration:
 
 ## References
 
-- **J026:** Audit Architecture Simplification (T→F as first-class audit type)
+- **J026:** Audit Architecture Simplification (audit model)
+- **J023:** Audit Records and Triggers (two-level model)
 - **J022:** Content Hashing (jig_hash for T and F nodes)
 - **A002:** CLI Command Architecture (verb-first commands)
 - **A001:** Core Artifacts Contract (graph schemas)
 
 ---
 
-_Coverage tells you what ran. The audit log remembers._
+_Coverage tells you what ran. The record remembers._

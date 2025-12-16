@@ -3,6 +3,18 @@
 **Status:** Proposal
 **Date:** 2025-12-07
 **Refactors:** J023, J024
+**Refined by:** J023 (revised 2025-12-16), J028 (Coverage Audit)
+
+---
+
+## Note: Two-Level Model Evolution
+
+This document established the foundational architecture for JIG audits. The implementation has evolved to use a **two-level model**:
+
+1. **Audit Log** — One entry per audit activity (not per edge)
+2. **Detail Files** — Records (NDJSON) for coverage, Reports (Markdown) for semantic audits
+
+See J023 (revised) for the current schema and J028 for coverage audit specifics. The principles in this document remain valid; the storage model has been refined.
 
 ---
 
