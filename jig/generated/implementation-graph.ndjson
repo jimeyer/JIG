@@ -1,4 +1,5 @@
-{"_meta": {"edge_count": 625, "generated": "2025-12-16T22:00:54.657175+00:00", "node_count": 397, "version": "1.0"}}
+{"_meta": {"edge_count": 647, "generated": "2025-12-16T22:09:39.301646+00:00", "node_count": 410, "version": "1.0"}}
+{"bases": [], "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "C-jig.audit.coverage.TFEdge", "language": "python", "line": 97, "name": "TFEdge", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/cli/discovery.py", "git_blob": "eef8be26bdec", "id": "C-jig.cli.discovery.ProjectNotFoundError", "language": "python", "line": 8, "name": "ProjectNotFoundError", "type": "class"}
 {"bases": ["click.Group"], "file": "src/jig/cli/main.py", "git_blob": "559dc771c0dd", "id": "C-jig.cli.main.OrderedGroup", "language": "python", "line": 13, "name": "OrderedGroup", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/config/parser.py", "git_blob": "d38747f8e36d", "id": "C-jig.config.parser.ConfigError", "language": "python", "line": 18, "name": "ConfigError", "type": "class"}
@@ -20,8 +21,13 @@
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.decorator", "language": "python", "line": 57, "name": "decorator", "signature": "decorator(func: F) -> F", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.implements", "language": "python", "line": 12, "name": "implements", "signature": "implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]", "type": "function"}
 {"async": false, "file": "src/jig/__init__.py", "git_blob": "ff3c01288136", "id": "F-jig.__init__.verifies", "language": "python", "line": 39, "name": "verifies", "signature": "verifies(*spec_ids: str) -> Callable[[F], F]", "type": "function"}
-{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "4d903fdac937", "id": "F-jig.audit.coverage.ensure_audits_directory", "implements": ["S-066"], "jig_hash": "19e7ba4bf6a4", "language": "python", "line": 76, "name": "ensure_audits_directory", "signature": "ensure_audits_directory(config: JigConfig) -> Path", "type": "function"}
-{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "4d903fdac937", "id": "F-jig.audit.coverage.run_coverage_collection", "implements": ["S-066"], "jig_hash": "243cd108601a", "language": "python", "line": 17, "name": "run_coverage_collection", "signature": "run_coverage_collection(config: JigConfig, coverage_file: Optional[Path]) -> tuple[int, Path]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage._build_function_index", "implements": ["S-066"], "jig_hash": "a9db1f0f1ff7", "language": "python", "line": 154, "name": "_build_function_index", "signature": "_build_function_index(impl_graph_path: Path, project_root: Path) -> dict[str, list[tuple[int, str]]]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage._context_to_test_id", "implements": ["S-066"], "jig_hash": "3b9042400ae8", "language": "python", "line": 279, "name": "_context_to_test_id", "signature": "_context_to_test_id(context: str) -> Optional[str]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage._find_function_at_line", "implements": ["S-066"], "jig_hash": "81f50c89ab41", "language": "python", "line": 195, "name": "_find_function_at_line", "signature": "_find_function_at_line(function_index: dict[str, list[tuple[int, str]]], file_path: str, line: int) -> Optional[str]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage._parse_coverage_database", "implements": ["S-066"], "jig_hash": "26ae4f761837", "language": "python", "line": 231, "name": "_parse_coverage_database", "signature": "_parse_coverage_database(coverage_file: Path) -> dict[str, dict[str, set[int]]]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage.ensure_audits_directory", "implements": ["S-066"], "jig_hash": "19e7ba4bf6a4", "language": "python", "line": 82, "name": "ensure_audits_directory", "signature": "ensure_audits_directory(config: JigConfig) -> Path", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage.extract_tf_edges", "implements": ["S-066"], "jig_hash": "40524d2f8ac0", "language": "python", "line": 106, "name": "extract_tf_edges", "signature": "extract_tf_edges(coverage_file: Path, impl_graph_path: Path, project_root: Path) -> list[TFEdge]", "type": "function"}
+{"async": false, "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "F-jig.audit.coverage.run_coverage_collection", "implements": ["S-066"], "jig_hash": "243cd108601a", "language": "python", "line": 23, "name": "run_coverage_collection", "signature": "run_coverage_collection(config: JigConfig, coverage_file: Optional[Path]) -> tuple[int, Path]", "type": "function"}
 {"async": false, "file": "src/jig/cli/audit.py", "git_blob": "19cbce796cc4", "id": "F-jig.cli.audit.coverage_command", "implements": ["S-066"], "jig_hash": "a1f96a486dcc", "language": "python", "line": 13, "name": "coverage_command", "signature": "coverage_command(config: JigConfig) -> int", "type": "function"}
 {"async": false, "file": "src/jig/cli/discovery.py", "git_blob": "eef8be26bdec", "id": "F-jig.cli.discovery.find_project_root", "implements": ["S-057"], "jig_hash": "299a5f4957ab", "language": "python", "line": 15, "name": "find_project_root", "signature": "find_project_root(start_dir: Path | None) -> Path", "type": "function"}
 {"async": false, "file": "src/jig/cli/layers.py", "git_blob": "1e2cd5848e98", "id": "F-jig.cli.layers._display_full", "language": "python", "line": 233, "name": "_display_full", "signature": "_display_full(layers_dict, brick_dependencies, brick_unit_counts, has_cycles, bricks, verbose)", "type": "function"}
@@ -190,6 +196,7 @@
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
 {"id": "M-ast", "language": "python", "name": "ast", "type": "external_module"}
+{"id": "M-bisect", "language": "python", "name": "bisect", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
 {"id": "M-click", "language": "python", "name": "click", "type": "external_module"}
@@ -200,6 +207,9 @@
 {"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
 {"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
 {"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
+{"id": "M-collections", "language": "python", "name": "collections", "type": "external_module"}
+{"id": "M-coverage.numbits", "language": "python", "name": "coverage.numbits", "type": "external_module"}
+{"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
 {"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
 {"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
 {"id": "M-dataclasses", "language": "python", "name": "dataclasses", "type": "external_module"}
@@ -323,6 +333,7 @@
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
+{"id": "M-json", "language": "python", "name": "json", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
 {"id": "M-logging", "language": "python", "name": "logging", "type": "external_module"}
@@ -356,6 +367,8 @@
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
 {"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
+{"id": "M-re", "language": "python", "name": "re", "type": "external_module"}
+{"id": "M-sqlite3", "language": "python", "name": "sqlite3", "type": "external_module"}
 {"id": "M-subprocess", "language": "python", "name": "subprocess", "type": "external_module"}
 {"id": "M-subprocess", "language": "python", "name": "subprocess", "type": "external_module"}
 {"id": "M-sys", "language": "python", "name": "sys", "type": "external_module"}
@@ -466,7 +479,16 @@
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer._extract_verifies_decorators", "type": "contains"}
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer._validate_spec_id", "type": "contains"}
 {"source": "C-jig.verification_graph.analyzer.TestAnalyzer", "target": "F-jig.verification_graph.analyzer.TestAnalyzer.analyze_file", "type": "contains"}
+{"source": "F-jig.audit.coverage._build_function_index", "target": "S-066", "type": "implements"}
+{"source": "F-jig.audit.coverage._context_to_test_id", "target": "S-066", "type": "implements"}
+{"source": "F-jig.audit.coverage._find_function_at_line", "target": "S-066", "type": "implements"}
+{"source": "F-jig.audit.coverage._parse_coverage_database", "target": "S-066", "type": "implements"}
 {"source": "F-jig.audit.coverage.ensure_audits_directory", "target": "S-066", "type": "implements"}
+{"line": 125, "source": "F-jig.audit.coverage.extract_tf_edges", "target": "F-jig.audit.coverage._build_function_index", "type": "calls"}
+{"line": 136, "source": "F-jig.audit.coverage.extract_tf_edges", "target": "F-jig.audit.coverage._context_to_test_id", "type": "calls"}
+{"line": 143, "source": "F-jig.audit.coverage.extract_tf_edges", "target": "F-jig.audit.coverage._find_function_at_line", "type": "calls"}
+{"line": 128, "source": "F-jig.audit.coverage.extract_tf_edges", "target": "F-jig.audit.coverage._parse_coverage_database", "type": "calls"}
+{"source": "F-jig.audit.coverage.extract_tf_edges", "target": "S-066", "type": "implements"}
 {"source": "F-jig.audit.coverage.run_coverage_collection", "target": "S-066", "type": "implements"}
 {"source": "F-jig.cli.audit.coverage_command", "target": "S-066", "type": "implements"}
 {"source": "F-jig.cli.discovery.find_project_root", "target": "S-057", "type": "implements"}
@@ -662,14 +684,27 @@
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
 {"line": 3, "source": "M-jig.__init__", "target": "M-typing", "type": "imports"}
+{"source": "M-jig.audit.coverage", "target": "C-jig.audit.coverage.TFEdge", "type": "contains"}
+{"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage._build_function_index", "type": "contains"}
+{"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage._context_to_test_id", "type": "contains"}
+{"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage._find_function_at_line", "type": "contains"}
+{"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage._parse_coverage_database", "type": "contains"}
 {"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage.ensure_audits_directory", "type": "contains"}
+{"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage.extract_tf_edges", "type": "contains"}
 {"source": "M-jig.audit.coverage", "target": "F-jig.audit.coverage.run_coverage_collection", "type": "contains"}
-{"line": 12, "source": "M-jig.audit.coverage", "target": "M-jig", "type": "imports"}
-{"line": 13, "source": "M-jig.audit.coverage", "target": "M-jig.config", "type": "imports"}
-{"line": 9, "source": "M-jig.audit.coverage", "target": "M-pathlib", "type": "imports"}
-{"line": 7, "source": "M-jig.audit.coverage", "target": "M-subprocess", "type": "imports"}
-{"line": 8, "source": "M-jig.audit.coverage", "target": "M-sys", "type": "imports"}
-{"line": 10, "source": "M-jig.audit.coverage", "target": "M-typing", "type": "imports"}
+{"line": 12, "source": "M-jig.audit.coverage", "target": "M-bisect", "type": "imports"}
+{"line": 13, "source": "M-jig.audit.coverage", "target": "M-collections", "type": "imports"}
+{"line": 242, "source": "M-jig.audit.coverage", "target": "M-coverage.numbits", "type": "imports"}
+{"line": 14, "source": "M-jig.audit.coverage", "target": "M-dataclasses", "type": "imports"}
+{"line": 18, "source": "M-jig.audit.coverage", "target": "M-jig", "type": "imports"}
+{"line": 19, "source": "M-jig.audit.coverage", "target": "M-jig.config", "type": "imports"}
+{"line": 7, "source": "M-jig.audit.coverage", "target": "M-json", "type": "imports"}
+{"line": 15, "source": "M-jig.audit.coverage", "target": "M-pathlib", "type": "imports"}
+{"line": 8, "source": "M-jig.audit.coverage", "target": "M-re", "type": "imports"}
+{"line": 9, "source": "M-jig.audit.coverage", "target": "M-sqlite3", "type": "imports"}
+{"line": 10, "source": "M-jig.audit.coverage", "target": "M-subprocess", "type": "imports"}
+{"line": 11, "source": "M-jig.audit.coverage", "target": "M-sys", "type": "imports"}
+{"line": 16, "source": "M-jig.audit.coverage", "target": "M-typing", "type": "imports"}
 {"source": "M-jig.cli.audit", "target": "F-jig.cli.audit.coverage_command", "type": "contains"}
 {"line": 6, "source": "M-jig.cli.audit", "target": "M-click", "type": "imports"}
 {"line": 8, "source": "M-jig.cli.audit", "target": "M-jig", "type": "imports"}

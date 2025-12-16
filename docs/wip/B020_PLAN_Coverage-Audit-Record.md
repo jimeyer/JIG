@@ -35,7 +35,7 @@ B-cli (layer 1)
 
 - [x] WU0: Create Intent nodes (O-021, S-066, S-067) — bricks.yaml deferred to WU1
 - [x] WU1: CLI + coverage collection — tests ☑ / code ☑ / docs ☑
-- [ ] WU2: T→F extraction — tests ☐ / code ☐ / docs ☐
+- [x] WU2: T→F extraction — tests ☑ / code ☑ / docs ☑
 - [ ] WU3: Record file writer — tests ☐ / code ☐ / docs ☐
 - [ ] WU4: End-to-end integration — tests ☐ / code ☐ / docs ☐
 
@@ -194,11 +194,11 @@ ls jig/audits/records/        # Directory should exist
 **Implements**: S-066 (T→F Edge Collection via Coverage)
 
 **Acceptance Criteria**:
-- [ ] Read `.coverage` SQLite database
-- [ ] Extract test contexts (which test covered which lines)
-- [ ] Load implementation graph for line→function resolution
-- [ ] Produce list of (test_id, function_id, result) tuples
-- [ ] Handle edge cases: nested functions, parametrized tests
+- [x] Read `.coverage` SQLite database
+- [x] Extract test contexts (which test covered which lines)
+- [x] Load implementation graph for line→function resolution
+- [x] Produce list of (test_id, function_id, result) tuples
+- [x] Handle edge cases: nested functions, parametrized tests
 
 **Implementation Notes**:
 - Approach:
