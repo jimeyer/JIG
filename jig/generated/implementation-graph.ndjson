@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 671, "generated": "2025-12-16T22:22:30.234212+00:00", "node_count": 423, "version": "1.0"}}
+{"_meta": {"edge_count": 671, "generated": "2025-12-16T22:23:38.011454+00:00", "node_count": 423, "version": "1.0"}}
 {"bases": [], "file": "src/jig/audit/coverage.py", "git_blob": "e8d1f97a8737", "id": "C-jig.audit.coverage.TFEdge", "language": "python", "line": 97, "name": "TFEdge", "type": "class"}
 {"bases": ["Exception"], "file": "src/jig/cli/discovery.py", "git_blob": "eef8be26bdec", "id": "C-jig.cli.discovery.ProjectNotFoundError", "language": "python", "line": 8, "name": "ProjectNotFoundError", "type": "class"}
 {"bases": ["click.Group"], "file": "src/jig/cli/main.py", "git_blob": "3303181b4e7b", "id": "C-jig.cli.main.OrderedGroup", "language": "python", "line": 13, "name": "OrderedGroup", "type": "class"}

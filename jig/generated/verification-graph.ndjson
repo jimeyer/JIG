@@ -1,4 +1,4 @@
-{"_meta": {"edge_count": 352, "generated": "2025-12-10T17:17:54.906314+00:00", "node_count": 376, "version": "1.0"}}
+{"_meta": {"edge_count": 405, "generated": "2025-12-16T22:23:38.110365+00:00", "node_count": 421, "version": "1.0"}}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_creates_all_graphs", "jig_hash": "baa371da8a15", "type": "test", "verifies": ["S-059"]}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_not_in_project", "jig_hash": "3be1b387fb7b", "type": "test", "verifies": ["S-059"]}
 {"file": "tests/cli/test_align.py", "id": "T-test_align.test_align_output_format", "jig_hash": "25f96b0adc96", "type": "test", "verifies": ["S-059"]}
@@ -139,6 +139,37 @@
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_only_help_and_version_global_options", "jig_hash": "ae9446b7b4d8", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_unknown_option_fails", "jig_hash": "afc246f2993a", "type": "test", "verifies": ["S-061"]}
 {"file": "tests/cli/test_cli_root.py", "id": "T-test_cli_root.test_version_option_works", "jig_hash": "075ca3ef46a9", "type": "test", "verifies": ["S-061"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_audit_bare_shows_help", "jig_hash": "7a0fd93eed56", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_audit_command_group_exists", "jig_hash": "41d65f3fbde8", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_audit_coverage_command_exists", "jig_hash": "8ae922a7c6ca", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_build_function_index", "jig_hash": "439e6378c975", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_context_to_test_id_complex_params", "jig_hash": "4a42f2dd1f5d", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_context_to_test_id_invalid_format", "jig_hash": "67cafc6502e1", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_context_to_test_id_simple", "jig_hash": "b00a7917fbc0", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_context_to_test_id_strips_parametrization", "jig_hash": "72e4b67c8a28", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_context_to_test_id_with_class", "jig_hash": "c44032504502", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_ensure_audits_directory_creates_path", "jig_hash": "c2e8ed20e35a", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_ensure_audits_directory_idempotent", "jig_hash": "110baa07eedd", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_extract_tf_edges_basic", "jig_hash": "5d3718c879cb", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_extract_tf_edges_parametrized_collapsed", "jig_hash": "61b90c1c30bb", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_find_function_at_line_before_any_function", "jig_hash": "d03123daab72", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_find_function_at_line_exact_match", "jig_hash": "36a2266938f4", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_find_function_at_line_nested_functions", "jig_hash": "b9a26b7a7a5b", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_find_function_at_line_unknown_file", "jig_hash": "57727ceeee27", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_find_function_at_line_within_function", "jig_hash": "a23aba9c8788", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_help_shows_audit_command", "jig_hash": "5e5c191cc3e5", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_run_coverage_collection_builds_correct_command", "jig_hash": "9bcf47c9ce48", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_run_coverage_collection_captures_test_failures", "jig_hash": "3ed04c0def20", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage.py", "id": "T-test_coverage.test_run_coverage_collection_returns_coverage_path", "jig_hash": "99789d7a1511", "type": "test", "verifies": ["S-066"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_cli_audit_coverage_accessible", "jig_hash": "21bf20292038", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_cleans_up_coverage_file", "jig_hash": "e5a231823c40", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_continues_on_test_failure", "jig_hash": "217e7207f1a7", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_missing_impl_graph", "jig_hash": "20b39db86edb", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_missing_verify_graph", "jig_hash": "c970559491d5", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_overwrites_same_day_record", "jig_hash": "0f3783a6e4f6", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_shows_progress", "jig_hash": "4a099d1e35b2", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_coverage_command_writes_record_file", "jig_hash": "fc58caf41f12", "type": "test", "verifies": ["S-066", "S-067"]}
+{"file": "tests/audit/test_coverage_integration.py", "id": "T-test_coverage_integration.test_record_file_is_grepable", "jig_hash": "c7fb3fb90b54", "type": "test", "verifies": ["S-067"]}
 {"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_accuracy_99_percent", "jig_hash": "76ebc1546c5d", "type": "test", "verifies": ["S-002"]}
 {"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_invalid_id_warning", "jig_hash": "3b3d75d852ab", "type": "test", "verifies": ["S-002"]}
 {"file": "tests/unit/test_decorator_extraction.py", "id": "T-test_decorator_extraction.test_decorator_mixed_valid_invalid", "jig_hash": "56d34bdbc7f7", "type": "test", "verifies": ["S-002"]}
@@ -327,6 +358,20 @@
 {"file": "tests/cli/test_rebuild.py", "id": "T-test_rebuild.test_rebuild_no_options", "jig_hash": "33eed2fb9f4b", "type": "test", "verifies": ["S-058"]}
 {"file": "tests/cli/test_rebuild.py", "id": "T-test_rebuild.test_rebuild_not_in_project", "jig_hash": "9b48c791770e", "type": "test", "verifies": ["S-058"]}
 {"file": "tests/cli/test_rebuild.py", "id": "T-test_rebuild.test_rebuild_verify", "jig_hash": "2717e0147a29", "type": "test", "verifies": ["S-058"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_build_edge_record", "jig_hash": "e0c9607e48c3", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_build_edge_record_missing_hash", "jig_hash": "ce42eb31e05d", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_cleanup_coverage_file_deletes", "jig_hash": "7053f9a5e42a", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_cleanup_coverage_file_nonexistent", "jig_hash": "c11b3a4b952e", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_load_function_hashes", "jig_hash": "c28d71de04e1", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_load_function_hashes_ignores_non_functions", "jig_hash": "7997ff781344", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_load_test_hashes", "jig_hash": "2e7ac169cc1f", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_creates_directory", "jig_hash": "09e3b6b26a91", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_creates_file", "jig_hash": "d941183e3a77", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_grepable", "jig_hash": "a7e0e674abca", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_includes_jig_hash", "jig_hash": "7aa616d62e9c", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_sorted", "jig_hash": "a1f90ee0d3d4", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_uses_today_by_default", "jig_hash": "1c3e1f814d58", "type": "test", "verifies": ["S-067"]}
+{"file": "tests/audit/test_record_writer.py", "id": "T-test_record_writer.test_write_coverage_record_valid_json", "jig_hash": "d97dbd4b26ca", "type": "test", "verifies": ["S-067"]}
 {"file": "tests/cli/test_removed_commands.py", "id": "T-test_removed_commands.test_impl_command_removed", "jig_hash": "87b43b1e674f", "type": "test", "verifies": []}
 {"file": "tests/cli/test_removed_commands.py", "id": "T-test_removed_commands.test_impl_rebuild_command_removed", "jig_hash": "287748550ad9", "type": "test", "verifies": []}
 {"file": "tests/cli/test_removed_commands.py", "id": "T-test_removed_commands.test_intent_command_removed", "jig_hash": "9a0393191cac", "type": "test", "verifies": []}
@@ -509,6 +554,45 @@
 {"source": "T-test_cli_root.test_only_help_and_version_global_options", "target": "S-061", "type": "verifies"}
 {"source": "T-test_cli_root.test_unknown_option_fails", "target": "S-061", "type": "verifies"}
 {"source": "T-test_cli_root.test_version_option_works", "target": "S-061", "type": "verifies"}
+{"source": "T-test_coverage.test_audit_bare_shows_help", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_audit_command_group_exists", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_audit_coverage_command_exists", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_build_function_index", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_context_to_test_id_complex_params", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_context_to_test_id_invalid_format", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_context_to_test_id_simple", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_context_to_test_id_strips_parametrization", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_context_to_test_id_with_class", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_ensure_audits_directory_creates_path", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_ensure_audits_directory_idempotent", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_extract_tf_edges_basic", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_extract_tf_edges_parametrized_collapsed", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_find_function_at_line_before_any_function", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_find_function_at_line_exact_match", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_find_function_at_line_nested_functions", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_find_function_at_line_unknown_file", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_find_function_at_line_within_function", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_help_shows_audit_command", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_run_coverage_collection_builds_correct_command", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_run_coverage_collection_captures_test_failures", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage.test_run_coverage_collection_returns_coverage_path", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_cli_audit_coverage_accessible", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_cli_audit_coverage_accessible", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_cleans_up_coverage_file", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_cleans_up_coverage_file", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_continues_on_test_failure", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_continues_on_test_failure", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_missing_impl_graph", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_missing_impl_graph", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_missing_verify_graph", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_missing_verify_graph", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_overwrites_same_day_record", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_overwrites_same_day_record", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_shows_progress", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_shows_progress", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_writes_record_file", "target": "S-066", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_coverage_command_writes_record_file", "target": "S-067", "type": "verifies"}
+{"source": "T-test_coverage_integration.test_record_file_is_grepable", "target": "S-067", "type": "verifies"}
 {"source": "T-test_decorator_extraction.test_accuracy_99_percent", "target": "S-002", "type": "verifies"}
 {"source": "T-test_decorator_extraction.test_decorator_invalid_id_warning", "target": "S-002", "type": "verifies"}
 {"source": "T-test_decorator_extraction.test_decorator_mixed_valid_invalid", "target": "S-002", "type": "verifies"}
@@ -680,6 +764,20 @@
 {"source": "T-test_rebuild.test_rebuild_no_options", "target": "S-058", "type": "verifies"}
 {"source": "T-test_rebuild.test_rebuild_not_in_project", "target": "S-058", "type": "verifies"}
 {"source": "T-test_rebuild.test_rebuild_verify", "target": "S-058", "type": "verifies"}
+{"source": "T-test_record_writer.test_build_edge_record", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_build_edge_record_missing_hash", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_cleanup_coverage_file_deletes", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_cleanup_coverage_file_nonexistent", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_load_function_hashes", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_load_function_hashes_ignores_non_functions", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_load_test_hashes", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_creates_directory", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_creates_file", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_grepable", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_includes_jig_hash", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_sorted", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_uses_today_by_default", "target": "S-067", "type": "verifies"}
+{"source": "T-test_record_writer.test_write_coverage_record_valid_json", "target": "S-067", "type": "verifies"}
 {"source": "T-test_reporting.test_format_as_json_is_valid_json", "target": "S-026", "type": "verifies"}
 {"source": "T-test_reporting.test_format_as_json_multiple_phases", "target": "S-026", "type": "verifies"}
 {"source": "T-test_reporting.test_format_as_json_success", "target": "S-026", "type": "verifies"}
