@@ -9,23 +9,28 @@ import jig
 from jig.config import JigConfig
 
 
-@jig.implements("S-066", "S-067")
-def coverage_command(config: JigConfig) -> int:
+@jig.implements("S-066", "S-067", "S-070")
+def coverage_command(config: JigConfig, skip_rebuild: bool = False) -> int:
     """Run full coverage audit pipeline.
 
     Executes the complete coverage audit workflow:
-    1. Verify required graphs exist
-    2. Run pytest with coverage instrumentation
-    3. Extract T→F edges from coverage data
-    4. Write edges to NDJSON record file
-    5. Clean up .coverage file
+    1. Auto-rebuild stale impl + verify graphs
+    2. Verify required graphs exist
+    3. Run pytest with coverage instrumentation
+    4. Extract T→F edges from coverage data
+    5. Write edges to NDJSON record file
+    6. Clean up .coverage file
 
     Args:
         config: JIG configuration with project paths.
+        skip_rebuild: If True, skip auto-rebuild.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
+    # Auto-rebuild stale impl + verify graphs before auditing (S-070)
+    from jig.cli.auto_rebuild import ensure_graphs_current
+    ensure_graphs_current(["impl", "verify"], config, skip_rebuild=skip_rebuild)
     from jig.audit.coverage import (
         ensure_audits_directory,
         extract_tf_edges,
