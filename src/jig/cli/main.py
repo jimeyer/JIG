@@ -32,6 +32,19 @@ def get_config(ctx: click.Context) -> JigConfig:
     return ctx.obj["config"]
 
 
+@jig.implements("S-071")
+def get_no_rebuild(ctx: click.Context) -> bool:
+    """Get --no-rebuild flag from Click context.
+
+    Args:
+        ctx: Click context.
+
+    Returns:
+        True if --no-rebuild was passed, False otherwise.
+    """
+    return ctx.obj.get("no_rebuild", False)
+
+
 from jig.cli.audit import coverage_command
 from jig.cli.rebuild import (
     align_command,
@@ -54,11 +67,18 @@ from jig.cli.validate import (
 
 @click.group(cls=OrderedGroup, invoke_without_command=True)
 @click.version_option()
+@click.option(
+    "--no-rebuild",
+    is_flag=True,
+    default=False,
+    help="Skip automatic graph rebuild before commands.",
+)
 @click.pass_context
-@jig.implements("S-061", "S-065")
-def cli(ctx):
+@jig.implements("S-061", "S-065", "S-071")
+def cli(ctx, no_rebuild: bool):
     """JIG — Keep specs, code, and tests aligned."""
     ctx.ensure_object(dict)
+    ctx.obj["no_rebuild"] = no_rebuild
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -134,7 +154,7 @@ def align(ctx) -> None:
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
-@jig.implements("S-061", "S-065")
+@jig.implements("S-061", "S-065", "S-071")
 def validate(ctx):
     """Validate JIG artifacts.
 
@@ -149,13 +169,14 @@ def validate(ctx):
     # If no subcommand, run full validation
     if ctx.invoked_subcommand is None:
         config = get_config(ctx)
-        exit_code = validate_full_command(config, "human")
+        skip_rebuild = get_no_rebuild(ctx)
+        exit_code = validate_full_command(config, "human", skip_rebuild=skip_rebuild)
         sys.exit(exit_code)
 
 
 @validate.command(name="intent")
 @click.pass_context
-@jig.implements("S-061", "S-065")
+@jig.implements("S-061", "S-065", "S-071")
 def validate_intent_cli(ctx) -> None:
     """Validate intent artifacts (specifications, outcomes, decorators).
 
@@ -166,13 +187,14 @@ def validate_intent_cli(ctx) -> None:
         jigy validate intent
     """
     config = get_config(ctx)
-    exit_code = validate_intent_command(config, "human")
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = validate_intent_command(config, "human", skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @validate.command(name="bricks")
 @click.pass_context
-@jig.implements("S-061", "S-065")
+@jig.implements("S-061", "S-065", "S-071")
 def validate_bricks_cli(ctx) -> None:
     """Validate brick definitions and partition constraints.
 
@@ -183,13 +205,14 @@ def validate_bricks_cli(ctx) -> None:
         jigy validate bricks
     """
     config = get_config(ctx)
-    exit_code = validate_bricks_command(config, "human")
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = validate_bricks_command(config, "human", skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @validate.command()
 @click.pass_context
-@jig.implements("S-061", "S-065")
+@jig.implements("S-061", "S-065", "S-071")
 def full(ctx) -> None:
     """Run full validation (intent + bricks if graph exists).
 
@@ -200,14 +223,15 @@ def full(ctx) -> None:
         jigy validate full
     """
     config = get_config(ctx)
-    exit_code = validate_full_command(config, "human")
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = validate_full_command(config, "human", skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 # Show command group (S-060)
 @cli.group(name="show", invoke_without_command=True)
 @click.pass_context
-@jig.implements("S-060", "S-065")
+@jig.implements("S-060", "S-065", "S-071")
 def show_group(ctx) -> None:
     """Display JIG structure information.
 
@@ -221,27 +245,30 @@ def show_group(ctx) -> None:
     if ctx.invoked_subcommand is None:
         # No subcommand = show overview
         config = get_config(ctx)
-        exit_code = show_overview_command(config)
+        skip_rebuild = get_no_rebuild(ctx)
+        exit_code = show_overview_command(config, skip_rebuild=skip_rebuild)
         sys.exit(exit_code)
 
 
 @show_group.command(name="layers")
 @click.pass_context
-@jig.implements("S-060", "S-065")
+@jig.implements("S-060", "S-065", "S-071")
 def show_layers_cli(ctx) -> None:
     """Display layer hierarchy."""
     config = get_config(ctx)
-    exit_code = show_layers_command(config)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = show_layers_command(config, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @show_group.command(name="bricks")
 @click.pass_context
-@jig.implements("S-060", "S-065")
+@jig.implements("S-060", "S-065", "S-071")
 def show_bricks_cli(ctx) -> None:
     """Display brick details."""
     config = get_config(ctx)
-    exit_code = show_bricks_command(config)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = show_bricks_command(config, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
@@ -264,7 +291,7 @@ def audit_group(ctx) -> None:
 
 @audit_group.command(name="coverage")
 @click.pass_context
-@jig.implements("S-066", "S-067")
+@jig.implements("S-066", "S-067", "S-071")
 def audit_coverage_cli(ctx) -> None:
     """Run full coverage audit pipeline.
 
@@ -275,7 +302,8 @@ def audit_coverage_cli(ctx) -> None:
         jigy audit coverage
     """
     config = get_config(ctx)
-    exit_code = coverage_command(config)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = coverage_command(config, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
