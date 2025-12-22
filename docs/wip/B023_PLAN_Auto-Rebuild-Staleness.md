@@ -31,11 +31,11 @@
 
 ## Work Unit Checklist
 
-- [ ] WU1: Staleness Detection Module — tests ☐ / code ☐ / docs ☐
-- [ ] WU2: Graph Metadata for Staleness — tests ☐ / code ☐ / docs ☐
-- [ ] WU3: Auto-Rebuild Integration — tests ☐ / code ☐ / docs ☐
-- [ ] WU4: --no-rebuild Flag — tests ☐ / code ☐ / docs ☐
-- [ ] WU5: Validation — SCOPE verified ☐
+- [x] WU1: Staleness Detection Module — tests ✓ / code ✓ / docs ✓
+- [x] WU2: Graph Metadata for Staleness — tests ✓ / code ✓ / docs ✓
+- [x] WU3: Auto-Rebuild Integration — tests ✓ / code ✓ / docs ✓
+- [x] WU4: --no-rebuild Flag — tests ✓ / code ✓ / docs ✓
+- [x] WU5: Validation — SCOPE verified ✓
 
 ---
 

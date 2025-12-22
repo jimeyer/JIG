@@ -59,7 +59,11 @@ def ensure_graphs_current(
         if graph_type in rebuild_funcs:
             # Note: rebuild commands echo their own output ("Rebuilding X graph...")
             # We suppress that for auto-rebuild by not calling the full command
-            _rebuild_graph_quietly(graph_type, config)
+            try:
+                _rebuild_graph_quietly(graph_type, config)
+            except Exception as e:
+                # Log error but continue - don't fail the whole command
+                click.echo(f"  {graph_type}: rebuild failed ({e})", err=True)
 
     # Show which graphs were up to date
     for graph_type in graph_types:

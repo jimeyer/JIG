@@ -87,7 +87,8 @@ def test_coverage_command_missing_impl_graph(tmp_path):
     _create_mock_verify_graph(config.paths.generated / "verification-graph.ndjson")
 
     with patch("click.echo") as mock_echo:
-        exit_code = coverage_command(config)
+        # Skip auto-rebuild to test missing graph behavior
+        exit_code = coverage_command(config, skip_rebuild=True)
 
     assert exit_code == 1
 
@@ -107,7 +108,8 @@ def test_coverage_command_missing_verify_graph(tmp_path):
     _create_mock_impl_graph(config.paths.generated / "implementation-graph.ndjson")
 
     with patch("click.echo") as mock_echo:
-        exit_code = coverage_command(config)
+        # Skip auto-rebuild to test missing graph behavior
+        exit_code = coverage_command(config, skip_rebuild=True)
 
     assert exit_code == 1
 
@@ -157,7 +159,8 @@ def test_coverage_command_shows_progress(tmp_path):
 
         mock_run.side_effect = create_coverage
 
-        exit_code = coverage_command(config)
+        # Skip auto-rebuild since we manually created mock graphs
+        exit_code = coverage_command(config, skip_rebuild=True)
 
     # Check progress messages
     echo_messages = [str(call) for call in mock_echo.call_args_list]
@@ -204,7 +207,8 @@ def test_coverage_command_writes_record_file(tmp_path):
 
         mock_run.side_effect = create_coverage
 
-        exit_code = coverage_command(config)
+        # Skip auto-rebuild since we manually created mock graphs
+        exit_code = coverage_command(config, skip_rebuild=True)
 
     assert exit_code == 0
 
@@ -256,7 +260,8 @@ def test_coverage_command_cleans_up_coverage_file(tmp_path):
         mock_run.side_effect = create_coverage
 
         # Verify .coverage exists before cleanup
-        coverage_command(config)
+        # Skip auto-rebuild since we manually created mock graphs
+        coverage_command(config, skip_rebuild=True)
 
     # .coverage should be deleted after processing
     assert not mock_coverage_file.exists()
@@ -299,7 +304,8 @@ def test_coverage_command_continues_on_test_failure(tmp_path):
 
         mock_run.side_effect = create_coverage
 
-        exit_code = coverage_command(config)
+        # Skip auto-rebuild since we manually created mock graphs
+        exit_code = coverage_command(config, skip_rebuild=True)
 
     # Should still succeed (exit 0) even though tests failed
     assert exit_code == 0
@@ -345,11 +351,12 @@ def test_coverage_command_overwrites_same_day_record(tmp_path):
         return MagicMock(returncode=0)
 
     # Run twice
+    # Skip auto-rebuild since we manually created mock graphs
     with patch("jig.audit.coverage.subprocess.run", side_effect=create_coverage):
-        coverage_command(config)
+        coverage_command(config, skip_rebuild=True)
 
     with patch("jig.audit.coverage.subprocess.run", side_effect=create_coverage):
-        coverage_command(config)
+        coverage_command(config, skip_rebuild=True)
 
     # Should still only have one file (overwritten)
     records_dir = config.paths.jig_root / "audits" / "records"
@@ -478,7 +485,8 @@ def test_record_file_is_grepable(tmp_path):
 
         mock_run.side_effect = create_coverage_with_data
 
-        coverage_command(config)
+        # Skip auto-rebuild since we manually created mock graphs
+        coverage_command(config, skip_rebuild=True)
 
     # Read record file
     records_dir = config.paths.jig_root / "audits" / "records"
