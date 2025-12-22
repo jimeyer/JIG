@@ -11,10 +11,15 @@ from jig.config import ConfigError, JigConfig, load_config
 
 
 class OrderedGroup(click.Group):
-    """A Click group that preserves command order."""
+    """A Click group with explicit command ordering."""
+
+    COMMAND_ORDER = ["align", "validate", "show", "audit", "rebuild"]
 
     def list_commands(self, ctx):
-        return list(self.commands.keys())
+        # Return commands in explicit order, then any others
+        ordered = [c for c in self.COMMAND_ORDER if c in self.commands]
+        others = [c for c in self.commands if c not in self.COMMAND_ORDER]
+        return ordered + others
 
 
 from jig.cli.discovery import ProjectNotFoundError, find_project_root
@@ -88,9 +93,11 @@ def cli(ctx, no_rebuild: bool):
 @click.pass_context
 @jig.implements("S-058", "S-065")
 def rebuild_group(ctx) -> None:
-    """Rebuild JIG graphs.
+    """Manual Rebuild of JIG graphs.
 
     Rebuilds implementation, verification, and/or intent graphs.
+
+    Rebuild runs automatically before align and validate commands.
 
     Example:
         jigy rebuild           # Rebuild all graphs
