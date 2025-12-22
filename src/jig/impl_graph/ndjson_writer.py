@@ -14,7 +14,7 @@ import jig
 from .graph import Graph
 
 
-@jig.implements("S-003")
+@jig.implements("S-003", "S-068")
 class NDJSONWriter:
     """Writer for implementation graphs in NDJSON format.
 
@@ -25,13 +25,15 @@ class NDJSONWriter:
     - Deterministic output (same input → identical output)
     """
 
-    def __init__(self, graph: Graph) -> None:
+    def __init__(self, graph: Graph, git_metadata: Optional[Dict[str, Any]] = None) -> None:
         """Initialize the NDJSON writer.
 
         Args:
             graph: The graph to write.
+            git_metadata: Optional git state metadata for staleness detection.
         """
         self.graph = graph
+        self.git_metadata = git_metadata
 
     @jig.implements("S-003")
     def write(
@@ -68,6 +70,7 @@ class NDJSONWriter:
                 f.write(json.dumps(edge, sort_keys=True))
                 f.write("\n")
 
+    @jig.implements("S-068")
     def _generate_metadata(self, include_timestamp: bool) -> Dict[str, Any]:
         """Generate metadata for the NDJSON file.
 
@@ -87,6 +90,12 @@ class NDJSONWriter:
 
         if include_timestamp:
             metadata["_meta"]["generated"] = datetime.now(timezone.utc).isoformat()
+
+        # Add git metadata for staleness detection (S-068)
+        if self.git_metadata:
+            metadata["_meta"]["git_head"] = self.git_metadata.get("git_head")
+            metadata["_meta"]["git_tree_hashes"] = self.git_metadata.get("git_tree_hashes", {})
+            metadata["_meta"]["git_dirty_files"] = self.git_metadata.get("git_dirty_files", [])
 
         return metadata
 
@@ -122,11 +131,12 @@ class NDJSONWriter:
         )
 
 
-@jig.implements("S-003")
+@jig.implements("S-003", "S-068")
 def write_ndjson(
     graph: Graph,
     output_path: Path,
     include_timestamp: bool = True,
+    git_metadata: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Write a graph to NDJSON format.
 
@@ -136,6 +146,7 @@ def write_ndjson(
         graph: The graph to write.
         output_path: Path to write the NDJSON file.
         include_timestamp: Whether to include generated timestamp in metadata.
+        git_metadata: Optional git state metadata for staleness detection.
     """
-    writer = NDJSONWriter(graph)
+    writer = NDJSONWriter(graph, git_metadata=git_metadata)
     writer.write(output_path, include_timestamp=include_timestamp)
