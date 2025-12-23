@@ -31,7 +31,7 @@ JIG establishes a five-level hierarchy that connects human intent to machine exe
 ```
 Constitution (this document)
     ↓
-Outcomes (O-001 through O-020)
+Outcomes (O-001 through O-022)
     ↓
 Specifications (S-001 through S-0XX)
     ↓
@@ -46,7 +46,7 @@ Every function should trace upward to a specification, every specification to an
 
 ## Outcomes
 
-JIG delivers its purpose through 20 measurable outcomes. Each outcome specifies concrete success criteria and links to detailed specifications.
+JIG delivers its purpose through 18 measurable outcomes. Each outcome specifies concrete success criteria and links to detailed specifications.
 
 ### Discovery & Extraction
 
@@ -76,29 +76,11 @@ Validation error messages include file paths, line numbers, and actionable descr
 Full project validation completes in <5 seconds. Fast validation enables integration into pre-commit hooks, CI pipelines, and watch mode workflows.
 *Enables: Enforcing Constraints (fast feedback loops)*
 
-### Visualization & Discovery
-
-**[O-007: Visual Inspection of Graphs](outcomes/O-007.md)**
-Developers can visually inspect the structure of implementation, intent, and verification graphs to understand codebase architecture and intent alignment.
-*Enables: Continuity Across Sessions (visual understanding), Grounding in Reality*
-
-**[O-008: Discovery of Code Relationships](outcomes/O-008.md)**
-Developers can discover relationships between code elements to understand dependencies, identify coupling, and trace implementation flows.
-*Enables: Grounding in Reality, Intent Alignment*
-
 ### Intent Graph Management
 
 **[O-009: Generate Intent Graph from Specifications and Bricks](outcomes/O-009.md)**
 Developers can generate a complete intent graph containing specifications, outcomes, and brick definitions from human-authored artifacts.
 *Enables: Intent Alignment, Continuity Across Sessions*
-
-**[O-010: Visualize Bricks as Compound Nodes](outcomes/O-010.md)**
-Developers can see brick boundaries as visual containers around member implementation nodes in the graph visualizer.
-*Enables: Intent Alignment (architectural understanding)*
-
-**[O-011: Interact with Brick Boundaries](outcomes/O-011.md)**
-Developers can collapse, expand, and filter bricks to focus attention and reduce visual complexity.
-*Enables: Continuity Across Sessions (managing cognitive load)*
 
 ### Architecture Enforcement
 
@@ -132,6 +114,10 @@ JIG detects when specifications, implementations, or tests change, enabling auto
 Tests that verify specifications are discoverable and queryable, completing the S-F-T alignment triangle. Enables queries like "which specs have no verifying tests?"
 *Enables: Grounding in Reality (verification), Intent Alignment*
 
+**[O-021: Verifiable Test-to-Implementation Coverage](outcomes/O-021.md)**
+Tests that claim to verify specifications demonstrably execute the implementing code. Completes the S-F-T triangle with objective, execution-based evidence—detecting cases where tests pass but don't actually execute relevant implementation.
+*Enables: Grounding in Reality (verification), Intent Alignment*
+
 ### Developer Experience
 
 **[O-019: Intuitive CLI Experience](outcomes/O-019.md)**
@@ -141,6 +127,10 @@ Users interact with JIG through a memorable, verb-first command structure requir
 **[O-020: Configurable Project Structure](outcomes/O-020.md)**
 JIG adapts to diverse project layouts without requiring projects to reorganize their code. Enables adoption in existing projects with non-standard directory structures.
 *Enables: Grounding in Reality (works with real projects as-is)*
+
+**[O-022: Commands Operate on Current Data](outcomes/O-022.md)**
+JIG commands operate on up-to-date graph data without requiring manual rebuild invocation. Developers receive correct results from `validate`, `show`, and `audit` commands without remembering to run `jigy rebuild` first.
+*Enables: Continuity Across Sessions (correct results), Grounding in Reality*
 
 ---
 

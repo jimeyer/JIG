@@ -21,7 +21,7 @@ def validate_specification_files(spec_dir: Path) -> ValidationResult:
     Validate specification files against A001 contract.
 
     Checks:
-    - Required fields: id, type
+    - Required fields: id, title, type
     - ID format: S-{number}
     - ID uniqueness
     - Filename matches ID
@@ -67,6 +67,16 @@ def validate_specification_files(spec_dir: Path) -> ValidationResult:
                     message="Missing required field: 'type'",
                     code="MISSING_REQUIRED_FIELD",
                     field="type",
+                )
+            )
+
+        if "title" not in frontmatter:
+            result.add_error(
+                ValidationError(
+                    file=str(spec_file),
+                    message="Missing required field: 'title'. Per A001, specifications must have a title field in frontmatter.",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="title",
                 )
             )
 
@@ -131,7 +141,7 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
     Outcomes are optional artifacts.
 
     Checks:
-    - Required fields: id, type
+    - Required fields: id, title, type, specifies
     - ID format: O-{number}
     - ID uniqueness
     - No excluded fields: brick
@@ -191,6 +201,16 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
                     message="Missing required field: 'specifies'",
                     code="MISSING_REQUIRED_FIELD",
                     field="specifies",
+                )
+            )
+
+        if "title" not in frontmatter:
+            result.add_error(
+                ValidationError(
+                    file=str(outcome_file),
+                    message="Missing required field: 'title'. Per A001, outcomes must have a title field in frontmatter.",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="title",
                 )
             )
 

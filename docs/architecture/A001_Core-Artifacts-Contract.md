@@ -54,12 +54,14 @@ These artifacts are interdependent but acyclic: graphs SHALL be generated before
 ```yaml
 ---
 id: S-001
+title: Session Token Validation
 type: specification
 ---
 ```
 
 **Field contract:**
 - `id` (string, REQUIRED): Format SHALL be `S-{number}` (e.g., `S-001`, `S-042`)
+- `title` (string, REQUIRED): Noun phrase describing observable behavior or capability (e.g., "Session Token Validation", "Graph Rebuild on File Change")
 - `type` (string, REQUIRED): Value SHALL be exactly `"specification"`
 
 **Excluded fields:**
@@ -81,6 +83,7 @@ type: specification
 ```yaml
 ---
 id: O-001
+title: Layer Architecture Enforcement
 type: outcome
 specifies: [S-001, S-002]
 ---
@@ -88,6 +91,7 @@ specifies: [S-001, S-002]
 
 **Field contract:**
 - `id` (string, REQUIRED): Format SHALL be `O-{number}`
+- `title` (string, REQUIRED): Noun phrase describing delivered value (e.g., "Layer Architecture Enforcement", "Automated Code-to-Specification Traceability")
 - `type` (string, REQUIRED): Value SHALL be exactly `"outcome"`
 - `specifies` (array, REQUIRED): SHALL contain spec IDs this outcome decomposes into. MAY be empty `[]`.
 

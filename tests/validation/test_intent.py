@@ -25,6 +25,7 @@ def test_validate_specification_valid():
         spec_file.write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -100,6 +101,7 @@ def test_validate_specification_id_filename_mismatch():
         spec_file.write_text(
             """---
 id: S-002
+title: Test Specification
 type: specification
 ---
 
@@ -114,6 +116,31 @@ type: specification
 
 
 @jig.verifies("S-018")
+def test_validate_specification_missing_title():
+    """Missing required field 'title' detected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+
+        spec_file = spec_dir / "S-001.md"
+        spec_file.write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Test Specification
+"""
+        )
+
+        result = validate_specification_files(spec_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "title" in result.errors[0].message.lower()
+        assert result.errors[0].code == "MISSING_REQUIRED_FIELD"
+
+
+@jig.verifies("S-018")
 def test_validate_specification_duplicate_ids():
     """Duplicate spec IDs detected."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -123,6 +150,7 @@ def test_validate_specification_duplicate_ids():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: First Specification
 type: specification
 ---
 
@@ -133,6 +161,7 @@ type: specification
         (spec_dir / "S-002.md").write_text(
             """---
 id: S-001
+title: Second Specification
 type: specification
 ---
 
@@ -156,6 +185,7 @@ def test_validate_specification_excluded_fields():
         spec_file.write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 brick: B-001
 depends_on: [S-002]
@@ -186,6 +216,7 @@ def test_validate_outcome_valid():
         outcome_file.write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: []
 ---
@@ -272,7 +303,9 @@ def test_validate_outcome_excluded_field():
         outcome_file.write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
+specifies: []
 brick: B-001
 ---
 
@@ -283,6 +316,32 @@ brick: B-001
         result = validate_outcome_files(outcome_dir)
         assert not result.passed
         assert any("brick" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-019")
+def test_validate_outcome_missing_title():
+    """Missing required field 'title' detected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+
+        outcome_file = outcome_dir / "O-001.md"
+        outcome_file.write_text(
+            """---
+id: O-001
+type: outcome
+specifies: []
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_outcome_files(outcome_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "title" in result.errors[0].message.lower()
+        assert result.errors[0].code == "MISSING_REQUIRED_FIELD"
 
 
 @jig.verifies("S-020")
@@ -298,6 +357,7 @@ def test_validate_decorator_valid_implements():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -360,6 +420,7 @@ def test_validate_decorator_multiple_specs():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification 1
 type: specification
 ---
 
@@ -369,6 +430,7 @@ type: specification
         (spec_dir / "S-002.md").write_text(
             """---
 id: S-002
+title: Test Specification 2
 type: specification
 ---
 
@@ -404,6 +466,7 @@ def test_validate_decorator_verifies_spec():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -441,7 +504,9 @@ def test_validate_decorator_verifies_outcome():
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
+specifies: []
 ---
 
 # Test
@@ -505,6 +570,7 @@ def test_validate_outcome_completeness_valid_single_spec():
         outcome_file.write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001]
 ---
@@ -532,6 +598,7 @@ def test_validate_outcome_completeness_valid_multiple_specs():
         outcome_file.write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001, S-002, S-003]
 ---
@@ -559,6 +626,7 @@ def test_validate_outcome_completeness_empty_specifies():
         outcome_file.write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: []
 ---
@@ -588,6 +656,7 @@ def test_validate_outcome_completeness_multiple_empty():
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome 1
 type: outcome
 specifies: []
 ---
@@ -600,6 +669,7 @@ specifies: []
         (outcome_dir / "O-002.md").write_text(
             """---
 id: O-002
+title: Test Outcome 2
 type: outcome
 specifies: [S-001]
 ---
@@ -612,6 +682,7 @@ specifies: [S-001]
         (outcome_dir / "O-003.md").write_text(
             """---
 id: O-003
+title: Test Outcome 3
 type: outcome
 specifies: []
 ---
@@ -663,6 +734,7 @@ def test_validate_specification_coverage_valid_single_outcome():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -674,6 +746,7 @@ type: specification
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001]
 ---
@@ -703,6 +776,7 @@ def test_validate_specification_coverage_valid_multiple_outcomes():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -714,6 +788,7 @@ type: specification
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome 1
 type: outcome
 specifies: [S-001]
 ---
@@ -725,6 +800,7 @@ specifies: [S-001]
         (outcome_dir / "O-002.md").write_text(
             """---
 id: O-002
+title: Test Outcome 2
 type: outcome
 specifies: [S-001, S-002]
 ---
@@ -754,6 +830,7 @@ def test_validate_specification_coverage_orphaned_spec():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification 1
 type: specification
 ---
 
@@ -764,6 +841,7 @@ type: specification
         (spec_dir / "S-002.md").write_text(
             """---
 id: S-002
+title: Test Specification 2
 type: specification
 ---
 
@@ -775,6 +853,7 @@ type: specification
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001]
 ---
@@ -806,6 +885,7 @@ def test_validate_specification_coverage_multiple_orphaned():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification 1
 type: specification
 ---
 
@@ -816,6 +896,7 @@ type: specification
         (spec_dir / "S-002.md").write_text(
             """---
 id: S-002
+title: Test Specification 2
 type: specification
 ---
 
@@ -826,6 +907,7 @@ type: specification
         (spec_dir / "S-003.md").write_text(
             """---
 id: S-003
+title: Test Specification 3
 type: specification
 ---
 
@@ -837,6 +919,7 @@ type: specification
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001]
 ---
@@ -870,6 +953,7 @@ def test_validate_specification_coverage_no_outcomes():
         (spec_dir / "S-001.md").write_text(
             """---
 id: S-001
+title: Test Specification 1
 type: specification
 ---
 
@@ -880,6 +964,7 @@ type: specification
         (spec_dir / "S-002.md").write_text(
             """---
 id: S-002
+title: Test Specification 2
 type: specification
 ---
 
@@ -912,6 +997,7 @@ def test_validate_specification_coverage_no_specs():
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: []
 ---
