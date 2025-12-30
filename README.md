@@ -14,11 +14,11 @@ pip install jig
 # Initialize JIG in your project
 mkdir -p jig/specifications jig/outcomes
 
-# Validate your artifacts
-jigy validate
-
 # Rebuild all graphs
 jigy rebuild
+
+# Validate your artifacts
+jigy validate
 
 # Run full alignment check
 jigy align
@@ -52,14 +52,14 @@ See [Configuration Guide](docs/configuration.md) for full details.
 
 | Command | Description |
 |---------|-------------|
-| `jigy validate` | Validate all JIG artifacts |
-| `jigy validate intent` | Validate specifications and outcomes |
-| `jigy validate bricks` | Validate brick definitions |
+| `jigy align` | Full alignment: rebuild + validate + summary |
 | `jigy rebuild` | Rebuild all graphs |
 | `jigy rebuild impl` | Rebuild implementation graph |
 | `jigy rebuild verify` | Rebuild verification graph |
 | `jigy rebuild intent` | Rebuild intent graph |
-| `jigy align` | Full alignment: rebuild + validate + summary |
+| `jigy validate` | Validate all JIG artifacts |
+| `jigy validate intent` | Validate specifications and outcomes |
+| `jigy validate bricks` | Validate brick definitions |
 | `jigy show` | Display project structure overview |
 | `jigy show layers` | Display layer hierarchy |
 | `jigy show bricks` | Display brick details |
