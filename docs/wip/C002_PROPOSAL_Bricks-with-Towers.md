@@ -1,4 +1,4 @@
-# Proposal: Bricks with Slices
+# Proposal: Bricks with Towers
 
 **Status:** Draft
 **Author:** Claude + Jim
@@ -24,12 +24,12 @@ Currently, there's no way to:
 
 ---
 
-## Solution: Introduce Slices
+## Solution: Introduce Towers
 
-A **Slice** is a vertical partition of the codebase. Slices are **completely independent** — no code imports cross slice boundaries.
+A **Tower** is a vertical partition of the codebase. Towers are **completely independent** — no code imports cross tower boundaries.
 
 ```
-              │  server  │  harness  │  device-logic  │  ← Slices
+              │  server  │  harness  │  device-logic  │  ← Towers
   ────────────┼──────────┼───────────┼────────────────┤
   Layer 2     │   B-s2   │   B-h2    │                │
   Layer 1     │   B-s1   │   B-h1    │     B-d1       │
@@ -38,21 +38,21 @@ A **Slice** is a vertical partition of the codebase. Slices are **completely ind
                                Layers ↓
 ```
 
-- **Layers** = horizontal rows (dependency depth within a slice)
-- **Slices** = vertical columns (complete isolation)
-- **Bricks** = cells in the Layer × Slice matrix
+- **Layers** = horizontal rows (dependency depth within a tower)
+- **Towers** = vertical columns (complete isolation)
+- **Bricks** = cells in the Layer × Tower matrix
 
-### Key Principle: Slices Are Independent
+### Key Principle: Towers Are Independent
 
-**No cross-slice code dependencies.** Ever.
+**No cross-tower code dependencies.** Ever.
 
-How do slices communicate? Through **INTENT** — the shared specifications, contracts, and test vectors that all slices implement against. INTENT is not code; it's the shared understanding that enables independent implementation.
+How do towers communicate? Through **INTENT** — the shared specifications, contracts, and test vectors that all towers implement against. INTENT is not code; it's the shared understanding that enables independent implementation.
 
 ```
          ┌─────────────────────────────────────────────┐
          │                   INTENT                     │
          │  (Charter, Specs, Contracts, Test Vectors)   │
-         │              NOT CODE — NO SLICE             │
+         │             NOT CODE — NO TOWER             │
          └──────────┬──────────┬──────────┬────────────┘
                     │          │          │
            implements      implements    implements
@@ -60,7 +60,7 @@ How do slices communicate? Through **INTENT** — the shared specifications, con
                     ▼          ▼          ▼
               ┌─────────┐ ┌─────────┐ ┌───────────────┐
               │ server  │ │ harness │ │ device-logic  │
-              │ (slice) │ │ (slice) │ │   (slice)     │
+              │ (tower) │ │ (tower) │ │   (tower)     │
               └─────────┘ └─────────┘ └───────────────┘
                     │          │          │
                   ISOLATED   ISOLATED   ISOLATED
@@ -68,11 +68,11 @@ How do slices communicate? Through **INTENT** — the shared specifications, con
 
 ---
 
-## Slice Definitions
+## Tower Definitions
 
-Three slices partition the executable codebase:
+Three towers partition the executable codebase:
 
-| Slice ID | A-002 Component | Contains | Language |
+| Tower ID | A-002 Component | Contains | Language |
 |----------|-----------------|----------|----------|
 | `server` | #2 SERVER | Planes, Enforcer, Monitors, Routing | Python forever |
 | `harness` | #3 HARNESS | Transport, Timers, GUI, Effect Executor | Python forever |
@@ -80,16 +80,16 @@ Three slices partition the executable codebase:
 
 ### What About INTENT?
 
-INTENT (#1 from A-002) is **not a slice**. Slices partition executable code. INTENT contains:
+INTENT (#1 from A-002) is **not a tower**. Towers partition executable code. INTENT contains:
 - Markdown documents (Charter, Architecture)
 - YAML/JSON specifications
 - Test vectors
 
-INTENT is managed separately — it's the **bridge** that enables slice independence.
+INTENT is managed separately — it's the **bridge** that enables tower independence.
 
-### Slice ID Format
+### Tower ID Format
 
-Slice IDs use **kebab-case** for language-agnostic compatibility:
+Tower IDs use **kebab-case** for language-agnostic compatibility:
 
 - `server` ✓
 - `harness` ✓
@@ -119,16 +119,16 @@ bricks:
   - id: B-crdt-core
     name: CRDT Core Primitives
     layer: 1
-    slice: device-logic              # NEW: required field
+    tower: device-logic              # NEW: required field
     units:
       - M-ase.device_logic.crdt.core
 ```
 
-### Slice Field Rules
+### Tower Field Rules
 
-1. **Required** — every brick must declare its slice
+1. **Required** — every brick must declare its tower
 2. **Enum** — must be one of: `server`, `harness`, `device-logic`
-3. **Immutable** — the three slices are architectural constants, not extensible
+3. **Immutable** — the three towers are architectural constants, not extensible
 
 ---
 
@@ -136,19 +136,19 @@ bricks:
 
 ### The Core Rule
 
-**Layer rules apply within a slice. Cross-slice dependencies are forbidden.**
+**Layer rules apply within a tower. Cross-tower dependencies are forbidden.**
 
 ```
-WITHIN slice:    Layer N may depend on layers 0..(N-1)
-ACROSS slices:   FORBIDDEN — no exceptions
+WITHIN tower:    Layer N may depend on layers 0..(N-1)
+ACROSS towers:   FORBIDDEN — no exceptions
 ```
 
 ### Validation Logic
 
 ```
 is_valid_dependency(from_brick, to_brick):
-    if from_brick.slice != to_brick.slice:
-        return FALSE  # Cross-slice = always invalid
+    if from_brick.tower != to_brick.tower:
+        return FALSE  # Cross-tower = always invalid
 
     if from_brick.layer <= to_brick.layer:
         return FALSE  # Must depend on lower layer
@@ -158,7 +158,7 @@ is_valid_dependency(from_brick, to_brick):
 
 ### Why No Exceptions?
 
-A-002 shows a dependency matrix with some allowed cross-slice imports. We simplify:
+A-002 shows a dependency matrix with some allowed cross-tower imports. We simplify:
 
 | A-002 Says | We Say | Why |
 |------------|--------|-----|
@@ -212,22 +212,22 @@ units:
 ### Existing Commands (Enhanced)
 
 ```bash
-jigy validate        # Now validates slice isolation
-jigy layers          # Show layer structure (within each slice)
+jigy validate        # Now validates tower isolation
+jigy layers          # Show layer structure (within each tower)
 ```
 
 ### New Commands
 
 ```bash
-jigy slices                    # List all slices with brick counts
-jigy slices <slice_id>         # Show all bricks in a slice
-jigy matrix                    # Show 2D Layer × Slice grid
+jigy towers                    # List all towers with brick counts
+jigy towers <tower_id>         # Show all bricks in a tower
+jigy matrix                    # Show 2D Layer × Tower grid
 ```
 
-### Example Output: `jigy slices`
+### Example Output: `jigy towers`
 
 ```
-Slices (3):
+Towers (3):
 
 server (5 bricks)
   Layer 0: B-server-transport
@@ -259,22 +259,22 @@ Layer 0       │  B-trn   │  B-trn    │  B-codec,B-elc │
 
 ## Validation Errors
 
-### Cross-Slice Violation
+### Cross-Tower Violation
 
 ```
-ERROR: Cross-slice dependency forbidden
-  Brick: B-crdt-core (slice=device-logic)
-  Depends on: B-planes-core (slice=server)
-  Rule: Slices are completely independent. No cross-slice imports.
+ERROR: Cross-tower dependency forbidden
+  Brick: B-crdt-core (tower=device-logic)
+  Depends on: B-planes-core (tower=server)
+  Rule: Towers are completely independent. No cross-tower imports.
   Fix: Use INTENT specifications instead of direct code imports.
 ```
 
-### Layer Violation (Within Slice)
+### Layer Violation (Within Tower)
 
 ```
 ERROR: Layer dependency violation
-  Brick: B-igp (layer=2, slice=device-logic)
-  Depends on: B-replicator (layer=2, slice=device-logic)
+  Brick: B-igp (layer=2, tower=device-logic)
+  Depends on: B-replicator (layer=2, tower=device-logic)
   Rule: Layer 2 may only depend on layers 0-1
 ```
 
@@ -282,23 +282,23 @@ ERROR: Layer dependency violation
 
 ## Migration Path
 
-### Phase 1: Add Slice Field
+### Phase 1: Add Tower Field
 
-1. Add required `slice` field to brick schema
-2. Assign all existing bricks to appropriate slice
-3. Validate slice values are in enum
+1. Add required `tower` field to brick schema
+2. Assign all existing bricks to appropriate tower
+3. Validate tower values are in enum
 
 ### Phase 2: Enforce Isolation
 
-1. Validate no cross-slice dependencies
+1. Validate no cross-tower dependencies
 2. Fix violations by extracting shared code to INTENT specs
-3. Add `jigy slices` command
+3. Add `jigy towers` command
 
 ### Phase 3: Multi-Language Support
 
 1. Add language-prefixed unit format
 2. Support Rust/Swift/Kotlin unit references
-3. Validate cross-language slice consistency
+3. Validate cross-language tower consistency
 
 ---
 
@@ -309,13 +309,13 @@ ERROR: Layer dependency violation
 ```json
 {
   "properties": {
-    "slice": {
+    "tower": {
       "type": "string",
       "enum": ["server", "harness", "device-logic"],
-      "description": "The architectural slice this brick belongs to"
+      "description": "The architectural tower this brick belongs to"
     }
   },
-  "required": ["id", "layer", "slice", "units"]
+  "required": ["id", "layer", "tower", "units"]
 }
 ```
 
@@ -326,20 +326,20 @@ ERROR: Layer dependency violation
 | Concept | Definition |
 |---------|------------|
 | **Layer** | Horizontal stratification (dependency depth) |
-| **Slice** | Vertical partition (complete isolation) |
-| **Brick** | Cell in Layer × Slice matrix |
-| **INTENT** | Not a slice — specifications that bridge slices |
-| **Layer Rule** | Within slice: layer N depends only on layers < N |
-| **Slice Rule** | Across slices: **FORBIDDEN** |
+| **Tower** | Vertical partition (complete isolation) |
+| **Brick** | Cell in Layer × Tower matrix |
+| **INTENT** | Not a tower — specifications that bridge towers |
+| **Layer Rule** | Within tower: layer N depends only on layers < N |
+| **Tower Rule** | Across towers: **FORBIDDEN** |
 
 ### The Simplification
 
 A-002 defines a complex dependency matrix. We simplify to one rule:
 
-> **Slices don't import from each other. Period.**
+> **Towers don't import from each other. Period.**
 
 How do they interoperate? Through INTENT — shared specifications, contracts, and test vectors. This enables:
-- True independence (each slice is a standalone codebase)
+- True independence (each tower is a standalone codebase)
 - Multi-language freedom (device-logic can be Rust without affecting server)
-- Parallel development (teams work on slices independently)
-- Clean testing (each slice tests against INTENT, not other slices)
+- Parallel development (teams work on towers independently)
+- Clean testing (each tower tests against INTENT, not other towers)

@@ -1,20 +1,20 @@
-# SCOPE: Extended Intent Hierarchy and Slices
+# SCOPE: Extended Intent Hierarchy and Towers
 
 **ID:** C003
 **Status:** Draft
 **Date:** 2025-12-29
-**Implements:** C001_PROPOSAL_JIG-Core-Artifacts-Contract.md, C002_PROPOSAL_Bricks-with-Slices.md
+**Implements:** C001_PROPOSAL_JIG-Core-Artifacts-Contract.md, C002_PROPOSAL_Bricks-with-Towers.md
 
 ---
 
 ## Executive Summary
 
-This scope document defines the work required to evolve JIG from a **4-level hierarchy** (Outcome → Specification → Code/Tests) to a **7-level hierarchy** (Charter → Goals → Architecture/Outcomes → Specifications → Code/Tests) while adding **vertical partitioning** (Slices) to the existing horizontal partitioning (Layers).
+This scope document defines the work required to evolve JIG from a **4-level hierarchy** (Outcome → Specification → Code/Tests) to a **7-level hierarchy** (Charter → Goals → Architecture/Outcomes → Specifications → Code/Tests) while adding **vertical partitioning** (Towers) to the existing horizontal partitioning (Layers).
 
 **Two complementary changes:**
 
 1. **C001**: Extend intent hierarchy with Charter, Goals, and Architecture
-2. **C002**: Add Slices to Bricks for complete isolation partitioning
+2. **C002**: Add Towers to Bricks for complete isolation partitioning
 
 ---
 
@@ -27,7 +27,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 | Architecture | None | A-### documents with supports_goals, constrains |
 | Outcomes | O-### with specifies only | O-### with supports_goals + specifies |
 | Specifications | S-### | S-### (no change) |
-| Bricks | layer only | layer + slice |
+| Bricks | layer only | layer + tower |
 | Code/Tests | C-, T- annotations | C-, T- annotations (no change) |
 
 ---
@@ -99,12 +99,12 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 
 **After:**
 ```json
-{"id":"B-crdt","type":"brick","name":"CRDT Primitives","layer":0,"slice":"device-logic","units":["M-ase.crdt"],"file":"jig/bricks.yaml"}
+{"id":"B-crdt","type":"brick","name":"CRDT Primitives","layer":0,"tower":"device-logic","units":["M-ase.crdt"],"file":"jig/bricks.yaml"}
 ```
 
 **Implementation:**
-- Update `_load_brick_nodes()` to include `slice` field
-- Bricks MUST have `slice` (required field per C002)
+- Update `_load_brick_nodes()` to include `tower` field
+- Bricks MUST have `tower` (required field per C002)
 
 #### A.1.6 New Edge Types
 
@@ -130,7 +130,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 
 **After:**
 ```json
-{"_meta":{"version":"2.0","charter":"Charter","goal_count":5,"architecture_count":2,"outcome_count":18,"spec_count":54,"brick_count":11,"slice_count":3,...}}
+{"_meta":{"version":"2.0","charter":"Charter","goal_count":5,"architecture_count":2,"outcome_count":18,"spec_count":54,"brick_count":11,"tower_count":3,...}}
 ```
 
 ---
@@ -212,46 +212,46 @@ ERROR: Architecture validation failed
 - specifies MUST be non-empty (S-042)
 - All specs in specifies MUST exist (reference integrity)
 
-#### A.2.5 Slice Validation (C002) (NEW)
+#### A.2.5 Tower Validation (C002) (NEW)
 
 **Update:** `validate_brick_definitions(jig_config)` in `bricks.py`
 
 **New rules:**
-1. Required field: `slice`
-2. `slice` MUST be one of: `server`, `harness`, `device-logic`
-3. Cross-slice dependencies FORBIDDEN
+1. Required field: `tower`
+2. `tower` MUST be one of: `server`, `harness`, `device-logic`
+3. Cross-tower dependencies FORBIDDEN
 
 **Error examples:**
 ```
-ERROR: Missing required field 'slice'
+ERROR: Missing required field 'tower'
   Brick: B-crdt-core
   File: jig/bricks.yaml
 
-ERROR: Invalid slice value
+ERROR: Invalid tower value
   Brick: B-crdt-core
   Value: "core"
   Valid: server, harness, device-logic
 
-ERROR: Cross-slice dependency forbidden
-  Brick: B-crdt-core (slice=device-logic)
-  Imports from: B-planes-core (slice=server)
-  Rule: Slices are completely independent. No cross-slice imports.
+ERROR: Cross-tower dependency forbidden
+  Brick: B-crdt-core (tower=device-logic)
+  Imports from: B-planes-core (tower=server)
+  Rule: Towers are completely independent. No cross-tower imports.
   Fix: Use INTENT specifications instead of direct code imports.
 ```
 
-#### A.2.6 Slice Isolation Enforcement
+#### A.2.6 Tower Isolation Enforcement
 
-**Function:** `validate_slice_isolation(bricks, impl_graph)`
+**Function:** `validate_tower_isolation(bricks, impl_graph)`
 
 **Algorithm:**
 ```
-1. Build brick → slice mapping from bricks.yaml
+1. Build brick → tower mapping from bricks.yaml
 2. Build unit → brick mapping from brick.units
 3. For each edge in implementation graph where type="imports":
    a. Get source_brick = unit_to_brick[source]
    b. Get target_brick = unit_to_brick[target]
-   c. If source_brick.slice != target_brick.slice:
-      - VIOLATION: cross-slice import detected
+   c. If source_brick.tower != target_brick.tower:
+      - VIOLATION: cross-tower import detected
 4. Return all violations with file locations
 ```
 
@@ -287,11 +287,11 @@ class PathsConfig:
     generated: Path
 ```
 
-#### A.3.2 Slice Enum
+#### A.3.2 Tower Enum
 
 **New constant:**
 ```python
-VALID_SLICES = frozenset({"server", "harness", "device-logic"})
+VALID_TOWERS = frozenset({"server", "harness", "device-logic"})
 ```
 
 ---
@@ -330,13 +330,13 @@ G-3: Verify Implementation Completeness
   ...
 ```
 
-#### A.4.2 Slices Commands (C002)
+#### A.4.2 Towers Commands (C002)
 
 **New commands:**
 
-**`jigy slices`** — List all slices with brick counts
+**`jigy towers`** — List all towers with brick counts
 ```
-Slices (3):
+Towers (3):
 
 server (5 bricks)
   Layer 0: B-server-transport
@@ -354,9 +354,9 @@ device-logic (6 bricks)
   Layer 2: B-igp, B-replicator
 ```
 
-**`jigy slices <slice_id>`** — Show all bricks in a specific slice
+**`jigy towers <tower_id>`** — Show all bricks in a specific tower
 
-**`jigy matrix`** — Show 2D Layer × Slice grid
+**`jigy matrix`** — Show 2D Layer × Tower grid
 ```
               │  server  │  harness  │  device-logic  │
 ──────────────┼──────────┼───────────┼────────────────┤
@@ -377,12 +377,12 @@ Layer 0       │  B-trn   │  B-trn    │  B-codec,B-elc │
 - Validate charter (new)
 - Validate goals (new)
 - Validate architecture (new)
-- Validate slice isolation (new)
+- Validate tower isolation (new)
 
 **New flags:**
 - `--charter` — Validate charter only
 - `--architecture` — Validate architecture only
-- `--slices` — Validate slice isolation only
+- `--towers` — Validate tower isolation only
 
 ---
 
@@ -403,7 +403,7 @@ Order in NDJSON file:
 4. Architecture nodes (A-001, A-002, ...)
 5. Outcome nodes (with supports_goals)
 6. Specification nodes (unchanged)
-7. Brick nodes (with slice)
+7. Brick nodes (with tower)
 8. Edge records (expanded)
 
 #### A.5.3 Edge Record Format
@@ -529,7 +529,7 @@ specifies: [S-001, S-002]
 
 ### B.4 Brick Updates (C002)
 
-**Action:** Add `slice` field to all bricks in `jig/bricks.yaml`
+**Action:** Add `tower` field to all bricks in `jig/bricks.yaml`
 
 **Current format:**
 ```yaml
@@ -547,19 +547,19 @@ bricks:
   - id: B-decorators
     name: JIG Core Decorators
     layer: 0
-    slice: device-logic    # NEW
+    tower: device-logic    # NEW
     units:
       - M-jig.__init__
 ```
 
 **Affected:** All 11 bricks in `jig/bricks.yaml`
 
-**Note for JIG itself:** JIG tooling is NOT part of ASE's server/harness/device-logic slices. Options:
-1. JIG uses a fourth slice: `tooling` (extends enum)
-2. JIG is exempt from slice assignment (tooling lives outside the pyramid)
+**Note for JIG itself:** JIG tooling is NOT part of ASE's server/harness/device-logic towers. Options:
+1. JIG uses a fourth tower: `tooling` (extends enum)
+2. JIG is exempt from tower assignment (tooling lives outside the pyramid)
 3. JIG uses `device-logic` as a catch-all for single-component projects
 
-**Recommendation:** Option 2 — JIG tooling is exempt. The three slices are ASE architectural constants, not JIG constants. JIG validates slices but doesn't require them for its own codebase.
+**Recommendation:** Option 2 — JIG tooling is exempt. The three towers are ASE architectural constants, not JIG constants. JIG validates towers but doesn't require them for its own codebase.
 
 ---
 
@@ -596,16 +596,16 @@ New specifications needed to cover the extended functionality:
 | S-084 | supports_goal edges | Intent graph MUST include A/O→Goal edges |
 | S-085 | constrains edges | Intent graph MUST include A→S edges |
 
-#### B.5.4 Slice Specifications (C002)
+#### B.5.4 Tower Specifications (C002)
 
 | ID | Title | Description |
 |----|-------|-------------|
-| S-086 | Brick slice field required | Bricks MUST have slice field |
-| S-087 | Slice enum values | slice MUST be one of: server, harness, device-logic |
-| S-088 | Cross-slice isolation | Cross-slice dependencies are forbidden |
-| S-089 | Slice validation in jigy validate | jigy validate MUST check slice isolation |
-| S-090 | jigy slices command | CLI MUST provide slices listing command |
-| S-091 | jigy matrix command | CLI MUST provide layer×slice matrix command |
+| S-086 | Brick tower field required | Bricks MUST have tower field |
+| S-087 | Tower enum values | tower MUST be one of: server, harness, device-logic |
+| S-088 | Cross-tower isolation | Cross-tower dependencies are forbidden |
+| S-089 | Tower validation in jigy validate | jigy validate MUST check tower isolation |
+| S-090 | jigy towers command | CLI MUST provide towers listing command |
+| S-091 | jigy matrix command | CLI MUST provide layer×tower matrix command |
 
 ---
 
@@ -618,7 +618,7 @@ New outcomes to group the new specifications:
 | O-023 | Charter establishes project goals | [G-1] | [S-072, S-073, S-074, S-075] |
 | O-024 | Architecture constrains specifications | [G-1, G-4] | [S-076, S-077, S-078, S-079] |
 | O-025 | Intent graph captures full hierarchy | [G-3, G-4] | [S-080, S-081, S-082, S-083, S-084, S-085] |
-| O-026 | Slices enforce component isolation | [G-2] | [S-086, S-087, S-088, S-089, S-090, S-091] |
+| O-026 | Towers enforce component isolation | [G-2] | [S-086, S-087, S-088, S-089, S-090, S-091] |
 
 ---
 
@@ -766,25 +766,25 @@ Atomic work packages for implementation:
 
 ---
 
-### WU-C012: Brick Schema - Add Slice Field
+### WU-C012: Brick Schema - Add Tower Field
 
 **Scope:**
-- Update brick validation to require `slice` field
-- Add VALID_SLICES constant
-- Validate slice is in enum
-- Update bricks.yaml with slice for all bricks
+- Update brick validation to require `tower` field
+- Add VALID_TOWERS constant
+- Validate tower is in enum
+- Update bricks.yaml with tower for all bricks
 
 **Specs:** S-086, S-087
 **Outcome:** O-026
 
 ---
 
-### WU-C013: Slice Isolation Validation
+### WU-C013: Tower Isolation Validation
 
 **Scope:**
-- Add `validate_slice_isolation()` to bricks.py
-- Build brick→slice and unit→brick mappings
-- Scan implementation graph for cross-slice imports
+- Add `validate_tower_isolation()` to bricks.py
+- Build brick→tower and unit→brick mappings
+- Scan implementation graph for cross-tower imports
 - Report violations with fix suggestions
 
 **Specs:** S-088, S-089
@@ -792,11 +792,11 @@ Atomic work packages for implementation:
 
 ---
 
-### WU-C014: Intent Graph - Slices in Bricks
+### WU-C014: Intent Graph - Towers in Bricks
 
 **Scope:**
-- Update `_load_brick_nodes()` to include slice field
-- Update metadata with slice_count
+- Update `_load_brick_nodes()` to include tower field
+- Update metadata with tower_count
 - Bump schema version to 2.0
 
 **Specs:** S-086
@@ -804,11 +804,11 @@ Atomic work packages for implementation:
 
 ---
 
-### WU-C015: CLI - Slice Commands
+### WU-C015: CLI - Tower Commands
 
 **Scope:**
-- Add `jigy slices` command
-- Add `jigy slices <slice_id>` variant
+- Add `jigy towers` command
+- Add `jigy towers <tower_id>` variant
 - Add `jigy matrix` command
 - Format output for terminal display
 
@@ -880,19 +880,19 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 
 
                  WU-C012
-            (Brick slice field)
+            (Brick tower field)
                      │
          ┌───────────┴───────────┐
          │                       │
          ▼                       ▼
      WU-C013                 WU-C014
-(Slice isolation)      (Graph slice field)
+(Tower isolation)      (Graph tower field)
          │                       │
          └───────────┬───────────┘
                      │
                      ▼
                  WU-C015
-            (CLI slice commands)
+            (CLI tower commands)
 ```
 
 ---
@@ -908,18 +908,18 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 - Provide migration script to add placeholder `supports_goals: []`
 - Complete migration before making it required
 
-### E.2 Brick Slice Assignment
+### E.2 Brick Tower Assignment
 
 **Risk:** Current bricks may not cleanly map to server/harness/device-logic.
 
 **Mitigation:**
-- JIG tooling is exempt from slice requirements (it's a tool, not an ASE component)
-- For ASE, analyze imports to determine correct slice
-- Allow `slice: null` during migration period
+- JIG tooling is exempt from tower requirements (it's a tool, not an ASE component)
+- For ASE, analyze imports to determine correct tower
+- Allow `tower: null` during migration period
 
-### E.3 Cross-Slice Violations
+### E.3 Cross-Tower Violations
 
-**Risk:** Existing code may have cross-slice imports that are now forbidden.
+**Risk:** Existing code may have cross-tower imports that are now forbidden.
 
 **Mitigation:**
 - Run validation in audit mode first (report but don't fail)
@@ -942,20 +942,20 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 
 ### F.1 Functional Criteria
 
-1. `jigy validate` passes with Charter, Architecture, and slice validation
+1. `jigy validate` passes with Charter, Architecture, and tower validation
 2. `jigy rebuild intent` generates graph with Charter, Goal, Architecture nodes
 3. `jigy show charter` displays charter and goals
 4. `jigy show architecture` lists all architecture documents
-5. `jigy slices` displays slice breakdown
-6. `jigy matrix` displays layer × slice grid
-7. Cross-slice imports are detected and reported
+5. `jigy towers` displays tower breakdown
+6. `jigy matrix` displays layer × tower grid
+7. Cross-tower imports are detected and reported
 
 ### F.2 Document Criteria
 
 1. Charter.md exists with valid frontmatter
 2. At least 2 Architecture documents exist
 3. All Outcomes have supports_goals
-4. All Bricks have slice (or explicit exemption)
+4. All Bricks have tower (or explicit exemption)
 5. Specifications S-072 through S-091 exist
 6. Outcomes O-023 through O-026 exist
 
@@ -966,7 +966,7 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 3. Goal nodes present (G-1 through G-N)
 4. Architecture nodes present with supports_goals and constrains
 5. Outcome nodes include supports_goals
-6. Brick nodes include slice
+6. Brick nodes include tower
 7. All new edge types present: defines_goal, supports_goal, constrains
 
 ---

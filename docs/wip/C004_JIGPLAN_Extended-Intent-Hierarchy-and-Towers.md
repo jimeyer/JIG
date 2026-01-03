@@ -1,6 +1,6 @@
-# JIGPLAN: Extended Intent Hierarchy and Slices
+# JIGPLAN: Extended Intent Hierarchy and Towers
 
-**SCOPE:** docs/wip/C003_SCOPE_Extended-Intent-Hierarchy-and-Slices.md
+**SCOPE:** docs/wip/C003_SCOPE_Extended-Intent-Hierarchy-and-Towers.md
 **Date:** 2025-12-29
 **Status:** Draft
 **Author:** Claude + Jim
@@ -9,13 +9,13 @@
 
 ## Summary
 
-This JIGPLAN defines the architectural evolution of JIG from a 4-level hierarchy (Outcome → Specification → Code/Tests) to a 7-level hierarchy (Charter → Goals → Architecture/Outcomes → Specifications → Code/Tests) with vertical partitioning (Slices).
+This JIGPLAN defines the architectural evolution of JIG from a 4-level hierarchy (Outcome → Specification → Code/Tests) to a 7-level hierarchy (Charter → Goals → Architecture/Outcomes → Specifications → Code/Tests) with vertical partitioning (Towers).
 
 **Key changes:**
 - **1 new root document**: Charter.md (replaces Constitution.md)
-- **1 new architecture document**: A-001.md (merges C001 Core Artifacts Contract + C002 Slices)
+- **1 new architecture document**: A-001.md (merges C001 Core Artifacts Contract + C002 Towers)
 - **18 outcome updates**: Add `supports_goals` to all existing outcomes
-- **11 brick updates**: Add `slice: jig` to all bricks
+- **11 brick updates**: Add `tower: jig` to all bricks
 - **20 new specifications**: S-072 through S-091
 - **4 new outcomes**: O-023 through O-026
 
@@ -66,7 +66,7 @@ Derived from Constitution.md's four stated purposes:
 | CREATE | O-023 | Charter establishes project goals | supports_goals: [G-5, G-4] |
 | CREATE | O-024 | Architecture constrains specifications | supports_goals: [G-3, G-5] |
 | CREATE | O-025 | Intent graph captures full hierarchy | supports_goals: [G-5, G-2] |
-| CREATE | O-026 | Slices enforce component isolation | supports_goals: [G-3] |
+| CREATE | O-026 | Towers enforce component isolation | supports_goals: [G-3] |
 
 ### Specifications
 
@@ -87,12 +87,12 @@ Derived from Constitution.md's four stated purposes:
 | CREATE | S-083 | defines_goal edges | Intent graph MUST include Charter→Goal edges |
 | CREATE | S-084 | supports_goal edges | Intent graph MUST include A→Goal and O→Goal edges |
 | CREATE | S-085 | constrains edges | Intent graph MUST include A→S edges for constrains relationships |
-| CREATE | S-086 | Brick slice field required | Bricks MUST have slice field in bricks.yaml |
-| CREATE | S-087 | Slice value validation | slice MUST be a valid slice ID defined for the project |
-| CREATE | S-088 | Cross-slice isolation | Cross-slice dependencies are forbidden |
-| CREATE | S-089 | Slice isolation validation | jigy validate MUST check for cross-slice dependencies |
-| CREATE | S-090 | jigy slices command | CLI MUST provide command to list slices and their bricks |
-| CREATE | S-091 | jigy matrix command | CLI MUST provide layer×slice matrix visualization |
+| CREATE | S-086 | Brick tower field required | Bricks MUST have tower field in bricks.yaml |
+| CREATE | S-087 | Tower value validation | tower MUST be a valid tower ID defined for the project |
+| CREATE | S-088 | Cross-tower isolation | Cross-tower dependencies are forbidden |
+| CREATE | S-089 | Tower isolation validation | jigy validate MUST check for cross-tower dependencies |
+| CREATE | S-090 | jigy towers command | CLI MUST provide command to list towers and their bricks |
+| CREATE | S-091 | jigy matrix command | CLI MUST provide layer×tower matrix visualization |
 
 ---
 
@@ -208,7 +208,7 @@ goals to Charter. Breaks in this chain indicate misalignment between intent and 
 
 **File:** `jig/architecture/A-001.md`
 
-**Purpose:** Merge C001 (Core Artifacts Contract) and C002 (Bricks with Slices) into single authoritative architecture document.
+**Purpose:** Merge C001 (Core Artifacts Contract) and C002 (Bricks with Towers) into single authoritative architecture document.
 
 **Frontmatter:**
 ```yaml
@@ -236,13 +236,13 @@ Defines the G-A-O-S-C-T pyramid and the Layer×Slice partitioning model.
 [Content from C001 sections on Charter, Architecture, Outcome, Specification]
 
 ## Brick Partitioning
-[Content from C001 section 5 + C002 slice concept]
+[Content from C001 section 5 + C002 tower concept]
 
-## Layer and Slice Model
-[Content from C002 - layers are horizontal, slices are vertical]
+## Layer and Tower Model
+[Content from C002 - layers are horizontal, towers are vertical]
 
 ## Validation Rules
-[Content from C001 Validation Contract + C002 slice validation]
+[Content from C001 Validation Contract + C002 tower validation]
 ```
 
 ---
@@ -318,32 +318,32 @@ represented as edges.
 - Architecture constraints visible in graph structure
 ```
 
-**O-026: Slices enforce component isolation**
+**O-026: Towers enforce component isolation**
 
 ```yaml
 ---
 id: O-026
 type: outcome
-title: Slices enforce component isolation
+title: Towers enforce component isolation
 supports_goals: [G-3]
 specifies: [S-086, S-087, S-088, S-089, S-090, S-091]
 ---
 
-# Slices enforce component isolation
+# Towers enforce component isolation
 
-Bricks are assigned to slices (vertical partitions). Cross-slice dependencies
+Bricks are assigned to towers (vertical partitions). Cross-tower dependencies
 are forbidden, enforcing complete isolation between components.
 
 ## Value
 - Components can be developed/deployed independently
-- Multi-language freedom (slice can be rewritten in different language)
-- Clean testing (each slice tests against INTENT, not other slices)
+- Multi-language freedom (tower can be rewritten in different language)
+- Clean testing (each tower tests against INTENT, not other towers)
 
-## Note on JIG's Single Slice
+## Note on JIG's Single Tower
 
-JIG currently uses a single slice (`jig`) since it is a cohesive tooling system.
-This demonstrates that the slice model supports single-component projects.
-Future JIG extensions (e.g., visualization tools) could introduce additional slices.
+JIG currently uses a single tower (`jig`) since it is a cohesive tooling system.
+This demonstrates that the tower model supports single-component projects.
+Future JIG extensions (e.g., visualization tools) could introduce additional towers.
 ```
 
 ---
@@ -372,12 +372,12 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 - S-084: A→Goal and O→Goal edges (supports_goal)
 - S-085: A→S edges (constrains)
 
-**Slice specs (S-086 through S-091):**
-- S-086: Brick slice field required
-- S-087: Slice value must be valid
-- S-088: Cross-slice dependencies forbidden
-- S-089: jigy validate checks slice isolation
-- S-090: jigy slices command
+**Tower specs (S-086 through S-091):**
+- S-086: Brick tower field required
+- S-087: Tower value must be valid
+- S-088: Cross-tower dependencies forbidden
+- S-089: jigy validate checks tower isolation
+- S-090: jigy towers command
 - S-091: jigy matrix command
 
 ---
@@ -386,24 +386,24 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 
 | Action | Brick | Layer | Rationale |
 |--------|-------|-------|-----------|
-| MODIFY | B-decorators | 0 | Add slice: jig |
-| MODIFY | B-cli | 1 | Add slice: jig; add new commands (slices, matrix) |
-| MODIFY | B-validation | 0 | Add slice: jig; add charter/arch/slice validation |
-| MODIFY | B-impl-graph | 0 | Add slice: jig |
-| MODIFY | B-intent-graph | 0 | Add slice: jig; add Charter/Goal/Architecture nodes |
-| MODIFY | B-config | 0 | Add slice: jig; add charter/architecture paths |
-| MODIFY | B-hashing | 0 | Add slice: jig |
-| MODIFY | B-languages | 0 | Add slice: jig |
-| MODIFY | B-verification-graph | 1 | Add slice: jig |
-| MODIFY | B-audit | 1 | Add slice: jig |
-| MODIFY | B-staleness | 0 | Add slice: jig |
-| FORBIDDEN | (none) | - | All bricks need modification for slice field |
+| MODIFY | B-decorators | 0 | Add tower: jig |
+| MODIFY | B-cli | 1 | Add tower: jig; add new commands (towers, matrix) |
+| MODIFY | B-validation | 0 | Add tower: jig; add charter/arch/tower validation |
+| MODIFY | B-impl-graph | 0 | Add tower: jig |
+| MODIFY | B-intent-graph | 0 | Add tower: jig; add Charter/Goal/Architecture nodes |
+| MODIFY | B-config | 0 | Add tower: jig; add charter/architecture paths |
+| MODIFY | B-hashing | 0 | Add tower: jig |
+| MODIFY | B-languages | 0 | Add tower: jig |
+| MODIFY | B-verification-graph | 1 | Add tower: jig |
+| MODIFY | B-audit | 1 | Add tower: jig |
+| MODIFY | B-staleness | 0 | Add tower: jig |
+| FORBIDDEN | (none) | - | All bricks need modification for tower field |
 
 ---
 
 ### Brick Details
 
-#### All Bricks: Add Slice Field
+#### All Bricks: Add Tower Field
 
 **Current format:**
 ```yaml
@@ -419,12 +419,12 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 - id: B-decorators
   name: JIG Core Decorators
   layer: 0
-  slice: jig
+  tower: jig
   units:
     - M-jig.__init__
 ```
 
-**Slice rationale:** JIG is a single cohesive tool. All bricks belong to the `jig` slice. This demonstrates that the slice model works for single-component projects while establishing the infrastructure for future multi-slice evolution (e.g., a separate visualization tool).
+**Tower rationale:** JIG is a single cohesive tool. All bricks belong to the `jig` tower. This demonstrates that the tower model works for single-component projects while establishing the infrastructure for future multi-tower evolution (e.g., a separate visualization tool).
 
 #### B-validation Modifications
 
@@ -432,7 +432,7 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 - `validate_charter_file()` - Charter validation
 - `validate_architecture_files()` - Architecture validation
 - `validate_goal_references()` - Goal reference validation
-- `validate_slice_isolation()` - Cross-slice dependency checking
+- `validate_tower_isolation()` - Cross-tower dependency checking
 
 **New dependencies:** None (layer 0)
 
@@ -453,7 +453,7 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 - `architecture` path (default: `architecture`)
 
 **New constant:**
-- `VALID_SLICES` (project-specific, JIG uses `{"jig"}`)
+- `VALID_TOWERS` (project-specific, JIG uses `{"jig"}`)
 
 #### B-cli Modifications
 
@@ -461,8 +461,8 @@ Specs will be created as individual files in `jig/specifications/`. Summary:
 - `jigy show charter` - Display Charter and goals
 - `jigy show goals` - List goals with supporting artifacts
 - `jigy show architecture` - List architecture documents
-- `jigy slices` - List slices with brick counts
-- `jigy matrix` - Display layer×slice grid
+- `jigy towers` - List towers with brick counts
+- `jigy matrix` - Display layer×tower grid
 
 ---
 
@@ -494,16 +494,16 @@ Layer 1: SERVICES (3 bricks)
 
 No layer changes. All modifications are additive to existing bricks.
 
-### Slice Structure (New)
+### Tower Structure (New)
 
 ```
-Slice: jig (11 bricks)
+Tower: jig (11 bricks)
   Layer 0: B-decorators, B-validation, B-impl-graph, B-intent-graph,
            B-config, B-hashing, B-languages, B-staleness
   Layer 1: B-cli, B-verification-graph, B-audit
 ```
 
-**Note:** Since JIG has only one slice, cross-slice validation will always pass. The infrastructure exists for future multi-slice projects or JIG extensions.
+**Note:** Since JIG has only one tower, cross-tower validation will always pass. The infrastructure exists for future multi-tower projects or JIG extensions.
 
 ---
 
@@ -518,8 +518,8 @@ New validation functions:
 | implements | F-jig.validation.intent.validate_charter_file | S-072, S-073, S-074, S-075 |
 | implements | F-jig.validation.intent.validate_architecture_files | S-076, S-077, S-078, S-079 |
 | implements | F-jig.validation.intent.validate_goal_references | S-075 |
-| implements | F-jig.validation.bricks.validate_slice_field | S-086, S-087 |
-| implements | F-jig.validation.bricks.validate_slice_isolation | S-088, S-089 |
+| implements | F-jig.validation.bricks.validate_tower_field | S-086, S-087 |
+| implements | F-jig.validation.bricks.validate_tower_isolation | S-088, S-089 |
 
 New intent graph functions:
 
@@ -539,8 +539,8 @@ New CLI commands:
 | implements | F-jig.cli.show.show_charter | S-072 |
 | implements | F-jig.cli.show.show_goals | S-075 |
 | implements | F-jig.cli.show.show_architecture | S-076 |
-| implements | F-jig.cli.slices.slices_command | S-090 |
-| implements | F-jig.cli.slices.matrix_command | S-091 |
+| implements | F-jig.cli.towers.towers_command | S-090 |
+| implements | F-jig.cli.towers.matrix_command | S-091 |
 
 ### Decorators to REMOVE
 
@@ -580,7 +580,7 @@ jig/
 │   └── O-001.md ... O-026.md     # UPDATED + NEW
 ├── specifications/
 │   └── S-001.md ... S-091.md     # EXISTING + NEW
-├── bricks.yaml                   # UPDATED: slice field
+├── bricks.yaml                   # UPDATED: tower field
 ├── generated/                    # Intent graph version 2.0
 │   ├── intent-graph.ndjson       # Charter, Goal, Architecture nodes
 │   └── ...
@@ -607,8 +607,8 @@ jigy validate
 # ✓ Architecture: 1 file, valid supports_goals, valid constrains
 # ✓ Outcomes: 22 files, all have supports_goals
 # ✓ Specifications: 91 files, all valid
-# ✓ Bricks: 11 bricks, all have slice field
-# ✓ Slices: 1 slice (jig), no cross-slice violations
+# ✓ Bricks: 11 bricks, all have tower field
+# ✓ Towers: 1 tower (jig), no cross-tower violations
 # ✓ Layer structure: valid (no upward dependencies)
 
 # 3. Verify layer structure unchanged
@@ -660,7 +660,7 @@ Before human approval:
 - [x] All existing outcomes reviewed - 18 outcomes need supports_goals
 - [x] Charter goals derived from Constitution's 4 purposes + traceability
 - [x] Architecture document merges C001 + C002 proposals
-- [x] Brick slice field planned (single slice: jig)
+- [x] Brick tower field planned (single tower: jig)
 - [x] New specs follow evergreen guidelines
 - [x] Layer constraints validated (no changes)
 - [x] @jig decorator plan complete
@@ -678,7 +678,7 @@ Before human approval:
    - G-4: Intent Alignment
    - G-5: Full Traceability
 
-2. **Slice Name**: Is `jig` the right slice name, or prefer `jig-tooling`?
+2. **Tower Name**: Is `jig` the right tower name, or prefer `jig-tooling`?
 
 3. **Archive Strategy**: Archive Constitution.md to `jig/old/` or delete entirely?
 
