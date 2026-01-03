@@ -23,6 +23,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+
 # Virtual environments
 .venv/
 venv/
@@ -58,6 +59,7 @@ dmypy.json
 
 # JIG-specific
 jig/deltas/active/*/scratch/
+jig/generated/
 *.tmp
 *.bak
 cached.diff

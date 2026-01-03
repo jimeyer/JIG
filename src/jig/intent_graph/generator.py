@@ -15,11 +15,12 @@ import jig
 from jig.hashing import git_blob_hash, hash_brick, hash_intent_artifact
 
 
-@jig.implements("S-028", "S-050")
+@jig.implements("S-028", "S-050", "S-068")
 def generate_intent_graph(
     project_root: Path,
     output_path: Optional[Path] = None,
     include_timestamp: bool = True,
+    git_metadata: Optional[Dict[str, Any]] = None,
 ) -> tuple[Path, int, int]:
     """Generate intent-graph.ndjson from intent artifacts.
 
@@ -29,6 +30,7 @@ def generate_intent_graph(
             <project_root>/jig/generated/intent-graph.ndjson.
         include_timestamp: Whether to include generated timestamp in metadata.
             Defaults to True.
+        git_metadata: Optional git state metadata for staleness detection.
 
     Returns:
         Tuple of (output_path, node_count, edge_count).
@@ -68,6 +70,7 @@ def generate_intent_graph(
         outcome_count=len(outcome_nodes),
         brick_count=len(brick_nodes),
         include_timestamp=include_timestamp,
+        git_metadata=git_metadata,
     )
 
     # Write NDJSON file
@@ -250,11 +253,13 @@ def _create_specifies_edges(outcome_nodes: List[Dict[str, Any]]) -> List[Dict[st
     return edges
 
 
+@jig.implements("S-068")
 def _generate_metadata(
     spec_count: int,
     outcome_count: int,
     brick_count: int,
     include_timestamp: bool,
+    git_metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Generate metadata for intent graph.
 
@@ -263,6 +268,7 @@ def _generate_metadata(
         outcome_count: Number of outcome nodes.
         brick_count: Number of brick nodes.
         include_timestamp: Whether to include generated timestamp.
+        git_metadata: Optional git state metadata for staleness detection.
 
     Returns:
         Metadata dictionary with _meta key.
@@ -278,6 +284,12 @@ def _generate_metadata(
 
     if include_timestamp:
         metadata["_meta"]["generated"] = datetime.now(timezone.utc).isoformat()
+
+    # Add git metadata for staleness detection (S-068)
+    if git_metadata:
+        metadata["_meta"]["git_head"] = git_metadata.get("git_head")
+        metadata["_meta"]["git_tree_hashes"] = git_metadata.get("git_tree_hashes", {})
+        metadata["_meta"]["git_dirty_files"] = git_metadata.get("git_dirty_files", [])
 
     return metadata
 

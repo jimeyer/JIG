@@ -12,16 +12,20 @@ from jig.cli.discovery import find_project_root
 from jig.config import JigConfig
 
 
-@jig.implements("S-060", "S-065")
-def show_overview_command(config: JigConfig) -> int:
+@jig.implements("S-060", "S-065", "S-070")
+def show_overview_command(config: JigConfig, skip_rebuild: bool = False) -> int:
     """Display bricks + layers overview.
 
     Args:
         config: JIG configuration with resolved paths.
+        skip_rebuild: If True, skip auto-rebuild.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
+    # Auto-rebuild all stale graphs before showing (S-070)
+    from jig.cli.auto_rebuild import ensure_graphs_current
+    ensure_graphs_current(["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild)
     bricks_file = config.paths.bricks
     impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
@@ -73,16 +77,20 @@ def show_overview_command(config: JigConfig) -> int:
     return 0
 
 
-@jig.implements("S-060", "S-065")
-def show_layers_command(config: JigConfig) -> int:
+@jig.implements("S-060", "S-065", "S-070")
+def show_layers_command(config: JigConfig, skip_rebuild: bool = False) -> int:
     """Display layer hierarchy.
 
     Args:
         config: JIG configuration with resolved paths.
+        skip_rebuild: If True, skip auto-rebuild.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
+    # Auto-rebuild stale impl + intent graphs before showing (S-070)
+    from jig.cli.auto_rebuild import ensure_graphs_current
+    ensure_graphs_current(["impl", "intent"], config, skip_rebuild=skip_rebuild)
     bricks_file = config.paths.bricks
     impl_graph = config.paths.generated / "implementation-graph.ndjson"
 
@@ -165,16 +173,20 @@ def show_layers_command(config: JigConfig) -> int:
     return 0
 
 
-@jig.implements("S-060", "S-065")
-def show_bricks_command(config: JigConfig) -> int:
+@jig.implements("S-060", "S-065", "S-070")
+def show_bricks_command(config: JigConfig, skip_rebuild: bool = False) -> int:
     """Display brick details.
 
     Args:
         config: JIG configuration with resolved paths.
+        skip_rebuild: If True, skip auto-rebuild.
 
     Returns:
         Exit code (0 for success, non-zero on failure).
     """
+    # Auto-rebuild stale impl + intent graphs before showing (S-070)
+    from jig.cli.auto_rebuild import ensure_graphs_current
+    ensure_graphs_current(["impl", "intent"], config, skip_rebuild=skip_rebuild)
     bricks_file = config.paths.bricks
     impl_graph = config.paths.generated / "implementation-graph.ndjson"
 

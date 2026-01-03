@@ -7,9 +7,10 @@ import click
 import jig
 from jig.cli.discovery import find_project_root
 from jig.config import JigConfig
+from jig.staleness import collect_git_metadata
 
 
-@jig.implements("S-058", "S-065")
+@jig.implements("S-058", "S-065", "S-068")
 def rebuild_impl_command(config: JigConfig) -> int:
     """Rebuild implementation graph.
 
@@ -30,6 +31,9 @@ def rebuild_impl_command(config: JigConfig) -> int:
 
     output_path = config.paths.generated / "implementation-graph.ndjson"
 
+    # Collect git metadata for staleness detection (S-068)
+    git_metadata = collect_git_metadata(config, [config.paths.source])
+
     graph = build_graph(
         project_root=config.project_root,
         source_dir=config.paths.source,
@@ -38,13 +42,14 @@ def rebuild_impl_command(config: JigConfig) -> int:
         verbose=False,
         strict=True,
         include_timestamp=True,
+        git_metadata=git_metadata,
     )
 
     click.echo(f"  impl: {graph.node_count()} nodes, {graph.edge_count()} edges")
     return 0
 
 
-@jig.implements("S-058", "S-065")
+@jig.implements("S-058", "S-065", "S-068")
 def rebuild_intent_command(config: JigConfig) -> int:
     """Rebuild intent graph.
 
@@ -59,17 +64,27 @@ def rebuild_intent_command(config: JigConfig) -> int:
     click.echo(f"Rebuilding intent graph...")
 
     output_path = config.paths.generated / "intent-graph.ndjson"
+
+    # Collect git metadata for staleness detection (S-068)
+    # Intent graph inputs: specifications, outcomes, bricks
+    git_metadata = collect_git_metadata(config, [
+        config.paths.specifications,
+        config.paths.outcomes,
+        config.paths.bricks.parent,  # jig_root for bricks.yaml
+    ])
+
     output_path, node_count, edge_count = generate_intent_graph(
         project_root=config.project_root,
         output_path=output_path,
         include_timestamp=True,
+        git_metadata=git_metadata,
     )
 
     click.echo(f"  intent: {node_count} nodes, {edge_count} edges")
     return 0
 
 
-@jig.implements("S-058", "S-065")
+@jig.implements("S-058", "S-065", "S-068")
 def rebuild_verify_command(config: JigConfig) -> int:
     """Rebuild verification graph.
 
@@ -85,11 +100,15 @@ def rebuild_verify_command(config: JigConfig) -> int:
 
     output_path = config.paths.generated / "verification-graph.ndjson"
 
+    # Collect git metadata for staleness detection (S-068)
+    git_metadata = collect_git_metadata(config, [config.paths.tests])
+
     graph = build_verification_graph(
         project_root=config.project_root,
         test_dir=config.paths.tests,
         output_path=output_path,
         include_timestamp=True,
+        git_metadata=git_metadata,
     )
 
     click.echo(f"  verify: {graph.node_count()} nodes, {graph.edge_count()} edges")
@@ -121,7 +140,7 @@ def rebuild_all_command(config: JigConfig) -> int:
     return 0
 
 
-@jig.implements("S-059", "S-065")
+@jig.implements("S-059", "S-065", "S-068")
 def align_command(config: JigConfig) -> int:
     """Run full alignment workflow: rebuild all graphs, validate, display summary.
 
@@ -150,6 +169,7 @@ def align_command(config: JigConfig) -> int:
     # Step 2: Rebuild impl graph
     impl_output = config.paths.generated / "implementation-graph.ndjson"
     try:
+        impl_git_metadata = collect_git_metadata(config, [config.paths.source])
         impl_graph = build_graph(
             project_root=config.project_root,
             source_dir=config.paths.source,
@@ -158,6 +178,7 @@ def align_command(config: JigConfig) -> int:
             verbose=False,
             strict=True,
             include_timestamp=True,
+            git_metadata=impl_git_metadata,
         )
         click.echo(f"  impl: {impl_graph.node_count()} functions")
     except Exception as e:
@@ -167,11 +188,13 @@ def align_command(config: JigConfig) -> int:
     # Step 3: Rebuild verify graph
     verify_output = config.paths.generated / "verification-graph.ndjson"
     try:
+        verify_git_metadata = collect_git_metadata(config, [config.paths.tests])
         verify_graph = build_verification_graph(
             project_root=config.project_root,
             test_dir=config.paths.tests,
             output_path=verify_output,
             include_timestamp=True,
+            git_metadata=verify_git_metadata,
         )
         click.echo(f"  verify: {verify_graph.node_count()} tests")
     except Exception as e:
@@ -181,10 +204,16 @@ def align_command(config: JigConfig) -> int:
     # Step 4: Rebuild intent graph
     try:
         intent_output = config.paths.generated / "intent-graph.ndjson"
+        intent_git_metadata = collect_git_metadata(config, [
+            config.paths.specifications,
+            config.paths.outcomes,
+            config.paths.bricks.parent,
+        ])
         intent_output, intent_nodes, intent_edges = generate_intent_graph(
             project_root=config.project_root,
             output_path=intent_output,
             include_timestamp=True,
+            git_metadata=intent_git_metadata,
         )
         # Count specs and outcomes from the graph
         spec_dir = config.paths.specifications

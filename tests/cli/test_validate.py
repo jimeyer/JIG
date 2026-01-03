@@ -108,7 +108,8 @@ def test_validate_bricks_success():
 """
         )
 
-        result = runner.invoke(cli, ["validate", "bricks"])
+        # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks"])
         assert result.exit_code == 0
         assert "brick" in result.output.lower()
 
@@ -158,7 +159,8 @@ def test_validate_bricks_partition_gap():
 """
         )
 
-        result = runner.invoke(cli, ["validate", "bricks"])
+        # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks"])
         assert result.exit_code == 1
         assert "gap" in result.output.lower() or "0 bricks" in result.output.lower()
 
@@ -200,7 +202,8 @@ type: specification
 """
         )
 
-        result = runner.invoke(cli, ["validate"])
+        # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
+        result = runner.invoke(cli, ["--no-rebuild", "validate"])
         assert result.exit_code == 0
         # Should run both validations
         assert "intent" in result.output.lower() or "specification" in result.output.lower()
@@ -226,7 +229,8 @@ type: specification
 """
         )
 
-        result = runner.invoke(cli, ["validate"])
+        # Use --no-rebuild to skip auto-rebuild (testing graph-less behavior)
+        result = runner.invoke(cli, ["--no-rebuild", "validate"])
         # Should succeed (intent validation passes, brick validation skipped)
         assert result.exit_code == 0
 

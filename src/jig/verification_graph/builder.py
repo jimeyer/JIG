@@ -5,7 +5,7 @@ This is the main entry point for building the verification graph.
 """
 
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import jig
 from jig.impl_graph.graph import Graph
@@ -14,13 +14,14 @@ from jig.verification_graph.analyzer import TestAnalyzer
 from jig.verification_graph.discovery import discover_test_files
 
 
-@jig.implements("S-055")
+@jig.implements("S-055", "S-068")
 def build_verification_graph(
     project_root: Path,
     test_dir: Optional[Path] = None,
     output_path: Optional[Path] = None,
     exclude_patterns: Optional[List[str]] = None,
     include_timestamp: bool = True,
+    git_metadata: Optional[Dict[str, Any]] = None,
 ) -> Graph:
     """Build verification graph from test files.
 
@@ -36,6 +37,7 @@ def build_verification_graph(
         output_path: Path for NDJSON output (defaults to jig/generated/verification-graph.ndjson).
         exclude_patterns: Additional patterns to exclude from discovery.
         include_timestamp: Whether to include timestamp in metadata.
+        git_metadata: Optional git state metadata for staleness detection.
 
     Returns:
         The populated Graph instance.
@@ -62,6 +64,6 @@ def build_verification_graph(
     # 3. Write to NDJSON
     if output_path is None:
         output_path = project_root / "jig" / "generated" / "verification-graph.ndjson"
-    write_ndjson(graph, output_path, include_timestamp=include_timestamp)
+    write_ndjson(graph, output_path, include_timestamp=include_timestamp, git_metadata=git_metadata)
 
     return graph

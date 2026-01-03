@@ -16,6 +16,8 @@ bricks:
       - M-jig.cli.discovery
       - M-jig.cli.rebuild
       - M-jig.cli.show
+      - M-jig.cli.audit
+      - M-jig.cli.auto_rebuild
 
   - id: B-validation
     name: Artifact Validation
@@ -70,3 +72,16 @@ bricks:
       - M-jig.verification_graph.discovery
       - M-jig.verification_graph.analyzer
       - M-jig.verification_graph.builder
+
+  - id: B-audit
+    name: Audit System
+    layer: 1
+    units:
+      - M-jig.audit.coverage
+      - M-jig.audit.record_writer
+
+  - id: B-staleness
+    name: Staleness Detection
+    layer: 0
+    units:
+      - M-jig.staleness

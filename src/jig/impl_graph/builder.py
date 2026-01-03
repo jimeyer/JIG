@@ -104,6 +104,7 @@ class GraphBuilder:
         output_path: Path,
         include_timestamp: bool = True,
         verbose: bool = False,
+        git_metadata: Optional[dict] = None,
     ) -> None:
         """Write the graph to an NDJSON file.
 
@@ -111,8 +112,14 @@ class GraphBuilder:
             output_path: Path to write the NDJSON file.
             include_timestamp: Include timestamp in metadata.
             verbose: Enable verbose output.
+            git_metadata: Optional git state metadata for staleness detection.
         """
-        write_ndjson(self.graph, output_path, include_timestamp=include_timestamp)
+        write_ndjson(
+            self.graph,
+            output_path,
+            include_timestamp=include_timestamp,
+            git_metadata=git_metadata,
+        )
 
         if verbose:
             logger.info(f"Graph written to {output_path}")
@@ -182,7 +189,7 @@ class GraphBuilder:
         self.graph.add_edges(result["edges"])
 
 
-@jig.implements("S-001", "S-003", "S-006")
+@jig.implements("S-001", "S-003", "S-006", "S-068")
 def build_graph(
     project_root: Path,
     source_dir: Optional[Path] = None,
@@ -191,6 +198,7 @@ def build_graph(
     verbose: bool = False,
     strict: bool = True,
     include_timestamp: bool = True,
+    git_metadata: Optional[dict] = None,
 ) -> Graph:
     """Build an implementation graph from source files.
 
@@ -204,6 +212,7 @@ def build_graph(
         verbose: Enable verbose output.
         strict: Fail on parse errors.
         include_timestamp: Include timestamp in metadata.
+        git_metadata: Optional git state metadata for staleness detection.
 
     Returns:
         The constructed graph.
@@ -215,6 +224,11 @@ def build_graph(
     graph = builder.build(exclude_patterns=exclude_patterns, verbose=verbose, strict=strict)
 
     if output_path:
-        builder.write(output_path, include_timestamp=include_timestamp, verbose=verbose)
+        builder.write(
+            output_path,
+            include_timestamp=include_timestamp,
+            verbose=verbose,
+            git_metadata=git_metadata,
+        )
 
     return graph

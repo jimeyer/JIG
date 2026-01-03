@@ -55,6 +55,10 @@ specifies:
 A test outcome.
 """)
 
+        # Create bricks.yaml (required for auto-rebuild of intent graph)
+        bricks_file = project / "jig" / "bricks.yaml"
+        bricks_file.write_text("bricks: []\n")
+
         # Create default source directory
         (project / "src").mkdir()
         (project / "test").mkdir()
@@ -70,6 +74,10 @@ def test_validate_uses_config_paths(project_dir):
     (project_dir / "custom_jig" / "specifications").mkdir()
     (project_dir / "custom_jig" / "outcomes").mkdir()
     (project_dir / "custom_jig" / "generated").mkdir()
+
+    # Create bricks.yaml (required for auto-rebuild of intent graph)
+    bricks_file = project_dir / "custom_jig" / "bricks.yaml"
+    bricks_file.write_text("bricks: []\n")
 
     # Create a spec in custom location
     spec_file = project_dir / "custom_jig" / "specifications" / "S-002.md"
@@ -334,6 +342,10 @@ def test_full_workflow_with_config(project_dir):
     (project_dir / "custom_jig" / "specifications").mkdir()
     (project_dir / "custom_jig" / "outcomes").mkdir()
     (project_dir / "custom_jig" / "generated").mkdir()
+
+    # Create bricks.yaml (required for auto-rebuild of intent graph)
+    bricks_file = project_dir / "custom_jig" / "bricks.yaml"
+    bricks_file.write_text("bricks: []\n")
 
     # Create specification
     spec_file = project_dir / "custom_jig" / "specifications" / "S-100.md"
