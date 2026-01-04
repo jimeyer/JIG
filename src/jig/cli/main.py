@@ -59,9 +59,16 @@ from jig.cli.rebuild import (
     rebuild_verify_command,
 )
 from jig.cli.show import (
+    show_architecture_command,
     show_bricks_command,
+    show_charter_command,
+    show_goals_command,
     show_layers_command,
     show_overview_command,
+)
+from jig.cli.towers import (
+    matrix_command,
+    towers_command,
 )
 from jig.cli.validate import (
     validate_bricks_command,
@@ -276,6 +283,100 @@ def show_bricks_cli(ctx) -> None:
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
     exit_code = show_bricks_command(config, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+@show_group.command(name="charter")
+@click.pass_context
+@jig.implements("S-072", "S-065", "S-071")
+def show_charter_cli(ctx) -> None:
+    """Display Charter.md content and goals.
+
+    Shows the project charter with defined goals.
+
+    Example:
+        jigy show charter
+    """
+    config = get_config(ctx)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = show_charter_command(config, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+@show_group.command(name="goals")
+@click.pass_context
+@jig.implements("S-075", "S-065", "S-071")
+def show_goals_cli(ctx) -> None:
+    """Display all goals with supporting artifacts.
+
+    Lists goals from Charter.md with their supporting
+    Outcomes and Architecture documents.
+
+    Example:
+        jigy show goals
+    """
+    config = get_config(ctx)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = show_goals_command(config, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+@show_group.command(name="architecture")
+@click.argument("arch_id", required=False, default=None)
+@click.pass_context
+@jig.implements("S-076", "S-065", "S-071")
+def show_architecture_cli(ctx, arch_id: str | None) -> None:
+    """Display architecture documents.
+
+    Lists all architecture documents, or shows details
+    for a specific one if ARCH_ID is provided.
+
+    Example:
+        jigy show architecture         # List all
+        jigy show architecture A-001   # Show specific
+    """
+    config = get_config(ctx)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = show_architecture_command(config, arch_id=arch_id, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+# Towers command group (S-090, S-091)
+@cli.command(name="towers")
+@click.argument("tower_id", required=False, default=None)
+@click.pass_context
+@jig.implements("S-090", "S-065", "S-071")
+def towers_cli(ctx, tower_id: str | None) -> None:
+    """Display tower structure with brick counts.
+
+    Lists all towers with brick counts by layer.
+    For single-tower projects, shows appropriate message.
+
+    Example:
+        jigy towers           # List all towers
+        jigy towers core      # Show specific tower
+    """
+    config = get_config(ctx)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = towers_command(config, tower_id=tower_id, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+@cli.command(name="matrix")
+@click.pass_context
+@jig.implements("S-091", "S-065", "S-071")
+def matrix_cli(ctx) -> None:
+    """Display layer × tower grid.
+
+    Shows a matrix view of layers vs towers.
+    For single-tower projects, shows appropriate message.
+
+    Example:
+        jigy matrix
+    """
+    config = get_config(ctx)
+    skip_rebuild = get_no_rebuild(ctx)
+    exit_code = matrix_command(config, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
