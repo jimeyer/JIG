@@ -1,0 +1,18 @@
+# DIG Configuration
+# See: jig/architecture/A-001.md
+
+types:
+  - exploration
+  - scope
+  - jigplan
+  - plan
+  - journal
+  - wu
+  - retrospective
+
+statuses:
+  - active
+  - parked
+  - implemented
+  - abandoned
+  - superseded

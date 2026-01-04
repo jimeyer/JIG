@@ -24,6 +24,7 @@ def test_validate_intent_success():
             """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test
@@ -72,6 +73,7 @@ def test_validate_intent_exit_codes():
             """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test
@@ -178,6 +180,7 @@ def test_validate_full_success():
             """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test
@@ -223,6 +226,7 @@ def test_validate_full_skips_bricks_if_no_graph():
             """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test
@@ -313,6 +317,7 @@ def test_validate_human_output_only():
             """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test

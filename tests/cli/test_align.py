@@ -21,6 +21,7 @@ def create_minimal_jig_project(root: Path) -> None:
         """---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test Specification
@@ -32,6 +33,7 @@ type: specification
         """---
 id: O-001
 type: outcome
+title: Test Outcome
 specifies: [S-001]
 ---
 

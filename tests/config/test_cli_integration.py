@@ -31,6 +31,7 @@ def project_dir():
         spec_file.write_text("""---
 id: S-001
 type: specification
+title: Test Specification
 ---
 
 # Test Specification
@@ -46,6 +47,7 @@ A test specification for validation.
         outcome_file.write_text("""---
 id: O-001
 type: outcome
+title: Test Outcome
 specifies:
   - S-001
 ---
@@ -84,6 +86,7 @@ def test_validate_uses_config_paths(project_dir):
     spec_file.write_text("""---
 id: S-002
 type: specification
+title: Custom Specification
 ---
 
 # Custom Specification
@@ -99,6 +102,7 @@ A custom specification.
     outcome_file.write_text("""---
 id: O-002
 type: outcome
+title: Custom Outcome
 specifies:
   - S-002
 ---
@@ -352,6 +356,7 @@ def test_full_workflow_with_config(project_dir):
     spec_file.write_text("""---
 id: S-100
 type: specification
+title: Workflow Test Spec
 ---
 
 # Workflow Test Spec
@@ -367,6 +372,7 @@ Test specification for full workflow.
     outcome_file.write_text("""---
 id: O-100
 type: outcome
+title: Workflow Test Outcome
 specifies:
   - S-100
 ---

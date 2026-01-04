@@ -3,7 +3,7 @@
 **Status:** Draft
 **Author:** Claude + Jim
 **Date:** 2025-12-29
-**Related:** [contextBricks.md](contextBricks.md), [A-002: Four-Component Separation](../../jig/architecture/A-002.md)
+**Related:** [contextBricks.md](contextBricks.md), [A-002: Four-Component Separation](../../jig/architecture/A-002_Four_Component_Separation.md)
 
 ---
 
@@ -70,13 +70,21 @@ How do towers communicate? Through **INTENT** — the shared specifications, con
 
 ## Tower Definitions
 
-Three towers partition the executable codebase:
+Towers are **project-defined**. Each project declares its own towers based on its architectural needs. Towers are **implicit** — they're inferred from usage in bricks, not declared separately.
+
+### Example: ASE's Three Towers
+
+ASE (the reference project) uses three towers based on A-002:
 
 | Tower ID | A-002 Component | Contains | Language |
 |----------|-----------------|----------|----------|
 | `server` | #2 SERVER | Planes, Enforcer, Monitors, Routing | Python forever |
 | `harness` | #3 HARNESS | Transport, Timers, GUI, Effect Executor | Python forever |
 | `device-logic` | #4 DEVICE LOGIC | CRDT, Protocol, Operations, IGP | Python → Rust/Swift/Kotlin |
+
+### Single-Tower Projects
+
+Projects that don't need vertical partitioning simply omit the `tower` field. All bricks belong to an implicit default tower, and cross-tower validation is skipped.
 
 ### What About INTENT?
 
@@ -112,23 +120,36 @@ bricks:
       - M-ase.device_logic.crdt.core
 ```
 
-### Proposed Format
+### Proposed Format (Multi-Tower Project)
 
 ```yaml
 bricks:
   - id: B-crdt-core
     name: CRDT Core Primitives
     layer: 1
-    tower: device-logic              # NEW: required field
+    tower: device-logic              # NEW: optional field
     units:
       - M-ase.device_logic.crdt.core
 ```
 
+### Proposed Format (Single-Tower Project)
+
+```yaml
+bricks:
+  - id: B-decorators
+    name: JIG Core Decorators
+    layer: 0
+    # tower omitted — single-tower project
+    units:
+      - M-jig.__init__
+```
+
 ### Tower Field Rules
 
-1. **Required** — every brick must declare its tower
-2. **Enum** — must be one of: `server`, `harness`, `device-logic`
-3. **Immutable** — the three towers are architectural constants, not extensible
+1. **Optional** — omit for single-tower projects
+2. **Implicit** — towers are inferred from usage, not declared separately
+3. **Kebab-case** — tower IDs use kebab-case for cross-language compatibility
+4. **Consistent** — if any brick has a tower, cross-tower validation is enabled
 
 ---
 
@@ -259,6 +280,16 @@ Layer 0       │  B-trn   │  B-trn    │  B-codec,B-elc │
 
 ## Validation Errors
 
+### Possible Typo Warning
+
+```
+WARNING: Tower 'devic-logic' has only 1 brick
+  Brick: B-crdt-core
+  Hint: Did you mean 'device-logic'? (3 bricks)
+
+  To suppress: This is a warning, not an error. Ignore if intentional.
+```
+
 ### Cross-Tower Violation
 
 ```
@@ -284,9 +315,9 @@ ERROR: Layer dependency violation
 
 ### Phase 1: Add Tower Field
 
-1. Add required `tower` field to brick schema
-2. Assign all existing bricks to appropriate tower
-3. Validate tower values are in enum
+1. Add optional `tower` field to brick schema
+2. Assign bricks to towers (or omit for single-tower projects)
+3. Towers inferred from usage — no separate declaration needed
 
 ### Phase 2: Enforce Isolation
 
@@ -311,13 +342,15 @@ ERROR: Layer dependency violation
   "properties": {
     "tower": {
       "type": "string",
-      "enum": ["server", "harness", "device-logic"],
-      "description": "The architectural tower this brick belongs to"
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "The architectural tower this brick belongs to (optional, kebab-case)"
     }
   },
-  "required": ["id", "layer", "tower", "units"]
+  "required": ["id", "layer", "units"]
 }
 ```
+
+**Note:** Tower is optional. If omitted, the project is treated as single-tower. Valid towers are inferred from usage across all bricks.
 
 ---
 

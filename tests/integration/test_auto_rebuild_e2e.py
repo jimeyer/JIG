@@ -30,6 +30,8 @@ def make_config(tmp_path: Path) -> JigConfig:
         outcomes=tmp_path / "jig" / "outcomes",
         bricks=tmp_path / "jig" / "bricks.yaml",
         generated=tmp_path / "jig" / "generated",
+        charter=tmp_path / "jig" / "Charter.md",
+        architecture=tmp_path / "jig" / "architecture",
     )
     return JigConfig(
         paths=paths,

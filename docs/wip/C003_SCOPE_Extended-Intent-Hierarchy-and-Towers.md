@@ -41,7 +41,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 #### A.1.1 New Node Type: Charter
 
 ```json
-{"id":"Charter","type":"charter","defines_goals":["G-1","G-2","G-3","G-4","G-5"],"file":"jig/Charter.md"}
+{"id":"Charter","type":"charter","defines_goals":["G-001","G-002","G-003","G-004","G-005"],"file":"jig/Charter.md"}
 ```
 
 **Implementation:**
@@ -53,7 +53,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 #### A.1.2 New Node Type: Goal
 
 ```json
-{"id":"G-1","type":"goal","title":"Discover Correct Design Intent","file":"jig/Charter.md"}
+{"id":"G-001","type":"goal","title":"Discover Correct Design Intent","file":"jig/Charter.md"}
 ```
 
 **Implementation:**
@@ -65,12 +65,12 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 #### A.1.3 New Node Type: Architecture
 
 ```json
-{"id":"A-001","type":"architecture","title":"Device Logic Contract","status":"active","supports_goals":["G-1","G-5"],"constrains":["S-116","S-117"],"file":"jig/architecture/A-001.md"}
+{"id":"A-001","type":"architecture","title":"Device Logic Contract","status":"active","supports_goals":["G-001","G-005"],"constrains":["S-116","S-117"],"file":"jig/architecture/A-001_Device_Logic_Contract.md"}
 ```
 
 **Implementation:**
 - Add `_load_architecture_nodes()` method
-- Scan `jig/architecture/A-*.md` files
+- Scan `jig/architecture/A-*_*.md` files (ID + title in filename)
 - Parse YAML frontmatter (id, type, title, status, supports_goals, constrains)
 - Create one node per architecture document
 
@@ -78,12 +78,12 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 
 **Current:**
 ```json
-{"id":"O-001","type":"outcome","specifies":["S-001"],"file":"jig/outcomes/O-001.md"}
+{"id":"O-001","type":"outcome","specifies":["S-001"],"file":"jig/outcomes/O-001_Secure_Authentication.md"}
 ```
 
 **After:**
 ```json
-{"id":"O-001","type":"outcome","supports_goals":["G-2","G-4"],"specifies":["S-001"],"file":"jig/outcomes/O-001.md"}
+{"id":"O-001","type":"outcome","supports_goals":["G-002","G-004"],"specifies":["S-001"],"file":"jig/outcomes/O-001_Secure_Authentication.md"}
 ```
 
 **Implementation:**
@@ -104,7 +104,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 
 **Implementation:**
 - Update `_load_brick_nodes()` to include `tower` field
-- Bricks MUST have `tower` (required field per C002)
+- Bricks MAY have `tower` (optional field per C002, omit for single-tower projects)
 
 #### A.1.6 New Edge Types
 
@@ -156,7 +156,7 @@ This scope document defines the work required to evolve JIG from a **4-level hie
 ```
 ERROR: Charter validation failed
   File: jig/Charter.md
-  Issue: defines_goals contains G-6 but no "### G-6:" header found in body
+  Issue: defines_goals contains G-006 but no "### G-006:" header found in body
 ```
 
 #### A.2.2 Goal Validation (NEW)
@@ -173,8 +173,8 @@ ERROR: Charter validation failed
 ERROR: Invalid goal reference
   File: jig/outcomes/O-015.md
   Field: supports_goals
-  Referenced: G-99
-  Available: G-1, G-2, G-3, G-4, G-5
+  Referenced: G-099
+  Available: G-001, G-002, G-003, G-004, G-005
 ```
 
 #### A.2.3 Architecture Validation (NEW)
@@ -182,7 +182,7 @@ ERROR: Invalid goal reference
 **Function:** `validate_architecture_files(jig_config, charter_goals, spec_ids)`
 
 **Rules:**
-1. Files in `jig/architecture/A-*.md`
+1. Files in `jig/architecture/A-{NNN}_{Title_Snake_Case}.md`
 2. ID format: `A-{number}` (zero-padded to 3 digits)
 3. Required fields: `id`, `type`, `title`, `status`, `supports_goals`
 4. `type` MUST be exactly `"architecture"`
@@ -195,7 +195,7 @@ ERROR: Invalid goal reference
 **Error examples:**
 ```
 ERROR: Architecture validation failed
-  File: jig/architecture/A-001.md
+  File: jig/architecture/A-001_Device_Logic_Contract.md
   Issue: supports_goals is empty - architecture must support at least one goal
 ```
 
@@ -217,20 +217,20 @@ ERROR: Architecture validation failed
 **Update:** `validate_brick_definitions(jig_config)` in `bricks.py`
 
 **New rules:**
-1. Required field: `tower`
-2. `tower` MUST be one of: `server`, `harness`, `device-logic`
-3. Cross-tower dependencies FORBIDDEN
+1. Optional field: `tower` (omit for single-tower projects)
+2. If present, `tower` MUST be kebab-case format (`^[a-z][a-z0-9-]*$`)
+3. Cross-tower dependencies FORBIDDEN (only validated if towers are used)
 
 **Error examples:**
 ```
-ERROR: Missing required field 'tower'
+ERROR: Invalid tower format
   Brick: B-crdt-core
-  File: jig/bricks.yaml
+  Value: "DeviceLogic"
+  Rule: Tower must be kebab-case (e.g., "device-logic")
 
-ERROR: Invalid tower value
+WARNING: Tower 'devic-logic' has only 1 brick
   Brick: B-crdt-core
-  Value: "core"
-  Valid: server, harness, device-logic
+  Hint: Did you mean 'device-logic'? (3 bricks)
 
 ERROR: Cross-tower dependency forbidden
   Brick: B-crdt-core (tower=device-logic)
@@ -245,14 +245,16 @@ ERROR: Cross-tower dependency forbidden
 
 **Algorithm:**
 ```
-1. Build brick → tower mapping from bricks.yaml
-2. Build unit → brick mapping from brick.units
-3. For each edge in implementation graph where type="imports":
+1. Collect all tower values from bricks
+2. If no towers declared (single-tower project): SKIP validation, return []
+3. Build brick → tower mapping from bricks.yaml
+4. Build unit → brick mapping from brick.units
+5. For each edge in implementation graph where type="imports":
    a. Get source_brick = unit_to_brick[source]
    b. Get target_brick = unit_to_brick[target]
-   c. If source_brick.tower != target_brick.tower:
+   c. If both have towers AND source_brick.tower != target_brick.tower:
       - VIOLATION: cross-tower import detected
-4. Return all violations with file locations
+6. Return all violations with file locations
 ```
 
 ---
@@ -287,12 +289,14 @@ class PathsConfig:
     generated: Path
 ```
 
-#### A.3.2 Tower Enum
+#### A.3.2 Tower Format Validation
 
 **New constant:**
 ```python
-VALID_TOWERS = frozenset({"server", "harness", "device-logic"})
+TOWER_PATTERN = re.compile(r'^[a-z][a-z0-9-]*$')  # kebab-case
 ```
+
+**Note:** Towers are project-defined and implicit (inferred from usage). No fixed enum — any kebab-case string is valid.
 
 ---
 
@@ -318,15 +322,15 @@ VALID_TOWERS = frozenset({"server", "harness", "device-logic"})
 ```
 Goals defined in Charter:
 
-G-1: Discover Correct Design Intent
+G-001: Discover Correct Design Intent
   Supported by: A-001, A-002
   Outcomes: O-001, O-005, O-012
 
-G-2: Model System Behavior
+G-002: Model System Behavior
   Supported by: A-001
   Outcomes: O-002, O-003, O-007
 
-G-3: Verify Implementation Completeness
+G-003: Verify Implementation Completeness
   ...
 ```
 
@@ -399,7 +403,7 @@ Schema version: `1.0` → `2.0`
 Order in NDJSON file:
 1. `_meta` (updated with new counts)
 2. Charter node (single)
-3. Goal nodes (G-1, G-2, ...)
+3. Goal nodes (G-001, G-002, ...)
 4. Architecture nodes (A-001, A-002, ...)
 5. Outcome nodes (with supports_goals)
 6. Specification nodes (unchanged)
@@ -409,10 +413,10 @@ Order in NDJSON file:
 #### A.5.3 Edge Record Format
 
 ```json
-{"source":"Charter","target":"G-1","type":"defines_goal"}
-{"source":"A-001","target":"G-1","type":"supports_goal"}
+{"source":"Charter","target":"G-001","type":"defines_goal"}
+{"source":"A-001","target":"G-001","type":"supports_goal"}
 {"source":"A-001","target":"S-116","type":"constrains"}
-{"source":"O-001","target":"G-2","type":"supports_goal"}
+{"source":"O-001","target":"G-002","type":"supports_goal"}
 {"source":"O-001","target":"S-001","type":"specifies"}
 ```
 
@@ -433,26 +437,26 @@ These are changes to the JIG intent documents themselves — the specifications,
 ---
 id: Charter
 type: charter
-defines_goals: [G-1, G-2, G-3, G-4, G-5]
+defines_goals: [G-001, G-002, G-003, G-004, G-005]
 ---
 
 # JIG Charter
 
 ## Charter Goals
 
-### G-1: Discover Correct Design Intent
+### G-001: Discover Correct Design Intent
 [Description]
 
-### G-2: Model System Behavior
+### G-002: Model System Behavior
 [Description]
 
-### G-3: Verify Implementation Completeness
+### G-003: Verify Implementation Completeness
 [Description]
 
-### G-4: Enable Traceability
+### G-004: Enable Traceability
 [Description]
 
-### G-5: Support Evolution
+### G-005: Support Evolution
 [Description]
 ```
 
@@ -466,7 +470,7 @@ defines_goals: [G-1, G-2, G-3, G-4, G-5]
 
 #### B.2.1 A-001: Four-Component Separation
 
-Already exists at `jig/architecture/A-002.md` — needs renumbering and frontmatter update.
+Already exists at `jig/architecture/A-002_Four_Component_Separation.md` — needs renumbering and frontmatter update.
 
 ```yaml
 ---
@@ -474,14 +478,14 @@ id: A-001
 type: architecture
 title: Four-Component Separation
 status: active
-supports_goals: [G-1, G-2]
+supports_goals: [G-001, G-002]
 constrains: [S-001, S-002, S-003]
 ---
 ```
 
 #### B.2.2 A-002: Intent Hierarchy
 
-New document defining the G-A-O-S-C-T pyramid.
+New document defining the G-A-O-S-C-T intent graph.
 
 ```yaml
 ---
@@ -489,7 +493,7 @@ id: A-002
 type: architecture
 title: Intent Hierarchy (G-A-O-S-C-T Pyramid)
 status: active
-supports_goals: [G-1, G-3, G-4]
+supports_goals: [G-001, G-003, G-004]
 constrains: []
 ---
 ```
@@ -516,7 +520,7 @@ specifies: [S-001, S-002]
 id: O-001
 type: outcome
 title: ...
-supports_goals: [G-2, G-4]
+supports_goals: [G-002, G-004]
 specifies: [S-001, S-002]
 ---
 ```
@@ -529,37 +533,35 @@ specifies: [S-001, S-002]
 
 ### B.4 Brick Updates (C002)
 
-**Action:** Add `tower` field to all bricks in `jig/bricks.yaml`
+**Action:** Optionally add `tower` field to bricks in `jig/bricks.yaml`
 
-**Current format:**
+**Single-tower project (like JIG) — no changes needed:**
 ```yaml
 bricks:
   - id: B-decorators
     name: JIG Core Decorators
     layer: 0
+    # tower field omitted — single-tower project
     units:
       - M-jig.__init__
 ```
 
-**Updated format:**
+**Multi-tower project (like ASE) — add tower field:**
 ```yaml
 bricks:
-  - id: B-decorators
-    name: JIG Core Decorators
+  - id: B-crdt-core
+    name: CRDT Core Primitives
     layer: 0
-    tower: device-logic    # NEW
+    tower: device-logic    # NEW: optional, project-defined
     units:
-      - M-jig.__init__
+      - M-ase.device_logic.crdt.core
 ```
 
-**Affected:** All 11 bricks in `jig/bricks.yaml`
+**Affected:** For JIG: no changes (single-tower). For ASE: all bricks need tower field.
 
-**Note for JIG itself:** JIG tooling is NOT part of ASE's server/harness/device-logic towers. Options:
-1. JIG uses a fourth tower: `tooling` (extends enum)
-2. JIG is exempt from tower assignment (tooling lives outside the pyramid)
-3. JIG uses `device-logic` as a catch-all for single-component projects
+**Note for JIG itself:** JIG is a single-tower project. The `tower` field is omitted from all bricks since towers are optional and implicit.
 
-**Recommendation:** Option 2 — JIG tooling is exempt. The three towers are ASE architectural constants, not JIG constants. JIG validates towers but doesn't require them for its own codebase.
+**Resolution:** Towers are project-defined, not fixed enums. Single-tower projects (like JIG) simply omit the tower field. Multi-tower projects (like ASE) define their own tower names.
 
 ---
 
@@ -580,7 +582,7 @@ New specifications needed to cover the extended functionality:
 
 | ID | Title | Description |
 |----|-------|-------------|
-| S-076 | Architecture file location | Architecture files MUST be in jig/architecture/A-*.md |
+| S-076 | Architecture file location | Architecture files MUST be in jig/architecture/A-{NNN}_{Title}.md |
 | S-077 | Architecture ID format | Architecture IDs MUST match `A-{NNN}` (zero-padded) |
 | S-078 | Architecture supports_goals required | Architecture MUST have non-empty supports_goals |
 | S-079 | Architecture constrains references | constrains field MUST reference existing specs |
@@ -598,14 +600,14 @@ New specifications needed to cover the extended functionality:
 
 #### B.5.4 Tower Specifications (C002)
 
-| ID | Title | Description |
-|----|-------|-------------|
-| S-086 | Brick tower field required | Bricks MUST have tower field |
-| S-087 | Tower enum values | tower MUST be one of: server, harness, device-logic |
-| S-088 | Cross-tower isolation | Cross-tower dependencies are forbidden |
-| S-089 | Tower validation in jigy validate | jigy validate MUST check tower isolation |
-| S-090 | jigy towers command | CLI MUST provide towers listing command |
-| S-091 | jigy matrix command | CLI MUST provide layer×tower matrix command |
+| ID    | Title                             | Description                                         |
+| ----- | --------------------------------- | --------------------------------------------------- |
+| S-086 | Brick tower field optional        | Bricks MAY have optional tower field                |
+| S-087 | Tower value format                | tower MUST be kebab-case if present                 |
+| S-088 | Cross-tower isolation             | Cross-tower dependencies are forbidden              |
+| S-089 | Tower validation in jigy validate | jigy validate MUST check tower isolation            |
+| S-090 | jigy towers command               | CLI MUST provide towers listing command             |
+| S-091 | jigy matrix command               | CLI MUST provide layer×tower matrix command         |
 
 ---
 
@@ -615,10 +617,10 @@ New outcomes to group the new specifications:
 
 | ID | Title | supports_goals | specifies |
 |----|-------|----------------|-----------|
-| O-023 | Charter establishes project goals | [G-1] | [S-072, S-073, S-074, S-075] |
-| O-024 | Architecture constrains specifications | [G-1, G-4] | [S-076, S-077, S-078, S-079] |
-| O-025 | Intent graph captures full hierarchy | [G-3, G-4] | [S-080, S-081, S-082, S-083, S-084, S-085] |
-| O-026 | Towers enforce component isolation | [G-2] | [S-086, S-087, S-088, S-089, S-090, S-091] |
+| O-023 | Charter establishes project goals | [G-001] | [S-072, S-073, S-074, S-075] |
+| O-024 | Architecture constrains specifications | [G-001, G-004] | [S-076, S-077, S-078, S-079] |
+| O-025 | Intent graph captures full hierarchy | [G-003, G-004] | [S-080, S-081, S-082, S-083, S-084, S-085] |
+| O-026 | Towers enforce component isolation | [G-002] | [S-086, S-087, S-088, S-089, S-090, S-091] |
 
 ---
 
@@ -769,10 +771,9 @@ Atomic work packages for implementation:
 ### WU-C012: Brick Schema - Add Tower Field
 
 **Scope:**
-- Update brick validation to require `tower` field
-- Add VALID_TOWERS constant
-- Validate tower is in enum
-- Update bricks.yaml with tower for all bricks
+- Update brick validation to support optional `tower` field
+- Validate tower format (kebab-case) if present
+- Tower field omitted for single-tower projects like JIG
 
 **Specs:** S-086, S-087
 **Outcome:** O-026
@@ -783,6 +784,7 @@ Atomic work packages for implementation:
 
 **Scope:**
 - Add `validate_tower_isolation()` to bricks.py
+- Skip validation for single-tower projects (no towers declared)
 - Build brick→tower and unit→brick mappings
 - Scan implementation graph for cross-tower imports
 - Report violations with fix suggestions
@@ -795,8 +797,8 @@ Atomic work packages for implementation:
 ### WU-C014: Intent Graph - Towers in Bricks
 
 **Scope:**
-- Update `_load_brick_nodes()` to include tower field
-- Update metadata with tower_count
+- Update `_load_brick_nodes()` to include optional tower field
+- Update metadata with tower_count (0 for single-tower projects)
 - Bump schema version to 2.0
 
 **Specs:** S-086
@@ -910,12 +912,13 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 
 ### E.2 Brick Tower Assignment
 
-**Risk:** Current bricks may not cleanly map to server/harness/device-logic.
+**Risk:** For multi-tower projects, bricks may not cleanly map to intended towers.
 
 **Mitigation:**
-- JIG tooling is exempt from tower requirements (it's a tool, not an ASE component)
-- For ASE, analyze imports to determine correct tower
-- Allow `tower: null` during migration period
+- Tower field is optional — single-tower projects (like JIG) simply omit it
+- Towers are project-defined — no fixed enum to conflict with
+- For multi-tower projects, analyze imports to determine correct tower
+- Typo warnings help catch mistakes (single-brick towers flagged)
 
 ### E.3 Cross-Tower Violations
 
@@ -946,16 +949,16 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 2. `jigy rebuild intent` generates graph with Charter, Goal, Architecture nodes
 3. `jigy show charter` displays charter and goals
 4. `jigy show architecture` lists all architecture documents
-5. `jigy towers` displays tower breakdown
-6. `jigy matrix` displays layer × tower grid
-7. Cross-tower imports are detected and reported
+5. `jigy towers` displays tower breakdown (or "single-tower project" message)
+6. `jigy matrix` displays layer × tower grid (or layer-only for single-tower)
+7. Cross-tower imports are detected and reported (for multi-tower projects)
 
 ### F.2 Document Criteria
 
 1. Charter.md exists with valid frontmatter
 2. At least 2 Architecture documents exist
 3. All Outcomes have supports_goals
-4. All Bricks have tower (or explicit exemption)
+4. Bricks have optional tower field (omit for single-tower projects)
 5. Specifications S-072 through S-091 exist
 6. Outcomes O-023 through O-026 exist
 
@@ -963,10 +966,10 @@ WU-C004          WU-C005          WU-C006 ◄───────────�
 
 1. Intent graph version is 2.0
 2. Charter node present with defines_goals
-3. Goal nodes present (G-1 through G-N)
+3. Goal nodes present (G-001 through G-00N)
 4. Architecture nodes present with supports_goals and constrains
 5. Outcome nodes include supports_goals
-6. Brick nodes include tower
+6. Brick nodes include tower if present (optional field)
 7. All new edge types present: defines_goal, supports_goal, constrains
 
 ---

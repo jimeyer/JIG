@@ -32,6 +32,8 @@ def _make_test_config(tmp_path: Path) -> JigConfig:
         outcomes=jig_root / "outcomes",
         bricks=jig_root / "bricks.yaml",
         generated=generated,
+        charter=jig_root / "Charter.md",
+        architecture=jig_root / "architecture",
     )
 
     return JigConfig(

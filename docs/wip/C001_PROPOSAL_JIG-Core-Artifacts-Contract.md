@@ -83,7 +83,7 @@ The system consists of exactly **seven** core artifact types:
 ---
 id: Charter
 type: charter
-defines_goals: [G-1, G-2, G-3, G-4, G-5]
+defines_goals: [G-001, G-002, G-003, G-004, G-005]
 ---
 ```
 
@@ -108,10 +108,10 @@ Goals SHALL be defined in the markdown body using this header format:
 ```markdown
 ## Charter Goals
 
-### G-1: Discover Correct Design Intent
+### G-001: Discover Correct Design Intent
 [Description of goal]
 
-### G-2: Model System Behavior
+### G-002: Model System Behavior
 [Description of goal]
 ```
 
@@ -121,7 +121,7 @@ Goal IDs in `defines_goals` SHALL match `### G-{number}:` headers in the body.
 
 ## 2. Architecture Documents
 
-**Location:** `jig/architecture/A-{number}.md`
+**Location:** `jig/architecture/A-{number}_{Title_Snake_Case}.md`
 
 **Purpose:** Define structural constraints that shape specifications. Architecture documents establish boundaries, interfaces, and invariants.
 
@@ -133,7 +133,7 @@ id: A-001
 type: architecture
 title: Device Logic Contract
 status: active
-supports_goals: [G-1, G-5]
+supports_goals: [G-001, G-005]
 constrains: [S-116, S-117, S-118]
 ---
 ```
@@ -157,15 +157,17 @@ constrains: [S-116, S-117, S-118]
 
 ### Naming Convention
 
-- Files SHALL be named `A-001.md`, `A-002.md`, etc.
+- Files SHALL be named `A-{NNN}_{Title_Snake_Case}.md`
+- Examples: `A-001_Device_Logic_Contract.md`, `A-002_Intent_Hierarchy.md`
 - Numbers SHALL be zero-padded to 3 digits
-- Numbers SHALL be sequential (no gaps preferred, but not required)
+- Title in filename SHALL match frontmatter `title` field (validation warns on drift)
+- ID in frontmatter is canonical — references use `A-001`, not the filename
 
 ---
 
 ## 3. Outcome Files
 
-**Location:** `jig/outcomes/O-{number}.md`
+**Location:** `jig/outcomes/O-{number}_{Title_Snake_Case}.md`
 
 **Purpose:** Define business value and decompose into specifications. Outcomes answer "why does this matter?"
 
@@ -176,7 +178,7 @@ constrains: [S-116, S-117, S-118]
 id: O-001
 type: outcome
 title: Airspace messages use single, semantic operation type
-supports_goals: [G-2, G-4]
+supports_goals: [G-002, G-004]
 specifies: [S-001, S-002, S-003, S-004]
 ---
 ```
@@ -202,11 +204,19 @@ specifies: [S-001, S-002, S-003, S-004]
 - `constrains` — Outcomes specify, they don't constrain (that's Architecture)
 - `brick` — Not applicable to intent documents
 
+### Naming Convention
+
+- Files SHALL be named `O-{NNN}_{Title_Snake_Case}.md`
+- Examples: `O-001_Secure_Authentication.md`, `O-015_Real_Time_Sync.md`
+- Numbers SHALL be zero-padded to 3 digits
+- Title in filename SHALL match frontmatter `title` field (validation warns on drift)
+- ID in frontmatter is canonical — references use `O-001`, not the filename
+
 ---
 
 ## 4. Specification Files
 
-**Location:** `jig/specifications/S-{number}.md`
+**Location:** `jig/specifications/S-{number}_{Title_Snake_Case}.md`
 
 **Purpose:** Define technical requirements. Specifications are the target of both `constrains` (from Architecture) and `specifies` (from Outcomes).
 
@@ -244,6 +254,14 @@ status: active
 - `constrained_by` — Derived from Architecture `constrains` field
 - `specified_by` — Derived from Outcome `specifies` field
 - `supports_goals` — Specs don't directly support goals; they are constrained/specified by documents that do
+
+### Naming Convention
+
+- Files SHALL be named `S-{NNN}_{Title_Snake_Case}.md`
+- Examples: `S-001_Token_Expiration.md`, `S-042_CRDT_Value_Observation.md`
+- Numbers SHALL be zero-padded to 3 digits
+- Title in filename SHALL match frontmatter `title` field (validation warns on drift)
+- ID in frontmatter is canonical — references use `S-001`, not the filename
 
 ### Important Note
 
@@ -375,22 +393,22 @@ jig/generated/verification-graph.ndjson
 
 **Charter Node:**
 ```json
-{"id":"Charter","type":"charter","defines_goals":["G-1","G-2","G-3","G-4","G-5"],"file":"jig/Charter.md"}
+{"id":"Charter","type":"charter","defines_goals":["G-001","G-002","G-003","G-004","G-005"],"file":"jig/Charter.md"}
 ```
 
 **Goal Node:**
 ```json
-{"id":"G-1","type":"goal","title":"Discover Correct Design Intent","file":"jig/Charter.md"}
+{"id":"G-001","type":"goal","title":"Discover Correct Design Intent","file":"jig/Charter.md"}
 ```
 
 **Architecture Node:**
 ```json
-{"id":"A-001","type":"architecture","title":"Device Logic Contract","status":"active","supports_goals":["G-1","G-5"],"constrains":["S-116","S-117"],"file":"jig/architecture/A-001.md"}
+{"id":"A-001","type":"architecture","title":"Device Logic Contract","status":"active","supports_goals":["G-001","G-005"],"constrains":["S-116","S-117"],"file":"jig/architecture/A-001_Device_Logic_Contract.md"}
 ```
 
 **Outcome Node:**
 ```json
-{"id":"O-001","type":"outcome","title":"...","supports_goals":["G-2"],"specifies":["S-001","S-002"],"file":"jig/outcomes/O-001.md"}
+{"id":"O-001","type":"outcome","title":"...","supports_goals":["G-002"],"specifies":["S-001","S-002"],"file":"jig/outcomes/O-001_Secure_Authentication.md"}
 ```
 
 **Specification Node:**
@@ -435,7 +453,7 @@ jig/generated/verification-graph.ndjson
 | Type | Format | Example | Notes |
 |------|--------|---------|-------|
 | Charter | `Charter` | `Charter` | Singleton |
-| Goal | `G-{number}` | `G-1`, `G-5` | From Charter, not zero-padded |
+| Goal | `G-{number}` | `G-001`, `G-005` | From Charter, zero-padded to 3 digits |
 | Architecture | `A-{number}` | `A-001`, `A-007` | Zero-padded to 3 digits |
 | Outcome | `O-{number}` | `O-001`, `O-045` | Zero-padded to 3 digits |
 | Specification | `S-{number}` | `S-001`, `S-169` | Zero-padded to 3 digits |
@@ -450,20 +468,21 @@ jig/generated/verification-graph.ndjson
 ```
 project-root/
 ├── jig/
-│   ├── Charter.md                    # Root document
-│   ├── JIG-Core-Artifacts-Contract.md  # This document
-│   ├── architecture/                 # Architecture documents
-│   │   ├── A-001.md
-│   │   ├── A-002.md
+│   ├── Charter.md                              # Root document (singleton)
+│   ├── architecture/                           # Architecture documents
+│   │   ├── A-001_Device_Logic_Contract.md
+│   │   ├── A-002_Intent_Hierarchy.md
 │   │   └── ...
-│   ├── outcomes/                     # Outcome documents
-│   │   ├── O-001.md
+│   ├── outcomes/                               # Outcome documents
+│   │   ├── O-001_Secure_Authentication.md
+│   │   ├── O-002_Real_Time_Sync.md
 │   │   └── ...
-│   ├── specifications/               # Specification documents
-│   │   ├── S-001.md
+│   ├── specifications/                         # Specification documents
+│   │   ├── S-001_Token_Expiration.md
+│   │   ├── S-002_Password_Hashing.md
 │   │   └── ...
-│   ├── bricks.yaml                   # Brick definitions
-│   └── generated/                    # Machine-generated graphs
+│   ├── bricks.yaml                             # Brick definitions
+│   └── generated/                              # Machine-generated graphs
 │       ├── intent-graph.ndjson
 │       ├── implementation-graph.ndjson
 │       └── verification-graph.ndjson
@@ -472,6 +491,27 @@ project-root/
 └── test/
     └── [test code with @jig annotations]
 ```
+
+### Filename Convention
+
+All JIG artifact files (except Charter.md and bricks.yaml) include the title in the filename:
+
+| Artifact | Format | Example |
+|----------|--------|---------|
+| Architecture | `A-{NNN}_{Title_Snake_Case}.md` | `A-001_Device_Logic_Contract.md` |
+| Outcome | `O-{NNN}_{Title_Snake_Case}.md` | `O-001_Secure_Authentication.md` |
+| Specification | `S-{NNN}_{Title_Snake_Case}.md` | `S-001_Token_Expiration.md` |
+
+**Rules:**
+- Title in filename SHALL match frontmatter `title` field
+- ID in frontmatter is canonical — code references use `S-001`, not the filename
+- Validation SHOULD warn when filename title drifts from frontmatter title
+- Snake_Case preserves word boundaries and avoids case-sensitivity issues
+
+**Rationale:**
+- Discoverability: `ls jig/specifications/` shows what specs exist without reading files
+- Navigation: Fuzzy finders can search by concept, not just ID
+- Git diffs: PRs show meaningful names, not just `S-042.md`
 
 ---
 
@@ -560,7 +600,7 @@ The following data SHALL be computed on demand, NOT stored:
 1. **Add Charter frontmatter** — Add `defines_goals` field
 2. **Update Architecture** — Add required `supports_goals` field
 3. **Update Outcomes** — Add required `supports_goals` field
-4. **Rename Goal references** — Change `[1, 5]` to `[G-1, G-5]`
+4. **Rename Goal references** — Change `[1, 5]` to `[G-001, G-005]`
 5. **Regenerate intent-graph** — Include Charter and Goal nodes
 6. **Validate** — Run validation for new rules
 

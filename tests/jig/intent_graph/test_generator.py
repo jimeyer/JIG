@@ -96,7 +96,7 @@ def test_generate_intent_graph_basic(temp_project):
     # First line: metadata
     metadata = json.loads(lines[0])
     assert "_meta" in metadata
-    assert metadata["_meta"]["version"] == "1.0"
+    assert metadata["_meta"]["version"] == "2.0"
     assert metadata["_meta"]["spec_count"] == 2
     assert metadata["_meta"]["outcome_count"] == 1
     assert metadata["_meta"]["brick_count"] == 1
