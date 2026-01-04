@@ -20,6 +20,11 @@ DEFAULT_SPECIFICATIONS = "specifications"
 DEFAULT_OUTCOMES = "outcomes"
 DEFAULT_BRICKS = "bricks.yaml"
 DEFAULT_GENERATED = "generated"
+DEFAULT_CHARTER = "Charter.md"
+DEFAULT_ARCHITECTURE = "architecture"
+
+# Tower validation pattern (kebab-case)
+TOWER_PATTERN = r"^[a-z][a-z0-9-]*[a-z0-9]$|^[a-z]$"
 
 
 @dataclass
@@ -36,6 +41,8 @@ class PathsConfig:
     outcomes: Path
     bricks: Path
     generated: Path
+    charter: Path
+    architecture: Path
 
 
 @dataclass
@@ -118,6 +125,8 @@ def _extract_paths_config(raw_config: dict[str, Any], project_root: Path) -> Pat
     outcomes = jig_root / paths_dict.get("outcomes", DEFAULT_OUTCOMES)
     bricks = jig_root / paths_dict.get("bricks", DEFAULT_BRICKS)
     generated = jig_root / paths_dict.get("generated", DEFAULT_GENERATED)
+    charter = jig_root / paths_dict.get("charter", DEFAULT_CHARTER)
+    architecture = jig_root / paths_dict.get("architecture", DEFAULT_ARCHITECTURE)
 
     return PathsConfig(
         source=source,
@@ -127,6 +136,8 @@ def _extract_paths_config(raw_config: dict[str, Any], project_root: Path) -> Pat
         outcomes=outcomes,
         bricks=bricks,
         generated=generated,
+        charter=charter,
+        architecture=architecture,
     )
 
 
