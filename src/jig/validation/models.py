@@ -30,6 +30,7 @@ class ValidationResult:
 
     passed: bool
     errors: list[ValidationError] = field(default_factory=list)
+    warnings: list[ValidationError] = field(default_factory=list)
     phase_name: str = ""
     items_checked: int = 0
     detail: Optional[str] = None  # Optional additional detail for display
@@ -38,6 +39,11 @@ class ValidationResult:
         """Add an error to the result."""
         self.errors.append(error)
         self.passed = False
+
+    def add_warning(self, warning: ValidationError) -> None:
+        """Add a warning to the result (does not fail validation)."""
+        warning.severity = "warning"
+        self.warnings.append(warning)
 
     def __str__(self) -> str:
         # Build the display string

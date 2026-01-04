@@ -864,3 +864,306 @@ def _normalize_cycle(cycle: list[str]) -> list[str]:
 
     min_idx = cycle.index(min(cycle))
     return cycle[min_idx:] + cycle[:min_idx]
+
+
+# ============================================================================
+# Tower Validation (S-086, S-087, S-088, S-089)
+# ============================================================================
+
+
+@jig.implements("S-086", "S-087")
+def validate_tower_format(bricks_file: Path) -> ValidationResult:
+    """
+    Validate brick tower field format.
+
+    Checks:
+    - Tower field is optional (S-086)
+    - When present, tower must be kebab-case (S-087)
+    - Single-brick towers generate typo warning
+    """
+    from jig.config.schema import TOWER_PATTERN
+
+    result = ValidationResult(passed=True, phase_name="tower format")
+
+    # Check bricks.yaml exists
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
+    # Parse bricks.yaml
+    try:
+        bricks_data = yaml.safe_load(bricks_file.read_text())
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Failed to parse bricks.yaml: {e}",
+                code="INVALID_YAML",
+            )
+        )
+        return result
+
+    # Handle both formats
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
+    if not isinstance(bricks_data, list):
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must contain a list of bricks",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    result.items_checked = len(bricks_data)
+
+    # Compile tower pattern
+    tower_pattern = re.compile(TOWER_PATTERN)
+
+    # Count bricks per tower
+    tower_bricks: dict[str, list[str]] = {}
+    bricks_with_tower = 0
+
+    for brick in bricks_data:
+        brick_id = brick.get("id", "unknown")
+        tower = brick.get("tower")
+
+        if tower is not None:
+            bricks_with_tower += 1
+
+            # Validate tower format (S-087)
+            if not isinstance(tower, str):
+                result.add_error(
+                    ValidationError(
+                        file=str(bricks_file),
+                        message=f"Brick '{brick_id}': tower must be a string, not {type(tower).__name__}",
+                        code="INVALID_TOWER_TYPE",
+                        field="tower",
+                    )
+                )
+            elif not tower_pattern.match(tower):
+                result.add_error(
+                    ValidationError(
+                        file=str(bricks_file),
+                        message=f"Brick '{brick_id}': Invalid tower format '{tower}' (must be kebab-case, e.g., 'backend', 'device-logic')",
+                        code="INVALID_TOWER_FORMAT",
+                        field="tower",
+                    )
+                )
+            else:
+                # Track bricks per tower
+                if tower not in tower_bricks:
+                    tower_bricks[tower] = []
+                tower_bricks[tower].append(brick_id)
+
+    # Warn about single-brick towers (possible typo)
+    for tower_name, bricks in tower_bricks.items():
+        if len(bricks) == 1:
+            # Find other towers to suggest
+            other_towers = [t for t in tower_bricks.keys() if t != tower_name]
+            hint = ""
+            if other_towers:
+                # Find similar tower name
+                for other in other_towers:
+                    if _is_similar(tower_name, other):
+                        hint = f" Did you mean '{other}'?"
+                        break
+
+            result.add_warning(
+                ValidationError(
+                    file=str(bricks_file),
+                    message=f"Tower '{tower_name}' has only 1 brick ({bricks[0]}).{hint}",
+                    code="SINGLE_BRICK_TOWER",
+                    severity="warning",
+                )
+            )
+
+    # Set result detail
+    if bricks_with_tower == 0:
+        result.detail = "single-tower project (no tower fields)"
+    else:
+        result.detail = f"{len(tower_bricks)} towers, {bricks_with_tower} bricks with tower field"
+
+    return result
+
+
+def _is_similar(s1: str, s2: str) -> bool:
+    """Check if two strings are similar (simple Levenshtein distance check)."""
+    # Simple check: one character difference or substring
+    if abs(len(s1) - len(s2)) > 2:
+        return False
+    if s1 in s2 or s2 in s1:
+        return True
+    # Check character difference
+    differences = sum(1 for a, b in zip(s1, s2) if a != b)
+    return differences <= 2
+
+
+@jig.implements("S-088", "S-089")
+def validate_tower_isolation(
+    bricks_file: Path,
+    impl_graph_file: Path,
+) -> ValidationResult:
+    """
+    Validate tower isolation - cross-tower dependencies are forbidden.
+
+    Checks:
+    - If any brick has tower field, tower validation is active
+    - Cross-tower function calls are detected and reported (S-088)
+    - Skipped for single-tower projects (S-089)
+    """
+    result = ValidationResult(passed=True, phase_name="tower isolation")
+
+    # Load implementation graph
+    if not impl_graph_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Implementation graph not found: {impl_graph_file}. Run 'jigy impl rebuild' first.",
+                code="GRAPH_NOT_FOUND",
+            )
+        )
+        return result
+
+    graph_nodes = _load_graph_nodes(impl_graph_file)
+
+    # Load function call edges
+    call_edges = []
+    try:
+        with impl_graph_file.open() as f:
+            for line in f:
+                item = json.loads(line)
+                if item.get("type") == "calls":
+                    call_edges.append(item)
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(impl_graph_file),
+                message=f"Failed to load implementation graph: {e}",
+                code="INVALID_GRAPH",
+            )
+        )
+        return result
+
+    # Load bricks
+    if not bricks_file.exists():
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Bricks file not found: {bricks_file}",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
+    try:
+        bricks_data = yaml.safe_load(bricks_file.read_text())
+    except Exception as e:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Failed to parse bricks.yaml: {e}",
+                code="INVALID_YAML",
+            )
+        )
+        return result
+
+    # Handle both formats
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+
+    if not isinstance(bricks_data, list):
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must contain a list of bricks",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    # Build brick-to-tower mapping
+    brick_towers: dict[str, Optional[str]] = {}
+    has_any_tower = False
+
+    for brick in bricks_data:
+        brick_id = brick.get("id", "unknown")
+        tower = brick.get("tower")
+        brick_towers[brick_id] = tower
+        if tower is not None:
+            has_any_tower = True
+
+    # If no bricks have tower field, skip validation (single-tower project)
+    if not has_any_tower:
+        result.detail = "single-tower project, isolation check skipped"
+        return result
+
+    # Build function-to-brick mapping
+    function_to_brick: dict[str, str] = {}
+
+    for brick in bricks_data:
+        brick_id = brick.get("id", "unknown")
+        units = brick.get("units", [])
+
+        # Expand units to functions
+        expanded_functions = _expand_units_to_functions(units, graph_nodes)
+        for func_id in expanded_functions:
+            function_to_brick[func_id] = brick_id
+
+    # Check for cross-tower dependencies
+    violations: list[tuple[str, str, str, str, str, str]] = []  # (source_brick, source_tower, target_brick, target_tower, source_func, target_func)
+
+    for edge in call_edges:
+        source_func = edge.get("source")
+        target_func = edge.get("target")
+
+        if not source_func or not target_func:
+            continue
+
+        source_brick = function_to_brick.get(source_func)
+        target_brick = function_to_brick.get(target_func)
+
+        # Both functions must be in bricks
+        if not source_brick or not target_brick:
+            continue
+
+        # Skip same-brick dependencies
+        if source_brick == target_brick:
+            continue
+
+        # Get towers
+        source_tower = brick_towers.get(source_brick)
+        target_tower = brick_towers.get(target_brick)
+
+        # If either has no tower, treat as "default" tower
+        source_tower = source_tower or "default"
+        target_tower = target_tower or "default"
+
+        # Check for cross-tower dependency
+        if source_tower != target_tower:
+            violations.append((source_brick, source_tower, target_brick, target_tower, source_func, target_func))
+
+    # Report violations
+    for source_brick, source_tower, target_brick, target_tower, source_func, target_func in violations:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message=f"Cross-tower dependency forbidden:\n"
+                f"  {source_brick} (tower: {source_tower}) → {target_brick} (tower: {target_tower})\n"
+                f"  {source_func} calls {target_func}\n"
+                f"  Fix: Use INTENT specifications instead of direct code imports.",
+                code="CROSS_TOWER_DEPENDENCY",
+            )
+        )
+
+    result.items_checked = len(call_edges)
+    result.detail = f"{len(violations)} cross-tower violations"
+    return result

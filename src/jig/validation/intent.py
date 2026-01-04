@@ -586,3 +586,471 @@ def _get_decorator_name(call_node: ast.Call) -> str:
     if isinstance(call_node.func, ast.Attribute):
         return f"jig.{call_node.func.attr}"
     return "unknown"
+
+
+# ============================================================================
+# Charter and Goal Validation (S-072, S-073, S-074, S-075)
+# ============================================================================
+
+
+@jig.implements("S-072", "S-073", "S-074", "S-075")
+def validate_charter_file(charter_path: Path) -> ValidationResult:
+    """
+    Validate Charter.md against S-072, S-073, S-074, S-075 specifications.
+
+    Checks:
+    - Charter file exists at jig/Charter.md (S-072)
+    - Charter has valid YAML frontmatter
+    - Charter has id: Charter, type: charter
+    - Charter has defines_goals array (S-073)
+    - Goal headers match defines_goals array (S-074)
+    - Goal IDs match G-{number} format (S-075)
+    """
+    result = ValidationResult(passed=True, phase_name="charter")
+    result.items_checked = 1
+
+    # S-072: Check file exists
+    if not charter_path.exists():
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message="Charter file not found. Charter must be a single file at jig/Charter.md",
+                code="FILE_NOT_FOUND",
+            )
+        )
+        return result
+
+    # Parse frontmatter
+    frontmatter = _parse_frontmatter(charter_path)
+    if frontmatter is None:
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message="Missing or invalid YAML frontmatter",
+                code="INVALID_FRONTMATTER",
+            )
+        )
+        return result
+
+    # Check id field
+    if frontmatter.get("id") != "Charter":
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message=f"Invalid id: '{frontmatter.get('id')}' (must be exactly 'Charter')",
+                code="INVALID_ID",
+                field="id",
+            )
+        )
+
+    # Check type field
+    if frontmatter.get("type") != "charter":
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message=f"Invalid type: '{frontmatter.get('type')}' (must be exactly 'charter')",
+                code="INVALID_TYPE",
+                field="type",
+            )
+        )
+
+    # S-073: Check defines_goals array
+    defines_goals = frontmatter.get("defines_goals")
+    if not defines_goals:
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message="Missing required field: 'defines_goals'. Charter must define at least one goal.",
+                code="MISSING_REQUIRED_FIELD",
+                field="defines_goals",
+            )
+        )
+        return result
+
+    if not isinstance(defines_goals, list):
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message=f"defines_goals must be an array, not {type(defines_goals).__name__}",
+                code="INVALID_FIELD_TYPE",
+                field="defines_goals",
+            )
+        )
+        return result
+
+    if len(defines_goals) == 0:
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message="defines_goals array is empty. Charter must define at least one goal.",
+                code="EMPTY_DEFINES_GOALS",
+                field="defines_goals",
+            )
+        )
+        return result
+
+    # S-075: Check goal ID format
+    goal_pattern = re.compile(r"^G-\d+$")
+    for goal_id in defines_goals:
+        if not goal_pattern.match(goal_id):
+            result.add_error(
+                ValidationError(
+                    file=str(charter_path),
+                    message=f"Invalid goal ID format: '{goal_id}' (must match G-{{number}} pattern, e.g., G-001)",
+                    code="INVALID_GOAL_ID_FORMAT",
+                    field="defines_goals",
+                )
+            )
+
+    # Check for duplicates
+    if len(defines_goals) != len(set(defines_goals)):
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message="defines_goals contains duplicate goal IDs",
+                code="DUPLICATE_GOAL_ID",
+                field="defines_goals",
+            )
+        )
+
+    # S-074: Extract goal headers from body and verify they match
+    body_goals = _extract_goal_headers(charter_path)
+    body_goal_ids = set(body_goals.keys())
+    frontmatter_goal_ids = set(defines_goals)
+
+    # Goals in frontmatter but not in body
+    missing_in_body = frontmatter_goal_ids - body_goal_ids
+    for goal_id in missing_in_body:
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message=f"Goal '{goal_id}' in defines_goals but no matching '### {goal_id}:' header in body",
+                code="MISSING_GOAL_HEADER",
+                field="defines_goals",
+            )
+        )
+
+    # Goals in body but not in frontmatter
+    missing_in_frontmatter = body_goal_ids - frontmatter_goal_ids
+    for goal_id in missing_in_frontmatter:
+        result.add_error(
+            ValidationError(
+                file=str(charter_path),
+                message=f"Goal header '### {goal_id}:' in body but not listed in defines_goals",
+                code="UNDECLARED_GOAL_HEADER",
+            )
+        )
+
+    result.detail = f"1 file, {len(defines_goals)} goals defined"
+    return result
+
+
+def _extract_goal_headers(charter_path: Path) -> dict[str, str]:
+    """
+    Extract goal headers from Charter.md body.
+
+    Returns dict of goal_id -> title from headers matching '### G-{number}: {Title}'
+    """
+    goals = {}
+    goal_header_pattern = re.compile(r"^###\s+(G-\d+):\s*(.*)$", re.MULTILINE)
+
+    try:
+        content = charter_path.read_text()
+        # Skip frontmatter
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                content = parts[2]
+
+        for match in goal_header_pattern.finditer(content):
+            goal_id = match.group(1)
+            title = match.group(2).strip()
+            goals[goal_id] = title
+
+    except Exception:
+        pass
+
+    return goals
+
+
+@jig.implements("S-075")
+def validate_goal_references(
+    charter_path: Path,
+    outcome_dir: Path,
+    architecture_dir: Optional[Path] = None,
+) -> ValidationResult:
+    """
+    Validate that all goal references point to valid Charter goals.
+
+    Checks:
+    - Outcome supports_goals reference valid goals (if present)
+    - Architecture supports_goals reference valid goals (if present)
+    """
+    result = ValidationResult(passed=True, phase_name="goal references")
+
+    # Load valid goals from Charter
+    valid_goals = set()
+    if charter_path.exists():
+        frontmatter = _parse_frontmatter(charter_path)
+        if frontmatter and "defines_goals" in frontmatter:
+            valid_goals = set(frontmatter["defines_goals"])
+
+    if not valid_goals:
+        # No goals defined, skip reference validation
+        result.detail = "0 goal references (no charter goals defined)"
+        return result
+
+    total_references = 0
+    invalid_references = 0
+
+    # Check outcomes
+    for outcome_file in sorted(outcome_dir.glob("O-*.md")):
+        frontmatter = _parse_frontmatter(outcome_file)
+        if frontmatter is None:
+            continue
+
+        supports_goals = frontmatter.get("supports_goals", [])
+        if isinstance(supports_goals, list):
+            for goal_id in supports_goals:
+                total_references += 1
+                if goal_id not in valid_goals:
+                    invalid_references += 1
+                    result.add_error(
+                        ValidationError(
+                            file=str(outcome_file),
+                            message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
+                            code="INVALID_GOAL_REFERENCE",
+                            field="supports_goals",
+                        )
+                    )
+
+    # Check architectures
+    if architecture_dir and architecture_dir.exists():
+        for arch_file in sorted(architecture_dir.glob("A-*.md")):
+            frontmatter = _parse_frontmatter(arch_file)
+            if frontmatter is None:
+                continue
+
+            supports_goals = frontmatter.get("supports_goals", [])
+            if isinstance(supports_goals, list):
+                for goal_id in supports_goals:
+                    total_references += 1
+                    if goal_id not in valid_goals:
+                        invalid_references += 1
+                        result.add_error(
+                            ValidationError(
+                                file=str(arch_file),
+                                message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
+                                code="INVALID_GOAL_REFERENCE",
+                                field="supports_goals",
+                            )
+                        )
+
+    result.items_checked = total_references
+    result.detail = f"{total_references} goal references ({invalid_references} invalid)"
+    return result
+
+
+# ============================================================================
+# Architecture Validation (S-076, S-077, S-078, S-079)
+# ============================================================================
+
+
+@jig.implements("S-076", "S-077", "S-078", "S-079")
+def validate_architecture_files(
+    architecture_dir: Path,
+    charter_goals: set[str],
+    spec_ids: set[str],
+) -> ValidationResult:
+    """
+    Validate architecture files against S-076, S-077, S-078, S-079 specifications.
+
+    Checks:
+    - Files are in jig/architecture/ directory (S-076)
+    - Files follow A-{NNN}_{Title}.md naming pattern (S-076)
+    - ID format: A-{NNN} zero-padded (S-077)
+    - Required fields: id, type, title, status, supports_goals (S-078)
+    - status enum: draft, proposed, active, deprecated
+    - supports_goals references valid Charter goals (S-078)
+    - constrains references valid spec IDs (S-079)
+    """
+    result = ValidationResult(passed=True, phase_name="architecture")
+
+    # Architecture directory is optional
+    if not architecture_dir.exists():
+        result.detail = "0 files (no architecture directory)"
+        return result
+
+    arch_files = sorted(architecture_dir.glob("A-*.md"))
+    result.items_checked = len(arch_files)
+
+    if len(arch_files) == 0:
+        result.detail = "0 files"
+        return result
+
+    seen_ids = {}
+    arch_id_pattern = re.compile(r"^A-\d{3}$")
+    valid_statuses = {"draft", "proposed", "active", "deprecated"}
+
+    for arch_file in arch_files:
+        # Parse frontmatter
+        frontmatter = _parse_frontmatter(arch_file)
+        if frontmatter is None:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="Missing or invalid YAML frontmatter",
+                    code="INVALID_FRONTMATTER",
+                )
+            )
+            continue
+
+        # Check required fields
+        arch_id = frontmatter.get("id")
+        if not arch_id:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="Missing required field: 'id'",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="id",
+                )
+            )
+            continue
+
+        # S-077: Check ID format
+        if not arch_id_pattern.match(arch_id):
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=f"Invalid ID format: '{arch_id}' (must match A-NNN pattern, e.g., A-001)",
+                    code="INVALID_ID_FORMAT",
+                    field="id",
+                )
+            )
+
+        # Check ID uniqueness
+        if arch_id in seen_ids:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=f"Duplicate ID '{arch_id}' (also in {seen_ids[arch_id]})",
+                    code="DUPLICATE_ID",
+                    field="id",
+                )
+            )
+        else:
+            seen_ids[arch_id] = arch_file.name
+
+        # Check type field
+        if frontmatter.get("type") != "architecture":
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=f"Invalid type: '{frontmatter.get('type')}' (must be 'architecture')",
+                    code="INVALID_TYPE",
+                    field="type",
+                )
+            )
+
+        # Check title field
+        if "title" not in frontmatter:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="Missing required field: 'title'",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="title",
+                )
+            )
+
+        # Check status field
+        status = frontmatter.get("status")
+        if not status:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="Missing required field: 'status'",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="status",
+                )
+            )
+        elif status not in valid_statuses:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=f"Invalid status: '{status}' (must be one of: draft, proposed, active, deprecated)",
+                    code="INVALID_STATUS",
+                    field="status",
+                )
+            )
+
+        # S-078: Check supports_goals field
+        supports_goals = frontmatter.get("supports_goals")
+        if not supports_goals:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="Missing required field: 'supports_goals'. Architecture must support at least one goal.",
+                    code="MISSING_REQUIRED_FIELD",
+                    field="supports_goals",
+                )
+            )
+        elif not isinstance(supports_goals, list):
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=f"supports_goals must be an array, not {type(supports_goals).__name__}",
+                    code="INVALID_FIELD_TYPE",
+                    field="supports_goals",
+                )
+            )
+        elif len(supports_goals) == 0:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message="supports_goals array is empty. Architecture must support at least one goal.",
+                    code="EMPTY_SUPPORTS_GOALS",
+                    field="supports_goals",
+                )
+            )
+        else:
+            # Validate goal references
+            for goal_id in supports_goals:
+                if goal_id not in charter_goals:
+                    result.add_error(
+                        ValidationError(
+                            file=str(arch_file),
+                            message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
+                            code="INVALID_GOAL_REFERENCE",
+                            field="supports_goals",
+                        )
+                    )
+
+        # S-079: Check constrains field (optional)
+        constrains = frontmatter.get("constrains")
+        if constrains is not None:
+            if not isinstance(constrains, list):
+                result.add_error(
+                    ValidationError(
+                        file=str(arch_file),
+                        message=f"constrains must be an array, not {type(constrains).__name__}",
+                        code="INVALID_FIELD_TYPE",
+                        field="constrains",
+                    )
+                )
+            else:
+                # Validate spec references
+                for spec_id in constrains:
+                    if spec_id not in spec_ids:
+                        result.add_error(
+                            ValidationError(
+                                file=str(arch_file),
+                                message=f"Invalid spec reference in constrains: '{spec_id}' does not exist",
+                                code="INVALID_SPEC_REFERENCE",
+                                field="constrains",
+                            )
+                        )
+
+    result.detail = f"{len(arch_files)} files"
+    return result
