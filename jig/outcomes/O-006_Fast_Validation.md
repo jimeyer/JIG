@@ -39,9 +39,9 @@ The validation system must:
 ## Specified By
 
 This outcome is delivered through:
-- **S-023**: Specification Validation Performance - fast spec file validation
-- **S-024**: Outcome Validation Performance - fast outcome file validation
-- **S-025**: Brick Validation Performance - fast brick definition validation
+- **S-023**: Intent Validation CLI Command - fast validation without graph generation
+- **S-024**: Brick Validation CLI Command - validates bricks against implementation graph
+- **S-025**: Full Validation CLI Command - intelligent combined validation
 
 ## Constitution Linkage
 

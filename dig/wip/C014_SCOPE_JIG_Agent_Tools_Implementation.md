@@ -27,6 +27,26 @@ This scope document defines the work required to implement agent-oriented toolin
 
 **Core Insight:** Agents want to query the JIG graph directly, not reconstruct it from files. Every tool call saved is context that can be used for actual work.
 
+### Alignment with Charter Goals
+
+This implementation directly supports the five Charter goals:
+
+| Charter Goal | How Agent Tools Support It |
+|--------------|---------------------------|
+| **G-001: Grounding in Reality** | Graph queries let agents query actual code structure instead of guessing |
+| **G-002: Continuity Across Sessions** | Structured JSON output enables programmatic context extraction |
+| **G-003: Enforcing Constraints** | Enhanced validation with error codes and fix hints |
+| **G-004: Intent Alignment** | `jigy spec new` ensures specs are created with correct format; `jigy search specs` prevents duplicate specs |
+| **G-005: Full Traceability** | `jigy audit gaps` identifies breaks in the S-F-T traceability chain |
+
+### Alignment with A-001 Architecture
+
+Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the intent hierarchy programmatically. The new commands query the three generated graphs:
+
+- `intent-graph.ndjson` — Charter, Goals, Architecture, Outcomes, Specifications, Bricks
+- `implementation-graph.ndjson` — Functions, Classes, Modules, `@jig.implements` edges
+- `verification-graph.ndjson` — Tests, `@jig.verifies` edges
+
 ---
 
 ## Current State Analysis
@@ -70,6 +90,7 @@ This scope document defines the work required to implement agent-oriented toolin
 
 | Command | Description | JSON Support |
 |---------|-------------|--------------|
+| `jigy context` | Generate dynamic project context for agents | Yes |
 | `jigy show spec <id>` | Query single spec with implementations/verifications | Yes |
 | `jigy show specs` | List specs with status filtering | Yes |
 | `jigy audit gaps` | Find unimplemented/unverified specs | Yes |
@@ -107,9 +128,11 @@ This scope document defines the work required to implement agent-oriented toolin
 
 ## PART A: Graph Query Commands
 
+Per A-001 (JIG Core Architecture), the intent hierarchy forms a G-A-O-S-C-T pyramid. These commands expose programmatic access to that hierarchy, supporting G-001 (Grounding in Reality) by letting agents query actual structure instead of guessing.
+
 ### A.1 `jigy show spec <id>`
 
-**Purpose:** Query a single specification with its full S-F-T triangle.
+**Purpose:** Query a single specification with its full S-F-T triangle (Spec → Functions → Tests).
 
 **File:** `src/jig/cli/show.py`
 
@@ -404,13 +427,373 @@ def gaps_command(
 
 ---
 
+## PART B2: Dynamic Context Injection
+
+### B2.1 Problem: Static Context is Suboptimal
+
+Currently, agents receive JIG context through manual injection of `agents/contextJIG.md` (229 lines). This approach has limitations:
+
+| Problem | Impact |
+|---------|--------|
+| **Manual friction** | User must remember to inject every session |
+| **Static content** | Doesn't reflect current project state |
+| **All-or-nothing** | 229 lines consumed regardless of task complexity |
+| **No state awareness** | Agent doesn't know coverage gaps, recent changes |
+
+### B2.2 Solution: Three-Layer Context Architecture
+
+**Layer 1: CLAUDE.md (Always Injected, Minimal)**
+
+Cursor auto-injects `CLAUDE.md` at session start. Keep it minimal (~20 lines) with just enough to orient the agent:
+
+```markdown
+## JIG Project
+
+This codebase uses JIG for intent-implementation alignment.
+
+**First command:** Run `jigy context` to understand current project state.
+
+**Key commands:**
+- `jigy context` — Dynamic project summary for agents
+- `jigy show spec S-001` — Query specification details
+- `jigy audit gaps` — Find coverage gaps
+- `jigy validate` — Check all constraints
+
+**Key locations:**
+- `jig/Charter.md` — Project goals (G-001 through G-005)
+- `jig/specifications/` — Behavioral requirements (S-###.md)
+- `jig/bricks.yaml` — Architectural partitioning
+
+**Before modifying code:** Run `jigy show spec S-###` to understand intent.
+```
+
+**Layer 2: `jigy context` (On-Demand, Dynamic)**
+
+Agent runs at session start or when needing orientation. Generates **dynamic** context reflecting actual project state.
+
+**Layer 3: `agents/contextJIG.md` (Deep Reference)**
+
+Comprehensive JIG documentation. Agent reads when needing detailed understanding of concepts (layers, towers, evergreen principles). Not injected by default.
+
+### B2.3 `jigy context` Command
+
+**Purpose:** Generate dynamic, agent-oriented project context.
+
+**File:** `src/jig/cli/context.py` (new)
+
+#### Human Output
+
+```
+$ jigy context
+
+╔══════════════════════════════════════════════════════════════════╗
+║  JIG CONTEXT: jig-dev                                             ║
+╚══════════════════════════════════════════════════════════════════╝
+
+PROJECT STATE
+─────────────
+Charter:        jig/Charter.md (5 goals: G-001..G-005)
+Architecture:   1 document (A-001)
+Outcomes:       26 total
+Specifications: 91 total │ 78 implemented │ 65 verified │ 3 gaps
+Bricks:         11 total │ 3 layers │ single tower
+
+COVERAGE SUMMARY
+────────────────
+  ✓ Implemented:   78/91 (86%)
+  ✓ Verified:      65/91 (71%)
+  ⚠ Unimplemented: 3 specs
+  ⚠ Unverified:    13 specs
+
+TOP GAPS (run `jigy audit gaps` for full list)
+──────────────────────────────────────────────
+  S-044  CRDT Conflict Resolution         unimplemented
+  S-045  Offline Queue Persistence        unimplemented
+  S-046  Network Partition Detection      unimplemented
+  S-012  Token Expiration                 unverified (2 functions)
+  S-023  Rate Limiting                    unverified (1 function)
+
+KEY COMMANDS
+────────────
+  jigy show spec <id>    Query spec with implementations/tests
+  jigy show specs        List all specs with status
+  jigy audit gaps        Full coverage report
+  jigy validate          Check all constraints
+  jigy search specs      Find specs by keyword
+
+ARCHITECTURE CONSTRAINTS (A-001)
+────────────────────────────────
+  • Decorators: @jig.implements("S-###"), @jig.verifies("S-###")
+  • Bricks partition codebase (no gaps, no overlaps)
+  • Layer N depends only on layers < N
+  • Cross-tower dependencies forbidden (if towers used)
+
+CHARTER GOALS
+─────────────
+  G-001: Grounding in Reality
+  G-002: Continuity Across Sessions
+  G-003: Enforcing Constraints
+  G-004: Intent Alignment
+  G-005: Full Traceability
+```
+
+#### JSON Output
+
+```bash
+$ jigy context --format json
+```
+
+```json
+{"project":"jig-dev","charter":{"file":"jig/Charter.md","goals":["G-001","G-002","G-003","G-004","G-005"]},"stats":{"specs":{"total":91,"implemented":78,"verified":65,"unimplemented":3,"unverified":13},"outcomes":{"total":26},"bricks":{"total":11,"layers":3,"towers":1}},"top_gaps":[{"id":"S-044","title":"CRDT Conflict Resolution","status":"unimplemented"},{"id":"S-045","title":"Offline Queue Persistence","status":"unimplemented"},{"id":"S-012","title":"Token Expiration","status":"unverified","impl_count":2}],"commands":{"query_spec":"jigy show spec <id>","list_specs":"jigy show specs","audit_gaps":"jigy audit gaps","validate":"jigy validate"}}
+```
+
+#### Markdown Output (for LLM Injection)
+
+```bash
+$ jigy context --format markdown
+```
+
+Outputs clean markdown suitable for direct injection into agent context:
+
+```markdown
+# JIG Context: jig-dev
+
+## Project State
+- **Charter:** jig/Charter.md (5 goals)
+- **Specs:** 91 total | 78 implemented | 65 verified
+- **Bricks:** 11 total | 3 layers
+
+## Top Coverage Gaps
+1. S-044 CRDT Conflict Resolution — unimplemented
+2. S-045 Offline Queue Persistence — unimplemented
+3. S-012 Token Expiration — unverified
+
+## Quick Commands
+- `jigy show spec <id>` — Query spec details
+- `jigy audit gaps` — Full coverage report
+
+## Before Writing Code
+1. Run `jigy show spec S-###` to understand the spec
+2. Use `@jig.implements("S-###")` decorator
+3. Run `jigy validate` before committing
+```
+
+### B2.4 Implementation
+
+```python
+"""Dynamic context generation for AI agents."""
+
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
+import click
+
+import jig
+from jig.config import JigConfig
+
+
+@dataclass
+class ProjectContext:
+    """Aggregated project context for agents."""
+    
+    project_name: str
+    charter_file: str
+    goals: list[str]
+    spec_stats: dict
+    outcome_stats: dict
+    brick_stats: dict
+    top_gaps: list[dict]
+    validation_status: str
+
+
+@jig.implements("S-103")
+def context_command(
+    config: JigConfig,
+    output_format: str = "human",
+    skip_rebuild: bool = False,
+) -> int:
+    """Generate dynamic project context for AI agents.
+    
+    Supports G-002 (Continuity Across Sessions) by providing
+    machine-readable project state that persists across sessions.
+    
+    Output formats:
+    - human: Rich terminal output with boxes and colors
+    - json: Compact single-line JSON for programmatic use
+    - markdown: Clean markdown for LLM context injection
+    """
+    from jig.cli.auto_rebuild import ensure_graphs_current
+    ensure_graphs_current(["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild)
+    
+    # Gather context from graphs
+    context = gather_project_context(config)
+    
+    # Output in requested format
+    if output_format == "json":
+        click.echo(format_context_json(context))
+    elif output_format == "markdown":
+        click.echo(format_context_markdown(context))
+    else:
+        click.echo(format_context_human(context))
+    
+    return 0
+
+
+def gather_project_context(config: JigConfig) -> ProjectContext:
+    """Gather project context from all graphs."""
+    from jig.cli.graph_utils import load_ndjson
+    
+    # Load graphs
+    intent = load_ndjson(config.paths.generated / "intent-graph.ndjson")
+    impl = load_ndjson(config.paths.generated / "implementation-graph.ndjson")
+    verify = load_ndjson(config.paths.generated / "verification-graph.ndjson")
+    
+    # Extract Charter and goals
+    charter_node = next((n for n in intent if n.get("type") == "charter"), None)
+    goals = charter_node.get("defines_goals", []) if charter_node else []
+    
+    # Count specs by status
+    specs = [n for n in intent if n.get("type") == "specification"]
+    implemented_ids = set()
+    verified_ids = set()
+    
+    for node in impl:
+        for spec_id in node.get("implements", []):
+            implemented_ids.add(spec_id)
+    
+    for node in verify:
+        for spec_id in node.get("verifies", []):
+            verified_ids.add(spec_id)
+    
+    spec_ids = {s["id"] for s in specs}
+    unimplemented = spec_ids - implemented_ids
+    unverified = spec_ids - verified_ids
+    
+    # Find top gaps
+    top_gaps = []
+    for spec in specs:
+        sid = spec["id"]
+        if sid in unimplemented:
+            top_gaps.append({
+                "id": sid,
+                "title": spec.get("title", ""),
+                "status": "unimplemented"
+            })
+        elif sid in unverified:
+            impl_count = sum(1 for n in impl if sid in n.get("implements", []))
+            top_gaps.append({
+                "id": sid,
+                "title": spec.get("title", ""),
+                "status": "unverified",
+                "impl_count": impl_count
+            })
+    
+    # Sort: unimplemented first, then unverified
+    top_gaps.sort(key=lambda g: (0 if g["status"] == "unimplemented" else 1, g["id"]))
+    
+    # Count bricks/layers
+    bricks = [n for n in intent if n.get("type") == "brick"]
+    layers = set(b.get("layer", 0) for b in bricks)
+    towers = set(b.get("tower") for b in bricks if b.get("tower"))
+    
+    return ProjectContext(
+        project_name=config.project_root.name,
+        charter_file=str(config.paths.charter.relative_to(config.project_root)),
+        goals=goals,
+        spec_stats={
+            "total": len(specs),
+            "implemented": len(implemented_ids & spec_ids),
+            "verified": len(verified_ids & spec_ids),
+            "unimplemented": len(unimplemented),
+            "unverified": len(unverified),
+        },
+        outcome_stats={
+            "total": len([n for n in intent if n.get("type") == "outcome"])
+        },
+        brick_stats={
+            "total": len(bricks),
+            "layers": len(layers),
+            "towers": len(towers) if towers else 1,
+        },
+        top_gaps=top_gaps[:5],  # Top 5 gaps
+        validation_status="unknown",
+    )
+```
+
+### B2.5 Output Format Selection
+
+| Format | Use Case | Size |
+|--------|----------|------|
+| `human` | Interactive terminal use | ~40 lines |
+| `json` | Programmatic consumption | 1 line |
+| `markdown` | LLM context injection | ~25 lines |
+
+**Agent workflow:**
+```bash
+# At session start, agent runs:
+jigy context --format markdown
+
+# Output is compact, focused, and includes actionable next steps
+```
+
+### B2.6 CLAUDE.md Update Specification
+
+Update `CLAUDE.md` to use the three-layer approach:
+
+**Current** (122 lines with full JIG explanation):
+- Full decorator examples
+- Project structure
+- Validation section
+
+**Proposed** (~50 lines, pointing to dynamic context):
+- Keep existing intro and key commands
+- Add: "Run `jigy context` for current project state"
+- Keep: filename format, title selection, H1 header guidance
+- Remove: duplicated content that `jigy context` provides dynamically
+
+### B2.7 `agents/contextJIG.md` Role
+
+Keep `agents/contextJIG.md` as **deep reference documentation**:
+
+| Aspect | Role |
+|--------|------|
+| **Purpose** | Comprehensive JIG concepts for complex tasks |
+| **When used** | Agent reads on-demand when needing detailed understanding |
+| **Injection** | NOT injected at session start |
+| **Content** | G-A-O-S-C-T pyramid, ID formats, evergreen principles, validation rules |
+
+Agent can reference it with:
+```
+Read agents/contextJIG.md for detailed JIG concepts
+```
+
+---
+
 ## PART C: Project Initialization (C007)
 
 ### C.1 `jigy init`
 
-**Purpose:** Initialize JIG in a new project.
+**Purpose:** Initialize JIG in a new project per A-001 File Structure.
 
 **File:** `src/jig/cli/init.py` (new)
+
+Per A-001 (JIG Core Architecture), the required file structure is:
+
+```
+project-root/
+├── jig/
+│   ├── Charter.md                    # Root document (singleton)
+│   ├── architecture/                 # Architecture documents
+│   ├── outcomes/                     # Outcome documents
+│   ├── specifications/               # Specification documents
+│   ├── bricks.yaml                   # Brick definitions
+│   └── generated/                    # Machine-generated graphs
+│       ├── README.md                 # (tracked)
+│       ├── intent-graph.ndjson       # (gitignored)
+│       ├── implementation-graph.ndjson  # (gitignored)
+│       └── verification-graph.ndjson # (gitignored)
+```
 
 #### C.1.1 Usage
 
@@ -419,6 +802,7 @@ $ jigy init
 
 Created:
   jig/
+  jig/Charter.md              # Skeleton with G-001 placeholder
   jig/specifications/
   jig/outcomes/
   jig/architecture/
@@ -474,15 +858,48 @@ jig/generated/*.ndjson
 """
 
 
+CHARTER_TEMPLATE = """---
+id: Charter
+type: charter
+defines_goals: [G-001]
+---
+
+# Project Charter
+
+## Purpose
+
+[Describe why this project exists and what problems it solves]
+
+## Charter Goals
+
+### G-001: [First Goal Title]
+
+[Describe what this goal achieves and why it matters]
+
+---
+
+## For AI Agents Reading This
+
+If you are an AI agent working on this codebase:
+
+1. **Read before writing**: Query the graphs to understand what exists
+2. **Link your work**: Use `@jig.implements()` and `@jig.verifies()` decorators
+3. **Validate continuously**: Run `jigy validate` before committing
+4. **Understand intent first**: Read specs before modifying implementation
+
+JIG exists because you exist. Use it.
+"""
+
+
 @jig.implements("S-095")  # New spec for init command
 def init_command(project_root: Path, add_gitignore: bool = True) -> int:
-    """Initialize JIG in a project.
+    """Initialize JIG in a project per A-001 File Structure.
     
     Creates directory structure and optionally updates .gitignore.
     """
     jig_root = project_root / "jig"
     
-    # Create directories
+    # Create directories (per A-001)
     directories = [
         jig_root,
         jig_root / "specifications",
@@ -496,6 +913,12 @@ def init_command(project_root: Path, add_gitignore: bool = True) -> int:
         if not d.exists():
             d.mkdir(parents=True)
             created.append(str(d.relative_to(project_root)))
+    
+    # Create Charter.md if missing (per A-001 - singleton root document)
+    charter_file = jig_root / "Charter.md"
+    if not charter_file.exists():
+        charter_file.write_text(CHARTER_TEMPLATE)
+        created.append(str(charter_file.relative_to(project_root)))
     
     # Create bricks.yaml if missing
     bricks_file = jig_root / "bricks.yaml"
@@ -792,16 +1215,31 @@ class ValidationError:
 
 ### F.1 Template Directory Structure
 
+Per A-001 File Structure, templates must create artifacts in the correct format:
+
 ```
 src/jig/templates/
-├── generated_README.md
-├── gitignore_snippet.txt
-├── specification.md
-├── outcome.md
-└── bricks.yaml
+├── charter.md              # Skeleton Charter per A-001
+├── generated_README.md     # README for generated/ directory
+├── gitignore_snippet.txt   # .gitignore entry for generated files
+├── specification.md        # Spec template with correct frontmatter
+├── outcome.md              # Outcome template with supports_goals
+├── architecture.md         # Architecture template with supports_goals
+└── bricks.yaml             # Empty bricks structure
 ```
 
-### F.2 Package Data
+### F.2 Template Frontmatter Requirements
+
+Per A-001, each artifact type has required frontmatter fields:
+
+| Template | Required Fields |
+|----------|-----------------|
+| `charter.md` | `id: Charter`, `type: charter`, `defines_goals: [G-001]` |
+| `specification.md` | `id`, `type: specification`, `title` |
+| `outcome.md` | `id`, `type: outcome`, `title`, `supports_goals`, `specifies` |
+| `architecture.md` | `id`, `type: architecture`, `title`, `status`, `supports_goals` |
+
+### F.3 Package Data
 
 Update `pyproject.toml`:
 
@@ -816,24 +1254,40 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 
 ### G.1 Agent Tools Specifications
 
-| ID | Title | Description |
-|----|-------|-------------|
-| S-093 | Graph Query Commands | `jigy show spec/specs` with graph queries |
-| S-094 | Coverage Gap Auditing | `jigy audit gaps` finds missing coverage |
-| S-095 | Project Initialization | `jigy init` creates directory structure |
-| S-096 | Artifact ID Generation | `jigy next-id` returns next available ID |
-| S-097 | Specification Creation | `jigy spec new` creates valid spec file |
-| S-098 | Outcome Creation | `jigy outcome new` creates valid outcome file |
-| S-099 | Specification Search | `jigy search specs` searches by keyword |
-| S-100 | JSON Output Format | `--format json` produces NDJSON/compact JSON |
-| S-101 | Generated Directory README | Auto-create README in generated/ |
-| S-102 | Gitignore Recommendation | Init suggests .gitignore entry |
+Per A-001 (JIG Core Architecture), all specifications must follow the `S-{NNN}` format. These new specifications extend the CLI layer to support agent workflows:
+
+| ID | Title | Charter Goal | Description |
+|----|-------|--------------|-------------|
+| S-093 | Graph Query Commands | G-001 | `jigy show spec/specs` queries graphs directly |
+| S-094 | Coverage Gap Auditing | G-005 | `jigy audit gaps` finds breaks in traceability |
+| S-095 | Project Initialization | G-004 | `jigy init` creates correct directory structure |
+| S-096 | Artifact ID Generation | G-004 | `jigy next-id` returns next available ID |
+| S-097 | Specification Creation | G-004 | `jigy spec new` creates valid spec file |
+| S-098 | Outcome Creation | G-004 | `jigy outcome new` creates valid outcome file |
+| S-099 | Specification Search | G-001 | `jigy search specs` searches by keyword |
+| S-100 | JSON Output Format | G-002 | `--format json` produces NDJSON/compact JSON |
+| S-101 | Generated Directory README | G-003 | Auto-create README in generated/ |
+| S-102 | Gitignore Recommendation | G-003 | Init suggests .gitignore entry |
+| S-103 | Dynamic Context Generation | G-002 | `jigy context` generates agent-oriented project state |
+| S-104 | Context Output Formats | G-002 | Context supports human/json/markdown output |
+| S-105 | Agent Context Architecture | G-002, G-004 | Three-layer context: CLAUDE.md + jigy context + deep reference |
 
 ### G.2 New Outcome
 
+Per A-001, outcomes must have `supports_goals` and `specifies` fields:
+
 | ID | Title | supports_goals | specifies |
 |----|-------|----------------|-----------|
-| O-027 | Agent-Oriented Tooling | [G-001, G-003] | [S-093, S-094, S-095, S-096, S-097, S-098, S-099, S-100, S-101, S-102] |
+| O-027 | Agent-Oriented Tooling | [G-001, G-002, G-004, G-005] | [S-093..S-105] |
+
+**Full specification list for O-027:**
+`[S-093, S-094, S-095, S-096, S-097, S-098, S-099, S-100, S-101, S-102, S-103, S-104, S-105]`
+
+**Rationale for Goal Alignment:**
+- **G-001 (Grounding)**: Graph queries and search let agents query actual structure
+- **G-002 (Continuity)**: `jigy context` provides dynamic state; JSON output enables programmatic extraction
+- **G-004 (Intent Alignment)**: Artifact creation ensures correct spec format before implementation
+- **G-005 (Traceability)**: Gap auditing identifies breaks in the S-F-T chain
 
 ---
 
@@ -905,6 +1359,73 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 
 ---
 
+#### WU-4B: Context Command
+
+**Scope:**
+- Create `src/jig/cli/context.py`
+- Implement `jigy context` command
+- Support three output formats: human, json, markdown
+- Gather project state from all three graphs
+- Compute coverage statistics
+- Extract top 5 coverage gaps
+- Display Charter goals
+- Show architecture constraints summary
+
+**Files:**
+- `src/jig/cli/context.py`
+- `src/jig/cli/main.py`
+
+**Specs:** S-103, S-104
+
+**Charter Goal:** G-002 (Continuity Across Sessions)
+
+---
+
+#### WU-4C: Context Markdown Format
+
+**Scope:**
+- Implement `--format markdown` output
+- Optimize for LLM context injection (~25 lines)
+- Include actionable commands
+- Include top gaps
+- Clean, parseable format
+
+**Files:** `src/jig/cli/context.py`
+
+**Specs:** S-104
+
+---
+
+#### WU-4D: CLAUDE.md Update
+
+**Scope:**
+- Update `CLAUDE.md` to use three-layer context approach
+- Add "Run `jigy context` for current project state" guidance
+- Keep minimal (~50 lines, not 122)
+- Point to `agents/contextJIG.md` for deep reference
+- Remove duplicated content that `jigy context` provides dynamically
+
+**Files:** `CLAUDE.md`
+
+**Specs:** S-105
+
+**Note:** This is a documentation change, not a code change.
+
+---
+
+#### WU-4E: Document `agents/contextJIG.md` Role
+
+**Scope:**
+- Add header comment to `agents/contextJIG.md` clarifying its role
+- Document that it's deep reference, not session-start injection
+- Add note pointing to `jigy context` for dynamic state
+
+**Files:** `agents/contextJIG.md`
+
+**Specs:** S-105
+
+---
+
 ### Phase 2: Initialization & Creation (P1)
 
 #### WU-5: Init Command
@@ -912,7 +1433,8 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 **Scope:**
 - Create `src/jig/cli/init.py`
 - Implement `jigy init` command
-- Create directory structure
+- Create directory structure per A-001 File Structure
+- Create Charter.md skeleton (singleton per A-001)
 - Create bricks.yaml template
 - Create generated/README.md
 - Optionally update .gitignore
@@ -922,6 +1444,10 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 - `src/jig/cli/main.py`
 
 **Specs:** S-095, S-101, S-102
+
+**A-001 Compliance:**
+- Directory structure matches A-001 File Structure section
+- Charter.md created with valid frontmatter (id: Charter, defines_goals)
 
 ---
 
@@ -942,20 +1468,26 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 
 **Scope:**
 - Create `src/jig/templates/` directory
+- Add charter.md template (per A-001 Charter validation rules)
 - Add generated_README.md
 - Add gitignore_snippet.txt
-- Add specification.md template
-- Add outcome.md template
+- Add specification.md template (per A-001 ID format)
+- Add outcome.md template (with supports_goals per A-001)
+- Add architecture.md template (with supports_goals per A-001)
 - Add bricks.yaml template
 - Update pyproject.toml for package data
 
 **Files:**
-- `src/jig/templates/*.md`
-- `src/jig/templates/*.txt`
-- `src/jig/templates/*.yaml`
+- `src/jig/templates/charter.md`
+- `src/jig/templates/generated_README.md`
+- `src/jig/templates/gitignore_snippet.txt`
+- `src/jig/templates/specification.md`
+- `src/jig/templates/outcome.md`
+- `src/jig/templates/architecture.md`
+- `src/jig/templates/bricks.yaml`
 - `pyproject.toml`
 
-**Specs:** S-095
+**Specs:** S-095, S-097, S-098
 
 ---
 
@@ -1060,12 +1592,24 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 #### WU-14: Create Specifications
 
 **Scope:**
-- Create S-093 through S-102
+- Create S-093 through S-105 (13 specifications)
 - Create O-027
 
 **Files:**
-- `jig/specifications/S-093_*.md` through `S-102_*.md`
-- `jig/outcomes/O-027_*.md`
+- `jig/specifications/S-093_Graph_Query_Commands.md`
+- `jig/specifications/S-094_Coverage_Gap_Auditing.md`
+- `jig/specifications/S-095_Project_Initialization.md`
+- `jig/specifications/S-096_Artifact_ID_Generation.md`
+- `jig/specifications/S-097_Specification_Creation.md`
+- `jig/specifications/S-098_Outcome_Creation.md`
+- `jig/specifications/S-099_Specification_Search.md`
+- `jig/specifications/S-100_JSON_Output_Format.md`
+- `jig/specifications/S-101_Generated_Directory_README.md`
+- `jig/specifications/S-102_Gitignore_Recommendation.md`
+- `jig/specifications/S-103_Dynamic_Context_Generation.md`
+- `jig/specifications/S-104_Context_Output_Formats.md`
+- `jig/specifications/S-105_Agent_Context_Architecture.md`
+- `jig/outcomes/O-027_Agent_Oriented_Tooling.md`
 
 ---
 
@@ -1075,6 +1619,7 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 - Tests for graph_utils.py
 - Tests for show spec/specs
 - Tests for audit gaps
+- Tests for context command (all three formats)
 - Tests for init command
 - Tests for next-id, spec new, outcome new
 - Tests for search specs
@@ -1086,54 +1631,75 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 ## PART I: Dependency Graph
 
 ```
-                    WU-14 (create specs)
-                           │
-         ┌─────────────────┴─────────────────┐
-         │                                   │
-         ▼                                   ▼
-     WU-1                              WU-7
-  (graph utils)                     (templates)
-         │                               │
-    ┌────┴────┐                         │
-    │         │                         │
-    ▼         ▼                         ▼
- WU-2      WU-4                      WU-5
-(show      (audit                   (init)
- spec)      gaps)                      │
-    │                                  │
-    ▼                                  ▼
- WU-3                               WU-6
-(show                           (auto-readme
- specs)                          on rebuild)
-
-                    WU-8
-                  (next-id)
-                     │
-         ┌───────────┴───────────┐
-         │                       │
-         ▼                       ▼
-      WU-9                    WU-10
-  (spec new)              (outcome new)
-         │                       │
-         └───────────┬───────────┘
-                     │
-                     ▼
-                  WU-11
-              (search specs)
-
-         ┌───────────────────────┐
-         │                       │
-         ▼                       ▼
-      WU-12                   WU-13
-   (JSON on                (enhanced
- show cmds)              validation)
-         │                       │
-         └───────────┬───────────┘
-                     │
-                     ▼
-                  WU-15
+                    WU-14 (create specs S-093..S-105, O-027)
+                                    │
+         ┌──────────────────────────┼──────────────────────────┐
+         │                          │                          │
+         ▼                          ▼                          ▼
+     WU-1                       WU-7                      WU-4D
+  (graph utils)              (templates)              (CLAUDE.md
+         │                          │                   update)
+    ┌────┴────┬─────────┐          │                      │
+    │         │         │          │                      ▼
+    ▼         ▼         ▼          ▼                   WU-4E
+ WU-2      WU-4      WU-4B      WU-5              (contextJIG.md
+(show      (audit   (context   (init)                 role doc)
+ spec)      gaps)    cmd)         │
+    │         │         │         │
+    ▼         │         ▼         ▼
+ WU-3        │      WU-4C      WU-6
+(show        │    (markdown  (auto-readme
+ specs)      │     format)   on rebuild)
+             │
+             └──────────────────────────┐
+                                        │
+                    WU-8                │
+                  (next-id)             │
+                     │                  │
+         ┌───────────┴───────────┐      │
+         │                       │      │
+         ▼                       ▼      │
+      WU-9                    WU-10     │
+  (spec new)              (outcome new) │
+         │                       │      │
+         └───────────┬───────────┘      │
+                     │                  │
+                     ▼                  │
+                  WU-11                 │
+              (search specs)            │
+                                        │
+         ┌───────────────────────┐      │
+         │                       │      │
+         ▼                       ▼      │
+      WU-12                   WU-13     │
+   (JSON on                (enhanced    │
+ show cmds)              validation)    │
+         │                       │      │
+         └───────────┬───────────┘      │
+                     │                  │
+                     ▼                  │
+                  WU-15 ◄───────────────┘
                  (tests)
 ```
+
+### Phase Organization
+
+| Phase | Work Units | Focus |
+|-------|------------|-------|
+| **Phase 1 (P0)** | WU-1, WU-2, WU-3, WU-4, WU-4B, WU-4C, WU-4D, WU-4E | Graph queries, context command, documentation |
+| **Phase 2 (P1)** | WU-5, WU-6, WU-7, WU-8, WU-9, WU-10, WU-11 | Init, templates, artifact creation |
+| **Phase 3 (P2)** | WU-12, WU-13, WU-14, WU-15 | JSON enhancement, specs, tests |
+
+### Work Unit Count
+
+| Category | Count |
+|----------|-------|
+| Core graph queries | 4 (WU-1..WU-4) |
+| Context injection | 4 (WU-4B..WU-4E) |
+| Initialization | 3 (WU-5..WU-7) |
+| Artifact creation | 4 (WU-8..WU-11) |
+| Enhancement & docs | 4 (WU-12..WU-15) |
+| **Total** | **19 work units** |
 
 ---
 
@@ -1184,36 +1750,70 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 1. `jigy show spec S-001` displays complete S-F-T triangle
 2. `jigy show specs --unimplemented` lists only unimplemented specs
 3. `jigy audit gaps` identifies all coverage gaps
-4. `jigy init` creates complete directory structure
-5. `jigy next-id spec` returns next available ID
-6. `jigy spec new "Title"` creates valid specification file
-7. `jigy search specs "keyword"` finds matching specs
-8. All new commands support `--format json`
+4. `jigy context` generates dynamic project summary
+5. `jigy context --format markdown` outputs LLM-optimized context (~25 lines)
+6. `jigy context --format json` outputs compact JSON for programmatic use
+7. `jigy init` creates complete directory structure (per A-001 File Structure)
+8. `jigy next-id spec` returns next available ID (format per A-001: `S-{NNN}`)
+9. `jigy spec new "Title"` creates valid specification file
+10. `jigy search specs "keyword"` finds matching specs
+11. All new commands support `--format json`
 
 ### K.2 C007 Criteria
 
 1. `jig/generated/README.md` is auto-created on rebuild
 2. `jigy init` offers to update .gitignore
 3. Templates exist in `src/jig/templates/`
+4. Generated directory structure matches A-001 File Structure section
 
-### K.3 Documentation Criteria
+### K.3 Charter Alignment Criteria
 
-1. CLAUDE.md references new commands
-2. Specifications S-093 through S-102 exist
-3. Outcome O-027 exists with supports_goals
+1. New commands support G-001 (Grounding) — agents query, don't guess
+2. JSON output supports G-002 (Continuity) — programmatic context extraction
+3. Validation supports G-003 (Constraints) — error codes and fix hints
+4. Artifact creation supports G-004 (Intent Alignment) — correct format before coding
+5. Gap auditing supports G-005 (Traceability) — identify breaks in S-F-T chain
 
-### K.4 Test Criteria
+### K.4 Context Architecture Criteria
+
+1. `CLAUDE.md` is minimal (~50 lines) and points to `jigy context`
+2. `jigy context` outputs dynamic project state (not static documentation)
+3. `agents/contextJIG.md` has header clarifying its role as deep reference
+4. Agent can get full orientation with: CLAUDE.md (auto) + `jigy context` (one call)
+5. Manual injection of `agents/contextJIG.md` is no longer required for basic tasks
+
+### K.5 Documentation Criteria
+
+1. CLAUDE.md references new commands including `jigy context`
+2. Specifications S-093 through S-105 exist with proper A-001 format
+3. Outcome O-027 exists with `supports_goals` referencing Charter goals
+4. All new specs have `@jig.implements` decorators in implementation
+
+### K.6 Test Criteria
 
 1. All new commands have test coverage
-2. `jigy validate` passes
-3. `jigy rebuild` succeeds
+2. `jigy context` tested with all three output formats
+3. `jigy validate` passes
+4. `jigy rebuild` succeeds
+5. `jigy align` shows complete traceability for new specs
 
 ---
 
 ## References
 
-- C006_PROPOSAL_JIG_Tools_Skills_Architecture.md
-- C007_PROPOSAL_Gitignore_Generated_Graphs.md
-- C003_SCOPE_Extended-Intent-Hierarchy-and-Towers.md (format reference)
-- C010_SCOPE_Standardized-Intent-Document-Naming.md (format reference)
+### Charter and Architecture
+- `jig/Charter.md` — Defines G-001 through G-005 (the five Charter goals this work supports)
+- `jig/architecture/A-001_JIG_Core_Architecture.md` — Defines intent hierarchy, artifact formats, file structure
+
+### Source Proposals
+- `dig/wip/C006_PROPOSAL_JIG_Tools_Skills_Architecture.md` — Agent tools architecture proposal
+- `dig/wip/C007_PROPOSAL_Gitignore_Generated_Graphs.md` — Gitignore and init command proposal
+
+### Related SCOPE Documents
+- `dig/archive/C003_SCOPE_Extended-Intent-Hierarchy-and-Towers.md` — Established G-A-O-S-C-T hierarchy
+- `dig/wip/C010_SCOPE_Standardized-Intent-Document-Naming.md` — Filename format conventions
+
+### Current Implementation
+- `src/jig/cli/` — Existing CLI commands to extend
+- `src/jig/validation/` — Existing validation to enhance
 

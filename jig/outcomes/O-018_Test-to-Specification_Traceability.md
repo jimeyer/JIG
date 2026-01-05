@@ -41,11 +41,11 @@ The verification graph must:
 
 This outcome is delivered through:
 - **S-051**: Test File Discovery - finds test files by pytest conventions
-- **S-052**: Verifies Decorator Extraction - parses `@jig.verifies` from test code
-- **S-053**: T→S Edge Creation - links tests to specifications in graph
-- **S-054**: Test Content Hashing - enables change detection for tests
-- **S-055**: Verification Gap Detection - identifies specs without tests
-- **S-056**: Verification Graph Performance - ensures fast graph generation
+- **S-052**: Test Node Schema - defines test node structure in verification graph
+- **S-053**: Verifies Decorator Extraction - parses `@jig.verifies` from test code
+- **S-054**: Test Function Hashing - enables change detection for tests
+- **S-055**: Verification Graph Generation - generates NDJSON verification graph
+- **S-056**: CLI Verify Rebuild Command - `jigy verify rebuild` command
 
 ## Constitution Linkage
 

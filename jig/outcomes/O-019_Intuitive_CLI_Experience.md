@@ -41,10 +41,10 @@ The CLI must:
 
 This outcome is delivered through:
 - **S-057**: Project Root Auto-Discovery - walks up directories to find project
-- **S-058**: Verb-First Command Pattern - consistent `jigy {verb}` structure
-- **S-059**: Zero-Config Defaults - sensible defaults for standard projects
-- **S-060**: Minimal Global Flags - only `--help` and `--version` globally
-- **S-061**: Command Dispatch Performance - fast startup before work begins
+- **S-058**: Verb-First Rebuild Commands - consistent `jigy rebuild {target}` structure
+- **S-059**: Align Command - single command for full workflow
+- **S-060**: Show Command Structure - `jigy show` for structural queries
+- **S-061**: Minimal Global Options - only `--help` and `--version` globally
 
 ## Constitution Linkage
 

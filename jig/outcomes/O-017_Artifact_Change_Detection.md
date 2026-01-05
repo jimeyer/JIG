@@ -41,12 +41,12 @@ The change detection system must:
 
 This outcome is delivered through:
 - **S-044**: Content Hash Format - defines SHA-256 truncated hash standard
-- **S-045**: Specification File Hashing - hashes spec markdown files
-- **S-046**: Implementation File Hashing - hashes source code files
-- **S-047**: Test File Hashing - hashes test files
-- **S-048**: Hash Persistence - stores hashes for comparison
-- **S-049**: Change Detection Query - API to check what changed
-- **S-050**: Staleness Check Performance - ensures fast unchanged checks
+- **S-045**: Intent Artifact Hashing - hashes specs and outcomes via canonical JSON
+- **S-046**: Function Hashing via AST - hashes implementing functions
+- **S-047**: Test Hashing via AST - hashes test functions
+- **S-048**: Brick Definition Hashing - hashes brick definitions independently
+- **S-049**: Git Blob Optimization - optional git-based hash caching
+- **S-050**: Graph Schema Hash Fields - jig_hash field on graph nodes
 
 ## Constitution Linkage
 

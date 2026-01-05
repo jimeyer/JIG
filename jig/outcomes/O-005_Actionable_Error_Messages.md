@@ -40,11 +40,11 @@ The error reporting system must:
 ## Specified By
 
 This outcome is delivered through:
-- **S-018**: Error Message File Paths - includes paths in all file errors
-- **S-019**: Error Message Line Numbers - includes line numbers when determinable
-- **S-020**: Error Description Clarity - plain language problem descriptions
-- **S-021**: Remediation Suggestions - actionable fix guidance
-- **S-022**: Error Grouping and Summary - organized error presentation
+- **S-018**: Specification File Validation - validates spec files with actionable error messages
+- **S-019**: Outcome File Validation - validates outcome files with actionable error messages
+- **S-020**: Decorator Reference Validation - validates decorators with file/line reporting
+- **S-021**: Brick Definition Validation - validates bricks with clear error messages
+- **S-022**: Brick Partition Validation - reports partition violations with function-level detail
 
 ## Constitution Linkage
 
