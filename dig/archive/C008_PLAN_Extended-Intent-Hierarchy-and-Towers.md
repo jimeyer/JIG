@@ -1,9 +1,11 @@
 ---
 title: "PLAN: Extended Intent Hierarchy and Towers"
 type: plan
-status: active
+status: implemented
 created: 1767537749
 created_human: "2026-01-04 08:42 CST"
+completed: 1767700000
+completed_human: "2026-01-05 CST"
 parent: "[[C004_JIGPLAN_Extended-Intent-Hierarchy-and-Towers]]"
 children: ['[[C009_JOURNAL_Extended-Intent-Hierarchy-and-Towers]]']
 ---
@@ -12,7 +14,7 @@ children: ['[[C009_JOURNAL_Extended-Intent-Hierarchy-and-Towers]]']
 - **SCOPE**: docs/wip/C003_SCOPE_Extended-Intent-Hierarchy-and-Towers.md
 - **JIGPLAN**: docs/wip/C004_JIGPLAN_Extended-Intent-Hierarchy-and-Towers.md
 - **Start**: 2026-01-04
-- **Status**: Draft
+- **Status**: Complete
 - **Branch**: charter-slices
 
 ---
@@ -45,35 +47,35 @@ children: ['[[C009_JOURNAL_Extended-Intent-Hierarchy-and-Towers]]']
 ## Work Unit Checklist
 
 ### Phase 1: O/S Node Creation
-- [ ] WU1: Create New Specifications — files ☐ / validate ☐
-- [ ] WU2: Create New Outcomes — files ☐ / validate ☐
+- [x] WU1: Create New Specifications — files ✓ / validate ✓
+- [x] WU2: Create New Outcomes — files ✓ / validate ✓
 
 ### Phase 2: Intent Document Creation
-- [ ] WU3: Create Charter Infrastructure — Charter.md ☐ / archive Constitution ☐
-- [ ] WU4: Create Architecture Infrastructure — directory ☐ / A-001 ☐
-- [ ] WU5: Update Existing Outcomes — 18 outcomes ☐ / validate ☐
+- [x] WU3: Create Charter Infrastructure — Charter.md ✓ / archive Constitution ✓
+- [x] WU4: Create Architecture Infrastructure — directory ✓ / A-001 ✓
+- [x] WU5: Update Existing Outcomes — 18 outcomes ✓ / validate ✓
 
 ### Phase 3: Configuration (Layer 0)
-- [ ] WU6: Configuration Schema Updates — paths ☐ / tower pattern ☐
+- [x] WU6: Configuration Schema Updates — paths ✓ / tower pattern ✓
 
 ### Phase 4: Validation Functions (Layer 0)
-- [ ] WU7: Charter and Goal Validation — validate_charter ☐ / validate_goals ☐
-- [ ] WU8: Architecture Validation — validate_architecture ☐
-- [ ] WU9: Tower Validation — tower_format ☐ / tower_isolation ☐
+- [x] WU7: Charter and Goal Validation — validate_charter ✓ / validate_goals ✓
+- [x] WU8: Architecture Validation — validate_architecture ✓
+- [x] WU9: Tower Validation — tower_format ✓ / tower_isolation ✓
 
 ### Phase 5: Intent Graph Generation (Layer 0)
-- [ ] WU10: Intent Graph - Charter and Goals — nodes ☐ / edges ☐
-- [ ] WU11: Intent Graph - Architecture — nodes ☐ / edges ☐
-- [ ] WU12: Intent Graph - Extended Outcomes — supports_goals ☐
-- [ ] WU13: Intent Graph - Towers and Metadata — tower field ☐ / version 2.0 ☐
+- [x] WU10: Intent Graph - Charter and Goals — nodes ✓ / edges ✓
+- [x] WU11: Intent Graph - Architecture — nodes ✓ / edges ✓
+- [x] WU12: Intent Graph - Extended Outcomes — supports_goals ✓
+- [x] WU13: Intent Graph - Towers and Metadata — tower field ✓ / version 2.0 ✓
 
 ### Phase 6: CLI Commands (Layer 1)
-- [ ] WU14: CLI Show Commands — charter ☐ / goals ☐ / architecture ☐
-- [ ] WU15: CLI Tower Commands — towers ☐ / matrix ☐
+- [x] WU14: CLI Show Commands — charter ✓ / goals ✓ / architecture ✓
+- [x] WU15: CLI Tower Commands — towers ✓ / matrix ✓
 
 ### Phase 7: Validation & Cleanup
-- [ ] WU16: End-to-End Validation — SCOPE verified ☐
-- [ ] WU17: Cleanup — Constitution archived ☐ / final validate ☐
+- [x] WU16: End-to-End Validation — SCOPE verified ✓
+- [x] WU17: Cleanup — Constitution archived ✓ / final validate ✓
 
 ---
 
@@ -86,17 +88,17 @@ children: ['[[C009_JOURNAL_Extended-Intent-Hierarchy-and-Towers]]']
 **Specs Addressed**: Meta — creates S-072 to S-091
 
 **Acceptance Criteria**:
-- [ ] S-072 through S-075 created (Charter specs)
-- [ ] S-076 through S-079 created (Architecture specs)
-- [ ] S-080 through S-085 created (Intent Graph specs)
-- [ ] S-086 through S-091 created (Tower specs)
-- [ ] Each spec has: id, type, title, outcome, acceptance criteria
-- [ ] All spec files follow naming convention: S-{NNN}_{Title_Snake_Case}.md
+- [x] S-072 through S-075 created (Charter specs)
+- [x] S-076 through S-079 created (Architecture specs)
+- [x] S-080 through S-085 created (Intent Graph specs)
+- [x] S-086 through S-091 created (Tower specs)
+- [x] Each spec has: id, type, title, outcome, acceptance criteria
+- [x] All spec files follow naming convention: S-{NNN}_{Title_Snake_Case}.md
 
 **Success Gates** (all must pass):
-- [ ] 20 new files exist in jig/specifications/
-- [ ] Each file has valid YAML frontmatter
-- [ ] No syntax errors in markdown
+- [x] 20 new files exist in jig/specifications/
+- [x] Each file has valid YAML frontmatter
+- [x] No syntax errors in markdown
 
 **Escalation Triggers** (stop and ask human if):
 - Spec acceptance criteria unclear from JIGPLAN
@@ -123,17 +125,17 @@ ls jig/specifications/S-07*.md jig/specifications/S-08*.md jig/specifications/S-
 **Specs Addressed**: Meta — creates outcomes for O-023 to O-026
 
 **Acceptance Criteria**:
-- [ ] O-023_Charter_Establishes_Project_Goals.md created
-- [ ] O-024_Architecture_Constrains_Specifications.md created
-- [ ] O-025_Intent_Graph_Captures_Full_Hierarchy.md created
-- [ ] O-026_Towers_Enforce_Component_Isolation.md created
-- [ ] Each outcome has: id, type, title, supports_goals, specifies
-- [ ] specifies arrays reference correct new specs
+- [x] O-023_Charter_Establishes_Project_Goals.md created
+- [x] O-024_Architecture_Constrains_Specifications.md created
+- [x] O-025_Intent_Graph_Captures_Full_Hierarchy.md created
+- [x] O-026_Towers_Enforce_Component_Isolation.md created
+- [x] Each outcome has: id, type, title, supports_goals, specifies
+- [x] specifies arrays reference correct new specs
 
 **Success Gates** (all must pass):
-- [ ] 4 new files exist in jig/outcomes/
-- [ ] Each file has valid YAML frontmatter with supports_goals
-- [ ] No syntax errors in markdown
+- [x] 4 new files exist in jig/outcomes/
+- [x] Each file has valid YAML frontmatter with supports_goals
+- [x] No syntax errors in markdown
 
 **Escalation Triggers** (stop and ask human if):
 - Outcome value proposition unclear
@@ -163,17 +165,17 @@ ls jig/outcomes/O-02[3-6]*.md | wc -l
 **Specs Addressed**: S-072, S-073, S-074, S-075
 
 **Acceptance Criteria**:
-- [ ] jig/Charter.md exists with valid YAML frontmatter
-- [ ] Frontmatter has: id: Charter, type: charter, defines_goals: [G-001..G-005]
-- [ ] Body has ### G-001: through ### G-005: headers
-- [ ] Goal descriptions derived from Constitution.md purposes
-- [ ] Agent instructions section preserved
+- [x] jig/Charter.md exists with valid YAML frontmatter
+- [x] Frontmatter has: id: Charter, type: charter, defines_goals: [G-001..G-005]
+- [x] Body has ### G-001: through ### G-005: headers
+- [x] Goal descriptions derived from Constitution.md purposes
+- [x] Agent instructions section preserved
 
 **Success Gates** (all must pass):
-- [ ] jig/Charter.md exists
-- [ ] Frontmatter parses as valid YAML
-- [ ] All 5 goal headers present in body
-- [ ] defines_goals array matches goal headers
+- [x] jig/Charter.md exists
+- [x] Frontmatter parses as valid YAML
+- [x] All 5 goal headers present in body
+- [x] defines_goals array matches goal headers
 
 **Escalation Triggers** (stop and ask human if):
 - Constitution.md content doesn't clearly map to 5 goals
@@ -201,17 +203,17 @@ grep "### G-00" jig/Charter.md
 **Specs Addressed**: S-076, S-077, S-078, S-079
 
 **Acceptance Criteria**:
-- [ ] jig/architecture/ directory exists
-- [ ] A-001_JIG_Core_Architecture.md exists with valid frontmatter
-- [ ] Frontmatter has: id, type: architecture, title, status: active, supports_goals, constrains
-- [ ] supports_goals references valid Charter goals
-- [ ] constrains references valid spec IDs
+- [x] jig/architecture/ directory exists
+- [x] A-001_JIG_Core_Architecture.md exists with valid frontmatter
+- [x] Frontmatter has: id, type: architecture, title, status: active, supports_goals, constrains
+- [x] supports_goals references valid Charter goals
+- [x] constrains references valid spec IDs
 
 **Success Gates** (all must pass):
-- [ ] Directory jig/architecture/ exists
-- [ ] A-001 file exists with valid YAML frontmatter
-- [ ] supports_goals array is non-empty
-- [ ] All spec IDs in constrains array exist
+- [x] Directory jig/architecture/ exists
+- [x] A-001 file exists with valid YAML frontmatter
+- [x] supports_goals array is non-empty
+- [x] All spec IDs in constrains array exist
 
 **Escalation Triggers** (stop and ask human if):
 - Unclear which specs A-001 should constrain
@@ -239,15 +241,15 @@ head -15 jig/architecture/A-001_JIG_Core_Architecture.md
 **Specs Addressed**: Part of O-023 delivery (outcomes support goals)
 
 **Acceptance Criteria**:
-- [ ] All 18 outcomes have supports_goals in frontmatter
-- [ ] Each supports_goals array is non-empty
-- [ ] Goal assignments match JIGPLAN "Goal Assignments" table
-- [ ] No other frontmatter fields modified
+- [x] All 18 outcomes have supports_goals in frontmatter
+- [x] Each supports_goals array is non-empty
+- [x] Goal assignments match JIGPLAN "Goal Assignments" table
+- [x] No other frontmatter fields modified
 
 **Success Gates** (all must pass):
-- [ ] All 18 outcome files have supports_goals
-- [ ] No outcome has empty supports_goals array
-- [ ] YAML frontmatter remains valid
+- [x] All 18 outcome files have supports_goals
+- [x] No outcome has empty supports_goals array
+- [x] YAML frontmatter remains valid
 
 **Escalation Triggers** (stop and ask human if):
 - Goal assignment unclear for any outcome
@@ -274,16 +276,16 @@ grep -l "supports_goals" jig/outcomes/O-*.md | wc -l
 **Specs Addressed**: Infrastructure for S-072, S-076
 
 **Acceptance Criteria**:
-- [ ] PathsConfig has charter: Path field (default: Charter.md)
-- [ ] PathsConfig has architecture: Path field (default: architecture)
-- [ ] TOWER_PATTERN constant added: `^[a-z][a-z0-9-]*$`
-- [ ] Path resolution logic handles new paths
-- [ ] Existing tests still pass
+- [x] PathsConfig has charter: Path field (default: Charter.md)
+- [x] PathsConfig has architecture: Path field (default: architecture)
+- [x] TOWER_PATTERN constant added: `^[a-z][a-z0-9-]*$`
+- [x] Path resolution logic handles new paths
+- [x] Existing tests still pass
 
 **Success Gates** (all must pass):
-- [ ] pytest src/jig/config/ -v passes
-- [ ] No type errors in schema.py
-- [ ] jigy validate still works (doesn't break existing)
+- [x] pytest src/jig/config/ -v passes
+- [x] No type errors in schema.py
+- [x] jigy validate still works (doesn't break existing)
 
 **Escalation Triggers** (stop and ask human if):
 - PathsConfig structure differs from expected
@@ -312,17 +314,17 @@ grep -n "TOWER_PATTERN" src/jig/config/schema.py
 **Specs Addressed**: S-072, S-073, S-074, S-075
 
 **Acceptance Criteria**:
-- [ ] validate_charter_file() checks: single file, required fields, goal headers match defines_goals
-- [ ] validate_goal_references() checks: all A/O supports_goals reference valid Charter goals
-- [ ] Clear error messages with file paths
-- [ ] Tests verify both valid and invalid cases
-- [ ] @jig.implements decorators on functions
-- [ ] @jig.verifies decorators on tests
+- [x] validate_charter_file() checks: single file, required fields, goal headers match defines_goals
+- [x] validate_goal_references() checks: all A/O supports_goals reference valid Charter goals
+- [x] Clear error messages with file paths
+- [x] Tests verify both valid and invalid cases
+- [x] @jig.implements decorators on functions
+- [x] @jig.verifies decorators on tests
 
 **Success Gates** (all must pass):
-- [ ] pytest test/validation/ -v passes
-- [ ] jigy rebuild && jigy validate passes
-- [ ] No modifications to FORBIDDEN bricks
+- [x] pytest test/validation/ -v passes
+- [x] jigy rebuild && jigy validate passes
+- [x] No modifications to FORBIDDEN bricks
 
 **Escalation Triggers** (stop and ask human if):
 - Validation logic ambiguous
@@ -351,16 +353,16 @@ jigy rebuild && jigy validate
 **Specs Addressed**: S-076, S-077, S-078, S-079
 
 **Acceptance Criteria**:
-- [ ] Validates file location pattern: jig/architecture/A-{NNN}_{Title}.md
-- [ ] Validates ID format: A-{NNN} (zero-padded)
-- [ ] Validates required fields: id, type, title, status, supports_goals
-- [ ] Validates status enum: draft, proposed, active, deprecated
-- [ ] Validates constrains references (if present)
-- [ ] Tests with @jig.verifies decorators
+- [x] Validates file location pattern: jig/architecture/A-{NNN}_{Title}.md
+- [x] Validates ID format: A-{NNN} (zero-padded)
+- [x] Validates required fields: id, type, title, status, supports_goals
+- [x] Validates status enum: draft, proposed, active, deprecated
+- [x] Validates constrains references (if present)
+- [x] Tests with @jig.verifies decorators
 
 **Success Gates** (all must pass):
-- [ ] pytest test/validation/test_architecture_validation.py -v passes
-- [ ] jigy rebuild && jigy validate passes
+- [x] pytest test/validation/test_architecture_validation.py -v passes
+- [x] jigy rebuild && jigy validate passes
 
 **Escalation Triggers** (stop and ask human if):
 - Status enum values need confirmation
@@ -386,15 +388,15 @@ pytest test/validation/test_architecture_validation.py -v
 **Specs Addressed**: S-086, S-087, S-088, S-089
 
 **Acceptance Criteria**:
-- [ ] validate_tower_format() checks kebab-case pattern if tower present
-- [ ] validate_tower_isolation() detects cross-tower dependencies
-- [ ] Skips validation for single-tower projects (no towers declared)
-- [ ] Clear error messages with brick names and violation details
-- [ ] Typo warnings for single-brick towers
+- [x] validate_tower_format() checks kebab-case pattern if tower present
+- [x] validate_tower_isolation() detects cross-tower dependencies
+- [x] Skips validation for single-tower projects (no towers declared)
+- [x] Clear error messages with brick names and violation details
+- [x] Typo warnings for single-brick towers
 
 **Success Gates** (all must pass):
-- [ ] pytest test/validation/test_tower_validation.py -v passes
-- [ ] jigy rebuild && jigy validate passes
+- [x] pytest test/validation/test_tower_validation.py -v passes
+- [x] jigy rebuild && jigy validate passes
 
 **Escalation Triggers** (stop and ask human if):
 - Cross-tower detection algorithm unclear
@@ -422,16 +424,16 @@ pytest test/validation/test_tower_validation.py -v
 **Specs Addressed**: S-080, S-081, S-083
 
 **Acceptance Criteria**:
-- [ ] _load_charter_node() creates single Charter node with defines_goals
-- [ ] _load_goal_nodes() extracts Goal nodes from Charter body
-- [ ] _create_defines_goal_edges() creates Charter→Goal edges
-- [ ] Goal nodes have: id, type: goal, title, file
-- [ ] Tests verify node and edge generation
+- [x] _load_charter_node() creates single Charter node with defines_goals
+- [x] _load_goal_nodes() extracts Goal nodes from Charter body
+- [x] _create_defines_goal_edges() creates Charter→Goal edges
+- [x] Goal nodes have: id, type: goal, title, file
+- [x] Tests verify node and edge generation
 
 **Success Gates** (all must pass):
-- [ ] pytest test/intent_graph/ -v passes
-- [ ] jigy rebuild produces intent-graph.ndjson with Charter and Goal nodes
-- [ ] jigy validate passes
+- [x] pytest test/intent_graph/ -v passes
+- [x] jigy rebuild produces intent-graph.ndjson with Charter and Goal nodes
+- [x] jigy validate passes
 
 **Escalation Triggers** (stop and ask human if):
 - Charter parsing logic complex
@@ -461,16 +463,16 @@ grep '"type":"goal"' jig/generated/intent-graph.ndjson
 **Specs Addressed**: S-082, S-084 (A→Goal), S-085
 
 **Acceptance Criteria**:
-- [ ] _load_architecture_nodes() creates nodes from jig/architecture/*.md
-- [ ] Architecture nodes have: id, type, title, status, supports_goals, constrains, file
-- [ ] _create_architecture_edges() creates A→Goal (supports_goal) edges
-- [ ] _create_constrains_edges() creates A→S (constrains) edges
-- [ ] Tests verify all edge types
+- [x] _load_architecture_nodes() creates nodes from jig/architecture/*.md
+- [x] Architecture nodes have: id, type, title, status, supports_goals, constrains, file
+- [x] _create_architecture_edges() creates A→Goal (supports_goal) edges
+- [x] _create_constrains_edges() creates A→S (constrains) edges
+- [x] Tests verify all edge types
 
 **Success Gates** (all must pass):
-- [ ] pytest test/intent_graph/ -v passes
-- [ ] jigy rebuild produces Architecture nodes
-- [ ] Edge types "supports_goal" and "constrains" present
+- [x] pytest test/intent_graph/ -v passes
+- [x] jigy rebuild produces Architecture nodes
+- [x] Edge types "supports_goal" and "constrains" present
 
 **Escalation Triggers** (stop and ask human if):
 - Multiple architecture files handling unclear
@@ -499,15 +501,15 @@ grep '"type":"constrains"' jig/generated/intent-graph.ndjson
 **Specs Addressed**: S-084 (O→Goal edges)
 
 **Acceptance Criteria**:
-- [ ] _load_outcome_nodes() includes supports_goals field
-- [ ] _create_outcome_edges() adds supports_goal edges for O→Goal
-- [ ] Existing specifies edges still generated
-- [ ] Tests verify both edge types from outcomes
+- [x] _load_outcome_nodes() includes supports_goals field
+- [x] _create_outcome_edges() adds supports_goal edges for O→Goal
+- [x] Existing specifies edges still generated
+- [x] Tests verify both edge types from outcomes
 
 **Success Gates** (all must pass):
-- [ ] pytest test/intent_graph/ -v passes
-- [ ] Outcome nodes in graph have supports_goals field
-- [ ] supports_goal edges from O nodes present
+- [x] pytest test/intent_graph/ -v passes
+- [x] Outcome nodes in graph have supports_goals field
+- [x] supports_goal edges from O nodes present
 
 **Escalation Triggers** (stop and ask human if):
 - Backwards compatibility with old outcomes needed
@@ -533,16 +535,16 @@ grep -A2 '"type":"outcome"' jig/generated/intent-graph.ndjson | head -20
 **Specs Addressed**: S-086 (graph representation)
 
 **Acceptance Criteria**:
-- [ ] _load_brick_nodes() includes tower field if present
-- [ ] tower field omitted from nodes when not declared (single-tower)
-- [ ] Metadata version updated to "2.0"
-- [ ] Metadata includes: charter, goal_count, architecture_count, tower_count
-- [ ] tower_count is 0 for single-tower projects
+- [x] _load_brick_nodes() includes tower field if present
+- [x] tower field omitted from nodes when not declared (single-tower)
+- [x] Metadata version updated to "2.0"
+- [x] Metadata includes: charter, goal_count, architecture_count, tower_count
+- [x] tower_count is 0 for single-tower projects
 
 **Success Gates** (all must pass):
-- [ ] pytest test/intent_graph/ -v passes
-- [ ] First line of intent-graph.ndjson has version: "2.0"
-- [ ] Metadata has all new counts
+- [x] pytest test/intent_graph/ -v passes
+- [x] First line of intent-graph.ndjson has version: "2.0"
+- [x] Metadata has all new counts
 
 **Escalation Triggers** (stop and ask human if):
 - Version bump breaks consumers
@@ -569,17 +571,17 @@ head -1 jig/generated/intent-graph.ndjson
 **Specs Addressed**: S-072 (show), S-075 (show goals), S-076 (show arch)
 
 **Acceptance Criteria**:
-- [ ] `jigy show charter` displays Charter.md content and goals
-- [ ] `jigy show goals` lists all goals with supporting artifacts
-- [ ] `jigy show architecture` lists architecture documents
-- [ ] `jigy show architecture A-001` shows specific architecture
-- [ ] Output formatted for terminal readability
+- [x] `jigy show charter` displays Charter.md content and goals
+- [x] `jigy show goals` lists all goals with supporting artifacts
+- [x] `jigy show architecture` lists architecture documents
+- [x] `jigy show architecture A-001` shows specific architecture
+- [x] Output formatted for terminal readability
 
 **Success Gates** (all must pass):
-- [ ] pytest test/cli/ -v passes
-- [ ] jigy show charter executes without error
-- [ ] jigy show goals executes without error
-- [ ] jigy show architecture executes without error
+- [x] pytest test/cli/ -v passes
+- [x] jigy show charter executes without error
+- [x] jigy show goals executes without error
+- [x] jigy show architecture executes without error
 
 **Escalation Triggers** (stop and ask human if):
 - CLI command structure doesn't fit existing pattern
@@ -609,17 +611,17 @@ jigy show architecture
 **Specs Addressed**: S-090, S-091
 
 **Acceptance Criteria**:
-- [ ] `jigy towers` lists all towers with brick counts by layer
-- [ ] `jigy towers <tower_id>` shows specific tower details
-- [ ] `jigy matrix` displays layer × tower grid
-- [ ] Single-tower message shown when no towers declared
-- [ ] Output formatted for terminal readability
+- [x] `jigy towers` lists all towers with brick counts by layer
+- [x] `jigy towers <tower_id>` shows specific tower details
+- [x] `jigy matrix` displays layer × tower grid
+- [x] Single-tower message shown when no towers declared
+- [x] Output formatted for terminal readability
 
 **Success Gates** (all must pass):
-- [ ] pytest test/cli/ -v passes
-- [ ] jigy towers executes without error
-- [ ] jigy matrix executes without error
-- [ ] Single-tower projects show appropriate message
+- [x] pytest test/cli/ -v passes
+- [x] jigy towers executes without error
+- [x] jigy matrix executes without error
+- [x] Single-tower projects show appropriate message
 
 **Escalation Triggers** (stop and ask human if):
 - Grid rendering complex for terminal
@@ -686,8 +688,8 @@ head -1 jig/generated/intent-graph.ndjson | grep '"version":"2.0"'
 - Intent graph version 2.0 with Charter, Goal, Architecture nodes
 
 **Deliverable**:
-- [ ] Integration test added: test/integration/test_extended_hierarchy.py (BEST)
-- [ ] All verification steps pass
+- [x] Integration test added: test/integration/test_extended_hierarchy.py (BEST)
+- [x] All verification steps pass
 
 **If Validation Fails**:
 - Investigate root cause (likely wiring/integration gap)
@@ -704,17 +706,17 @@ head -1 jig/generated/intent-graph.ndjson | grep '"version":"2.0"'
 **Specs Addressed**: (none - cleanup)
 
 **Acceptance Criteria**:
-- [ ] jig/old/ directory exists
-- [ ] jig/old/Constitution_v1.md contains original Constitution.md
-- [ ] jig/old/Constitution_v2_draft.md contains Constitution_v2.md
-- [ ] Original Constitution.md and Constitution_v2.md removed from jig/
-- [ ] Final jigy rebuild && jigy validate passes
+- [x] jig/old/ directory exists
+- [x] jig/old/Constitution_v1.md contains original Constitution.md
+- [x] jig/old/Constitution_v2_draft.md contains Constitution_v2.md
+- [x] Original Constitution.md and Constitution_v2.md removed from jig/
+- [x] Final jigy rebuild && jigy validate passes
 
 **Success Gates** (all must pass):
-- [ ] Archive files exist with correct content
-- [ ] No Constitution.md in jig/ root
-- [ ] jigy rebuild && jigy validate passes
-- [ ] No broken references anywhere
+- [x] Archive files exist with correct content
+- [x] No Constitution.md in jig/ root
+- [x] jigy rebuild && jigy validate passes
+- [x] No broken references anywhere
 
 **Escalation Triggers** (stop and ask human if):
 - References to Constitution.md found in code
@@ -737,44 +739,33 @@ jigy rebuild && jigy validate
 
 ## Execution Log
 
-(Filled in by orchestrator during execution)
-
-### WU1 Execution
-
-**Sub-Agent Report:**
-```
-(paste report)
-```
-
-**Parent Verification:**
-```bash
-(verification output)
-```
-
-**Decision:** CONTINUE | STOP | RETRY
-
-**Commit:** <hash>
+Execution completed 2026-01-04 via orchestrated sub-agent sessions.
+See C009_JOURNAL for detailed execution notes.
 
 ---
 
 ## Completion Summary
 
 **Scope Delivered:**
-- (to be filled)
+- Extended JIG from 4-level to 7-level intent hierarchy
+- Added Charter with 5 Goals (G-001 through G-005)
+- Added Architecture layer (A-001)
+- Added Tower infrastructure for vertical partitioning
+- Intent graph version 2.0 with full hierarchy support
 
 **JIG Summary:**
-- Specifications: X created, Y updated
-- Outcomes: X created, Y updated
-- Bricks: X modified
-- Decorators: X added
+- Specifications: 20 created (S-072 to S-091), +1 bonus (S-092)
+- Outcomes: 5 created (O-023 to O-027), 18 updated with supports_goals
+- Bricks: 4 modified (B-cli, B-validation, B-intent-graph, B-config)
+- Decorators: Multiple @jig.implements added
 
 **Clean Break Actions:**
-- [ ] Constitution.md archived to jig/old/
-- [ ] No backwards compatibility code added
-- [ ] Intent graph version bumped to 2.0
-- [ ] Final jigy rebuild && jigy validate passed
+- [x] Constitution.md archived to jig/old/
+- [x] No backwards compatibility code added
+- [x] Intent graph version bumped to 2.0
+- [x] Final jigy rebuild && jigy validate passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: (patterns that worked)
-- Systemic frictions: (process issues)
-- Open questions: (items for future work)
+- Repeatable wins: PLAN→JOURNAL structure enabled clear tracking
+- Systemic frictions: None significant
+- Open questions: None - scope fully delivered

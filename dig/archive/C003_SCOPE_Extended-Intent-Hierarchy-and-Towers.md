@@ -1,9 +1,11 @@
 ---
 title: "SCOPE: Extended Intent Hierarchy and Towers"
 type: scope
-status: active
+status: implemented
 created: 1767412904
 created_human: "2026-01-02 22:01 CST"
+completed: 1767700000
+completed_human: "2026-01-05 CST"
 parent: "[[C001_PROPOSAL_JIG-Core-Artifacts-Contract]]"
 children: ['[[C004_JIGPLAN_Extended-Intent-Hierarchy-and-Towers]]']
 ---

@@ -1,7 +1,7 @@
 ---
 title: "JIG Core Artifacts Contract"
 type: exploration
-status: active
+status: implemented
 created: 1767412904
 created_human: "2026-01-02 22:01 CST"
 parent: null
