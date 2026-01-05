@@ -36,7 +36,7 @@ This implementation directly supports the five Charter goals:
 | **G-001: Grounding in Reality** | Graph queries let agents query actual code structure instead of guessing |
 | **G-002: Continuity Across Sessions** | Structured JSON output enables programmatic context extraction |
 | **G-003: Enforcing Constraints** | Enhanced validation with error codes and fix hints |
-| **G-004: Intent Alignment** | `jigy spec new` ensures specs are created with correct format; `jigy search specs` prevents duplicate specs |
+| **G-004: Intent Alignment** | `jigy new spec` ensures specs are created with correct format; `jigy search specs` prevents duplicate specs |
 | **G-005: Full Traceability** | `jigy audit gaps` identifies breaks in the S-F-T traceability chain |
 
 ### Alignment with A-001 Architecture
@@ -56,7 +56,7 @@ Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the
 | Command | Status | Agent-Friendly? |
 |---------|--------|-----------------|
 | `jigy rebuild` | ✓ Complete | Partial — no JSON |
-| `jigy validate` | ✓ Complete | Partial — has `--format json` but limited |
+| `jigy validate` | ✓ Complete | Partial — has `--json` but limited |
 | `jigy show layers` | ✓ Complete | No JSON mode |
 | `jigy show bricks` | ✓ Complete | No JSON mode |
 | `jigy show charter` | ✓ Complete | No JSON mode |
@@ -68,8 +68,8 @@ Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the
 | `jigy show specs` | ✗ Missing | N/A |
 | `jigy audit gaps` | ✗ Missing | N/A |
 | `jigy next-id` | ✗ Missing | N/A |
-| `jigy spec new` | ✗ Missing | N/A |
-| `jigy outcome new` | ✗ Missing | N/A |
+| `jigy new spec` | ✗ Missing | N/A |
+| `jigy new outcome` | ✗ Missing | N/A |
 | `jigy search specs` | ✗ Missing | N/A |
 
 ### Missing Agent Capabilities
@@ -94,17 +94,18 @@ Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the
 | `jigy show spec <id>` | Query single spec with implementations/verifications | Yes |
 | `jigy show specs` | List specs with status filtering | Yes |
 | `jigy audit gaps` | Find unimplemented/unverified specs | Yes |
-| `jigy validate --format json` | Enhanced structured validation | Yes (improved) |
+| `jigy validate --json` | Enhanced structured validation | Yes (improved) |
 
 #### P1: High Value (Phase 2)
 
 | Command | Description | JSON Support |
 |---------|-------------|--------------|
-| `jigy init` | Initialize JIG in a project | N/A |
+| `jigy init` | Initialize JIG in a project | Yes |
 | `jigy next-id spec` | Get next available spec ID | Yes |
 | `jigy next-id outcome` | Get next available outcome ID | Yes |
-| `jigy spec new` | Create new specification | N/A |
-| `jigy outcome new` | Create new outcome | N/A |
+| `jigy new spec <title>` | Create new specification | Yes |
+| `jigy new outcome <title>` | Create new outcome | Yes |
+| `jigy new architecture <title>` | Create new architecture document | Yes |
 | `jigy search specs <query>` | Search specs by keyword | Yes |
 
 #### P2: Nice to Have (Phase 3)
@@ -113,7 +114,7 @@ Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the
 |---------|-------------|--------------|
 | `jigy show brick <id>` | Query single brick with specs/functions | Yes |
 | `jigy show outcome <id>` | Query single outcome with specs | Yes |
-| `--format json` on all show commands | Universal JSON support | Yes |
+| `--json` on all show commands | Universal JSON support | Yes |
 
 ### Generated Directory Management (C007)
 
@@ -123,6 +124,75 @@ Per A-001 (JIG Core Architecture), this work extends the CLI layer to expose the
 | `*.ndjson` gitignored | Graph files not version controlled |
 | Auto-create README | `jigy rebuild` creates README if missing |
 | `jigy init` creates structure | Sets up directories and .gitignore |
+
+### CLI Conventions
+
+#### Unix-Style Output
+
+All JIG commands follow Unix conventions:
+
+| Principle | Behavior |
+|-----------|----------|
+| **Success is silent** | Successful commands produce no output by default |
+| **Verbose on request** | `-v` or `--verbose` produces human-readable output on success |
+| **Errors are informative** | Failures include actionable tips for both humans and agents |
+| **Exit codes are meaningful** | 0 = success, non-zero = failure |
+| **JSON for agents** | `--json` flag produces structured output for programmatic use |
+
+**Examples:**
+
+```bash
+# Success: silent
+$ jigy new spec "Token Refresh"
+$ echo $?
+0
+
+# Success with verbose
+$ jigy new spec "Token Refresh" -v
+Created: jig/specifications/S-094_Token_Refresh.md
+
+# Failure: informative
+$ jigy new spec "Token Refresh"
+Error: Specification 'Token Refresh' already exists
+  File: jig/specifications/S-094_Token_Refresh.md
+  Tip: Use `jigy show spec S-094` to view existing spec
+  Tip: Use `jigy next-id spec` to find next available ID
+$ echo $?
+1
+
+# Failure with JSON
+$ jigy new spec "Token Refresh" --json
+{"error":"DUPLICATE_TITLE","message":"Specification 'Token Refresh' already exists","file":"jig/specifications/S-094_Token_Refresh.md","tips":["Use `jigy show spec S-094` to view existing spec","Use `jigy next-id spec` to find next available ID"]}
+$ echo $?
+1
+```
+
+#### Flag Conventions
+
+| Flag | Meaning |
+|------|---------|
+| `--json` | Output JSON (compact single-line or NDJSON for lists) |
+| `-v`, `--verbose` | Produce human output even on success |
+| `--no-rebuild` | Skip automatic graph rebuild |
+| `--dry-run` | Show what would happen without making changes |
+
+#### Command Structure
+
+Commands follow verb-noun pattern with consistent grouping:
+
+```
+jigy <verb> [noun] [args] [flags]
+```
+
+| Verb Group | Commands |
+|------------|----------|
+| `show` | `show spec`, `show specs`, `show brick`, `show outcome`, `show charter`, `show goals`, `show architecture` |
+| `new` | `new spec`, `new outcome`, `new architecture` |
+| `search` | `search specs` |
+| `next-id` | `next-id spec`, `next-id outcome`, `next-id architecture` |
+| `audit` | `audit gaps`, `audit coverage` |
+| `validate` | `validate`, `validate intent`, `validate bricks` |
+| `rebuild` | `rebuild`, `rebuild impl`, `rebuild intent`, `rebuild verify` |
 
 ---
 
@@ -161,7 +231,7 @@ S-042: CRDT Value Observation
 #### A.1.2 JSON Output
 
 ```bash
-jigy show spec S-042 --format json
+jigy show spec S-042 --json
 ```
 
 ```json
@@ -263,7 +333,7 @@ jigy show specs --unimplemented    # Only unimplemented
 jigy show specs --unverified       # Only unverified (incl. partial)
 jigy show specs --orphan           # No outcome assigned
 jigy show specs --complete         # Fully verified
-jigy show specs --format json      # NDJSON output
+jigy show specs --json      # NDJSON output
 ```
 
 #### A.2.3 JSON Output (NDJSON)
@@ -378,7 +448,7 @@ Summary: 3 unimplemented, 5 unverified, 12 orphan functions, 2 orphan specs
 #### B.1.2 JSON Output
 
 ```bash
-jigy audit gaps --format json
+jigy audit gaps --json
 ```
 
 ```json
@@ -540,7 +610,7 @@ CHARTER GOALS
 #### JSON Output
 
 ```bash
-$ jigy context --format json
+$ jigy context --json
 ```
 
 ```json
@@ -1005,7 +1075,7 @@ S-093
 $ jigy next-id outcome
 O-027
 
-$ jigy next-id spec --format json
+$ jigy next-id spec --json
 {"type":"specification","next_id":"S-093"}
 ```
 
@@ -1055,41 +1125,80 @@ def next_id_command(
     return 0
 ```
 
-### D.2 `jigy spec new`
+### D.2 `jigy new` Command Group
 
-**Purpose:** Create a new specification with correct formatting.
+**Purpose:** Create new JIG artifacts with correct formatting.
 
-```bash
-$ jigy spec new "CRDT Garbage Collection" --implements O-012
-
-Created: jig/specifications/S-093_CRDT_Garbage_Collection.md
-
-$ jigy spec new "CRDT Garbage Collection" --implements O-012 --body "CRDTs automatically garbage collect tombstones.
-
-**Acceptance Criteria:**
-- Tombstones older than gc_threshold are removed
-- GC runs on configurable interval"
-
-Created: jig/specifications/S-093_CRDT_Garbage_Collection.md
+**Command structure:**
+```
+jigy new <type> <title> [options]
 ```
 
-#### D.2.1 Implementation
+Where `<type>` is one of: `spec`, `outcome`, `architecture`
+
+#### D.2.1 Usage Examples
+
+```bash
+# Success: silent (Unix style)
+$ jigy new spec "CRDT Garbage Collection"
+$ echo $?
+0
+
+# Success with verbose
+$ jigy new spec "CRDT Garbage Collection" -v
+Created: jig/specifications/S-093_CRDT_Garbage_Collection.md
+
+# Success with JSON (returns created artifact info)
+$ jigy new spec "CRDT Garbage Collection" --json
+{"id":"S-093","type":"specification","title":"CRDT Garbage Collection","file":"jig/specifications/S-093_CRDT_Garbage_Collection.md"}
+
+# With options
+$ jigy new spec "Token Refresh" --implements O-012 --body "Tokens refresh automatically before expiration."
+
+# Failure: informative error with tips
+$ jigy new spec "CRDT Garbage Collection"
+Error: Similar specification already exists
+  Existing: S-093 "CRDT Garbage Collection"
+  File: jig/specifications/S-093_CRDT_Garbage_Collection.md
+  
+  Tips:
+  - Use `jigy show spec S-093` to view existing spec
+  - Use `jigy search specs "CRDT"` to find related specs
+  - Choose a different title if this is a new requirement
+$ echo $?
+1
+
+# Failure with JSON
+$ jigy new spec "CRDT Garbage Collection" --json
+{"error":"DUPLICATE_TITLE","message":"Similar specification already exists","existing":{"id":"S-093","title":"CRDT Garbage Collection","file":"jig/specifications/S-093_CRDT_Garbage_Collection.md"},"tips":["Use `jigy show spec S-093` to view existing spec","Use `jigy search specs \"CRDT\"` to find related specs"]}
+```
+
+#### D.2.2 Implementation
 
 ```python
-@jig.implements("S-097")  # New spec for spec creation
-def spec_new_command(
+@jig.implements("S-097")
+def new_spec_command(
     config: JigConfig,
     title: str,
     implements_outcome: str | None = None,
     body: str | None = None,
+    verbose: bool = False,
+    json_output: bool = False,
 ) -> int:
     """Create a new specification with correct formatting.
     
+    Unix style: silent on success, informative on failure.
+    
     Validates:
-    - ID not already used
+    - Title not already used (fuzzy match)
     - Outcome reference valid (if provided)
     - Title format follows guidelines
     """
+    # Check for similar existing specs
+    existing = find_similar_spec(config.paths.specifications, title)
+    if existing:
+        return _error_duplicate(existing, title, json_output)
+    
     # Get next ID
     next_id = get_next_id(config.paths.specifications, "S-")
     
@@ -1100,37 +1209,56 @@ def spec_new_command(
     
     # Validate outcome if provided
     if implements_outcome:
-        outcome_dir = config.paths.outcomes
-        if not any(outcome_dir.glob(f"{implements_outcome}*.md")):
-            click.echo(f"Warning: Outcome '{implements_outcome}' not found.")
-            if not click.confirm("Create anyway?", default=False):
-                return 1
+        outcome = find_outcome(config.paths.outcomes, implements_outcome)
+        if not outcome:
+            return _error_invalid_outcome(implements_outcome, config, json_output)
     
-    # Build content
-    content = f"""---
-id: {next_id}
-type: specification
-title: {title}
----
-
-# {title}
-
-"""
-    if body:
-        content += body + "\n"
-    else:
-        content += """[Describe the behavioral requirement here]
-
-**Acceptance Criteria:**
-- [Criterion 1]
-- [Criterion 2]
-"""
-    
-    # Write file
+    # Build and write content
+    content = build_spec_content(next_id, title, body)
     filepath.write_text(content)
-    click.echo(f"Created: {filepath.relative_to(config.project_root)}")
+    
+    # Output based on mode
+    if json_output:
+        result = {
+            "id": next_id,
+            "type": "specification",
+            "title": title,
+            "file": str(filepath.relative_to(config.project_root))
+        }
+        click.echo(json.dumps(result))
+    elif verbose:
+        click.echo(f"Created: {filepath.relative_to(config.project_root)}")
+    # else: silent (Unix style)
     
     return 0
+
+
+def _error_duplicate(existing: dict, title: str, json_output: bool) -> int:
+    """Output duplicate title error with tips."""
+    tips = [
+        f"Use `jigy show spec {existing['id']}` to view existing spec",
+        f"Use `jigy search specs \"{title.split()[0]}\"` to find related specs",
+        "Choose a different title if this is a new requirement"
+    ]
+    
+    if json_output:
+        error = {
+            "error": "DUPLICATE_TITLE",
+            "message": "Similar specification already exists",
+            "existing": existing,
+            "tips": tips
+        }
+        click.echo(json.dumps(error))
+    else:
+        click.echo(f"Error: Similar specification already exists", err=True)
+        click.echo(f"  Existing: {existing['id']} \"{existing['title']}\"", err=True)
+        click.echo(f"  File: {existing['file']}", err=True)
+        click.echo("", err=True)
+        click.echo("  Tips:", err=True)
+        for tip in tips:
+            click.echo(f"  - {tip}", err=True)
+    
+    return 1
 ```
 
 ### D.3 `jigy search specs`
@@ -1144,7 +1272,7 @@ S-001  Token Expiration           (O-001) [complete]
 S-002  Password Hashing           (O-001) [complete]
 S-007  Session Invalidation       (O-001) [unimplemented]
 
-$ jigy search specs "authentication" --format json
+$ jigy search specs "authentication" --json
 {"id":"S-001","title":"Token Expiration","outcome":"O-001","status":"complete","match":"title"}
 {"id":"S-002","title":"Password Hashing","outcome":"O-001","status":"complete","match":"body"}
 ```
@@ -1250,6 +1378,163 @@ jig = ["templates/*.md", "templates/*.txt", "templates/*.yaml"]
 
 ---
 
+## PART F2: Existing CLI Updates
+
+The Unix-style output conventions require updates to existing CLI commands. This ensures consistent behavior across all `jigy` commands.
+
+### F2.1 Commands Requiring Updates
+
+| Command | Current Behavior | Required Change |
+|---------|-----------------|-----------------|
+| `jigy validate` | Always outputs summary | Silent on success, `-v` for summary |
+| `jigy rebuild` | Always outputs counts | Silent on success, `-v` for counts |
+| `jigy rebuild impl` | Always outputs count | Silent on success |
+| `jigy rebuild intent` | Always outputs count | Silent on success |
+| `jigy rebuild verify` | Always outputs count | Silent on success |
+| `jigy align` | Always outputs summary | Silent on success, `-v` for summary |
+| `jigy init` | Always outputs created files | Silent on success, `-v` for details |
+
+### F2.2 Validation Command Updates
+
+**Current behavior:**
+```bash
+$ jigy validate
+✓ Validating specifications (91 files)
+✓ Validating outcomes (26 files)
+✓ Validating bricks (11 bricks)
+
+All validations passed.
+```
+
+**New behavior:**
+```bash
+# Success: silent
+$ jigy validate
+$ echo $?
+0
+
+# Success with verbose
+$ jigy validate -v
+✓ Validating specifications (91 files)
+✓ Validating outcomes (26 files)
+✓ Validating bricks (11 bricks)
+
+All validations passed.
+
+# Failure: always outputs errors with tips
+$ jigy validate
+✗ Validating specifications (91 files)
+  Error: S-003 missing required field 'id'
+    File: jig/specifications/S-003_Example.md:1
+    Tip: Add `id: S-003` to frontmatter
+    
+  Error: S-047 H1 does not match title
+    File: jig/specifications/S-047_Token_Auth.md:8
+    Tip: Change H1 to match frontmatter title exactly
+
+Validation failed: 2 errors
+$ echo $?
+1
+
+# Failure with JSON
+$ jigy validate --json
+{"valid":false,"errors":[{"code":"MISSING_REQUIRED_FIELD","file":"jig/specifications/S-003_Example.md","line":1,"field":"id","tip":"Add `id: S-003` to frontmatter"},{"code":"H1_TITLE_MISMATCH","file":"jig/specifications/S-047_Token_Auth.md","line":8,"tip":"Change H1 to match frontmatter title exactly"}],"summary":{"total_errors":2}}
+```
+
+### F2.3 Rebuild Command Updates
+
+**Current behavior:**
+```bash
+$ jigy rebuild
+Rebuilding implementation graph...
+  impl: 342 nodes, 1204 edges
+Rebuilding verification graph...
+  verify: 156 nodes, 89 edges
+Rebuilding intent graph...
+  intent: 128 nodes, 312 edges
+```
+
+**New behavior:**
+```bash
+# Success: silent
+$ jigy rebuild
+$ echo $?
+0
+
+# Success with verbose
+$ jigy rebuild -v
+Rebuilding implementation graph...
+  impl: 342 nodes, 1204 edges
+Rebuilding verification graph...
+  verify: 156 nodes, 89 edges
+Rebuilding intent graph...
+  intent: 128 nodes, 312 edges
+
+# Success with JSON
+$ jigy rebuild --json
+{"impl":{"nodes":342,"edges":1204},"verify":{"nodes":156,"edges":89},"intent":{"nodes":128,"edges":312}}
+
+# Failure: always outputs error with tips
+$ jigy rebuild
+Error: Failed to rebuild implementation graph
+  Cause: Syntax error in src/jig/cli/main.py:42
+  Tip: Fix syntax error before rebuilding
+  Tip: Run `python -m py_compile src/jig/cli/main.py` to check syntax
+$ echo $?
+1
+```
+
+### F2.4 Global Flag Implementation
+
+Add global flags to CLI root:
+
+```python
+@click.group(cls=OrderedGroup, invoke_without_command=True)
+@click.version_option()
+@click.option("--no-rebuild", is_flag=True, help="Skip automatic graph rebuild")
+@click.option("-v", "--verbose", is_flag=True, help="Verbose output (show success messages)")
+@click.option("--json", "json_output", is_flag=True, help="Output JSON for programmatic use")
+@click.pass_context
+def cli(ctx, no_rebuild: bool, verbose: bool, json_output: bool):
+    """JIG — Keep specs, code, and tests aligned."""
+    ctx.ensure_object(dict)
+    ctx.obj["no_rebuild"] = no_rebuild
+    ctx.obj["verbose"] = verbose
+    ctx.obj["json_output"] = json_output
+```
+
+### F2.5 Error Output Standards
+
+All errors MUST include:
+
+1. **Error type** — What went wrong
+2. **Location** — File and line number where applicable
+3. **Tips** — Actionable suggestions to fix the problem
+
+**Human format:**
+```
+Error: <error type>
+  <detail>: <value>
+  File: <path>:<line>
+  
+  Tips:
+  - <actionable suggestion 1>
+  - <actionable suggestion 2>
+```
+
+**JSON format:**
+```json
+{
+  "error": "ERROR_CODE",
+  "message": "Human-readable error type",
+  "file": "path/to/file.md",
+  "line": 42,
+  "tips": ["Actionable suggestion 1", "Actionable suggestion 2"]
+}
+```
+
+---
+
 ## PART G: New Specifications
 
 ### G.1 Agent Tools Specifications
@@ -1262,15 +1547,17 @@ Per A-001 (JIG Core Architecture), all specifications must follow the `S-{NNN}` 
 | S-094 | Coverage Gap Auditing | G-005 | `jigy audit gaps` finds breaks in traceability |
 | S-095 | Project Initialization | G-004 | `jigy init` creates correct directory structure |
 | S-096 | Artifact ID Generation | G-004 | `jigy next-id` returns next available ID |
-| S-097 | Specification Creation | G-004 | `jigy spec new` creates valid spec file |
-| S-098 | Outcome Creation | G-004 | `jigy outcome new` creates valid outcome file |
+| S-097 | Specification Creation | G-004 | `jigy new spec` creates valid spec file |
+| S-098 | Outcome Creation | G-004 | `jigy new outcome` creates valid outcome file |
 | S-099 | Specification Search | G-001 | `jigy search specs` searches by keyword |
-| S-100 | JSON Output Format | G-002 | `--format json` produces NDJSON/compact JSON |
+| S-100 | JSON Output Format | G-002 | `--json` produces NDJSON/compact JSON |
 | S-101 | Generated Directory README | G-003 | Auto-create README in generated/ |
 | S-102 | Gitignore Recommendation | G-003 | Init suggests .gitignore entry |
 | S-103 | Dynamic Context Generation | G-002 | `jigy context` generates agent-oriented project state |
 | S-104 | Context Output Formats | G-002 | Context supports human/json/markdown output |
 | S-105 | Agent Context Architecture | G-002, G-004 | Three-layer context: CLAUDE.md + jigy context + deep reference |
+| S-106 | Unix-Style CLI Output | G-001, G-003 | Silent success, informative failure with tips |
+| S-107 | CLI Global Flags | G-001 | `-v`/`--verbose` and `--json` flags on all commands |
 
 ### G.2 New Outcome
 
@@ -1278,10 +1565,10 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 
 | ID | Title | supports_goals | specifies |
 |----|-------|----------------|-----------|
-| O-027 | Agent-Oriented Tooling | [G-001, G-002, G-004, G-005] | [S-093..S-105] |
+| O-027 | Agent-Oriented Tooling | [G-001, G-002, G-003, G-004, G-005] | [S-093..S-107] |
 
 **Full specification list for O-027:**
-`[S-093, S-094, S-095, S-096, S-097, S-098, S-099, S-100, S-101, S-102, S-103, S-104, S-105]`
+`[S-093, S-094, S-095, S-096, S-097, S-098, S-099, S-100, S-101, S-102, S-103, S-104, S-105, S-106, S-107]`
 
 **Rationale for Goal Alignment:**
 - **G-001 (Grounding)**: Graph queries and search let agents query actual structure
@@ -1506,37 +1793,24 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 
 ---
 
-#### WU-9: Spec New Command
+#### WU-9: New Command Group
 
 **Scope:**
-- Add `jigy spec new <title>` command
-- Options: `--implements <outcome_id>`, `--body <text>`
-- Validate outcome reference
-- Use snake_case for filename
-- Write with correct frontmatter
+- Create `jigy new` command group
+- Add `jigy new spec <title>` subcommand
+- Add `jigy new outcome <title>` subcommand
+- Add `jigy new architecture <title>` subcommand
+- Unix-style: silent on success, `-v` for details
+- Options: `--implements <outcome_id>`, `--specifies <spec_ids>`, `--body <text>`
+- Validate references
+- Use snake_case for filenames
+- Include tips on failure
 
 **Files:**
 - `src/jig/cli/create.py`
 - `src/jig/cli/main.py`
 
-**Specs:** S-097
-
----
-
-#### WU-10: Outcome New Command
-
-**Scope:**
-- Add `jigy outcome new <title>` command
-- Options: `--specifies <spec_ids>`, `--body <text>`
-- Validate spec references
-- Use snake_case for filename
-- Write with correct frontmatter
-
-**Files:**
-- `src/jig/cli/create.py`
-- `src/jig/cli/main.py`
-
-**Specs:** S-098
+**Specs:** S-097, S-098, S-106
 
 ---
 
@@ -1561,7 +1835,7 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 #### WU-12: JSON Output on Show Commands
 
 **Scope:**
-- Add `--format json` to all existing show commands
+- Add `--json` to all existing show commands
 - Consistent NDJSON for lists, compact JSON for single objects
 - Update: `show layers`, `show bricks`, `show charter`, etc.
 
@@ -1589,10 +1863,73 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 
 ---
 
+#### WU-13B: Global CLI Flags
+
+**Scope:**
+- Add `-v`/`--verbose` flag to CLI root
+- Add `--json` flag to CLI root
+- Propagate flags through context to all commands
+- Update Click context helpers
+
+**Files:**
+- `src/jig/cli/main.py`
+- `src/jig/cli/validate.py`
+- `src/jig/cli/rebuild.py`
+- `src/jig/cli/show.py`
+
+**Specs:** S-100, S-106
+
+---
+
+#### WU-13C: Unix-Style Validate Command
+
+**Scope:**
+- Update `jigy validate` to be silent on success
+- Output only on failure or with `-v`
+- Add tips to error messages
+- Ensure `--json` produces structured output with tips
+
+**Files:**
+- `src/jig/cli/validate.py`
+- `src/jig/validation/reporting.py`
+
+**Specs:** S-106
+
+---
+
+#### WU-13D: Unix-Style Rebuild Command
+
+**Scope:**
+- Update `jigy rebuild` to be silent on success
+- Output node/edge counts only with `-v`
+- Add tips to error messages on failure
+- Support `--json` output with structured result
+
+**Files:**
+- `src/jig/cli/rebuild.py`
+
+**Specs:** S-106
+
+---
+
+#### WU-13E: Unix-Style Align Command
+
+**Scope:**
+- Update `jigy align` to be silent on success
+- Output summary only with `-v`
+- Ensure error output includes tips
+
+**Files:**
+- `src/jig/cli/rebuild.py`
+
+**Specs:** S-106
+
+---
+
 #### WU-14: Create Specifications
 
 **Scope:**
-- Create S-093 through S-105 (13 specifications)
+- Create S-093 through S-107 (15 specifications)
 - Create O-027
 
 **Files:**
@@ -1609,6 +1946,8 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 - `jig/specifications/S-103_Dynamic_Context_Generation.md`
 - `jig/specifications/S-104_Context_Output_Formats.md`
 - `jig/specifications/S-105_Agent_Context_Architecture.md`
+- `jig/specifications/S-106_Unix_Style_CLI_Output.md`
+- `jig/specifications/S-107_CLI_Global_Flags.md`
 - `jig/outcomes/O-027_Agent_Oriented_Tooling.md`
 
 ---
@@ -1688,7 +2027,7 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 |-------|------------|-------|
 | **Phase 1 (P0)** | WU-1, WU-2, WU-3, WU-4, WU-4B, WU-4C, WU-4D, WU-4E | Graph queries, context command, documentation |
 | **Phase 2 (P1)** | WU-5, WU-6, WU-7, WU-8, WU-9, WU-10, WU-11 | Init, templates, artifact creation |
-| **Phase 3 (P2)** | WU-12, WU-13, WU-14, WU-15 | JSON enhancement, specs, tests |
+| **Phase 3 (P2)** | WU-12, WU-13, WU-13B, WU-13C, WU-13D, WU-13E, WU-14, WU-15 | JSON, Unix-style output, specs, tests |
 
 ### Work Unit Count
 
@@ -1697,9 +2036,13 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 | Core graph queries | 4 (WU-1..WU-4) |
 | Context injection | 4 (WU-4B..WU-4E) |
 | Initialization | 3 (WU-5..WU-7) |
-| Artifact creation | 4 (WU-8..WU-11) |
-| Enhancement & docs | 4 (WU-12..WU-15) |
-| **Total** | **19 work units** |
+| Artifact creation | 3 (WU-8, WU-9, WU-11) |
+| JSON enhancement | 2 (WU-12, WU-13) |
+| Unix-style CLI updates | 4 (WU-13B..WU-13E) |
+| Specs & tests | 2 (WU-14, WU-15) |
+| **Total** | **22 work units** |
+
+**Note:** WU-10 merged into WU-9 (jigy new command group handles spec, outcome, and architecture).
 
 ---
 
@@ -1752,12 +2095,12 @@ Per A-001, outcomes must have `supports_goals` and `specifies` fields:
 3. `jigy audit gaps` identifies all coverage gaps
 4. `jigy context` generates dynamic project summary
 5. `jigy context --format markdown` outputs LLM-optimized context (~25 lines)
-6. `jigy context --format json` outputs compact JSON for programmatic use
+6. `jigy context --json` outputs compact JSON for programmatic use
 7. `jigy init` creates complete directory structure (per A-001 File Structure)
 8. `jigy next-id spec` returns next available ID (format per A-001: `S-{NNN}`)
-9. `jigy spec new "Title"` creates valid specification file
+9. `jigy new spec "Title"` creates valid specification file
 10. `jigy search specs "keyword"` finds matching specs
-11. All new commands support `--format json`
+11. All new commands support `--json`
 
 ### K.2 C007 Criteria
 

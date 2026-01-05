@@ -2,6 +2,7 @@
 title: "Proposal: Bricks with Towers"
 type: exploration
 status: implemented
+decision: "Towers added to brick model in A-001"
 created: 1767412904
 created_human: "2026-01-02 22:01 CST"
 parent: null

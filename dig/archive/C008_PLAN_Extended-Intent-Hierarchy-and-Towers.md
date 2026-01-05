@@ -2,6 +2,7 @@
 title: "PLAN: Extended Intent Hierarchy and Towers"
 type: plan
 status: implemented
+decision: "17 work units executed, Charter and A-001 created"
 created: 1767537749
 created_human: "2026-01-04 08:42 CST"
 completed: 1767700000

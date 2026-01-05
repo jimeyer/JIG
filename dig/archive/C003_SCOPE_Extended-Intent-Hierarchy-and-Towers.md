@@ -2,6 +2,7 @@
 title: "SCOPE: Extended Intent Hierarchy and Towers"
 type: scope
 status: implemented
+decision: "Scope completed via C004-C009 deliberation chain"
 created: 1767412904
 created_human: "2026-01-02 22:01 CST"
 completed: 1767700000
