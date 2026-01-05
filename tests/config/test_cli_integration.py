@@ -27,7 +27,7 @@ def project_dir():
         (project / "jig" / "generated").mkdir()
 
         # Create a valid specification
-        spec_file = project / "jig" / "specifications" / "S-001.md"
+        spec_file = project / "jig" / "specifications" / "S-001_Test_Specification.md"
         spec_file.write_text("""---
 id: S-001
 type: specification
@@ -43,7 +43,7 @@ A test specification for validation.
 """)
 
         # Create a valid outcome
-        outcome_file = project / "jig" / "outcomes" / "O-001.md"
+        outcome_file = project / "jig" / "outcomes" / "O-001_Test_Outcome.md"
         outcome_file.write_text("""---
 id: O-001
 type: outcome
@@ -82,7 +82,7 @@ def test_validate_uses_config_paths(project_dir):
     bricks_file.write_text("bricks: []\n")
 
     # Create a spec in custom location
-    spec_file = project_dir / "custom_jig" / "specifications" / "S-002.md"
+    spec_file = project_dir / "custom_jig" / "specifications" / "S-002_Custom_Specification.md"
     spec_file.write_text("""---
 id: S-002
 type: specification
@@ -98,7 +98,7 @@ A custom specification.
 """)
 
     # Create an outcome that specifies this spec
-    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-002.md"
+    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-002_Custom_Outcome.md"
     outcome_file.write_text("""---
 id: O-002
 type: outcome
@@ -352,7 +352,7 @@ def test_full_workflow_with_config(project_dir):
     bricks_file.write_text("bricks: []\n")
 
     # Create specification
-    spec_file = project_dir / "custom_jig" / "specifications" / "S-100.md"
+    spec_file = project_dir / "custom_jig" / "specifications" / "S-100_Workflow_Test_Spec.md"
     spec_file.write_text("""---
 id: S-100
 type: specification
@@ -368,7 +368,7 @@ Test specification for full workflow.
 """)
 
     # Create outcome
-    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-100.md"
+    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-100_Workflow_Test_Outcome.md"
     outcome_file.write_text("""---
 id: O-100
 type: outcome

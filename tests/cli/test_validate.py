@@ -20,14 +20,14 @@ def test_validate_intent_success():
         # Create valid spec
         spec_dir = Path("jig/specifications")
         spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001.md").write_text(
+        (spec_dir / "S-001_Test_Specification.md").write_text(
             """---
 id: S-001
 type: specification
 title: Test Specification
 ---
 
-# Test
+# Test Specification
 """
         )
 
@@ -69,14 +69,14 @@ def test_validate_intent_exit_codes():
         spec_dir.mkdir(parents=True)
 
         # Success: exit code 0
-        (spec_dir / "S-001.md").write_text(
+        (spec_dir / "S-001_Test_Specification.md").write_text(
             """---
 id: S-001
 type: specification
 title: Test Specification
 ---
 
-# Test
+# Test Specification
 """
         )
 
@@ -176,14 +176,14 @@ def test_validate_full_success():
         # Create valid spec
         spec_dir = Path("jig/specifications")
         spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001.md").write_text(
+        (spec_dir / "S-001_Test_Specification.md").write_text(
             """---
 id: S-001
 type: specification
 title: Test Specification
 ---
 
-# Test
+# Test Specification
 """
         )
 
@@ -222,14 +222,14 @@ def test_validate_full_skips_bricks_if_no_graph():
         # Create valid spec only (no graph)
         spec_dir = Path("jig/specifications")
         spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001.md").write_text(
+        (spec_dir / "S-001_Test_Specification.md").write_text(
             """---
 id: S-001
 type: specification
 title: Test Specification
 ---
 
-# Test
+# Test Specification
 """
         )
 
@@ -313,14 +313,14 @@ def test_validate_human_output_only():
         # Create valid spec
         spec_dir = Path("jig/specifications")
         spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001.md").write_text(
+        (spec_dir / "S-001_Test_Specification.md").write_text(
             """---
 id: S-001
 type: specification
 title: Test Specification
 ---
 
-# Test
+# Test Specification
 """
         )
 

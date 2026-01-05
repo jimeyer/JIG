@@ -5,7 +5,7 @@ status: active
 created: 1767550000
 created_human: "2026-01-04 12:00 CST"
 parent: "[[C010_SCOPE_Standardized-Intent-Document-Naming]]"
-children: []
+children: ['[[C012_PLAN_Standardized-Intent-Document-Naming]]']
 ---
 # JIGPLAN: Standardized Intent Document Naming
 

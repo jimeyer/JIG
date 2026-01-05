@@ -7,7 +7,7 @@ supports_goals: [G-001, G-003, G-004, G-005]
 constrains: [S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088]
 ---
 
-# A-001: JIG Core Architecture
+# JIG Core Architecture
 
 ## Overview
 

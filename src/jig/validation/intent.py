@@ -15,6 +15,164 @@ import jig
 from jig.validation.models import ValidationError, ValidationResult
 
 
+# ============================================================================
+# Filename Format Validation Helpers (S-018, S-019, S-076)
+# ============================================================================
+
+
+@jig.implements("S-018", "S-019", "S-076")
+def to_snake_case(title: str) -> str:
+    """
+    Convert title to snake_case for filename matching.
+
+    Rules:
+    - Replace spaces with underscores
+    - Remove punctuation (except hyphens in compound words)
+    - Preserve capitalization (Title_Case)
+    - Preserve acronyms
+
+    Examples:
+        "Python Code Structure" -> "Python_Code_Structure"
+        "CLI Show Commands" -> "CLI_Show_Commands"
+        "YAML Frontmatter Parsing" -> "YAML_Frontmatter_Parsing"
+        "What's New?" -> "Whats_New"
+        "Cross-Tower Isolation" -> "Cross-Tower_Isolation"
+    """
+    # Remove punctuation except hyphens and spaces
+    # Keep hyphens that are between letters (compound words)
+    result = []
+    for char in title:
+        if char.isalnum() or char == ' ':
+            result.append(char)
+        elif char == '-':
+            # Keep hyphens between letters (compound words)
+            result.append(char)
+        # else: drop other punctuation (apostrophes, question marks, etc.)
+
+    # Join and replace spaces with underscores
+    cleaned = ''.join(result)
+    return cleaned.replace(' ', '_')
+
+
+@jig.implements("S-018", "S-019", "S-076")
+def validate_filename_format(
+    file_path: Path,
+    frontmatter: dict,
+    type_prefix: str,
+) -> list[str]:
+    """
+    Validate that filename matches expected pattern and frontmatter title.
+
+    Pattern: {TYPE}-{NNN}_{Title_Snake_Case}.md
+
+    Args:
+        file_path: Path to the intent document file
+        frontmatter: Parsed YAML frontmatter dictionary
+        type_prefix: Expected prefix (S, O, or A)
+
+    Returns:
+        List of error messages (empty if valid).
+    """
+    errors = []
+
+    # Get frontmatter values
+    doc_id = frontmatter.get("id", "")
+    title = frontmatter.get("title", "")
+
+    if not title:
+        # Missing title is caught by required field validation
+        return errors
+
+    # Expected filename format
+    expected_snake = to_snake_case(title)
+    expected_filename = f"{doc_id}_{expected_snake}.md"
+
+    # Check if filename matches expected format
+    actual_filename = file_path.name
+
+    if actual_filename != expected_filename:
+        errors.append(
+            f"Invalid filename format\n"
+            f"  File: {file_path}\n"
+            f"  Expected: {expected_filename}\n"
+            f"  Actual: {actual_filename}\n"
+            f"  Rule: Filename must be {{TYPE}}-{{NNN}}_{{Title_Snake_Case}}.md"
+        )
+
+    return errors
+
+
+@jig.implements("S-018", "S-019", "S-076")
+def validate_h1_matches_title(file_path: Path, frontmatter: dict) -> list[str]:
+    """
+    Validate that first H1 in document body matches frontmatter title exactly.
+
+    The H1 must NOT include an ID prefix (e.g., "# A-001: Title" is invalid).
+
+    Returns:
+        List of error messages (empty if valid).
+    """
+    errors = []
+
+    title = frontmatter.get("title", "")
+    if not title:
+        # Missing title is caught by required field validation
+        return errors
+
+    try:
+        content = file_path.read_text()
+
+        # Skip frontmatter
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                body = parts[2]
+            else:
+                body = content
+        else:
+            body = content
+
+        # Find first H1 header
+        h1_pattern = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+        match = h1_pattern.search(body)
+
+        if not match:
+            errors.append(
+                f"Missing H1 header\n"
+                f"  File: {file_path}\n"
+                f"  Rule: Document must have at least one H1 (# Title) header"
+            )
+            return errors
+
+        h1_content = match.group(1).strip()
+
+        # Check if H1 matches title exactly
+        if h1_content != title:
+            errors.append(
+                f"H1 does not match title\n"
+                f"  File: {file_path}\n"
+                f"  Frontmatter title: \"{title}\"\n"
+                f"  First H1: \"# {h1_content}\"\n"
+                f"  Rule: First H1 must exactly match frontmatter title"
+            )
+
+        # Check if H1 contains ID prefix (e.g., "A-001: Title")
+        id_prefix_pattern = re.compile(r"^[AOS]-\d{3}:\s*")
+        if id_prefix_pattern.match(h1_content):
+            errors.append(
+                f"H1 contains ID prefix\n"
+                f"  File: {file_path}\n"
+                f"  First H1: \"# {h1_content}\"\n"
+                f"  Rule: H1 must NOT include ID prefix (use title only)"
+            )
+
+    except Exception:
+        # File reading errors are caught elsewhere
+        pass
+
+    return errors
+
+
 @jig.implements("S-018")
 def validate_specification_files(spec_dir: Path) -> ValidationResult:
     """
@@ -93,14 +251,25 @@ def validate_specification_files(spec_dir: Path) -> ValidationResult:
                 )
             )
 
-        # Check filename matches ID
-        expected_filename = f"{spec_id}.md"
-        if spec_file.name != expected_filename:
+        # Check filename format: {ID}_{Title_Snake_Case}.md
+        filename_errors = validate_filename_format(spec_file, frontmatter, "S")
+        for err_msg in filename_errors:
             result.add_error(
                 ValidationError(
                     file=str(spec_file),
-                    message=f"Filename '{spec_file.name}' does not match ID '{spec_id}' (expected '{expected_filename}')",
-                    code="FILENAME_ID_MISMATCH",
+                    message=err_msg,
+                    code="INVALID_FILENAME_FORMAT",
+                )
+            )
+
+        # Check H1 matches frontmatter title
+        h1_errors = validate_h1_matches_title(spec_file, frontmatter)
+        for err_msg in h1_errors:
+            result.add_error(
+                ValidationError(
+                    file=str(spec_file),
+                    message=err_msg,
+                    code="H1_TITLE_MISMATCH",
                 )
             )
 
@@ -224,6 +393,28 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
                     message=f"Invalid ID format: '{outcome_id}' (expected O-NNN pattern)",
                     code="INVALID_ID_FORMAT",
                     field="id",
+                )
+            )
+
+        # Check filename format: {ID}_{Title_Snake_Case}.md
+        filename_errors = validate_filename_format(outcome_file, frontmatter, "O")
+        for err_msg in filename_errors:
+            result.add_error(
+                ValidationError(
+                    file=str(outcome_file),
+                    message=err_msg,
+                    code="INVALID_FILENAME_FORMAT",
+                )
+            )
+
+        # Check H1 matches frontmatter title
+        h1_errors = validate_h1_matches_title(outcome_file, frontmatter)
+        for err_msg in h1_errors:
+            result.add_error(
+                ValidationError(
+                    file=str(outcome_file),
+                    message=err_msg,
+                    code="H1_TITLE_MISMATCH",
                 )
             )
 
@@ -961,6 +1152,28 @@ def validate_architecture_files(
                     message="Missing required field: 'title'",
                     code="MISSING_REQUIRED_FIELD",
                     field="title",
+                )
+            )
+
+        # Check filename format: {ID}_{Title_Snake_Case}.md
+        filename_errors = validate_filename_format(arch_file, frontmatter, "A")
+        for err_msg in filename_errors:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=err_msg,
+                    code="INVALID_FILENAME_FORMAT",
+                )
+            )
+
+        # Check H1 matches frontmatter title
+        h1_errors = validate_h1_matches_title(arch_file, frontmatter)
+        for err_msg in h1_errors:
+            result.add_error(
+                ValidationError(
+                    file=str(arch_file),
+                    message=err_msg,
+                    code="H1_TITLE_MISMATCH",
                 )
             )
 

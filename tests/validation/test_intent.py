@@ -21,7 +21,7 @@ def test_validate_specification_valid():
         spec_dir = Path(tmpdir) / "specifications"
         spec_dir.mkdir()
 
-        spec_file = spec_dir / "S-001.md"
+        spec_file = spec_dir / "S-001_Test_Specification.md"
         spec_file.write_text(
             """---
 id: S-001
@@ -212,7 +212,7 @@ def test_validate_outcome_valid():
         outcome_dir = Path(tmpdir) / "outcomes"
         outcome_dir.mkdir()
 
-        outcome_file = outcome_dir / "O-001.md"
+        outcome_file = outcome_dir / "O-001_Test_Outcome.md"
         outcome_file.write_text(
             """---
 id: O-001

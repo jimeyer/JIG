@@ -17,7 +17,7 @@ def create_minimal_jig_project(root: Path) -> None:
     (root / "jig" / "generated").mkdir(parents=True)
 
     # Create a minimal spec
-    (root / "jig" / "specifications" / "S-001.md").write_text(
+    (root / "jig" / "specifications" / "S-001_Test_Specification.md").write_text(
         """---
 id: S-001
 type: specification
@@ -29,7 +29,7 @@ title: Test Specification
     )
 
     # Create a minimal outcome
-    (root / "jig" / "outcomes" / "O-001.md").write_text(
+    (root / "jig" / "outcomes" / "O-001_Test_Outcome.md").write_text(
         """---
 id: O-001
 type: outcome

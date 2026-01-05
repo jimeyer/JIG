@@ -76,6 +76,8 @@ If you are an AI agent working on this codebase:
 
 7. **Check alignment**: Before claiming a task is complete, run `jigy align` to verify that implementation, intent, and tests form a coherent triangle.
 
+8. **Choose stable titles**: When creating intent documents, select titles that describe capabilities, not implementations. Titles appear in filenames and are semi-permanent. Good: "Response Caching", "User Authentication". Bad: "New Cache", "Redis Layer", "Fix Login Bug".
+
 JIG exists because you exist. Use it.
 
 ---
