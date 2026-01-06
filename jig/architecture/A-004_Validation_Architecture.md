@@ -2,9 +2,9 @@
 id: A-004
 type: architecture
 title: Validation Architecture
-status: draft
+status: active
 supports_goals: [G-003, G-005]
-constrains: [S-016, S-017, S-018, S-020, S-023, S-024, S-025, S-030, S-034, S-035, S-038, S-039, S-042, S-043, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088, S-089]
+constrains: [S-018, S-020, S-021, S-022, S-023, S-024, S-025, S-035, S-038, S-039, S-042, S-043, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088, S-089]
 ---
 
 # Validation Architecture
@@ -56,8 +56,8 @@ JIG validates seven artifact types. Each domain has:
 | Goal References | 2 | S-075 | `validate_goal_references()` |
 | Architecture | 7 | S-076, S-077, S-078, S-079 | `validate_architecture_files()` |
 | Outcome | 7 | S-018, S-042 | `validate_outcome_files()`, `validate_outcome_completeness()` |
-| Specification | 6 | S-016, S-017, S-043 | `validate_specification_files()`, `validate_specification_coverage()` |
-| Brick | 8 | S-030, S-034, S-035, S-038, S-039 | `validate_brick_*()` |
+| Specification | 5 | S-018, S-043 | `validate_specification_files()`, `validate_specification_coverage()` |
+| Brick | 8 | S-021, S-022, S-035, S-038, S-039 | `validate_brick_*()` |
 | Tower | 3 | S-086, S-087, S-088, S-089 | `validate_tower_format()`, `validate_tower_isolation()` |
 | Decorator | 3 | S-020 | `validate_decorator_files()` |
 
@@ -103,9 +103,9 @@ Goals defined in Charter are referenced by Architecture and Outcome documents. R
 
 ```
 validate_goal_references(
-    outcome_dir: Path | None,
-    arch_dir: Path | None,
-    charter_goals: set[str]
+    charter_path: Path,
+    outcome_dir: Path,
+    architecture_dir: Path | None = None,
 ) -> ValidationResult
 ```
 
@@ -113,7 +113,7 @@ validate_goal_references(
 
 **Called by:** `validate_intent_command()`
 
-**Dependency:** Requires charter goals extracted from `validate_charter_file()`
+**Note:** Function loads charter goals internally from `charter_path`.
 
 ---
 
@@ -188,12 +188,11 @@ Specifications define testable requirements. They must follow naming conventions
 
 | # | Rule | Spec |
 |---|------|------|
-| S-1 | Specification `id` SHALL match `S-{NNN}` pattern (zero-padded to 3 digits) | S-016 |
-| S-2 | Specification SHALL have required fields: `id`, `type`, `title`, `status` | S-016 |
-| S-3 | Specification `status` SHALL be one of: `draft`, `proposed`, `active`, `deprecated` | S-017 |
-| S-4 | Specification filename SHALL match `S-{NNN}_{Title}.md` pattern | S-016 |
-| S-5 | Specification H1 header SHALL match frontmatter `title` | S-016 |
-| S-6 | Every specification SHALL be referenced by at least one outcome | S-043 |
+| S-1 | Specification `id` SHALL match `S-{NNN}` pattern (zero-padded to 3 digits) | S-018 |
+| S-2 | Specification SHALL have required fields: `id`, `type`, `title` | S-018 |
+| S-3 | Specification filename SHALL match `S-{NNN}_{Title}.md` pattern | S-018 |
+| S-4 | Specification H1 header SHALL match frontmatter `title` | S-018 |
+| S-5 | Every specification SHALL be referenced by at least one outcome | S-043 |
 
 ### Functions
 
@@ -216,12 +215,12 @@ Bricks partition the codebase into architectural units. Every function must belo
 
 | # | Rule | Spec |
 |---|------|------|
-| B-1 | Brick `id` SHALL match `B-{kebab-case}` pattern | S-030 |
-| B-2 | Brick SHALL have required fields: `id`, `name`, `layer`, `units` | S-030 |
-| B-3 | Brick `layer` SHALL be a non-negative integer | S-030 |
-| B-4 | Brick `units` SHALL reference nodes in implementation graph | S-034 |
-| B-5 | Every function in implementation graph SHALL belong to exactly one brick | S-035 |
-| B-6 | No function SHALL belong to multiple bricks (partition constraint) | S-035 |
+| B-1 | Brick `id` SHALL match `B-{kebab-case}` pattern | S-035 |
+| B-2 | Brick SHALL have required fields: `id`, `name`, `layer`, `units` | S-021 |
+| B-3 | Brick `layer` SHALL be a non-negative integer | S-021 |
+| B-4 | Brick `units` SHALL reference nodes in implementation graph | S-021 |
+| B-5 | Every function in implementation graph SHALL belong to exactly one brick | S-022 |
+| B-6 | No function SHALL belong to multiple bricks (partition constraint) | S-022 |
 | B-7 | Brick dependencies SHALL respect layer hierarchy (no upward deps) | S-038 |
 | B-8 | Brick dependency graph SHALL be acyclic (DAG constraint) | S-039 |
 
@@ -352,8 +351,8 @@ Complete mapping from rules to specs to functions:
 | Goal Ref | GR-2 | S-075 | `validate_goal_references` |
 | Architecture | A-1..A-7 | S-076, S-077, S-078, S-079 | `validate_architecture_files` |
 | Outcome | O-1..O-7 | S-018, S-042 | `validate_outcome_files`, `validate_outcome_completeness` |
-| Specification | S-1..S-6 | S-016, S-017, S-043 | `validate_specification_files`, `validate_specification_coverage` |
-| Brick | B-1..B-8 | S-030, S-034, S-035, S-038, S-039 | `validate_brick_*` |
+| Specification | S-1..S-5 | S-018, S-043 | `validate_specification_files`, `validate_specification_coverage` |
+| Brick | B-1..B-8 | S-021, S-022, S-035, S-038, S-039 | `validate_brick_*` |
 | Tower | T-1..T-3 | S-086, S-087, S-088, S-089 | `validate_tower_format`, `validate_tower_isolation` |
 | Decorator | D-1..D-3 | S-020 | `validate_decorator_files` |
 
@@ -371,4 +370,5 @@ This document supersedes the "Validation Rules" section of A-001. A-001 retains 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.0 | 2026-01-06 | Activated. Fixed spec references (S-016/S-017→S-018, S-030/S-034→S-021/S-022). Fixed `validate_goal_references` signature. |
 | Draft | 2026-01-06 | Initial creation from A-001 validation rules + C018 analysis |
