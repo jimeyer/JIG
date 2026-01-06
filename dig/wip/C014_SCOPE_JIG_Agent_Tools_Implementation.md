@@ -113,7 +113,8 @@ Command-specific flags:
 |------|----------|---------|
 | `--json` | Most commands | Machine-readable output |
 | `--quiet` | Mutating commands | Suppress success output |
-| `--markdown` | `context` only | LLM-optimized markdown |
+
+**Why no `--markdown` flag?** Research shows markdown-compatible human output serves both audiences. Human output uses markdown-compatible formatting (headers, bullets) that renders well in terminals AND is directly consumable by LLMs. This matches how `git` works — readable by humans and agents without a special mode. See [Output Format Research](#output-format-research) for sources.
 
 ---
 
@@ -234,45 +235,47 @@ Per our design discussion, `context` is fundamentally different from `show`:
 
 **File:** `src/jig/cli/context.py` (new)
 
-#### Human Output
+#### Human Output (Markdown-Compatible)
+
+Human output uses markdown-compatible formatting that renders well in terminals AND is directly consumable by LLMs:
 
 ```
 $ jigy context
 
-JIG CONTEXT: jig-dev
-════════════════════
+# JIG Context: jig-dev
 
-PROJECT STATE
-  Charter:        jig/Charter.md (5 goals: G-001..G-005)
-  Architecture:   2 documents (A-001, A-002)
-  Outcomes:       26 total
-  Specifications: 91 total | 78 implemented | 65 verified
-  Bricks:         11 total | 3 layers | single tower
+## Project State
+- Charter: jig/Charter.md (5 goals: G-001..G-005)
+- Architecture: 2 documents (A-001, A-002)
+- Outcomes: 26 total
+- Specifications: 91 total | 78 implemented | 65 verified
+- Bricks: 11 total | 3 layers | single tower
 
-COVERAGE
-  Implemented:    78/91 (86%)
-  Verified:       65/91 (71%)
-  Gaps:           3 unimplemented, 13 unverified
+## Coverage
+- Implemented: 78/91 (86%)
+- Verified: 65/91 (71%)
+- Gaps: 3 unimplemented, 13 unverified
 
-TOP GAPS (run `jigy audit gaps` for full list)
-  S-044  CRDT Conflict Resolution         unimplemented
-  S-045  Offline Queue Persistence        unimplemented
-  S-046  Network Partition Detection      unimplemented
-  S-012  Token Expiration                 unverified (2 functions)
-  S-023  Rate Limiting                    unverified (1 function)
+## Top Gaps
+Run `jigy audit gaps` for full list.
+- S-044  CRDT Conflict Resolution         unimplemented
+- S-045  Offline Queue Persistence        unimplemented
+- S-046  Network Partition Detection      unimplemented
+- S-012  Token Expiration                 unverified (2 functions)
+- S-023  Rate Limiting                    unverified (1 function)
 
-QUICK COMMANDS
-  jigy context spec <id>   Context around a specification
-  jigy show spec <id>      Display spec with implementations
-  jigy audit gaps          Full coverage report
-  jigy validate            Check all constraints
+## Quick Commands
+- `jigy context spec <id>` — Context around a specification
+- `jigy show spec <id>` — Display spec with implementations
+- `jigy audit gaps` — Full coverage report
+- `jigy validate` — Check all constraints
 
-CHARTER GOALS
-  G-001: Grounding in Reality
-  G-002: Continuity Across Sessions
-  G-003: Enforcing Constraints
-  G-004: Intent Alignment
-  G-005: Full Traceability
+## Charter Goals
+- G-001: Grounding in Reality
+- G-002: Continuity Across Sessions
+- G-003: Enforcing Constraints
+- G-004: Intent Alignment
+- G-005: Full Traceability
 ```
 
 #### JSON Output
@@ -285,65 +288,39 @@ $ jigy context --json
 {"project":"jig-dev","charter":{"file":"jig/Charter.md","goals":["G-001","G-002","G-003","G-004","G-005"]},"stats":{"specs":{"total":91,"implemented":78,"verified":65},"outcomes":{"total":26},"bricks":{"total":11,"layers":3,"towers":1}},"top_gaps":[{"id":"S-044","title":"CRDT Conflict Resolution","status":"unimplemented"}]}
 ```
 
-#### Markdown Output (for LLM injection)
-
-```bash
-$ jigy context --markdown
-```
-
-```markdown
-# JIG Context: jig-dev
-
-## Project State
-- **Charter:** jig/Charter.md (5 goals)
-- **Specs:** 91 total | 78 implemented | 65 verified
-- **Bricks:** 11 total | 3 layers
-
-## Top Gaps
-1. S-044 CRDT Conflict Resolution — unimplemented
-2. S-045 Offline Queue Persistence — unimplemented
-3. S-012 Token Expiration — unverified (2 functions)
-
-## Quick Commands
-- `jigy context spec <id>` — Context around a spec
-- `jigy show spec <id>` — Spec with implementations
-- `jigy audit gaps` — Full coverage report
-```
-
 ### A.3 `jigy context spec <id>` (Spec-Level)
 
 **Purpose:** Orient agent to a specific specification and its neighborhood.
 
-#### Human Output
+#### Human Output (Markdown-Compatible)
 
 ```
 $ jigy context spec S-042
 
-CONTEXT: S-042 CRDT Value Observation
-═════════════════════════════════════
+# Context: S-042 CRDT Value Observation
 
-STATUS: PARTIAL (2 impl, 1 test, 1 gap)
-OUTCOME: O-012 (Real-time Collaboration)
-BRICK: B-crdt-observe (layer 1)
+- **Status:** PARTIAL (2 impl, 1 test, 1 gap)
+- **Outcome:** O-012 (Real-time Collaboration)
+- **Brick:** B-crdt-observe (layer 1)
 
-IMPLEMENTATIONS
-  F-jig.crdt.observe.subscribe    src/jig/crdt/observe.py:45
-  F-jig.crdt.observe.notify       src/jig/crdt/observe.py:78  ⚠ untested
+## Implementations
+- F-jig.crdt.observe.subscribe    src/jig/crdt/observe.py:45
+- F-jig.crdt.observe.notify       src/jig/crdt/observe.py:78  (untested)
 
-TESTS
-  T-test_observe.test_subscribe   tests/test_observe.py:23
+## Tests
+- T-test_observe.test_subscribe   tests/test_observe.py:23
 
-RELATED SPECS (same brick)
-  S-041  CRDT State Merge             complete
-  S-043  CRDT Conflict Resolution     unimplemented
+## Related Specs (same brick)
+- S-041  CRDT State Merge             complete
+- S-043  CRDT Conflict Resolution     unimplemented
 
-RELATED SPECS (same outcome)
-  S-040  Real-time Sync Protocol      complete
-  S-044  Offline Queue                unimplemented
+## Related Specs (same outcome)
+- S-040  Real-time Sync Protocol      complete
+- S-044  Offline Queue                unimplemented
 
-NEXT STEPS
-  - Add test for F-jig.crdt.observe.notify
-  - Run: jigy show spec S-042 for full details
+## Next Steps
+- Add test for F-jig.crdt.observe.notify
+- Run `jigy show spec S-042` for full details
 ```
 
 This is **context** — not just the spec, but its neighborhood, status, and actionable next steps.
@@ -353,27 +330,26 @@ This is **context** — not just the spec, but its neighborhood, status, and act
 ```
 $ jigy context brick B-crdt
 
-CONTEXT: B-crdt (CRDT Operations)
-═════════════════════════════════
+# Context: B-crdt (CRDT Operations)
 
-LAYER: 1
-TOWER: (default)
-SPECS: 5 total | 3 complete | 1 partial | 1 unimplemented
+- **Layer:** 1
+- **Tower:** (default)
+- **Specs:** 5 total | 3 complete | 1 partial | 1 unimplemented
 
-SPECIFICATIONS
-  S-040  CRDT State Merge             complete
-  S-041  CRDT State Diff              complete
-  S-042  CRDT Value Observation       partial (1 gap)
-  S-043  CRDT Conflict Resolution     unimplemented
-  S-044  CRDT Garbage Collection      complete
+## Specifications
+- S-040  CRDT State Merge             complete
+- S-041  CRDT State Diff              complete
+- S-042  CRDT Value Observation       partial (1 gap)
+- S-043  CRDT Conflict Resolution     unimplemented
+- S-044  CRDT Garbage Collection      complete
 
-DEPENDENCIES (layer 0 bricks this depends on)
-  B-core      Core utilities
-  B-types     Type definitions
+## Dependencies (layer 0 bricks this depends on)
+- B-core      Core utilities
+- B-types     Type definitions
 
-DEPENDENTS (layer 2+ bricks that depend on this)
-  B-sync      Synchronization layer
-  B-storage   Persistence layer
+## Dependents (layer 2+ bricks that depend on this)
+- B-sync      Synchronization layer
+- B-storage   Persistence layer
 ```
 
 ### A.5 Implementation
@@ -389,32 +365,33 @@ from jig.config import JigConfig
 @click.command()
 @click.argument("target", required=False)
 @click.argument("target_id", required=False)
-@click.option("--json", "json_output", is_flag=True, help="Output JSON")
-@click.option("--markdown", is_flag=True, help="Output markdown for LLM injection")
+@click.option("--json", "json_output", is_flag=True, help="Output JSON for programmatic use")
 @click.pass_context
 @jig.implements("S-103")
-def context(ctx, target: str | None, target_id: str | None, json_output: bool, markdown: bool):
+def context(ctx, target: str | None, target_id: str | None, json_output: bool):
     """Generate dynamic project context.
 
+    Human output is markdown-compatible (readable in terminals AND by LLMs).
+    Use --json for structured data when parsing programmatically.
+
     Examples:
-        jigy context                  # Full project context
+        jigy context                  # Full project context (markdown-compatible)
         jigy context spec S-042       # Context around spec S-042
         jigy context brick B-crdt     # Context around brick B-crdt
-        jigy context --json           # JSON output
-        jigy context --markdown       # Markdown for LLM injection
+        jigy context --json           # JSON output for programmatic use
     """
     config = ctx.obj["config"]
 
     if target is None:
-        return project_context(config, json_output, markdown)
+        return project_context(config, json_output)
     elif target == "spec":
-        return spec_context(config, target_id, json_output, markdown)
+        return spec_context(config, target_id, json_output)
     elif target == "brick":
-        return brick_context(config, target_id, json_output, markdown)
+        return brick_context(config, target_id, json_output)
     elif target == "outcome":
-        return outcome_context(config, target_id, json_output, markdown)
+        return outcome_context(config, target_id, json_output)
     elif target == "goal":
-        return goal_context(config, target_id, json_output, markdown)
+        return goal_context(config, target_id, json_output)
     else:
         click.echo(f"Unknown target: {target}", err=True)
         click.echo("Valid targets: spec, brick, outcome, goal", err=True)
@@ -723,7 +700,9 @@ Comprehensive documentation. Agent reads when needing detailed understanding of 
 | S-104 | Context Output Formats | G-002 |
 | S-105 | Agent Context Architecture | G-002, G-004 |
 
-**Note:** S-096 (Artifact ID Generation) removed — `jigy new` auto-assigns.
+**Notes:**
+- S-096 (Artifact ID Generation) removed — `jigy new` auto-assigns
+- S-104 covers two output formats: human (markdown-compatible) and JSON. No separate `--markdown` flag needed — see [Output Format Research](#output-format-research)
 
 ### H.2 New Outcome
 
@@ -831,3 +810,24 @@ Comprehensive documentation. Agent reads when needing detailed understanding of 
 ### Implementation
 - `src/jig/cli/` — Existing CLI commands
 - `src/jig/validation/` — Existing validation
+
+### Output Format Research
+
+Research into AI provider guidance on context formatting for agents (2025-01):
+
+**OpenAI:**
+- [Markdown is 15% more token efficient than JSON](https://community.openai.com/t/markdown-is-15-more-token-efficient-than-json/841742) — Token efficiency comparison across formats
+- [Structured Outputs Guide](https://platform.openai.com/docs/guides/structured-outputs) — When to use JSON vs markdown
+- [GPT-5 Prompting Guide](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide) — Markdown formatting recommendations
+
+**Anthropic:**
+- [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — Context curation best practices
+- [Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices) — Markdown-based memory and context files
+- [Prompting Best Practices](https://console.anthropic.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices) — Structured vs free-form context
+
+**Google:**
+- [Prompt Design Strategies](https://ai.google.dev/gemini-api/docs/prompting-strategies) — Consistent structure with XML/Markdown
+- [Guide agent behavior with authored context](https://cloud.google.com/gemini/docs/conversational-analytics-api/data-agent-system-instructions) — Structured fields vs system instructions
+- [Customize Gemini using AGENTS.md files](https://developer.android.com/studio/gemini/agent-files) — Markdown for agent instructions
+
+**Key Finding:** All three providers use markdown for agent context files (CLAUDE.md, AGENTS.md, GEMINI.md) and recommend JSON only for structured, schema-validated data. Human-readable markdown-compatible output serves both terminal users and LLMs without requiring a separate `--markdown` flag.
