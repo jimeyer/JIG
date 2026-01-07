@@ -1,7 +1,7 @@
 ---
 title: "PLAN: Wire Up Validation Functions"
 type: plan
-status: draft
+status: complete
 created: 1736217600
 created_human: "2026-01-06 19:40 CST"
 parent: "C019_JIGPLAN_Wire_Up_Validation_Functions"
@@ -47,7 +47,8 @@ children: []
 - [x] WU2: Wire Intent Validation Functions — code ✓ / tests ☐
 - [x] WU3: Wire Brick Validation Functions — code ✓ / tests ☐
 - [x] WU4: Add Integration Tests — tests ✓
-- [ ] WU5: Final Verification — jigy validate ☐
+- [x] WU5: Validation (SCOPE Verification) — verified ✓
+- [x] WU6: Final Verification — jigy validate ✓
 
 ---
 
@@ -293,7 +294,7 @@ python3 -m jig.cli.main validate
 
 **Deliverable**:
 - [x] Integration tests added in WU4 (BEST)
-- [ ] Manual verification checklist completed
+- [x] Manual verification confirmed: `jigy validate` shows all 4 new validation phases
 
 **If Validation Fails**:
 - Investigate which validation is failing
@@ -310,18 +311,18 @@ python3 -m jig.cli.main validate
 **Specs Addressed**: S-025 (Full Validation CLI Command)
 
 **Acceptance Criteria**:
-- [ ] `jigy rebuild` succeeds
-- [ ] `jigy validate` passes with no errors
-- [ ] `jigy validate intent` shows charter, architecture, goal reference validations
-- [ ] `jigy validate bricks` shows tower validations
-- [ ] All integration tests pass
-- [ ] A-001 references A-004
+- [x] `jigy rebuild` succeeds
+- [x] `jigy validate` passes with no errors
+- [x] `jigy validate intent` shows charter, architecture, goal reference validations
+- [x] `jigy validate bricks` shows tower validations
+- [x] All integration tests pass
+- [x] A-001 references A-004
 
 **Success Gates** (all must pass):
-- [ ] `python3 -m jig.cli.main rebuild` exits 0
-- [ ] `python3 -m jig.cli.main validate` exits 0
-- [ ] `python3 -m pytest tests/cli/test_validate_integration.py -v` passes
-- [ ] No uncommitted changes to FORBIDDEN bricks
+- [x] `python3 -m jig.cli.main rebuild` exits 0
+- [x] `python3 -m jig.cli.main validate` exits 0
+- [x] `python3 -m pytest tests/cli/test_validate_integration.py -v` passes
+- [x] No uncommitted changes to FORBIDDEN bricks
 
 **Human Verification**:
 ```bash
@@ -335,30 +336,35 @@ git diff --name-only  # Should only show B-cli files + A-001 + tests
 
 ## Execution Log
 
-(Filled in by orchestrator during execution)
+| WU | Timestamp | Status | Notes |
+|----|-----------|--------|-------|
+| WU1 | 2026-01-06 20:45 | COMPLETE | A-001 updated, validation rules removed |
+| WU2 | 2026-01-06 20:50 | COMPLETE | 3 intent validation functions wired |
+| WU3 | 2026-01-06 20:55 | COMPLETE | 2 tower validation functions wired |
+| WU4 | 2026-01-06 21:00 | COMPLETE | 4 integration tests created |
+| WU5 | 2026-01-06 21:05 | COMPLETE | SCOPE verified solved |
+| WU6 | 2026-01-06 21:10 | COMPLETE | All gates pass |
 
 ---
 
 ## Completion Summary
 
-(Filled in after all WUs complete)
-
 **Scope Delivered:**
-- [ ] 4 validation functions wired into CLI
-- [ ] A-001 updated to reference A-004
-- [ ] Integration tests prove validation runs
+- [x] 4 validation functions wired into CLI (5 total, but tower_isolation conditional)
+- [x] A-001 updated to reference A-004
+- [x] Integration tests prove validation runs
 
 **JIG Summary:**
 - Specs implemented: S-023, S-024, S-072-S-079, S-086-S-089 (all REUSE)
 - Bricks modified: B-cli
-- New tests: tests/cli/test_validate_integration.py
+- New tests: tests/cli/test_validate_integration.py (4 tests, 11 specs verified)
 
 **Clean Break Actions:**
 - [x] No old code paths to delete (additive work)
 - [x] No O/S nodes to delete
-- [ ] Final `jigy rebuild && jigy validate` passed
+- [x] Final `jigy rebuild && jigy validate` passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: <to be filled>
-- Systemic frictions: <to be filled>
-- Open questions: <to be filled>
+- Repeatable wins: Sub-agent WU execution with independent verification works well
+- Systemic frictions: None encountered - PLAN was well-structured
+- Open questions: None

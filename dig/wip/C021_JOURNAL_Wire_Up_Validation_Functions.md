@@ -1,7 +1,7 @@
 ---
 title: "JOURNAL: Wire Up Validation Functions"
 type: journal
-status: in_progress
+status: complete
 created: 1736221200
 created_human: "2026-01-06 20:40 CST"
 parent: "C020_PLAN_Wire_Up_Validation_Functions"
@@ -155,4 +155,76 @@ Each test:
 Decision: CONTINUE to WU5.
 
 ---
+
+### Entry 6 | 2026-01-06 21:05 | WU5 Complete
+
+```yaml
+type: outcome
+wu: WU5
+spec: null
+escalated: false
+```
+
+WU5: Validation (SCOPE Verification) - COMPLETE
+
+SCOPE problem verified as SOLVED:
+
+**Original Problem:** "Four validation functions exist but are never called from CLI commands"
+
+**Verification:**
+1. `jigy validate` output shows all 4 new validation phases:
+   - ✓ Validating charter (1 file, 5 goals defined) — NEW
+   - ✓ Validating architecture (4 files) — NEW
+   - ✓ Validating goal references (46 goal references (0 invalid)) — NEW
+   - ✓ Validating tower format (single-tower project) — NEW
+
+2. grep confirms all 4 functions populate results dict in validate.py
+3. Integration tests (WU4) prove validation catches errors (BEST quality level)
+4. JIG repo passes all validations (no false positives)
+
+Decision: CONTINUE to WU6 (Final Verification).
+
+---
+
+### Entry 7 | 2026-01-06 21:10 | WU6 Complete
+
+```yaml
+type: outcome
+wu: WU6
+spec: S-025
+escalated: false
+```
+
+WU6: Final Verification - COMPLETE
+
+All success gates passed:
+- [x] `python3 -m jig.cli.main rebuild` exits 0
+- [x] `python3 -m jig.cli.main validate` exits 0
+- [x] `python3 -m pytest tests/cli/test_validate_integration.py -v` passes (4/4)
+- [x] No uncommitted changes to FORBIDDEN bricks
+- [x] A-001 references A-004
+
+PLAN EXECUTION COMPLETE.
+
+---
+
+## Synthesis
+
+### Patterns
+- Clean sub-agent boundaries: Each WU was self-contained with clear success gates
+- Independent verification catches issues: Running validation commands myself after each sub-agent report
+- Additive work pattern: No breaking changes required, all functions already existed
+
+### Friction Summary
+- None significant encountered
+- PLAN was well-structured with clear WU boundaries
+
+### Suggestions
+- The PLAN's WU numbering in body vs checklist was slightly misaligned (checklist had 5 items, body had 6 WUs)
+- Future PLANs could ensure 1:1 correspondence
+
+### Wins
+- Sub-agent execution with independent verification is reliable
+- Integration tests as "BEST" quality level validation approach works well
+- Clean commit-per-WU maintains good git history
 
