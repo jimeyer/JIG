@@ -45,8 +45,8 @@ children: []
 
 ## Work Unit Checklist
 
-- [ ] WU1: OutputFormat Infrastructure — code ☐ / tests ☐
-- [ ] WU2: Markdown Formatter — code ☐ / tests ☐
+- [x] WU1: OutputFormat Infrastructure — code ☑ / tests ☑
+- [x] WU2: Markdown Formatter — code ☑ / tests ☑
 - [ ] WU3: Validate Commands with Flags — code ☐ / tests ☐
 - [ ] WU4: Rebuild and Align with Flags — code ☐ / tests ☐
 - [ ] WU5: Show Commands with Flags — code ☐ / tests ☐

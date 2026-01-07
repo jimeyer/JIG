@@ -48,3 +48,55 @@ wu: null
 
 ---
 
+### Entry 2 | 2026-01-06 17:25 | WU1 Complete
+
+```yaml
+type: outcome
+wu: WU1
+spec: S-093
+escalated: false
+```
+
+**Status:** COMPLETE (15/15 tests passed)
+
+**Files Created:**
+- `src/jig/cli/output.py` - OutputFormat enum, add_output_options decorator, resolve_format()
+- `tests/cli/test_output.py` - 15 tests covering all acceptance criteria
+
+**Files Modified:**
+- `jig/bricks.yaml` - Added M-jig.cli.output to B-cli brick
+
+**Key Implementation:**
+- `OutputFormat` enum with HUMAN, JSON, MARKDOWN values
+- `add_output_options` decorator stacks Click options for -j/-m/-v
+- `resolve_format()` validates mutual exclusivity and returns format
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
+### Entry 3 | 2026-01-06 17:30 | WU2 Complete
+
+```yaml
+type: outcome
+wu: WU2
+spec: S-094
+escalated: false
+```
+
+**Status:** COMPLETE (17/17 tests passed - 10 new markdown tests)
+
+**Files Modified:**
+- `src/jig/validation/reporting.py` - Added format_as_markdown() function
+- `tests/validation/test_reporting.py` - Added 10 markdown format tests
+
+**Key Implementation:**
+- format_as_markdown() follows existing format_as_json() pattern
+- Standard mode: # header, **Status**, **Checked**, ## Errors with bullets
+- Verbose mode: full paths, additional ## Phases section
+- Consistent with S-094 spec examples
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
