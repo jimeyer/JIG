@@ -189,9 +189,13 @@ def _has_towers(bricks_file: Path) -> bool:
     import yaml
     if not bricks_file.exists():
         return False
-    content = yaml.safe_load(bricks_file.read_text())
-    bricks = content.get("bricks", [])
-    return any("tower" in brick for brick in bricks)
+    bricks_data = yaml.safe_load(bricks_file.read_text())
+    # Handle both formats: {"bricks": [...]} or direct [...]
+    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
+        bricks_data = bricks_data["bricks"]
+    if not isinstance(bricks_data, list):
+        return False
+    return any("tower" in brick for brick in bricks_data)
 
 
 @jig.implements("S-024", "S-065", "S-070")
