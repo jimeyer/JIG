@@ -733,30 +733,25 @@ This gives a working pattern that can be replicated.
 
 ---
 
-## Part XI: Open Questions
+## Part XI: Design Decisions
 
-1. **Deprecation period:** How long should old command names continue working?
-   - Proposal: One minor version with warnings
+1. **No deprecation period.** Single user currently. Clean break to new commands.
 
-2. **JSON schema versioning:** Should JSON output include a `version` field?
-   - Proposal: Yes, `{"_version": "1.0", ...}`
+2. **No schema versioning.** JSON output parsed by agents, which are adaptable. May lock down schemas once tools mature.
 
-3. **Error code registry:** Need complete list of error codes for each tool
-   - Proposal: Document as we implement, collect in appendix
+3. **No error code registry.** Use descriptive stderr output. Agents know how to read.
 
-4. **Verbose default fields:** What additional fields does verbose add for each command?
-   - Proposal: Document per-command in implementation PRs
+4. **Document as we go.** Verbose field details will evolve with use.
 
 ---
 
 ## References
 
-- `jig-dev/docs/JIG_DIG_CLI_Design_Manifesto.md` — Principles
-- `jig-dev/docs/JIG_DIG_CLI_Recommendations.md` — Target command structure
-- `jig-dev/docs/JIG_DIG_Context_Integration.md` — Phase 3 design details
-- `jig-dev/jig/Charter.md` — JIG Charter goals
-- `dig-dev/jig/Charter.md` — DIG Charter goals
-- `jig-dev/jig/architecture/A-002_CLI_Command_Architecture.md` — JIG CLI architecture
+- `dig/wip/DJ001_CONCEPT_CLI_Design_Manifesto.md` — Principles
+- `dig/wip/DJ002_SCOPE_CLI_Recommendations.md` — Target command structure
+- `dig/wip/DJ003_CONCEPT_Context_Integration.md` — Phase 3 design details
+- `jig/Charter.md` — JIG Charter goals
+- `jig/architecture/A-002_CLI_Command_Architecture.md` — JIG CLI architecture
 
 ---
 

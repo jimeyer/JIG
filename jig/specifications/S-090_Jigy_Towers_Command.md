@@ -7,10 +7,17 @@ outcome: O-026
 
 # Jigy Towers Command
 
+## Command
+
+```bash
+jigy show towers           # List all towers
+jigy show towers <tower_id>  # Show specific tower details
+```
+
 ## Constraints
 
-1. **CLI MUST provide command to list towers and their bricks**
-   - Command: `jigy towers`
+1. **CLI provides command to list towers and their bricks**
+   - Command: `jigy show towers` (under show group per S-060)
    - Lists all declared towers
    - Shows brick count per tower by layer
 
@@ -24,8 +31,11 @@ outcome: O-026
    - Lists all bricks without tower grouping
 
 4. **Optional tower filter**
-   - `jigy towers <tower_id>` shows specific tower details
+   - `jigy show towers <tower_id>` shows specific tower details
    - Shows all bricks in that tower with their layers
+
+5. **Output format flags**
+   - Supports `-j/-m/-v` flags (S-093)
 
 ## Output Format (Multi-Tower)
 
@@ -49,5 +59,4 @@ Single-tower project
 
 ## Rationale
 
-Tower visibility enables developers to understand component boundaries and verify architectural partitioning. The command complements `jigy layers` by showing vertical structure.
-
+Tower visibility enables developers to understand component boundaries and verify architectural partitioning. Grouped under `show` for consistent verb-first structure.
