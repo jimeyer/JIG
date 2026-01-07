@@ -232,3 +232,30 @@ escalated: false
 
 ---
 
+### Entry 9 | 2026-01-06 18:00 | WU8 Complete (VALIDATION)
+
+```yaml
+type: outcome
+wu: WU8
+spec: S-093, S-094, S-026, S-060, S-090, S-091
+escalated: false
+```
+
+**Status:** PASSED - SCOPE verified at system boundary
+
+**Integration Test:** `tests/cli/test_output_modes.py` - 230 tests covering:
+- All 18 commands accept -j/-m/-v flags
+- Mutual exclusivity (-j -m errors) on all commands
+- Old commands removed (jigy towers, jigy matrix fail)
+- JSON output is valid and parseable
+- Markdown output has proper structure
+
+**Spot Checks:**
+- `jigy validate -j` - Valid JSON ✓
+- `jigy show layers -m` - Markdown with headers ✓
+- `jigy rebuild && jigy validate` - All validations passed ✓
+
+**Decision:** CONTINUE to cleanup - SCOPE is solved.
+
+---
+
