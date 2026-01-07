@@ -28,7 +28,7 @@ from jig.validation.intent import (
     validate_specification_coverage,
     validate_specification_files,
 )
-from jig.validation.reporting import format_as_json
+from jig.validation.reporting import format_as_json, format_as_markdown
 
 
 def _get_charter_goals(charter_path: Path) -> set[str]:
@@ -58,16 +58,24 @@ def _get_all_spec_ids(spec_dir: Path) -> set[str]:
     return spec_ids
 
 
-@jig.implements("S-023", "S-065", "S-070")
+@jig.implements("S-023", "S-026", "S-065", "S-070", "S-093", "S-094")
 def validate_intent_command(
     config: JigConfig,
     output_format: str = "human",
     skip_rebuild: bool = False,
+    verbose: bool = False,
 ) -> int:
     """
     Validate intent artifacts (specifications, outcomes, decorators).
 
-    Returns exit code: 0 (success), 1 (validation failures).
+    Args:
+        config: JIG configuration.
+        output_format: Output format ("human", "json", or "markdown").
+        skip_rebuild: Skip automatic graph rebuild.
+        verbose: Include additional detail in output.
+
+    Returns:
+        Exit code: 0 (success), 1 (validation failures).
     """
     # Auto-rebuild stale intent graph before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
@@ -149,7 +157,12 @@ def validate_intent_command(
     if output_format == "json":
         # Combine all into single "intent" result for JSON
         combined = {"intent": _combine_results(results)}
-        click.echo(format_as_json(combined))
+        # Single-line JSON per S-026
+        import json
+        click.echo(json.dumps(_format_json_output(combined), separators=(",", ":")))
+    elif output_format == "markdown":
+        # Markdown output per S-094
+        click.echo(format_as_markdown(results, verbose=verbose))
     else:
         # Human-readable output
         for result in results.values():
@@ -184,6 +197,59 @@ def _combine_results(results: dict) -> "ValidationResult":
     return combined
 
 
+def _format_json_output(results: dict) -> dict:
+    """Format ValidationResult objects as JSON-serializable dictionary.
+
+    Args:
+        results: Dictionary mapping phase name to ValidationResult.
+
+    Returns:
+        JSON-serializable dictionary with status, phases, and summary.
+    """
+    output = {}
+
+    # Add each phase
+    for phase_name, result in results.items():
+        phase_data = {
+            "passed": result.passed,
+            "errors": [],
+        }
+
+        for error in result.errors:
+            error_data = {
+                "file": error.file,
+                "line": error.line,
+                "code": error.code,
+                "message": error.message,
+                "severity": error.severity,
+            }
+
+            # Add optional field if present
+            if error.field:
+                error_data["field"] = error.field
+
+            phase_data["errors"].append(error_data)
+
+        output[phase_name] = phase_data
+
+    # Overall status
+    all_passed = all(result.passed for result in results.values())
+    output["status"] = "passed" if all_passed else "failed"
+
+    # Summary
+    total_errors = sum(len(result.errors) for result in results.values())
+    total_warnings = sum(
+        len([e for e in result.errors if e.severity == "warning"]) for result in results.values()
+    )
+
+    output["summary"] = {
+        "total_errors": total_errors,
+        "total_warnings": total_warnings,
+    }
+
+    return output
+
+
 def _has_towers(bricks_file: Path) -> bool:
     """Check if any brick declares a tower field."""
     import yaml
@@ -199,16 +265,24 @@ def _has_towers(bricks_file: Path) -> bool:
     return any("tower" in brick for brick in bricks_list)
 
 
-@jig.implements("S-024", "S-065", "S-070")
+@jig.implements("S-024", "S-026", "S-065", "S-070", "S-093", "S-094")
 def validate_bricks_command(
     config: JigConfig,
     output_format: str = "human",
     skip_rebuild: bool = False,
+    verbose: bool = False,
 ) -> int:
     """
     Validate brick definitions and partition against implementation graph.
 
-    Returns exit code: 0 (success), 1 (validation failures), 2 (errors).
+    Args:
+        config: JIG configuration.
+        output_format: Output format ("human", "json", or "markdown").
+        skip_rebuild: Skip automatic graph rebuild.
+        verbose: Include additional detail in output.
+
+    Returns:
+        Exit code: 0 (success), 1 (validation failures), 2 (errors).
     """
     # Auto-rebuild stale impl + intent graphs before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
@@ -225,7 +299,10 @@ def validate_bricks_command(
     # If graph not found, return error code 2
     if any(err.code == "GRAPH_NOT_FOUND" for err in definitions_result.errors):
         if output_format == "json":
-            click.echo(format_as_json({"bricks": _combine_results(results)}))
+            import json
+            click.echo(json.dumps(_format_json_output({"bricks": _combine_results(results)}), separators=(",", ":")))
+        elif output_format == "markdown":
+            click.echo(format_as_markdown(results, verbose=verbose))
         else:
             click.echo(str(definitions_result))
             for error in definitions_result.errors:
@@ -258,7 +335,12 @@ def validate_bricks_command(
     # Format output
     if output_format == "json":
         combined = {"bricks": _combine_results(results)}
-        click.echo(format_as_json(combined))
+        # Single-line JSON per S-026
+        import json
+        click.echo(json.dumps(_format_json_output(combined), separators=(",", ":")))
+    elif output_format == "markdown":
+        # Markdown output per S-094
+        click.echo(format_as_markdown(results, verbose=verbose))
     else:
         for result in results.values():
             click.echo(str(result))
@@ -277,48 +359,196 @@ def validate_bricks_command(
     return 0 if all_passed else 1
 
 
-@jig.implements("S-025", "S-065", "S-070")
+def _run_intent_validation(config: JigConfig) -> dict:
+    """Run intent validation and return results dictionary.
+
+    Args:
+        config: JIG configuration.
+
+    Returns:
+        Dictionary mapping phase names to ValidationResult objects.
+    """
+    from jig.validation.models import ValidationResult
+
+    spec_dir = config.paths.specifications
+    outcome_dir = config.paths.outcomes
+    src_dir = config.paths.source
+
+    results = {}
+
+    # Validate charter
+    charter_path = config.paths.charter
+    if charter_path.exists():
+        results["charter"] = validate_charter_file(charter_path)
+        charter_goals = _get_charter_goals(charter_path)
+    else:
+        results["charter"] = ValidationResult(passed=True, phase_name="charter", items_checked=0)
+        charter_goals = set()
+
+    # Validate specifications
+    if spec_dir.exists():
+        results["specifications"] = validate_specification_files(spec_dir)
+    else:
+        results["specifications"] = ValidationResult(passed=True, phase_name="specifications", items_checked=0)
+
+    # Validate outcomes
+    if outcome_dir.exists():
+        results["outcomes"] = validate_outcome_files(outcome_dir)
+        results["outcome_completeness"] = validate_outcome_completeness(outcome_dir)
+    else:
+        results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
+        results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
+
+    # Validate architecture files
+    arch_dir = config.paths.architecture
+    if arch_dir.exists() and charter_goals:
+        spec_ids = _get_all_spec_ids(spec_dir) if spec_dir.exists() else set()
+        results["architecture"] = validate_architecture_files(arch_dir, charter_goals, spec_ids)
+    else:
+        results["architecture"] = ValidationResult(passed=True, phase_name="architecture", items_checked=0)
+
+    # Validate goal references
+    if charter_path.exists() and outcome_dir.exists():
+        results["goal_references"] = validate_goal_references(
+            charter_path,
+            outcome_dir,
+            arch_dir if arch_dir.exists() else None,
+        )
+    else:
+        results["goal_references"] = ValidationResult(passed=True, phase_name="goal references", items_checked=0)
+
+    # Validate specification coverage
+    if spec_dir.exists() and outcome_dir.exists():
+        results["specification_coverage"] = validate_specification_coverage(spec_dir, outcome_dir)
+    else:
+        results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
+
+    # Validate decorators
+    test_dir = config.paths.tests
+    if src_dir.exists() and spec_dir.exists():
+        results["decorators"] = validate_decorator_files(
+            src_dir,
+            spec_dir,
+            outcome_dir if outcome_dir.exists() else None,
+            test_dir if test_dir.exists() else None,
+        )
+    else:
+        results["decorators"] = ValidationResult(passed=True, phase_name="decorators", items_checked=0)
+
+    return results
+
+
+def _run_bricks_validation(config: JigConfig) -> dict:
+    """Run bricks validation and return results dictionary.
+
+    Args:
+        config: JIG configuration.
+
+    Returns:
+        Dictionary mapping phase names to ValidationResult objects.
+    """
+    bricks_file = config.paths.bricks
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
+
+    results = {}
+
+    # Validate brick definitions
+    definitions_result = validate_brick_definitions(bricks_file, impl_graph)
+    results["brick_definitions"] = definitions_result
+
+    # If graph not found, return early
+    if any(err.code == "GRAPH_NOT_FOUND" for err in definitions_result.errors):
+        return results
+
+    # Validate tower format
+    results["tower_format"] = validate_tower_format(bricks_file)
+
+    # Validate brick partition
+    results["brick_partition"] = validate_brick_partition(bricks_file, impl_graph)
+
+    # Validate brick layer constraints
+    if definitions_result.passed:
+        results["layer_constraints"] = validate_brick_layer_constraints(bricks_file, impl_graph)
+
+    # Validate brick cycles
+    results["brick_cycles"] = validate_brick_cycles(bricks_file, impl_graph)
+
+    # Validate tower isolation
+    if _has_towers(bricks_file):
+        results["tower_isolation"] = validate_tower_isolation(bricks_file, impl_graph)
+
+    return results
+
+
+@jig.implements("S-025", "S-026", "S-065", "S-070", "S-093", "S-094")
 def validate_full_command(
     config: JigConfig,
     output_format: str = "human",
     skip_rebuild: bool = False,
+    verbose: bool = False,
 ) -> int:
     """
     Run full validation (intent + bricks if graph exists).
 
-    Returns exit code: 0 (success), 1 (validation failures).
+    Args:
+        config: JIG configuration.
+        output_format: Output format ("human", "json", or "markdown").
+        skip_rebuild: Skip automatic graph rebuild.
+        verbose: Include additional detail in output.
+
+    Returns:
+        Exit code: 0 (success), 1 (validation failures).
     """
     # Auto-rebuild all stale graphs before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
     ensure_graphs_current(["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild)
 
-    # Always run intent validation
-    if output_format != "json":
+    # For human output, run sub-commands directly
+    if output_format == "human":
         click.echo("=== Validating Intent ===\n")
+        intent_exit_code = validate_intent_command(config, output_format, skip_rebuild=True, verbose=verbose)
 
-    # Pass skip_rebuild=True to sub-commands since we already rebuilt
-    intent_exit_code = validate_intent_command(config, output_format, skip_rebuild=True)
-
-    # Conditionally run brick validation if implementation graph exists
-    impl_graph = config.paths.generated / "implementation-graph.ndjson"
-    if impl_graph.exists():
-        if output_format != "json":
+        # Conditionally run brick validation if implementation graph exists
+        impl_graph = config.paths.generated / "implementation-graph.ndjson"
+        if impl_graph.exists():
             click.echo("\n=== Validating Bricks ===\n")
-        brick_exit_code = validate_bricks_command(config, output_format, skip_rebuild=True)
-    else:
-        if output_format != "json":
+            brick_exit_code = validate_bricks_command(config, output_format, skip_rebuild=True, verbose=verbose)
+        else:
             click.echo("\n=== Skipping Brick Validation ===")
             click.echo("(Implementation graph not found)")
-        brick_exit_code = 0
+            brick_exit_code = 0
 
-    # Overall result
-    if output_format != "json":
+        # Overall result
         if intent_exit_code == 0 and brick_exit_code == 0:
             click.echo("\n✓ All validations passed.")
         else:
             click.echo("\n✗ Validation failed.")
 
-    return 0 if (intent_exit_code == 0 and brick_exit_code == 0) else 1
+        return 0 if (intent_exit_code == 0 and brick_exit_code == 0) else 1
+
+    # For JSON/markdown output, collect all results and output once
+    all_results = {}
+
+    # Run intent validation (collect results without output)
+    intent_results = _run_intent_validation(config)
+    all_results.update(intent_results)
+
+    # Run brick validation if graph exists
+    impl_graph = config.paths.generated / "implementation-graph.ndjson"
+    if impl_graph.exists():
+        brick_results = _run_bricks_validation(config)
+        all_results.update(brick_results)
+
+    # Format output
+    if output_format == "json":
+        import json
+        click.echo(json.dumps(_format_json_output(all_results), separators=(",", ":")))
+    elif output_format == "markdown":
+        click.echo(format_as_markdown(all_results, verbose=verbose))
+
+    # Return exit code
+    all_passed = all(r.passed for r in all_results.values())
+    return 0 if all_passed else 1
 
 
 @jig.implements("S-027", "S-065")

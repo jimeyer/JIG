@@ -51,6 +51,7 @@ def get_no_rebuild(ctx: click.Context) -> bool:
 
 
 from jig.cli.audit import coverage_command
+from jig.cli.output import add_output_options, resolve_format
 from jig.cli.rebuild import (
     align_command,
     rebuild_all_command,
@@ -167,9 +168,10 @@ def align(ctx) -> None:
 
 
 @cli.group(invoke_without_command=True)
+@add_output_options
 @click.pass_context
-@jig.implements("S-061", "S-065", "S-071")
-def validate(ctx):
+@jig.implements("S-026", "S-061", "S-065", "S-071", "S-093")
+def validate(ctx, json: bool, markdown: bool, verbose: bool):
     """Validate JIG artifacts.
 
     Validates specifications, outcomes, decorators, and bricks.
@@ -179,19 +181,23 @@ def validate(ctx):
         jigy validate intent    # Validate intent only
         jigy validate bricks    # Validate bricks only
         jigy validate full      # Run full validation (explicit)
+        jigy validate -j        # JSON output
+        jigy validate -m        # Markdown output
     """
     # If no subcommand, run full validation
     if ctx.invoked_subcommand is None:
+        output_format = resolve_format(json, markdown)
         config = get_config(ctx)
         skip_rebuild = get_no_rebuild(ctx)
-        exit_code = validate_full_command(config, "human", skip_rebuild=skip_rebuild)
+        exit_code = validate_full_command(config, output_format.value, skip_rebuild=skip_rebuild, verbose=verbose)
         sys.exit(exit_code)
 
 
 @validate.command(name="intent")
+@add_output_options
 @click.pass_context
-@jig.implements("S-061", "S-065", "S-071")
-def validate_intent_cli(ctx) -> None:
+@jig.implements("S-026", "S-061", "S-065", "S-071", "S-093")
+def validate_intent_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Validate intent artifacts (specifications, outcomes, decorators).
 
     Validates human-authored artifacts before any graph generation.
@@ -199,17 +205,21 @@ def validate_intent_cli(ctx) -> None:
 
     Example:
         jigy validate intent
+        jigy validate intent -j    # JSON output
+        jigy validate intent -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = validate_intent_command(config, "human", skip_rebuild=skip_rebuild)
+    exit_code = validate_intent_command(config, output_format.value, skip_rebuild=skip_rebuild, verbose=verbose)
     sys.exit(exit_code)
 
 
 @validate.command(name="bricks")
+@add_output_options
 @click.pass_context
-@jig.implements("S-061", "S-065", "S-071")
-def validate_bricks_cli(ctx) -> None:
+@jig.implements("S-026", "S-061", "S-065", "S-071", "S-093")
+def validate_bricks_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Validate brick definitions and partition constraints.
 
     Validates brick definitions against implementation graph.
@@ -217,17 +227,21 @@ def validate_bricks_cli(ctx) -> None:
 
     Example:
         jigy validate bricks
+        jigy validate bricks -j    # JSON output
+        jigy validate bricks -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = validate_bricks_command(config, "human", skip_rebuild=skip_rebuild)
+    exit_code = validate_bricks_command(config, output_format.value, skip_rebuild=skip_rebuild, verbose=verbose)
     sys.exit(exit_code)
 
 
 @validate.command()
+@add_output_options
 @click.pass_context
-@jig.implements("S-061", "S-065", "S-071")
-def full(ctx) -> None:
+@jig.implements("S-026", "S-061", "S-065", "S-071", "S-093")
+def full(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Run full validation (intent + bricks if graph exists).
 
     Validates all artifacts. Runs intent validation always,
@@ -235,10 +249,13 @@ def full(ctx) -> None:
 
     Example:
         jigy validate full
+        jigy validate full -j    # JSON output
+        jigy validate full -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = validate_full_command(config, "human", skip_rebuild=skip_rebuild)
+    exit_code = validate_full_command(config, output_format.value, skip_rebuild=skip_rebuild, verbose=verbose)
     sys.exit(exit_code)
 
 
