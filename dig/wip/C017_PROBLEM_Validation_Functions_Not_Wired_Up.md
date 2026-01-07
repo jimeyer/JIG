@@ -1,11 +1,12 @@
 ---
 title: "PROBLEM: Multiple Validation Functions Not Wired Up"
-type: problem
-status: active
+type: exploration
+status: implemented
+decision: "Validation functions wired into CLI via C018-C021"
 created: 1736202000
 created_human: "2026-01-06 15:20 CST"
 parent: null
-children: ["C018_SCOPE_Wire_Up_Validation_Functions"]
+children: ["[[C018_SCOPE_Wire_Up_Validation_Functions]]"]
 ---
 # PROBLEM: Multiple Validation Functions Not Wired Up
 

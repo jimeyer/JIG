@@ -1,11 +1,12 @@
 ---
 title: "JIGPLAN: Wire Up Validation Functions"
 type: jigplan
-status: draft
+status: implemented
+decision: "Pure plumbing change in B-cli to call existing B-validation functions"
 created: 1736217600
 created_human: "2026-01-06 19:40 CST"
-parent: "C018_SCOPE_Wire_Up_Validation_Functions"
-children: ["C020_PLAN_Wire_Up_Validation_Functions"]
+parent: "[[C018_SCOPE_Wire_Up_Validation_Functions]]"
+children: ["[[C020_PLAN_Wire_Up_Validation_Functions]]"]
 ---
 
 # JIGPLAN: Wire Up Validation Functions

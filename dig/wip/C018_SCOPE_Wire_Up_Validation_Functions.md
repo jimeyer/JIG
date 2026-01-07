@@ -1,13 +1,14 @@
 ---
 title: "SCOPE: Wire Up Validation Functions and Create A-004"
 type: scope
-status: active
+status: implemented
+decision: "All 5 validation functions wired into CLI commands"
 created: 1736206800
 created_human: "2026-01-06 16:40 CST"
 updated: 1736217600
 updated_human: "2026-01-06 19:40 CST"
-parent: "C017_PROBLEM_Validation_Functions_Not_Wired_Up"
-children: ["C019_JIGPLAN_Wire_Up_Validation_Functions"]
+parent: "[[C017_PROBLEM_Validation_Functions_Not_Wired_Up]]"
+children: ["[[C019_JIGPLAN_Wire_Up_Validation_Functions]]"]
 ---
 # SCOPE: Wire Up Validation Functions and Create A-004
 
