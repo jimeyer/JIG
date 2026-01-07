@@ -275,9 +275,10 @@ def full(ctx, json: bool, markdown: bool, verbose: bool) -> None:
 
 # Show command group (S-060)
 @cli.group(name="show", invoke_without_command=True)
+@add_output_options
 @click.pass_context
-@jig.implements("S-060", "S-065", "S-071")
-def show_group(ctx) -> None:
+@jig.implements("S-060", "S-065", "S-071", "S-093")
+def show_group(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Display JIG structure information.
 
     Shows bricks, layers, and other structural details.
@@ -286,58 +287,70 @@ def show_group(ctx) -> None:
         jigy show           # Show overview
         jigy show layers    # Show layer hierarchy
         jigy show bricks    # Show brick details
+        jigy show -j        # JSON output
+        jigy show -m        # Markdown output
     """
     if ctx.invoked_subcommand is None:
         # No subcommand = show overview
+        output_format = resolve_format(json, markdown)
         config = get_config(ctx)
         skip_rebuild = get_no_rebuild(ctx)
-        exit_code = show_overview_command(config, skip_rebuild=skip_rebuild)
+        exit_code = show_overview_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
         sys.exit(exit_code)
 
 
 @show_group.command(name="layers")
+@add_output_options
 @click.pass_context
-@jig.implements("S-060", "S-065", "S-071")
-def show_layers_cli(ctx) -> None:
+@jig.implements("S-060", "S-065", "S-071", "S-093")
+def show_layers_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Display layer hierarchy."""
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_layers_command(config, skip_rebuild=skip_rebuild)
+    exit_code = show_layers_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @show_group.command(name="bricks")
+@add_output_options
 @click.pass_context
-@jig.implements("S-060", "S-065", "S-071")
-def show_bricks_cli(ctx) -> None:
+@jig.implements("S-060", "S-065", "S-071", "S-093")
+def show_bricks_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Display brick details."""
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_bricks_command(config, skip_rebuild=skip_rebuild)
+    exit_code = show_bricks_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @show_group.command(name="charter")
+@add_output_options
 @click.pass_context
-@jig.implements("S-072", "S-065", "S-071")
-def show_charter_cli(ctx) -> None:
+@jig.implements("S-072", "S-065", "S-071", "S-093")
+def show_charter_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Display Charter.md content and goals.
 
     Shows the project charter with defined goals.
 
     Example:
         jigy show charter
+        jigy show charter -j    # JSON output
+        jigy show charter -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_charter_command(config, skip_rebuild=skip_rebuild)
+    exit_code = show_charter_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @show_group.command(name="goals")
+@add_output_options
 @click.pass_context
-@jig.implements("S-075", "S-065", "S-071")
-def show_goals_cli(ctx) -> None:
+@jig.implements("S-075", "S-065", "S-071", "S-093")
+def show_goals_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Display all goals with supporting artifacts.
 
     Lists goals from Charter.md with their supporting
@@ -345,18 +358,22 @@ def show_goals_cli(ctx) -> None:
 
     Example:
         jigy show goals
+        jigy show goals -j    # JSON output
+        jigy show goals -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_goals_command(config, skip_rebuild=skip_rebuild)
+    exit_code = show_goals_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
 @show_group.command(name="architecture")
 @click.argument("arch_id", required=False, default=None)
+@add_output_options
 @click.pass_context
-@jig.implements("S-076", "S-065", "S-071")
-def show_architecture_cli(ctx, arch_id: str | None) -> None:
+@jig.implements("S-076", "S-065", "S-071", "S-093")
+def show_architecture_cli(ctx, arch_id: str | None, json: bool, markdown: bool, verbose: bool) -> None:
     """Display architecture documents.
 
     Lists all architecture documents, or shows details
@@ -365,10 +382,13 @@ def show_architecture_cli(ctx, arch_id: str | None) -> None:
     Example:
         jigy show architecture         # List all
         jigy show architecture A-001   # Show specific
+        jigy show architecture -j      # JSON output
+        jigy show architecture -m      # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_architecture_command(config, arch_id=arch_id, skip_rebuild=skip_rebuild)
+    exit_code = show_architecture_command(config, arch_id=arch_id, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 

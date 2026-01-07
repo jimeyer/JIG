@@ -155,3 +155,28 @@ escalated: false
 
 ---
 
+### Entry 6 | 2026-01-06 17:45 | WU5 Complete
+
+```yaml
+type: outcome
+wu: WU5
+spec: S-060, S-093
+escalated: false
+```
+
+**Status:** COMPLETE (22/22 tests passed - 16 new flag tests)
+
+**Files Modified:**
+- `src/jig/cli/show.py` - Added output_format/verbose to all 6 show commands, JSON/markdown formatters
+- `src/jig/cli/main.py` - Added @add_output_options to show_group and all subcommands
+- `tests/cli/test_show.py` - Added 16 tests covering all show subcommands with flags
+
+**Key Implementation:**
+- All show commands (overview, layers, bricks, charter, goals, architecture) support -j/-m/-v
+- Each command has custom JSON schema appropriate to its data
+- Tests use --no-rebuild to isolate JSON output from auto-rebuild messages
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
