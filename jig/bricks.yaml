@@ -19,6 +19,7 @@ bricks:
       - M-jig.cli.audit
       - M-jig.cli.auto_rebuild
       - M-jig.cli.towers
+      - M-jig.cli.output
 
   - id: B-validation
     name: Artifact Validation
