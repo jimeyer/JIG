@@ -127,3 +127,32 @@ Independent verification confirms FORBIDDEN bricks untouched. Decision: CONTINUE
 
 ---
 
+### Entry 5 | 2026-01-06 21:00 | WU4 Complete
+
+```yaml
+type: outcome
+wu: WU4
+spec: S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-087, S-088, S-089
+escalated: false
+```
+
+WU4: Add Integration Tests - COMPLETE
+
+Sub-agent created `tests/cli/test_validate_integration.py` with 4 tests:
+1. test_validate_catches_invalid_charter - @jig.verifies("S-072", "S-073", "S-074")
+2. test_validate_catches_invalid_architecture - @jig.verifies("S-076", "S-077", "S-078", "S-079")
+3. test_validate_catches_invalid_goal_reference - @jig.verifies("S-075")
+4. test_validate_catches_invalid_tower_format - @jig.verifies("S-087", "S-088", "S-089")
+
+All tests pass (4/4). Tests follow existing pattern using CliRunner + isolated_filesystem().
+
+Each test:
+- Creates minimal invalid JIG project
+- Runs validation
+- Verifies exit_code != 0
+- Verifies error message mentions expected issue
+
+Decision: CONTINUE to WU5.
+
+---
+
