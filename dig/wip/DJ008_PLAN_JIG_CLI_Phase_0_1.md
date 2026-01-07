@@ -53,7 +53,7 @@ children: []
 - [x] WU6: Move Towers/Matrix to Show — code ☑ / tests ☑
 - [x] WU7: Audit Commands with Flags — code ☑ / tests ☑
 - [x] WU8: Validation — SCOPE verified ☑
-- [ ] WU9: Cleanup — orphaned files deleted ☐
+- [x] WU9: Cleanup — orphaned files deleted ☑
 
 ---
 

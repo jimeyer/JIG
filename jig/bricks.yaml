@@ -11,14 +11,11 @@ bricks:
     units:
       - M-jig.cli.main
       - M-jig.cli.validate
-      - M-jig.cli.layers
-      - M-jig.cli.verify
       - M-jig.cli.discovery
       - M-jig.cli.rebuild
       - M-jig.cli.show
       - M-jig.cli.audit
       - M-jig.cli.auto_rebuild
-      - M-jig.cli.towers
       - M-jig.cli.output
 
   - id: B-validation

@@ -259,3 +259,32 @@ escalated: false
 
 ---
 
+### Entry 10 | 2026-01-06 18:05 | WU9 Complete (CLEANUP)
+
+```yaml
+type: outcome
+wu: WU9
+spec: null
+escalated: false
+```
+
+**Status:** COMPLETE - Orphaned files deleted, all tests pass
+
+**Files Deleted:**
+- `src/jig/cli/towers.py` (code moved to show.py in WU6)
+- `src/jig/cli/layers.py` (orphaned, functionality in show.py)
+- `src/jig/cli/verify.py` (orphaned, redundant with rebuild.py)
+
+**Files Modified:**
+- `jig/bricks.yaml` - Removed M-jig.cli.towers, M-jig.cli.layers, M-jig.cli.verify
+- Fixed pre-existing test mismatch (Unicode arrow in test vs ASCII in impl)
+
+**Verification:**
+- All 836 tests pass ✓
+- `jigy rebuild && jigy validate` passes ✓
+- Deleted files don't exist ✓
+
+**Decision:** PLAN COMPLETE
+
+---
+
