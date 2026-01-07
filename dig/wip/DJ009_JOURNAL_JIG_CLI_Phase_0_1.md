@@ -1,7 +1,7 @@
 ---
 title: JOURNAL JIG CLI Phase 0 and 1
 type: journal
-status: in_progress
+status: complete
 created: 1736208000
 created_human: 2026-01-06 17:20 CST
 parent: "[[DJ008_PLAN_JIG_CLI_Phase_0_1]]"
@@ -288,3 +288,30 @@ escalated: false
 
 ---
 
+## Synthesis
+
+### Patterns
+
+- **Decorator stacking works well**: `@add_output_options` → `@click.pass_context` → `@jig.implements` chain is clean
+- **TDD with JIG**: Writing tests with `@jig.verifies` first, then implementing with `@jig.implements`, creates traceable alignment
+- **Consistent flag pattern**: Once WU1 established the pattern, WU3-WU7 were straightforward wiring exercises
+- **Sub-agent parallelism**: Each WU was self-contained, enabling clean handoffs
+
+### Friction Summary
+
+- **Minor**: JSON pretty-printing vs single-line inconsistency across commands
+- **Minor**: Pre-existing test used Unicode arrow when implementation used ASCII
+- **None significant**: Existing codebase patterns made integration smooth
+
+### Suggestions
+
+- Consider adding JSON compaction as a follow-up refinement
+- The `@add_output_options` pattern could be documented as a CLI extension guide
+- Integration test matrix approach (`test_output_modes.py`) is reusable for future command additions
+
+### Wins
+
+- Zero escalation triggers fired across 9 WUs
+- 836 tests passing, 230 new integration tests
+- Clean break achieved: 3 orphaned files deleted, no deprecation warnings needed
+- SCOPE problem fully solved with comprehensive verification

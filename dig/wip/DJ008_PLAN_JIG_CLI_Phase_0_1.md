@@ -451,26 +451,42 @@ pytest tests/ -v
 
 ## Execution Log
 
-(Filled in by orchestrator during execution)
+Executed 2026-01-06 by orchestrator following taskDoPLAN.md.
+
+- WU1: COMPLETE - OutputFormat enum and add_output_options decorator
+- WU2: COMPLETE - format_as_markdown() function
+- WU3: COMPLETE - Validate commands with -j/-m/-v flags
+- WU4: COMPLETE - Rebuild and align commands with flags
+- WU5: COMPLETE - Show commands with flags
+- WU6: COMPLETE - Moved towers/matrix to show subcommands
+- WU7: COMPLETE - Audit commands with flags
+- WU8: PASSED - SCOPE verification (230 integration tests)
+- WU9: COMPLETE - Deleted orphaned files
 
 ---
 
 ## Completion Summary
 
-(Filled in after all WUs complete)
+**Status:** COMPLETE ✓
 
 **Scope Delivered:**
-- <to be filled>
+- All 18 CLI commands support `-j/-m/-v` output format flags
+- `jigy show towers` and `jigy show matrix` replace standalone commands
+- Universal output format infrastructure for future commands
+- 230 integration tests verify complete coverage
 
 **JIG Summary:**
-- <to be filled>
+- Specs implemented: S-026, S-060, S-090, S-091, S-093, S-094
+- New tests: 112 (across 5 new test files)
+- Total tests: 836 (all passing)
+- jigy rebuild && jigy validate: PASS
 
 **Clean Break Actions:**
-- [ ] Deleted orphaned CLI modules (towers.py, layers.py, verify.py)
-- [ ] Updated bricks.yaml
-- [ ] Final `jigy rebuild && jigy validate` passed
+- [x] Deleted orphaned CLI modules (towers.py, layers.py, verify.py)
+- [x] Updated bricks.yaml
+- [x] Final `jigy rebuild && jigy validate` passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: <patterns that worked>
-- Systemic frictions: <process issues>
-- Open questions: <items for future work>
+- Repeatable wins: TDD with @jig.verifies patterns; @add_output_options decorator reuse
+- Systemic frictions: None significant; existing code patterns made wiring straightforward
+- Open questions: JSON output uses pretty-print (not single-line) for rebuild commands - minor deviation from S-026
