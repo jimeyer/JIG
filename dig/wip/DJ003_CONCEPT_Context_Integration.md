@@ -7,15 +7,10 @@ created_human: 2026-01-06 10:00 CST
 parent: "[[DJ002_SCOPE_CLI_Recommendations]]"
 children:
   - "[[DJ004_CONCEPT_Strategy]]"
-  - "[[DJ005_SCOPE_JIG_DIG_CLI_Implementation]]"
+  - "[[DJ005_SCOPE_CLI_Implementation]]"
 ---
 # JIG/DIG Context Integration
 
-**Date:** 2026-01-06
-**Status:** Design
-**Related:** JIG_DIG_CLI_Recommendations.md, JIG_DIG_Strategy.md
-
----
 
 ## Overview
 

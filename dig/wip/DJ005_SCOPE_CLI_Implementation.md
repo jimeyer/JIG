@@ -9,12 +9,6 @@ children: []
 ---
 # JIG DIG CLI Implementation Strategy
 
-**ID:** C015
-**Status:** Active
-**Date:** 2026-01-06
-**Reference:** JIG_DIG_CLI_Design_Manifesto.md, JIG_DIG_CLI_Recommendations.md, JIG_DIG_Context_Integration.md
-
----
 
 ## Executive Summary
 

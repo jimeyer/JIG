@@ -9,11 +9,6 @@ children: ["[[DJ002_SCOPE_CLI_Recommendations]]"]
 ---
 # JIG & DIG CLI Design Manifesto: The Dual-Audience Interface
 
-**Version:** 1.1
-**Date:** 2026-01-05
-**Applies to:** JIG, DIG, and future companion tools
-
----
 
 ## Preamble
 

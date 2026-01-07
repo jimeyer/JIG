@@ -9,11 +9,6 @@ children: ["[[DJ003_CONCEPT_Context_Integration]]"]
 ---
 # JIG & DIG CLI Recommendations
 
-**Date:** 2026-01-05
-**Reference:** JIG_DIG_CLI_Design_Manifesto.md
-**Based on:** A-002 (CLI Command Architecture), C014 (Agent Tools), D017 (CLI Output Unification)
-
----
 
 ## Executive Summary
 
