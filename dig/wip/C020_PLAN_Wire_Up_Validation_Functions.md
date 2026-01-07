@@ -43,7 +43,7 @@ children: []
 
 ## Work Unit Checklist
 
-- [ ] WU1: Update A-001 Architecture Document — docs ☐
+- [x] WU1: Update A-001 Architecture Document — docs ✓
 - [ ] WU2: Wire Intent Validation Functions — code ☐ / tests ☐
 - [ ] WU3: Wire Brick Validation Functions — code ☐ / tests ☐
 - [ ] WU4: Validation — SCOPE verified ☐
@@ -60,16 +60,16 @@ children: []
 **Specs Addressed**: None (architecture document update)
 
 **Acceptance Criteria**:
-- [ ] "Validation Rules" section (lines 157-197) removed from A-001
-- [ ] `constrains` list expanded to include S-080, S-081, S-082, S-083, S-084, S-085
-- [ ] Reference to A-004 added in place of removed section
-- [ ] `jigy validate` passes (no broken references)
+- [x] "Validation Rules" section (lines 157-197) removed from A-001
+- [x] `constrains` list expanded to include S-080, S-081, S-082, S-083, S-084, S-085
+- [x] Reference to A-004 added in place of removed section
+- [x] `jigy validate` passes (no broken references)
 
 **Success Gates** (all must pass):
-- [ ] A-001 frontmatter `constrains` includes S-080-S-085
-- [ ] A-001 body contains reference to A-004
-- [ ] A-001 no longer contains "Validation Rules" section
-- [ ] `python3 -m jig.cli.main validate intent` passes
+- [x] A-001 frontmatter `constrains` includes S-080-S-085
+- [x] A-001 body contains reference to A-004
+- [x] A-001 no longer contains "Validation Rules" section
+- [x] `python3 -m jig.cli.main validate intent` passes
 
 **Escalation Triggers** (stop and ask human if):
 - A-001 structure differs from expected
