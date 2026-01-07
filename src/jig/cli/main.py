@@ -454,9 +454,10 @@ def audit_group(ctx) -> None:
 
 
 @audit_group.command(name="coverage")
+@add_output_options
 @click.pass_context
-@jig.implements("S-066", "S-067", "S-071")
-def audit_coverage_cli(ctx) -> None:
+@jig.implements("S-066", "S-067", "S-071", "S-093")
+def audit_coverage_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Run full coverage audit pipeline.
 
     Runs tests with coverage, extracts T→F edges, and writes
@@ -464,10 +465,13 @@ def audit_coverage_cli(ctx) -> None:
 
     Example:
         jigy audit coverage
+        jigy audit coverage -j    # JSON output
+        jigy audit coverage -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = coverage_command(config, skip_rebuild=skip_rebuild)
+    exit_code = coverage_command(config, skip_rebuild=skip_rebuild, output_format=output_format, verbose=verbose)
     sys.exit(exit_code)
 
 

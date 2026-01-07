@@ -51,7 +51,7 @@ children: []
 - [x] WU4: Rebuild and Align with Flags — code ☑ / tests ☑
 - [x] WU5: Show Commands with Flags — code ☑ / tests ☑
 - [x] WU6: Move Towers/Matrix to Show — code ☑ / tests ☑
-- [ ] WU7: Audit Commands with Flags — code ☐ / tests ☐
+- [x] WU7: Audit Commands with Flags — code ☑ / tests ☑
 - [ ] WU8: Validation — SCOPE verified ☐
 - [ ] WU9: Cleanup — orphaned files deleted ☐
 

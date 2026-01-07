@@ -206,3 +206,29 @@ escalated: false
 
 ---
 
+### Entry 8 | 2026-01-06 17:55 | WU7 Complete
+
+```yaml
+type: outcome
+wu: WU7
+spec: S-093
+escalated: false
+```
+
+**Status:** COMPLETE (10/10 tests passed - all new audit flag tests)
+
+**Files Modified:**
+- `src/jig/cli/audit.py` - Added output_format/verbose params, JSON/markdown formatters
+- `src/jig/cli/main.py` - Added @add_output_options to audit_coverage_cli
+- `tests/cli/test_audit.py` - New file with 10 tests for flag wiring
+
+**Key Implementation:**
+- `jigy audit coverage` now supports -j/-m/-v flags
+- JSON output includes status, edges_found, record_path, duration_ms
+- Verbose adds edge details to output
+- No FORBIDDEN B-audit brick touched (only B-cli)
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
