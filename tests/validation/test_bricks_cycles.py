@@ -43,24 +43,24 @@ def test_validate_cycles_no_cycles_dag():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 
-- id: B-cli
-  name: CLI
-  layer: 2
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    layer: 2
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -90,18 +90,18 @@ def test_validate_cycles_simple_two_brick_cycle():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 0
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 0
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 0
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 0
+    units:
+      - F-b.func1
 """
         )
 
@@ -137,24 +137,24 @@ def test_validate_cycles_three_brick_cycle():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 1
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 1
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 1
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 1
+    units:
+      - F-b.func1
 
-- id: B-c
-  name: Brick C
-  layer: 1
-  units:
-    - F-c.func1
+  - id: B-c
+    name: Brick C
+    layer: 1
+    units:
+      - F-c.func1
 """
         )
 
@@ -190,13 +190,13 @@ def test_validate_cycles_self_loop():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 0
-  units:
-    - F-a.func1
-    - F-a.func2
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 0
+    units:
+      - F-a.func1
+      - F-a.func2
 """
         )
 
@@ -229,24 +229,24 @@ def test_validate_cycles_layer0_cycle():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-utils
-  name: Utils
-  layer: 0
-  units:
-    - F-utils.a
+            """bricks:
+  - id: B-utils
+    name: Utils
+    layer: 0
+    units:
+      - F-utils.a
 
-- id: B-data
-  name: Data
-  layer: 0
-  units:
-    - F-data.b
+  - id: B-data
+    name: Data
+    layer: 0
+    units:
+      - F-data.b
 
-- id: B-config
-  name: Config
-  layer: 0
-  units:
-    - F-config.c
+  - id: B-config
+    name: Config
+    layer: 0
+    units:
+      - F-config.c
 """
         )
 
@@ -284,30 +284,30 @@ def test_validate_cycles_multiple_cycles():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 0
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 0
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 0
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 0
+    units:
+      - F-b.func1
 
-- id: B-c
-  name: Brick C
-  layer: 1
-  units:
-    - F-c.func1
+  - id: B-c
+    name: Brick C
+    layer: 1
+    units:
+      - F-c.func1
 
-- id: B-d
-  name: Brick D
-  layer: 1
-  units:
-    - F-d.func1
+  - id: B-d
+    name: Brick D
+    layer: 1
+    units:
+      - F-d.func1
 """
         )
 
@@ -343,30 +343,30 @@ def test_validate_cycles_complex_graph_no_cycles():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 2
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 2
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 1
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 1
+    units:
+      - F-b.func1
 
-- id: B-c
-  name: Brick C
-  layer: 1
-  units:
-    - F-c.func1
+  - id: B-c
+    name: Brick C
+    layer: 1
+    units:
+      - F-c.func1
 
-- id: B-d
-  name: Brick D
-  layer: 0
-  units:
-    - F-d.func1
+  - id: B-d
+    name: Brick D
+    layer: 0
+    units:
+      - F-d.func1
 """
         )
 
@@ -393,18 +393,18 @@ def test_validate_cycles_no_dependencies():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 0
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 0
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 0
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 0
+    units:
+      - F-b.func1
 """
         )
 
@@ -440,36 +440,36 @@ def test_validate_cycles_long_cycle():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-a
-  name: Brick A
-  layer: 0
-  units:
-    - F-a.func1
+            """bricks:
+  - id: B-a
+    name: Brick A
+    layer: 0
+    units:
+      - F-a.func1
 
-- id: B-b
-  name: Brick B
-  layer: 0
-  units:
-    - F-b.func1
+  - id: B-b
+    name: Brick B
+    layer: 0
+    units:
+      - F-b.func1
 
-- id: B-c
-  name: Brick C
-  layer: 0
-  units:
-    - F-c.func1
+  - id: B-c
+    name: Brick C
+    layer: 0
+    units:
+      - F-c.func1
 
-- id: B-d
-  name: Brick D
-  layer: 0
-  units:
-    - F-d.func1
+  - id: B-d
+    name: Brick D
+    layer: 0
+    units:
+      - F-d.func1
 
-- id: B-e
-  name: Brick E
-  layer: 0
-  units:
-    - F-e.func1
+  - id: B-e
+    name: Brick E
+    layer: 0
+    units:
+      - F-e.func1
 """
         )
 

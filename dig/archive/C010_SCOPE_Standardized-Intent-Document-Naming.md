@@ -1,7 +1,8 @@
 ---
 title: "SCOPE: Standardized Intent Document Naming"
 type: scope
-status: active
+status: implemented
+decision: completed
 created: 1767550000
 created_human: "2026-01-04 12:00 CST"
 parent: null

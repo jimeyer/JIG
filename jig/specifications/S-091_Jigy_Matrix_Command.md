@@ -7,10 +7,16 @@ outcome: O-026
 
 # Jigy Matrix Command
 
+## Command
+
+```bash
+jigy show matrix  # Display layer × tower grid
+```
+
 ## Constraints
 
-1. **CLI MUST provide layer×tower matrix visualization**
-   - Command: `jigy matrix`
+1. **CLI provides layer×tower matrix visualization**
+   - Command: `jigy show matrix` (under show group per S-060)
    - Rows: layers (0, 1, 2, ...)
    - Columns: towers
    - Cells: brick counts or brick names
@@ -23,7 +29,10 @@ outcome: O-026
 
 3. **Single-tower project message**
    - When no towers declared: "single-tower project"
-   - Shows layer list without matrix (same as `jigy layers`)
+   - Shows layer list without matrix (same as `jigy show layers`)
+
+4. **Output format flags**
+   - Supports `-j/-m/-v` flags (S-093)
 
 ## Output Format (Multi-Tower)
 
@@ -40,10 +49,9 @@ Layer 2   |    1    |    —     |   —    |
 
 ```
 Single-tower project (no matrix)
-Use 'jigy layers' to view layer structure.
+Use 'jigy show layers' to view layer structure.
 ```
 
 ## Rationale
 
-The matrix view provides at-a-glance understanding of project structure. It answers "how is complexity distributed across layers and towers?" and helps identify architectural imbalances.
-
+The matrix view provides at-a-glance understanding of project structure. It answers "how is complexity distributed across layers and towers?" Grouped under `show` for consistent verb-first structure.

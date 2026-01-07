@@ -226,3 +226,260 @@ def test_json_schema_consistency():
     assert "code" in intent_error
     assert "message" in intent_error
     assert "severity" in intent_error
+
+
+# ============================================================================
+# Markdown Output Format Tests (S-094)
+# ============================================================================
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_success():
+    """Markdown format for successful validation includes status and checked counts."""
+    from jig.validation.reporting import format_as_markdown
+
+    intent_result = ValidationResult(passed=True, phase_name="intent", items_checked=91)
+    brick_result = ValidationResult(passed=True, phase_name="bricks", items_checked=11)
+
+    results = {
+        "intent": intent_result,
+        "bricks": brick_result,
+    }
+
+    md_output = format_as_markdown(results)
+
+    # Check header
+    assert "# Validation Result" in md_output
+    # Check status
+    assert "**Status:** Passed" in md_output
+    # Check counts
+    assert "91" in md_output
+    assert "11" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_failed():
+    """Markdown format for failed validation shows Failed status."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=False, phase_name="intent", items_checked=5)
+    result.add_error(
+        ValidationError(
+            file="jig/specifications/S-042.md",
+            line=7,
+            code="INVALID_REFERENCE",
+            message="Reference O-999 does not exist",
+        )
+    )
+
+    results = {"intent": result}
+    md_output = format_as_markdown(results)
+
+    assert "**Status:** Failed" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_with_errors():
+    """Markdown format includes structured error list with bullets."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=False, phase_name="intent", items_checked=5)
+    result.add_error(
+        ValidationError(
+            file="jig/specifications/S-042.md",
+            line=7,
+            code="INVALID_REFERENCE",
+            message="Reference O-999 does not exist",
+        )
+    )
+    result.add_error(
+        ValidationError(
+            file="jig/specifications/S-043.md",
+            line=12,
+            code="MISSING_FIELD",
+            message="Required field 'outcome' missing",
+        )
+    )
+
+    results = {"intent": result}
+    md_output = format_as_markdown(results)
+
+    # Check errors section header
+    assert "## Errors" in md_output
+    # Check bullet format with file:line, code, and message
+    assert "- **S-042.md:7**" in md_output
+    assert "`INVALID_REFERENCE`" in md_output
+    assert "Reference O-999 does not exist" in md_output
+    assert "- **S-043.md:12**" in md_output
+    assert "`MISSING_FIELD`" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_error_without_line():
+    """Markdown format handles errors without line numbers."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=False, phase_name="bricks", items_checked=3)
+    result.add_error(
+        ValidationError(
+            file="jig/bricks.yaml",
+            line=None,
+            code="PARTITION_GAP",
+            message="Function 'F-test.func' in 0 bricks",
+        )
+    )
+
+    results = {"bricks": result}
+    md_output = format_as_markdown(results)
+
+    # Should show file without line number
+    assert "- **bricks.yaml**" in md_output
+    assert "`PARTITION_GAP`" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_no_errors_section_when_passed():
+    """Markdown format omits Errors section when validation passes."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=True, phase_name="intent", items_checked=10)
+
+    results = {"intent": result}
+    md_output = format_as_markdown(results)
+
+    # Should not have errors section
+    assert "## Errors" not in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_is_valid_markdown():
+    """Markdown output is valid and parseable."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=False, phase_name="intent", items_checked=5)
+    result.add_error(
+        ValidationError(
+            file="test.md",
+            line=10,
+            code="TEST_ERROR",
+            message="Test message",
+        )
+    )
+
+    results = {"intent": result}
+    md_output = format_as_markdown(results)
+
+    # Basic markdown structure checks
+    assert md_output.startswith("#")  # Starts with header
+    assert "**" in md_output  # Has bold
+    assert "`" in md_output  # Has code formatting
+    assert "- " in md_output  # Has bullet points
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_verbose_mode():
+    """Verbose markdown adds full file paths and detailed context."""
+    from jig.validation.reporting import format_as_markdown
+
+    result = ValidationResult(passed=False, phase_name="intent", items_checked=5)
+    result.add_error(
+        ValidationError(
+            file="jig/specifications/S-042.md",
+            line=7,
+            code="INVALID_REFERENCE",
+            message="Reference O-999 does not exist",
+        )
+    )
+
+    results = {"intent": result}
+    md_output = format_as_markdown(results, verbose=True)
+
+    # Verbose mode should include full paths
+    assert "jig/specifications/S-042.md" in md_output
+    # Should still have basic structure
+    assert "# Validation Result" in md_output
+    assert "**Status:** Failed" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_verbose_success():
+    """Verbose markdown for successful validation includes metadata."""
+    from jig.validation.reporting import format_as_markdown
+
+    intent_result = ValidationResult(passed=True, phase_name="intent", items_checked=91)
+    brick_result = ValidationResult(passed=True, phase_name="bricks", items_checked=11)
+
+    results = {
+        "intent": intent_result,
+        "bricks": brick_result,
+    }
+
+    md_output = format_as_markdown(results, verbose=True)
+
+    # Verbose mode should have more detail
+    assert "# Validation Result" in md_output
+    assert "**Status:** Passed" in md_output
+    # Should include phase details section
+    assert "intent" in md_output.lower()
+    assert "bricks" in md_output.lower()
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_multiple_phases():
+    """Markdown format handles multiple validation phases with errors."""
+    from jig.validation.reporting import format_as_markdown
+
+    intent_result = ValidationResult(passed=False, phase_name="intent", items_checked=10)
+    intent_result.add_error(
+        ValidationError(
+            file="jig/specifications/S-001.md",
+            line=5,
+            code="MISSING_FIELD",
+            message="Missing required field: 'id'",
+        )
+    )
+
+    brick_result = ValidationResult(passed=False, phase_name="bricks", items_checked=5)
+    brick_result.add_error(
+        ValidationError(
+            file="jig/bricks.yaml",
+            line=20,
+            code="CYCLE_DETECTED",
+            message="Dependency cycle detected",
+        )
+    )
+
+    results = {
+        "intent": intent_result,
+        "bricks": brick_result,
+    }
+
+    md_output = format_as_markdown(results)
+
+    # Should include errors from both phases
+    assert "S-001.md:5" in md_output
+    assert "MISSING_FIELD" in md_output
+    assert "bricks.yaml:20" in md_output
+    assert "CYCLE_DETECTED" in md_output
+
+
+@jig.verifies("S-094")
+def test_format_as_markdown_checked_counts_format():
+    """Markdown format shows checked counts in readable format."""
+    from jig.validation.reporting import format_as_markdown
+
+    intent_result = ValidationResult(passed=True, phase_name="specifications", items_checked=91)
+    brick_result = ValidationResult(passed=True, phase_name="bricks", items_checked=11)
+
+    results = {
+        "specifications": intent_result,
+        "bricks": brick_result,
+    }
+
+    md_output = format_as_markdown(results)
+
+    # Should have checked line with counts
+    assert "**Checked:**" in md_output
+    # Should mention specs and bricks with counts
+    assert "91" in md_output
+    assert "11" in md_output

@@ -170,7 +170,7 @@ def test_coverage_command_shows_progress(tmp_path):
 
     assert "Running coverage audit" in messages_str
     assert "Running tests with coverage" in messages_str
-    assert "Extracting T→F edges" in messages_str
+    assert "Extracting T->F edges" in messages_str
     assert "Writing record file" in messages_str
 
 

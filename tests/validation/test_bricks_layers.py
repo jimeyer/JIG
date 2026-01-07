@@ -42,18 +42,18 @@ def test_validate_layer_constraints_valid_layer1_to_layer0():
         # Create bricks: B-core (layer 0), B-api (layer 1)
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 """
         )
 
@@ -82,18 +82,18 @@ def test_validate_layer_constraints_valid_layer2_to_layer1():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+            """bricks:
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 
-- id: B-cli
-  name: CLI
-  layer: 2
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    layer: 2
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -122,18 +122,18 @@ def test_validate_layer_constraints_valid_layer2_to_layer0():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-cli
-  name: CLI
-  layer: 2
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    layer: 2
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -162,18 +162,18 @@ def test_validate_layer_constraints_valid_layer0_to_layer0():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core-utils
-  name: Core Utils
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core-utils
+    name: Core Utils
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-core-data
-  name: Core Data
-  layer: 0
-  units:
-    - F-core.data.load
+  - id: B-core-data
+    name: Core Data
+    layer: 0
+    units:
+      - F-core.data.load
 """
         )
 
@@ -202,18 +202,18 @@ def test_validate_layer_constraints_invalid_layer1_to_layer2():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+            """bricks:
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 
-- id: B-cli
-  name: CLI
-  layer: 2
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    layer: 2
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -249,18 +249,18 @@ def test_validate_layer_constraints_invalid_layer0_to_layer1():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 """
         )
 
@@ -293,18 +293,18 @@ def test_validate_layer_constraints_invalid_layer1_to_layer1():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-api-handler
-  name: API Handler
-  layer: 1
-  units:
-    - F-api.handler.process
+            """bricks:
+  - id: B-api-handler
+    name: API Handler
+    layer: 1
+    units:
+      - F-api.handler.process
 
-- id: B-api-auth
-  name: API Auth
-  layer: 1
-  units:
-    - F-api.auth.verify
+  - id: B-api-auth
+    name: API Auth
+    layer: 1
+    units:
+      - F-api.auth.verify
 """
         )
 
@@ -335,18 +335,18 @@ def test_validate_layer_constraints_invalid_layer2_to_layer2():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-cli-main
-  name: CLI Main
-  layer: 2
-  units:
-    - F-cli.main.run
+            """bricks:
+  - id: B-cli-main
+    name: CLI Main
+    layer: 2
+    units:
+      - F-cli.main.run
 
-- id: B-cli-config
-  name: CLI Config
-  layer: 2
-  units:
-    - F-cli.config.load
+  - id: B-cli-config
+    name: CLI Config
+    layer: 2
+    units:
+      - F-cli.config.load
 """
         )
 
@@ -379,24 +379,24 @@ def test_validate_layer_constraints_multiple_violations():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 
-- id: B-cli
-  name: CLI
-  layer: 2
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    layer: 2
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -423,18 +423,18 @@ def test_validate_layer_constraints_no_dependencies():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
 
-- id: B-api
-  name: API
-  layer: 1
-  units:
-    - F-api.handler.process
+  - id: B-api
+    name: API
+    layer: 1
+    units:
+      - F-api.handler.process
 """
         )
 
@@ -464,13 +464,13 @@ def test_validate_layer_constraints_self_dependency_allowed():
 
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
-            """
-- id: B-core
-  name: Core
-  layer: 0
-  units:
-    - F-core.utils.helper
-    - F-core.utils.internal
+            """bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - F-core.utils.helper
+      - F-core.utils.internal
 """
         )
 

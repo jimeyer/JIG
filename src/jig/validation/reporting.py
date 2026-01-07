@@ -3,6 +3,7 @@ Validation reporting: human-readable and JSON output formats.
 """
 
 import json
+from pathlib import Path
 
 import jig
 from jig.validation.models import ValidationResult
@@ -81,5 +82,81 @@ def format_validation_results(results: list[ValidationResult]) -> str:
         # Add error details
         for error in result.errors:
             lines.append(str(error))
+
+    return "\n".join(lines)
+
+
+@jig.implements("S-094")
+def format_as_markdown(results: dict[str, ValidationResult], verbose: bool = False) -> str:
+    """
+    Format validation results as markdown for LLM-optimized output.
+
+    Args:
+        results: Dictionary mapping phase name to ValidationResult
+        verbose: If True, include full file paths and additional detail
+
+    Returns:
+        Markdown string with headers, bullets, and emphasis
+    """
+    lines = []
+
+    # Header
+    lines.append("# Validation Result")
+    lines.append("")
+
+    # Overall status
+    all_passed = all(result.passed for result in results.values())
+    status = "Passed" if all_passed else "Failed"
+    lines.append(f"**Status:** {status}")
+
+    # Checked counts - build a summary line
+    checked_parts = []
+    for phase_name, result in results.items():
+        checked_parts.append(f"{result.items_checked} {phase_name}")
+    lines.append(f"**Checked:** {', '.join(checked_parts)}")
+    lines.append("")
+
+    # Verbose mode: add phase details section
+    if verbose:
+        lines.append("## Phases")
+        lines.append("")
+        for phase_name, result in results.items():
+            phase_status = "Passed" if result.passed else "Failed"
+            lines.append(f"- **{phase_name}**: {phase_status} ({result.items_checked} checked)")
+        lines.append("")
+
+    # Collect all errors from all phases
+    all_errors = []
+    for phase_name, result in results.items():
+        for error in result.errors:
+            all_errors.append(error)
+
+    # Errors section (only if there are errors)
+    if all_errors:
+        lines.append("## Errors")
+        lines.append("")
+        for error in all_errors:
+            # Format file location
+            if verbose:
+                # Verbose mode: use full path
+                file_display = error.file
+            else:
+                # Normal mode: use basename only
+                file_display = Path(error.file).name
+
+            # Add line number if present
+            if error.line is not None:
+                location = f"{file_display}:{error.line}"
+            else:
+                location = file_display
+
+            # Format error code
+            code_display = f"`{error.code}`" if error.code else ""
+
+            # Build the error line
+            if code_display:
+                lines.append(f"- **{location}** - {code_display}: {error.message}")
+            else:
+                lines.append(f"- **{location}** - {error.message}")
 
     return "\n".join(lines)

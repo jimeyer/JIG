@@ -4,7 +4,7 @@ type: architecture
 title: JIG Core Architecture
 status: active
 supports_goals: [G-001, G-003, G-004, G-005]
-constrains: [S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088]
+constrains: [S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-080, S-081, S-082, S-083, S-084, S-085, S-086, S-087, S-088]
 ---
 
 # JIG Core Architecture
@@ -154,47 +154,12 @@ Projects that don't need vertical partitioning (like JIG itself) simply omit the
 
 ---
 
-## Validation Rules
+## Validation
 
-### Charter Validation
+Validation of JIG artifacts is governed by A-004 (Validation Architecture).
+See A-004 for the complete validation model, rules, and spec mappings.
 
-1. Charter `id` SHALL be exactly `"Charter"`
-2. Charter `defines_goals` SHALL be non-empty
-3. All goal IDs SHALL match `G-{number}` format
-4. All goal IDs SHALL have corresponding headers in body
-
-### Architecture Validation
-
-5. Architecture `id` SHALL match pattern `A-{NNN}`
-6. Architecture `supports_goals` SHALL be non-empty
-7. Architecture `supports_goals` SHALL reference goals defined in Charter
-8. Architecture `constrains` (if present) SHALL reference existing specs
-
-### Outcome Validation
-
-9. Outcome `id` SHALL match pattern `O-{NNN}`
-10. Outcome `supports_goals` SHALL be non-empty
-11. Outcome `supports_goals` SHALL reference goals defined in Charter
-12. Outcome `specifies` SHALL reference existing specs
-
-### Specification Validation
-
-13. Specification `id` SHALL match pattern `S-{NNN}`
-14. Specification `status` SHALL be one of: `draft`, `proposed`, `active`, `deprecated`
-
-### Brick Validation
-
-15. Brick `id` SHALL match pattern `B-[a-z0-9-]+`
-16. Brick `layer` SHALL be non-negative integer
-17. Brick `units` SHALL reference nodes in implementation graph
-18. Every function SHALL belong to exactly one brick (partition)
-19. Brick dependencies SHALL respect layer hierarchy (DAG)
-
-### Tower Validation
-
-20. Tower values (if present) SHALL match kebab-case pattern
-21. Cross-tower dependencies SHALL be detected and reported as errors
-22. Single-tower projects (no tower fields) skip tower validation
+This document (A-001) defines WHAT the structure IS. A-004 defines HOW to VALIDATE that structure.
 
 ---
 

@@ -101,12 +101,12 @@ def test_validate_bricks_success():
 
         # Create valid bricks
         (Path("jig") / "bricks.yaml").write_text(
-            """
-- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - M-test
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - M-test
 """
         )
 
@@ -125,11 +125,12 @@ def test_validate_bricks_missing_graph():
         # Create bricks but no graph
         Path("jig").mkdir()
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - M-test
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - M-test
 """
         )
 
@@ -154,10 +155,11 @@ def test_validate_bricks_partition_gap():
 
         # Create bricks that don't include the function (gap)
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-empty
-  name: Empty
-  layer: 0
-  units: []
+            """bricks:
+  - id: B-empty
+    name: Empty
+    layer: 0
+    units: []
 """
         )
 
@@ -197,11 +199,12 @@ title: Test Specification
 
         # Create valid bricks
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - F-test.func
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - F-test.func
 """
         )
 
@@ -335,3 +338,311 @@ title: Test Specification
             assert False, "Output should not be JSON"
         except json.JSONDecodeError:
             pass  # Expected
+
+
+# ============================================================================
+# Output Format Flag Tests (S-026, S-093)
+# ============================================================================
+
+
+def _setup_valid_project(runner):
+    """Helper to set up a valid JIG project for output format tests."""
+    spec_dir = Path("jig/specifications")
+    spec_dir.mkdir(parents=True)
+    (spec_dir / "S-001_Test_Specification.md").write_text(
+        """---
+id: S-001
+type: specification
+title: Test Specification
+---
+
+# Test Specification
+"""
+    )
+
+    # Create implementation graph
+    graph_dir = Path("jig/generated")
+    graph_dir.mkdir(parents=True)
+    graph_file = graph_dir / "implementation-graph.ndjson"
+    graph_file.write_text(
+        json.dumps({"id": "F-test.func", "type": "function"}) + "\n"
+    )
+
+    # Create valid bricks
+    (Path("jig") / "bricks.yaml").write_text(
+        """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - F-test.func
+"""
+    )
+
+
+def _setup_invalid_project(runner):
+    """Helper to set up an invalid JIG project for error output tests."""
+    spec_dir = Path("jig/specifications")
+    spec_dir.mkdir(parents=True)
+    # Invalid spec: missing id
+    (spec_dir / "S-001_Bad.md").write_text(
+        """---
+type: specification
+---
+
+# Test
+"""
+    )
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_json_flag():
+    """jigy validate -j produces JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-j"])
+        assert result.exit_code == 0
+
+        # Output must be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+        assert data["status"] == "passed"
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_intent_json_flag():
+    """jigy validate intent -j produces JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-j"])
+        assert result.exit_code == 0
+
+        # Output must be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+        assert data["status"] == "passed"
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_bricks_json_flag():
+    """jigy validate bricks -j produces JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks", "-j"])
+        assert result.exit_code == 0
+
+        # Output must be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+        assert data["status"] == "passed"
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_markdown_flag():
+    """jigy validate -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-m"])
+        assert result.exit_code == 0
+
+        # Output should be markdown (contains header)
+        assert "# Validation Result" in result.output
+        assert "**Status:**" in result.output
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_intent_markdown_flag():
+    """jigy validate intent -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-m"])
+        assert result.exit_code == 0
+
+        # Output should be markdown
+        assert "# Validation Result" in result.output
+        assert "**Status:**" in result.output
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_bricks_markdown_flag():
+    """jigy validate bricks -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks", "-m"])
+        assert result.exit_code == 0
+
+        # Output should be markdown
+        assert "# Validation Result" in result.output
+        assert "**Status:**" in result.output
+
+
+@jig.verifies("S-093")
+def test_validate_verbose_flag():
+    """jigy validate -v produces verbose output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-v"])
+        assert result.exit_code == 0
+
+        # Verbose human output - more detail than non-verbose
+        # Just verify it runs without error (verbose mode is format-dependent)
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_json_verbose_flag():
+    """jigy validate -j -v produces verbose JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-j", "-v"])
+        assert result.exit_code == 0
+
+        # Output must be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_markdown_verbose_flag():
+    """jigy validate -m -v produces verbose markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-m", "-v"])
+        assert result.exit_code == 0
+
+        # Verbose markdown should have phases section
+        assert "# Validation Result" in result.output
+        assert "## Phases" in result.output
+
+
+@jig.verifies("S-093")
+def test_validate_json_markdown_mutual_exclusion():
+    """jigy validate -j -m produces clear error message."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-j", "-m"])
+        assert result.exit_code != 0
+
+        # Error message should mention mutual exclusivity
+        assert "mutually exclusive" in result.output.lower()
+
+
+@jig.verifies("S-093")
+def test_validate_intent_json_markdown_mutual_exclusion():
+    """jigy validate intent -j -m produces clear error message."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-j", "-m"])
+        assert result.exit_code != 0
+        assert "mutually exclusive" in result.output.lower()
+
+
+@jig.verifies("S-093")
+def test_validate_bricks_json_markdown_mutual_exclusion():
+    """jigy validate bricks -j -m produces clear error message."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks", "-j", "-m"])
+        assert result.exit_code != 0
+        assert "mutually exclusive" in result.output.lower()
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_json_output_is_single_line():
+    """jigy validate -j produces single-line JSON (not pretty-printed)."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "-j"])
+        assert result.exit_code == 0
+
+        # Output should be single line (no embedded newlines in JSON)
+        # Strip trailing newline and check
+        output = result.output.strip()
+        assert "\n" not in output, "JSON output should be single-line"
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_json_with_errors():
+    """jigy validate -j includes error details in JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_invalid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-j"])
+        assert result.exit_code == 1
+
+        # Output must be valid JSON with error details
+        data = json.loads(result.output)
+        assert data["status"] == "failed"
+        assert "summary" in data
+        assert data["summary"]["total_errors"] > 0
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_markdown_with_errors():
+    """jigy validate -m includes error details in markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_invalid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-m"])
+        assert result.exit_code == 1
+
+        # Markdown should have errors section
+        assert "# Validation Result" in result.output
+        assert "**Status:** Failed" in result.output
+        assert "## Errors" in result.output
+
+
+@jig.verifies("S-026", "S-093")
+def test_validate_full_json_flag():
+    """jigy validate full -j produces JSON output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "full", "-j"])
+        assert result.exit_code == 0
+
+        # Output must be valid JSON
+        data = json.loads(result.output)
+        assert "status" in data
+
+
+@jig.verifies("S-093", "S-094")
+def test_validate_full_markdown_flag():
+    """jigy validate full -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        _setup_valid_project(runner)
+
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "full", "-m"])
+        assert result.exit_code == 0
+
+        # Output should be markdown
+        assert "# Validation Result" in result.output
