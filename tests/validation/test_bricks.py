@@ -39,12 +39,13 @@ def test_validate_brick_definitions_valid():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-authentication
-  name: Authentication
-  layer: 0
-  units:
-    - M-auth.session
-    - C-auth.tokens.Token
+bricks:
+  - id: B-authentication
+    name: Authentication
+    layer: 0
+    units:
+      - M-auth.session
+      - C-auth.tokens.Token
 """
         )
 
@@ -63,10 +64,11 @@ def test_validate_brick_definitions_missing_impl_graph():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -91,9 +93,10 @@ def test_validate_brick_definitions_missing_required_field():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    units:
+      - M-test
 """
         )
 
@@ -114,53 +117,54 @@ def test_validate_brick_definitions_valid_kebab_case_ids():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-auth
-  name: Authentication
-  layer: 0
-  units:
-    - M-test
+bricks:
+  - id: B-auth
+    name: Authentication
+    layer: 0
+    units:
+      - M-test
 
-- id: B-core-utils
-  name: Core Utilities
-  layer: 0
-  units:
-    - M-test
+  - id: B-core-utils
+    name: Core Utilities
+    layer: 0
+    units:
+      - M-test
 
-- id: B-rest-api
-  name: REST API
-  layer: 1
-  units:
-    - M-test
+  - id: B-rest-api
+    name: REST API
+    layer: 1
+    units:
+      - M-test
 
-- id: B-cli-interface
-  name: CLI Interface
-  layer: 2
-  units:
-    - M-test
+  - id: B-cli-interface
+    name: CLI Interface
+    layer: 2
+    units:
+      - M-test
 
-- id: B-a
-  name: Short
-  layer: 0
-  units:
-    - M-test
+  - id: B-a
+    name: Short
+    layer: 0
+    units:
+      - M-test
 
-- id: B-user-management
-  name: User Management
-  layer: 1
-  units:
-    - M-test
+  - id: B-user-management
+    name: User Management
+    layer: 1
+    units:
+      - M-test
 
-- id: B-with-many-hyphens
-  name: Many Hyphens
-  layer: 0
-  units:
-    - M-test
+  - id: B-with-many-hyphens
+    name: Many Hyphens
+    layer: 0
+    units:
+      - M-test
 
-- id: B-api-v2
-  name: API Version 2
-  layer: 1
-  units:
-    - M-test
+  - id: B-api-v2
+    name: API Version 2
+    layer: 1
+    units:
+      - M-test
 """
         )
 
@@ -181,10 +185,11 @@ def test_validate_brick_definitions_invalid_old_numeric_format():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-001
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: B-001
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -206,10 +211,11 @@ def test_validate_brick_definitions_invalid_uppercase():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-Auth
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: B-Auth
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -231,10 +237,11 @@ def test_validate_brick_definitions_invalid_underscore():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-core_utils
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: B-core_utils
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -256,10 +263,11 @@ def test_validate_brick_definitions_invalid_empty_name():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: B-
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -280,10 +288,11 @@ def test_validate_brick_definitions_invalid_missing_prefix():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: auth
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: auth
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -304,10 +313,11 @@ def test_validate_brick_definitions_invalid_wrong_prefix():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: INVALID-auth
-  name: Test
-  units:
-    - M-test
+bricks:
+  - id: INVALID-auth
+    name: Test
+    units:
+      - M-test
 """
         )
 
@@ -328,15 +338,16 @@ def test_validate_brick_definitions_duplicate_ids():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-first
-  name: First
-  units:
-    - M-first
+bricks:
+  - id: B-first
+    name: First
+    units:
+      - M-first
 
-- id: B-first
-  name: Duplicate
-  units:
-    - M-second
+  - id: B-first
+    name: Duplicate
+    units:
+      - M-second
 """
         )
 
@@ -357,10 +368,11 @@ def test_validate_brick_definitions_invalid_unit_prefix():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  units:
-    - auth.session  # Missing prefix!
+bricks:
+  - id: B-test
+    name: Test
+    units:
+      - auth.session  # Missing prefix!
 """
         )
 
@@ -386,10 +398,11 @@ def test_validate_brick_definitions_unit_not_in_graph():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  units:
-    - M-nonexistent.module  # Not in graph!
+bricks:
+  - id: B-test
+    name: Test
+    units:
+      - M-nonexistent.module  # Not in graph!
 """
         )
 
@@ -410,16 +423,17 @@ def test_validate_brick_definitions_excluded_fields():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  units:
-    - M-test
-  depends_on:
-    - B-other
-  public_api:
-    - some_function
-  specs:
-    - S-001
+bricks:
+  - id: B-test
+    name: Test
+    units:
+      - M-test
+    depends_on:
+      - B-other
+    public_api:
+      - some_function
+    specs:
+      - S-001
 """
         )
 
@@ -454,15 +468,16 @@ def test_validate_brick_partition_valid():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-auth
-  name: Authentication
-  units:
-    - M-auth.session  # Covers both login and logout
+bricks:
+  - id: B-auth
+    name: Authentication
+    units:
+      - M-auth.session  # Covers both login and logout
 
-- id: B-cli
-  name: CLI
-  units:
-    - F-cli.main.run
+  - id: B-cli
+    name: CLI
+    units:
+      - F-cli.main.run
 """
         )
 
@@ -489,10 +504,11 @@ def test_validate_brick_partition_gap():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-auth
-  name: Auth
-  units:
-    - F-auth.session.login  # Only login, not logout
+bricks:
+  - id: B-auth
+    name: Auth
+    units:
+      - F-auth.session.login  # Only login, not logout
 """
         )
 
@@ -518,15 +534,16 @@ def test_validate_brick_partition_overlap():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-auth
-  name: Auth
-  units:
-    - F-auth.session.login
+bricks:
+  - id: B-auth
+    name: Auth
+    units:
+      - F-auth.session.login
 
-- id: B-security
-  name: Security
-  units:
-    - F-auth.session.login  # Duplicate!
+  - id: B-security
+    name: Security
+    units:
+      - F-auth.session.login  # Duplicate!
 """
         )
 
@@ -554,15 +571,16 @@ def test_validate_brick_partition_class_splitting():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-token-init
-  name: TokenInit
-  units:
-    - F-auth.Token.__init__  # Only __init__
+bricks:
+  - id: B-token-init
+    name: TokenInit
+    units:
+      - F-auth.Token.__init__  # Only __init__
 
-- id: B-token-validation
-  name: TokenValidation
-  units:
-    - F-auth.Token.validate  # Only validate - CLASS SPLIT!
+  - id: B-token-validation
+    name: TokenValidation
+    units:
+      - F-auth.Token.validate  # Only validate - CLASS SPLIT!
 """
         )
 
@@ -592,10 +610,11 @@ def test_validate_brick_partition_module_expansion():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-auth
-  name: Auth
-  units:
-    - M-auth.session  # Should expand to all F-auth.session.*
+bricks:
+  - id: B-auth
+    name: Auth
+    units:
+      - M-auth.session  # Should expand to all F-auth.session.*
 """
         )
 
@@ -625,10 +644,11 @@ def test_validate_brick_partition_class_expansion():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-token
-  name: Token
-  units:
-    - C-auth.Token  # Should expand to all F-auth.Token.*
+bricks:
+  - id: B-token
+    name: Token
+    units:
+      - C-auth.Token  # Should expand to all F-auth.Token.*
 """
         )
 
@@ -652,17 +672,18 @@ def test_validate_brick_definitions_valid_layer_field():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-foundation
-  name: Foundation
-  layer: 0
-  units:
-    - M-test
+bricks:
+  - id: B-foundation
+    name: Foundation
+    layer: 0
+    units:
+      - M-test
 
-- id: B-core
-  name: Core
-  layer: 1
-  units:
-    - M-test
+  - id: B-core
+    name: Core
+    layer: 1
+    units:
+      - M-test
 """
         )
 
@@ -683,11 +704,12 @@ def test_validate_brick_definitions_missing_layer_field():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  units:
-    - M-test
-  # layer field missing!
+bricks:
+  - id: B-test
+    name: Test
+    units:
+      - M-test
+    # layer field missing!
 """
         )
 
@@ -709,35 +731,36 @@ def test_validate_brick_definitions_valid_layer_values():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-layer0
-  name: Layer 0
-  layer: 0
-  units:
-    - M-test
+bricks:
+  - id: B-layer0
+    name: Layer 0
+    layer: 0
+    units:
+      - M-test
 
-- id: B-layer1
-  name: Layer 1
-  layer: 1
-  units:
-    - M-test
+  - id: B-layer1
+    name: Layer 1
+    layer: 1
+    units:
+      - M-test
 
-- id: B-layer2
-  name: Layer 2
-  layer: 2
-  units:
-    - M-test
+  - id: B-layer2
+    name: Layer 2
+    layer: 2
+    units:
+      - M-test
 
-- id: B-layer10
-  name: Layer 10
-  layer: 10
-  units:
-    - M-test
+  - id: B-layer10
+    name: Layer 10
+    layer: 10
+    units:
+      - M-test
 
-- id: B-layer100
-  name: Layer 100
-  layer: 100
-  units:
-    - M-test
+  - id: B-layer100
+    name: Layer 100
+    layer: 100
+    units:
+      - M-test
 """
         )
 
@@ -758,11 +781,12 @@ def test_validate_brick_definitions_invalid_layer_type_string():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: "0"
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: "0"
+    units:
+      - M-test
 """
         )
 
@@ -784,11 +808,12 @@ def test_validate_brick_definitions_invalid_layer_type_float():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: 1.5
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: 1.5
+    units:
+      - M-test
 """
         )
 
@@ -810,11 +835,12 @@ def test_validate_brick_definitions_invalid_layer_type_null():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: null
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: null
+    units:
+      - M-test
 """
         )
 
@@ -837,11 +863,12 @@ def test_validate_brick_definitions_invalid_layer_type_list():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: []
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: []
+    units:
+      - M-test
 """
         )
 
@@ -863,11 +890,12 @@ def test_validate_brick_definitions_negative_layer():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: -1
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: -1
+    units:
+      - M-test
 """
         )
 
@@ -889,11 +917,12 @@ def test_validate_brick_definitions_large_negative_layer():
         bricks_file = tmpdir / "bricks.yaml"
         bricks_file.write_text(
             """
-- id: B-test
-  name: Test
-  layer: -10
-  units:
-    - M-test
+bricks:
+  - id: B-test
+    name: Test
+    layer: -10
+    units:
+      - M-test
 """
         )
 

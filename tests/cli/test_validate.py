@@ -101,12 +101,12 @@ def test_validate_bricks_success():
 
         # Create valid bricks
         (Path("jig") / "bricks.yaml").write_text(
-            """
-- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - M-test
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - M-test
 """
         )
 
@@ -125,11 +125,12 @@ def test_validate_bricks_missing_graph():
         # Create bricks but no graph
         Path("jig").mkdir()
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - M-test
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - M-test
 """
         )
 
@@ -154,10 +155,11 @@ def test_validate_bricks_partition_gap():
 
         # Create bricks that don't include the function (gap)
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-empty
-  name: Empty
-  layer: 0
-  units: []
+            """bricks:
+  - id: B-empty
+    name: Empty
+    layer: 0
+    units: []
 """
         )
 
@@ -197,11 +199,12 @@ title: Test Specification
 
         # Create valid bricks
         (Path("jig") / "bricks.yaml").write_text(
-            """- id: B-test
-  name: Test
-  layer: 0
-  units:
-    - F-test.func
+            """bricks:
+  - id: B-test
+    name: Test
+    layer: 0
+    units:
+      - F-test.func
 """
         )
 

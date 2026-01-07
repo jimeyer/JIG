@@ -78,15 +78,24 @@ def validate_brick_definitions(
         )
         return result
 
-    # Handle both formats: {"bricks": [...]} or direct [...]
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks (either as top-level list or under 'bricks:' key)",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -278,15 +287,24 @@ def validate_brick_partition(
         )
         return result
 
-    # Handle both formats: {"bricks": [...]} or direct [...]
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks (either as top-level list or under 'bricks:' key)",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -528,15 +546,24 @@ def validate_brick_layer_constraints(
         )
         return result
 
-    # Handle both formats
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -709,15 +736,24 @@ def validate_brick_cycles(
         )
         return result
 
-    # Handle both formats
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -909,15 +945,24 @@ def validate_tower_format(bricks_file: Path) -> ValidationResult:
         )
         return result
 
-    # Handle both formats
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
@@ -1076,15 +1121,24 @@ def validate_tower_isolation(
         )
         return result
 
-    # Handle both formats
-    if isinstance(bricks_data, dict) and "bricks" in bricks_data:
-        bricks_data = bricks_data["bricks"]
+    # Require production format: {"bricks": [...]}
+    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
+        result.add_error(
+            ValidationError(
+                file=str(bricks_file),
+                message="bricks.yaml must have 'bricks:' key containing a list of brick definitions",
+                code="INVALID_STRUCTURE",
+            )
+        )
+        return result
+
+    bricks_data = bricks_data["bricks"]
 
     if not isinstance(bricks_data, list):
         result.add_error(
             ValidationError(
                 file=str(bricks_file),
-                message="bricks.yaml must contain a list of bricks",
+                message="bricks.yaml 'bricks:' key must contain a list of brick definitions",
                 code="INVALID_STRUCTURE",
             )
         )
