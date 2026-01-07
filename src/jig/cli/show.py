@@ -701,6 +701,419 @@ def show_goals_command(
     return 0
 
 
+@jig.implements("S-060", "S-090", "S-093")
+def show_towers_command(
+    config: JigConfig,
+    tower_id: str | None = None,
+    output_format: OutputFormat = OutputFormat.HUMAN,
+    verbose: bool = False,
+    skip_rebuild: bool = False,
+) -> int:
+    """Display tower structure with brick counts by layer.
+
+    Args:
+        config: JIG configuration with resolved paths.
+        tower_id: Optional specific tower ID to show details for.
+        output_format: Output format (HUMAN, JSON, MARKDOWN).
+        verbose: If True, include additional detail.
+        skip_rebuild: If True, skip auto-rebuild.
+
+    Returns:
+        Exit code (0 for success, non-zero on failure).
+    """
+    from jig.cli.auto_rebuild import ensure_graphs_current
+
+    ensure_graphs_current(["impl", "intent"], config, skip_rebuild=skip_rebuild)
+
+    bricks_file = config.paths.bricks
+    bricks = _load_bricks(bricks_file)
+
+    if bricks is None:
+        if output_format == OutputFormat.JSON:
+            click.echo(json_module.dumps({"error": "No bricks.yaml found"}))
+        elif output_format == OutputFormat.MARKDOWN:
+            click.echo("# Towers\n\nNo bricks.yaml found.")
+        else:
+            click.echo("No bricks.yaml found.")
+        return 1
+
+    # Group bricks by tower
+    towers: dict[str | None, list] = defaultdict(list)
+    for brick in bricks:
+        tower = brick.get("tower")
+        towers[tower].append(brick)
+
+    # Check if single-tower project (no towers declared)
+    declared_towers = [t for t in towers.keys() if t is not None]
+
+    if not declared_towers:
+        # Single-tower project
+        if output_format == OutputFormat.JSON:
+            layers = defaultdict(int)
+            for brick in bricks:
+                layers[brick.get("layer", 0)] += 1
+            result = {
+                "single_tower": True,
+                "total_bricks": len(bricks),
+                "by_layer": [{"layer": l, "count": c} for l, c in sorted(layers.items())],
+            }
+            click.echo(json_module.dumps(result))
+        elif output_format == OutputFormat.MARKDOWN:
+            lines = ["# Single-Tower Project", ""]
+            lines.append("No towers declared in bricks.yaml.")
+            lines.append("All bricks operate in a single implicit tower.")
+            lines.append("")
+            lines.append(f"**Total Bricks:** {len(bricks)}")
+            lines.append("")
+            layers = defaultdict(int)
+            for brick in bricks:
+                layers[brick.get("layer", 0)] += 1
+            lines.append("## By Layer")
+            lines.append("")
+            for layer in sorted(layers.keys()):
+                lines.append(f"- **Layer {layer}:** {layers[layer]} bricks")
+            click.echo("\n".join(lines))
+        else:
+            click.echo("Single-Tower Project")
+            click.echo("=" * 40)
+            click.echo()
+            click.echo("No towers declared in bricks.yaml.")
+            click.echo("All bricks operate in a single implicit tower.")
+            click.echo()
+            click.echo(f"Total Bricks: {len(bricks)}")
+            layers = defaultdict(int)
+            for brick in bricks:
+                layers[brick.get("layer", 0)] += 1
+            if layers:
+                click.echo("By Layer:")
+                for layer in sorted(layers.keys()):
+                    click.echo(f"  Layer {layer}: {layers[layer]} bricks")
+        return 0
+
+    # Multi-tower project
+    if tower_id:
+        # Show specific tower
+        if tower_id not in towers:
+            if output_format == OutputFormat.JSON:
+                click.echo(json_module.dumps({
+                    "error": f"Tower '{tower_id}' not found",
+                    "available_towers": sorted(declared_towers),
+                }))
+            elif output_format == OutputFormat.MARKDOWN:
+                click.echo(f"# Tower Not Found\n\nTower '{tower_id}' not found.\n\n")
+                click.echo(f"**Available towers:** {', '.join(sorted(declared_towers))}")
+            else:
+                click.echo(f"Tower '{tower_id}' not found.")
+                click.echo(f"Available towers: {', '.join(sorted(declared_towers))}")
+            return 1
+
+        tower_bricks = towers[tower_id]
+        layers = defaultdict(list)
+        for brick in tower_bricks:
+            layers[brick.get("layer", 0)].append(brick)
+
+        if output_format == OutputFormat.JSON:
+            result = {
+                "tower": tower_id,
+                "brick_count": len(tower_bricks),
+                "layers": [
+                    {
+                        "layer": layer,
+                        "bricks": [
+                            {
+                                "id": b.get("id"),
+                                "name": b.get("name", b.get("id")),
+                                "units": b.get("units", []) if verbose else len(b.get("units", [])),
+                            }
+                            for b in layers[layer]
+                        ],
+                    }
+                    for layer in sorted(layers.keys(), reverse=True)
+                ],
+            }
+            click.echo(json_module.dumps(result))
+        elif output_format == OutputFormat.MARKDOWN:
+            lines = [f"# Tower: {tower_id}", ""]
+            lines.append(f"**Bricks:** {len(tower_bricks)}")
+            lines.append("")
+            for layer in sorted(layers.keys(), reverse=True):
+                layer_bricks = layers[layer]
+                lines.append(f"## Layer {layer}")
+                lines.append("")
+                for brick in layer_bricks:
+                    brick_id = brick.get("id")
+                    brick_name = brick.get("name", brick_id)
+                    lines.append(f"- **{brick_id}:** {brick_name}")
+                    if verbose:
+                        units = brick.get("units", [])
+                        lines.append(f"  - Units: {len(units)}")
+                lines.append("")
+            click.echo("\n".join(lines))
+        else:
+            click.echo(f"Tower: {tower_id}")
+            click.echo("=" * 40)
+            click.echo()
+            click.echo(f"Bricks: {len(tower_bricks)}")
+            click.echo()
+            for layer in sorted(layers.keys(), reverse=True):
+                layer_bricks = layers[layer]
+                click.echo(f"Layer {layer}:")
+                for brick in layer_bricks:
+                    brick_id = brick.get("id")
+                    brick_name = brick.get("name", brick_id)
+                    click.echo(f"  {brick_id}: {brick_name}")
+                    if verbose:
+                        units = brick.get("units", [])
+                        for u in units[:5]:
+                            click.echo(f"    - {u}")
+                        if len(units) > 5:
+                            click.echo(f"    ... and {len(units) - 5} more")
+                click.echo()
+        return 0
+
+    # List all towers
+    if output_format == OutputFormat.JSON:
+        result = {
+            "towers": [
+                {
+                    "name": tower_name,
+                    "brick_count": len(towers[tower_name]),
+                    "by_layer": [
+                        {"layer": l, "count": sum(1 for b in towers[tower_name] if b.get("layer", 0) == l)}
+                        for l in sorted(set(b.get("layer", 0) for b in towers[tower_name]))
+                    ],
+                }
+                for tower_name in sorted(declared_towers)
+            ],
+        }
+        unassigned = towers.get(None, [])
+        if unassigned:
+            result["unassigned"] = {
+                "brick_count": len(unassigned),
+                "brick_ids": [b.get("id") for b in unassigned],
+            }
+        click.echo(json_module.dumps(result))
+    elif output_format == OutputFormat.MARKDOWN:
+        lines = ["# Towers", ""]
+        for tower_name in sorted(declared_towers):
+            tower_bricks = towers[tower_name]
+            layers = defaultdict(int)
+            for brick in tower_bricks:
+                layers[brick.get("layer", 0)] += 1
+            layer_summary = ", ".join(f"L{l}:{c}" for l, c in sorted(layers.items()))
+            lines.append(f"## {tower_name}")
+            lines.append("")
+            lines.append(f"**Bricks:** {len(tower_bricks)} ({layer_summary})")
+            if verbose:
+                lines.append("")
+                for brick in tower_bricks:
+                    lines.append(f"- {brick.get('id')}: {brick.get('name', brick.get('id'))}")
+            lines.append("")
+        unassigned = towers.get(None, [])
+        if unassigned:
+            lines.append("## Unassigned")
+            lines.append("")
+            lines.append(f"**{len(unassigned)} bricks** not assigned to any tower:")
+            lines.append("")
+            for brick in unassigned:
+                lines.append(f"- {brick.get('id')}")
+        click.echo("\n".join(lines))
+    else:
+        click.echo("Towers")
+        click.echo("=" * 40)
+        click.echo()
+        for tower_name in sorted(declared_towers):
+            tower_bricks = towers[tower_name]
+            layers = defaultdict(int)
+            for brick in tower_bricks:
+                layers[brick.get("layer", 0)] += 1
+            layer_summary = ", ".join(f"L{l}:{c}" for l, c in sorted(layers.items()))
+            click.echo(f"{tower_name}: {len(tower_bricks)} bricks ({layer_summary})")
+            if verbose:
+                for brick in tower_bricks:
+                    click.echo(f"  - {brick.get('id')}: {brick.get('name', brick.get('id'))}")
+        unassigned = towers.get(None, [])
+        if unassigned:
+            click.echo()
+            click.echo(f"Unassigned: {len(unassigned)} bricks")
+            for brick in unassigned:
+                click.echo(f"  {brick.get('id')}")
+
+    return 0
+
+
+@jig.implements("S-060", "S-091", "S-093")
+def show_matrix_command(
+    config: JigConfig,
+    output_format: OutputFormat = OutputFormat.HUMAN,
+    verbose: bool = False,
+    skip_rebuild: bool = False,
+) -> int:
+    """Display layer x tower grid.
+
+    Args:
+        config: JIG configuration with resolved paths.
+        output_format: Output format (HUMAN, JSON, MARKDOWN).
+        verbose: If True, include additional detail.
+        skip_rebuild: If True, skip auto-rebuild.
+
+    Returns:
+        Exit code (0 for success, non-zero on failure).
+    """
+    from jig.cli.auto_rebuild import ensure_graphs_current
+
+    ensure_graphs_current(["impl", "intent"], config, skip_rebuild=skip_rebuild)
+
+    bricks_file = config.paths.bricks
+    bricks = _load_bricks(bricks_file)
+
+    if bricks is None:
+        if output_format == OutputFormat.JSON:
+            click.echo(json_module.dumps({"error": "No bricks.yaml found"}))
+        elif output_format == OutputFormat.MARKDOWN:
+            click.echo("# Layer x Tower Matrix\n\nNo bricks.yaml found.")
+        else:
+            click.echo("No bricks.yaml found.")
+        return 1
+
+    # Build tower/layer matrix
+    towers_set: set[str | None] = set()
+    layers_set: set[int] = set()
+    matrix: dict[tuple[str | None, int], list[str]] = defaultdict(list)
+
+    for brick in bricks:
+        tower = brick.get("tower")
+        layer = brick.get("layer", 0)
+        brick_id = brick.get("id")
+
+        towers_set.add(tower)
+        layers_set.add(layer)
+        matrix[(tower, layer)].append(brick_id)
+
+    # Check if single-tower project
+    declared_towers = [t for t in towers_set if t is not None]
+    if not declared_towers:
+        if output_format == OutputFormat.JSON:
+            result = {
+                "single_tower": True,
+                "message": "No towers declared - matrix view not applicable",
+            }
+            click.echo(json_module.dumps(result))
+        elif output_format == OutputFormat.MARKDOWN:
+            lines = ["# Single-Tower Project", ""]
+            lines.append("No towers declared - matrix view not applicable.")
+            lines.append("")
+            lines.append("Use `jigy show layers` to see layer structure.")
+            click.echo("\n".join(lines))
+        else:
+            click.echo("Single-Tower Project")
+            click.echo("=" * 40)
+            click.echo()
+            click.echo("No towers declared - matrix view not applicable.")
+            click.echo("Use 'jigy show layers' to see layer structure.")
+        return 0
+
+    # Build matrix data
+    sorted_towers = sorted(declared_towers)
+    sorted_layers = sorted(layers_set, reverse=True)
+
+    if output_format == OutputFormat.JSON:
+        grid = []
+        for layer in sorted_layers:
+            row = {"layer": layer, "cells": {}}
+            for tower in sorted_towers:
+                cell_bricks = matrix.get((tower, layer), [])
+                row["cells"][tower] = {
+                    "count": len(cell_bricks),
+                    "brick_ids": cell_bricks if verbose else None,
+                }
+            grid.append(row)
+
+        result = {
+            "towers": sorted_towers,
+            "layers": sorted_layers,
+            "grid": grid,
+        }
+
+        # Include unassigned if any
+        unassigned_total = sum(len(matrix.get((None, l), [])) for l in sorted_layers)
+        if unassigned_total > 0:
+            result["unassigned"] = {
+                "total": unassigned_total,
+                "by_layer": [
+                    {"layer": l, "count": len(matrix.get((None, l), []))}
+                    for l in sorted_layers
+                    if matrix.get((None, l))
+                ],
+            }
+
+        click.echo(json_module.dumps(result))
+    elif output_format == OutputFormat.MARKDOWN:
+        lines = ["# Layer x Tower Matrix", ""]
+
+        # Build markdown table
+        header = "| Layer |"
+        for tower in sorted_towers:
+            header += f" {tower[:12]} |"
+        lines.append(header)
+
+        separator = "|-------|"
+        for tower in sorted_towers:
+            separator += "-" * (len(tower[:12]) + 2) + "|"
+        lines.append(separator)
+
+        for layer in sorted_layers:
+            row = f"| L{layer}    |"
+            for tower in sorted_towers:
+                cell_bricks = matrix.get((tower, layer), [])
+                if cell_bricks:
+                    cell = f" {len(cell_bricks)} "
+                else:
+                    cell = " - "
+                row += cell.center(len(tower[:12]) + 2) + "|"
+            lines.append(row)
+
+        lines.append("")
+
+        # Unassigned
+        unassigned_total = sum(len(matrix.get((None, l), [])) for l in sorted_layers)
+        if unassigned_total > 0:
+            lines.append(f"**Unassigned:** {unassigned_total} bricks not in any tower")
+
+        click.echo("\n".join(lines))
+    else:
+        click.echo("Layer x Tower Matrix")
+        click.echo("=" * 60)
+        click.echo()
+
+        # Column headers
+        header = "Layer".ljust(8)
+        for tower in sorted_towers:
+            header += tower[:12].ljust(14)
+        click.echo(header)
+        click.echo("-" * len(header))
+
+        # Rows (layers, highest first)
+        for layer in sorted_layers:
+            row = f"L{layer}".ljust(8)
+            for tower in sorted_towers:
+                cell_bricks = matrix.get((tower, layer), [])
+                if cell_bricks:
+                    cell = f"{len(cell_bricks)} bricks"
+                else:
+                    cell = "-"
+                row += cell.ljust(14)
+            click.echo(row)
+
+        # Show unassigned if any
+        unassigned_total = sum(len(matrix.get((None, l), [])) for l in sorted_layers)
+        if unassigned_total > 0:
+            click.echo()
+            click.echo(f"Unassigned: {unassigned_total} bricks not in any tower")
+
+    return 0
+
+
 @jig.implements("S-076", "S-093")
 def show_architecture_command(
     config: JigConfig,

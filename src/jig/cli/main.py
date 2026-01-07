@@ -65,11 +65,9 @@ from jig.cli.show import (
     show_charter_command,
     show_goals_command,
     show_layers_command,
+    show_matrix_command,
     show_overview_command,
-)
-from jig.cli.towers import (
-    matrix_command,
-    towers_command,
+    show_towers_command,
 )
 from jig.cli.validate import (
     validate_bricks_command,
@@ -392,42 +390,49 @@ def show_architecture_cli(ctx, arch_id: str | None, json: bool, markdown: bool, 
     sys.exit(exit_code)
 
 
-# Towers command group (S-090, S-091)
-@cli.command(name="towers")
+@show_group.command(name="towers")
 @click.argument("tower_id", required=False, default=None)
+@add_output_options
 @click.pass_context
-@jig.implements("S-090", "S-065", "S-071")
-def towers_cli(ctx, tower_id: str | None) -> None:
+@jig.implements("S-060", "S-090", "S-065", "S-071", "S-093")
+def show_towers_cli(ctx, tower_id: str | None, json: bool, markdown: bool, verbose: bool) -> None:
     """Display tower structure with brick counts.
 
     Lists all towers with brick counts by layer.
     For single-tower projects, shows appropriate message.
 
     Example:
-        jigy towers           # List all towers
-        jigy towers core      # Show specific tower
+        jigy show towers           # List all towers
+        jigy show towers backend   # Show specific tower
+        jigy show towers -j        # JSON output
+        jigy show towers -m        # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = towers_command(config, tower_id=tower_id, skip_rebuild=skip_rebuild)
+    exit_code = show_towers_command(config, tower_id=tower_id, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 
-@cli.command(name="matrix")
+@show_group.command(name="matrix")
+@add_output_options
 @click.pass_context
-@jig.implements("S-091", "S-065", "S-071")
-def matrix_cli(ctx) -> None:
-    """Display layer × tower grid.
+@jig.implements("S-060", "S-091", "S-065", "S-071", "S-093")
+def show_matrix_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
+    """Display layer x tower grid.
 
     Shows a matrix view of layers vs towers.
     For single-tower projects, shows appropriate message.
 
     Example:
-        jigy matrix
+        jigy show matrix        # Display matrix
+        jigy show matrix -j     # JSON output
+        jigy show matrix -m     # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
-    exit_code = matrix_command(config, skip_rebuild=skip_rebuild)
+    exit_code = show_matrix_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
 
 

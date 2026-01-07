@@ -180,3 +180,29 @@ escalated: false
 
 ---
 
+### Entry 7 | 2026-01-06 17:50 | WU6 Complete
+
+```yaml
+type: outcome
+wu: WU6
+spec: S-060, S-090, S-091
+escalated: false
+```
+
+**Status:** COMPLETE (36/36 tests passed - 14 new towers/matrix tests)
+
+**Files Modified:**
+- `src/jig/cli/show.py` - Added show_towers_command and show_matrix_command with full output format support
+- `src/jig/cli/main.py` - Moved towers/matrix from root to show subcommands, removed standalone registration
+- `tests/cli/test_show.py` - Added 14 tests for towers/matrix under show, including old command removal tests
+
+**Key Implementation:**
+- `jigy show towers` and `jigy show matrix` now work
+- Old `jigy towers` and `jigy matrix` commands return "No such command"
+- Full -j/-m/-v flag support for both commands
+- towers.py is now orphaned (will be deleted in WU9)
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
