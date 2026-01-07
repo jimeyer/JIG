@@ -1,3 +1,14 @@
+---
+title: JIG/DIG Context Integration
+type: exploration
+status: active
+created: 1736200000
+created_human: 2026-01-06 10:00 CST
+parent: "[[DJ002_SCOPE_CLI_Recommendations]]"
+children:
+  - "[[DJ004_CONCEPT_Strategy]]"
+  - "[[DJ005_SCOPE_JIG_DIG_CLI_Implementation]]"
+---
 # JIG/DIG Context Integration
 
 **Date:** 2026-01-06

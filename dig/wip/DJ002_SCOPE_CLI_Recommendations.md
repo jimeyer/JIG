@@ -1,3 +1,12 @@
+---
+title: "JIG & DIG CLI Recommendations"
+type: scope
+status: active
+created: 1736100000
+created_human: "2026-01-05 12:00 CST"
+parent: "[[DJ001_CONCEPT_CLI_Design_Manifesto]]"
+children: ["[[DJ003_CONCEPT_Context_Integration]]"]
+---
 # JIG & DIG CLI Recommendations
 
 **Date:** 2026-01-05
