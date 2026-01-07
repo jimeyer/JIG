@@ -98,9 +98,10 @@ def cli(ctx, no_rebuild: bool):
 
 # Verb-first rebuild command group (S-058)
 @cli.group(name="rebuild", invoke_without_command=True)
+@add_output_options
 @click.pass_context
-@jig.implements("S-058", "S-065")
-def rebuild_group(ctx) -> None:
+@jig.implements("S-058", "S-065", "S-093")
+def rebuild_group(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Manual Rebuild of JIG graphs.
 
     Rebuilds implementation, verification, and/or intent graphs.
@@ -112,48 +113,58 @@ def rebuild_group(ctx) -> None:
         jigy rebuild impl      # Rebuild implementation graph only
         jigy rebuild intent    # Rebuild intent graph only
         jigy rebuild verify    # Rebuild verification graph only
+        jigy rebuild -j        # JSON output
+        jigy rebuild -m        # Markdown output
     """
     if ctx.invoked_subcommand is None:
         # No subcommand = rebuild all
+        output_format = resolve_format(json, markdown)
         config = get_config(ctx)
-        exit_code = rebuild_all_command(config)
+        exit_code = rebuild_all_command(config, output_format, verbose)
         sys.exit(exit_code)
 
 
 @rebuild_group.command(name="impl")
+@add_output_options
 @click.pass_context
-@jig.implements("S-058", "S-065")
-def rebuild_impl_cli(ctx) -> None:
+@jig.implements("S-058", "S-065", "S-093")
+def rebuild_impl_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Rebuild implementation graph."""
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
-    exit_code = rebuild_impl_command(config)
+    exit_code = rebuild_impl_command(config, output_format, verbose)
     sys.exit(exit_code)
 
 
 @rebuild_group.command(name="intent")
+@add_output_options
 @click.pass_context
-@jig.implements("S-058", "S-065")
-def rebuild_intent_cli(ctx) -> None:
+@jig.implements("S-058", "S-065", "S-093")
+def rebuild_intent_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Rebuild intent graph."""
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
-    exit_code = rebuild_intent_command(config)
+    exit_code = rebuild_intent_command(config, output_format, verbose)
     sys.exit(exit_code)
 
 
 @rebuild_group.command(name="verify")
+@add_output_options
 @click.pass_context
-@jig.implements("S-058", "S-065")
-def rebuild_verify_cli(ctx) -> None:
+@jig.implements("S-058", "S-065", "S-093")
+def rebuild_verify_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Rebuild verification graph."""
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
-    exit_code = rebuild_verify_command(config)
+    exit_code = rebuild_verify_command(config, output_format, verbose)
     sys.exit(exit_code)
 
 
 @cli.command()
+@add_output_options
 @click.pass_context
-@jig.implements("S-059", "S-065")
-def align(ctx) -> None:
+@jig.implements("S-059", "S-065", "S-093")
+def align(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     """Run full alignment workflow.
 
     Rebuilds all graphs, validates artifacts, and displays summary.
@@ -161,9 +172,12 @@ def align(ctx) -> None:
 
     Example:
         jigy align
+        jigy align -j    # JSON output
+        jigy align -m    # Markdown output
     """
+    output_format = resolve_format(json, markdown)
     config = get_config(ctx)
-    exit_code = align_command(config)
+    exit_code = align_command(config, output_format, verbose)
     sys.exit(exit_code)
 
 

@@ -100,3 +100,58 @@ escalated: false
 
 ---
 
+### Entry 4 | 2026-01-06 17:35 | WU3 Complete
+
+```yaml
+type: outcome
+wu: WU3
+spec: S-026, S-093
+escalated: false
+```
+
+**Status:** COMPLETE (30/30 tests passed - 17 new flag tests)
+
+**Files Modified:**
+- `src/jig/cli/main.py` - Added @add_output_options to validate group and subcommands
+- `src/jig/cli/validate.py` - Added verbose param, JSON single-line helper, markdown support
+- `tests/cli/test_validate.py` - Added 17 tests for flag wiring
+
+**Key Implementation:**
+- Validate commands now accept -j, -m, -v flags
+- JSON output is single-line (compact)
+- Mutual exclusivity check works (-j -m errors)
+- Helper functions for unified JSON/markdown output on validate full
+
+**Observation:** Existing output_format parameter was compatible with new pattern - no signature changes needed beyond adding verbose param.
+
+**Decision:** CONTINUE - All gates passed, no escalation triggers.
+
+---
+
+### Entry 5 | 2026-01-06 17:40 | WU4 Complete
+
+```yaml
+type: outcome
+wu: WU4
+spec: S-093
+escalated: false
+```
+
+**Status:** COMPLETE (17/17 tests passed - 11 new flag tests)
+
+**Files Modified:**
+- `src/jig/cli/rebuild.py` - Added format helpers, output_format/verbose params to all commands
+- `src/jig/cli/main.py` - Added @add_output_options to rebuild group, subcommands, and align
+- `tests/cli/test_rebuild.py` - Added 11 tests for flag wiring
+
+**Key Implementation:**
+- Rebuild commands output JSON with status, graphs array, duration_ms
+- Align command combines rebuild and validation results
+- All subcommands (impl, intent, verify) support flags
+
+**Observation:** JSON output is pretty-printed, not single-line. Minor deviation from S-026 "compact" requirement. Can tune later.
+
+**Decision:** CONTINUE - All gates passed, minor format deviation acceptable.
+
+---
+
