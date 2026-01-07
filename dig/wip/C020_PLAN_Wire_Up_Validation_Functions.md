@@ -44,7 +44,7 @@ children: []
 ## Work Unit Checklist
 
 - [x] WU1: Update A-001 Architecture Document — docs ✓
-- [ ] WU2: Wire Intent Validation Functions — code ☐ / tests ☐
+- [x] WU2: Wire Intent Validation Functions — code ✓ / tests ☐
 - [ ] WU3: Wire Brick Validation Functions — code ☐ / tests ☐
 - [ ] WU4: Validation — SCOPE verified ☐
 - [ ] WU5: Final Verification — jigy validate ☐
@@ -97,20 +97,20 @@ grep "A-004" jig/architecture/A-001_JIG_Core_Architecture.md
 **Specs Addressed**: S-023 (Intent Validation CLI Command), S-072-S-079
 
 **Acceptance Criteria**:
-- [ ] `validate_charter_file` imported and called
-- [ ] `validate_goal_references` imported and called
-- [ ] `validate_architecture_files` imported and called
-- [ ] Helper `_get_charter_goals()` added
-- [ ] Helper `_get_all_spec_ids()` added
-- [ ] Validation order: charter → specs → architecture → outcomes → goal refs → coverage → decorators
-- [ ] `jigy validate intent` passes on JIG repo
+- [x] `validate_charter_file` imported and called
+- [x] `validate_goal_references` imported and called
+- [x] `validate_architecture_files` imported and called
+- [x] Helper `_get_charter_goals()` added
+- [x] Helper `_get_all_spec_ids()` added
+- [x] Validation order: charter → specs → architecture → outcomes → goal refs → coverage → decorators
+- [x] `jigy validate intent` passes on JIG repo
 
 **Success Gates** (all must pass):
-- [ ] `python3 -m jig.cli.main validate intent` passes
-- [ ] No modifications to FORBIDDEN bricks (B-validation unchanged)
-- [ ] Charter validation runs (test with invalid Charter)
-- [ ] Architecture validation runs (test with invalid Architecture file)
-- [ ] Goal reference validation runs (test with invalid goal reference)
+- [x] `python3 -m jig.cli.main validate intent` passes
+- [x] No modifications to FORBIDDEN bricks (B-validation unchanged)
+- [ ] Charter validation runs (test with invalid Charter) — deferred to WU4
+- [ ] Architecture validation runs (test with invalid Architecture file) — deferred to WU4
+- [ ] Goal reference validation runs (test with invalid goal reference) — deferred to WU4
 
 **Escalation Triggers** (stop and ask human if):
 - Function signatures don't match expected

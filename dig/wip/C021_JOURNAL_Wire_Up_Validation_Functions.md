@@ -65,3 +65,34 @@ All 4 success gates passed. Decision: CONTINUE to WU2.
 
 ---
 
+### Entry 3 | 2026-01-06 20:50 | WU2 Complete
+
+```yaml
+type: outcome
+wu: WU2
+spec: S-023, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079
+escalated: false
+```
+
+WU2: Wire Intent Validation Functions - COMPLETE
+
+Sub-agent successfully:
+- Added imports for 3 validation functions from jig.validation.intent
+- Added helper functions `_get_charter_goals()` and `_get_all_spec_ids()`
+- Wired validate_charter_file(), validate_architecture_files(), validate_goal_references() into validate_intent_command()
+- Maintained correct validation order per A-004
+
+Validation output now shows 8 phases (vs 5 before):
+- charter (NEW)
+- specifications
+- outcomes
+- outcome completeness
+- architecture (NEW)
+- goal references (NEW)
+- specification coverage
+- decorators
+
+Independent verification confirms only src/jig/cli/validate.py modified. Decision: CONTINUE to WU3.
+
+---
+

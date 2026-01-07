@@ -17,13 +17,43 @@ from jig.validation.bricks import (
     validate_brick_partition,
 )
 from jig.validation.intent import (
+    validate_architecture_files,
+    validate_charter_file,
     validate_decorator_files,
+    validate_goal_references,
     validate_outcome_completeness,
     validate_outcome_files,
     validate_specification_coverage,
     validate_specification_files,
 )
 from jig.validation.reporting import format_as_json
+
+
+def _get_charter_goals(charter_path: Path) -> set[str]:
+    """Extract goal IDs from Charter frontmatter."""
+    import yaml
+    content = charter_path.read_text()
+    if content.startswith("---"):
+        parts = content.split("---", 2)
+        if len(parts) >= 3:
+            frontmatter = yaml.safe_load(parts[1])
+            return set(frontmatter.get("defines_goals", []))
+    return set()
+
+
+def _get_all_spec_ids(spec_dir: Path) -> set[str]:
+    """Get all specification IDs from spec directory."""
+    import yaml
+    spec_ids = set()
+    for spec_file in spec_dir.glob("S-*.md"):
+        content = spec_file.read_text()
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                frontmatter = yaml.safe_load(parts[1])
+                if "id" in frontmatter:
+                    spec_ids.add(frontmatter["id"])
+    return spec_ids
 
 
 @jig.implements("S-023", "S-065", "S-070")
@@ -46,6 +76,16 @@ def validate_intent_command(
 
     results = {}
 
+    # Validate charter (per A-004 rules C-1 through C-4)
+    charter_path = config.paths.charter
+    if charter_path.exists():
+        results["charter"] = validate_charter_file(charter_path)
+        charter_goals = _get_charter_goals(charter_path)
+    else:
+        from jig.validation.models import ValidationResult
+        results["charter"] = ValidationResult(passed=True, phase_name="charter", items_checked=0)
+        charter_goals = set()
+
     # Validate specifications
     if spec_dir.exists():
         results["specifications"] = validate_specification_files(spec_dir)
@@ -62,6 +102,26 @@ def validate_intent_command(
         from jig.validation.models import ValidationResult
         results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
         results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
+
+    # Validate architecture files (per A-004 rules A-1 through A-7)
+    arch_dir = config.paths.architecture
+    if arch_dir.exists() and charter_goals:
+        spec_ids = _get_all_spec_ids(spec_dir) if spec_dir.exists() else set()
+        results["architecture"] = validate_architecture_files(arch_dir, charter_goals, spec_ids)
+    else:
+        from jig.validation.models import ValidationResult
+        results["architecture"] = ValidationResult(passed=True, phase_name="architecture", items_checked=0)
+
+    # Validate goal references (per A-004 rules GR-1 and GR-2)
+    if charter_path.exists() and outcome_dir.exists():
+        results["goal_references"] = validate_goal_references(
+            charter_path,
+            outcome_dir,
+            arch_dir if arch_dir.exists() else None,
+        )
+    else:
+        from jig.validation.models import ValidationResult
+        results["goal_references"] = ValidationResult(passed=True, phase_name="goal references", items_checked=0)
 
     # Validate specification coverage (S-043)
     if spec_dir.exists() and outcome_dir.exists():
