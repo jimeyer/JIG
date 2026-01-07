@@ -96,3 +96,34 @@ Independent verification confirms only src/jig/cli/validate.py modified. Decisio
 
 ---
 
+### Entry 4 | 2026-01-06 20:55 | WU3 Complete
+
+```yaml
+type: outcome
+wu: WU3
+spec: S-024, S-086, S-087, S-088, S-089
+escalated: false
+```
+
+WU3: Wire Brick Validation Functions - COMPLETE
+
+Sub-agent successfully:
+- Added imports for validate_tower_format and validate_tower_isolation
+- Added helper function `_has_towers()`
+- Wired validate_tower_format() (always runs)
+- Wired validate_tower_isolation() (runs only if towers declared)
+
+Validation output now shows 6 phases (vs 4 before):
+- brick definitions
+- tower format (NEW - shows "single-tower project (no tower fields)")
+- brick partition
+- brick layer constraints
+- brick cycles
+- tower isolation (NEW - skipped since no towers)
+
+Note: JIG is a single-tower project, so tower isolation is correctly skipped.
+
+Independent verification confirms FORBIDDEN bricks untouched. Decision: CONTINUE to WU4.
+
+---
+

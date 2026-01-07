@@ -15,6 +15,8 @@ from jig.validation.bricks import (
     validate_brick_definitions,
     validate_brick_layer_constraints,
     validate_brick_partition,
+    validate_tower_format,
+    validate_tower_isolation,
 )
 from jig.validation.intent import (
     validate_architecture_files,
@@ -182,6 +184,16 @@ def _combine_results(results: dict) -> "ValidationResult":
     return combined
 
 
+def _has_towers(bricks_file: Path) -> bool:
+    """Check if any brick declares a tower field."""
+    import yaml
+    if not bricks_file.exists():
+        return False
+    content = yaml.safe_load(bricks_file.read_text())
+    bricks = content.get("bricks", [])
+    return any("tower" in brick for brick in bricks)
+
+
 @jig.implements("S-024", "S-065", "S-070")
 def validate_bricks_command(
     config: JigConfig,
@@ -215,6 +227,10 @@ def validate_bricks_command(
                 click.echo(str(error))
         return 2
 
+    # Validate tower format (per A-004 rule T-1)
+    tower_format_result = validate_tower_format(bricks_file)
+    results["tower_format"] = tower_format_result
+
     # Validate brick partition
     partition_result = validate_brick_partition(bricks_file, impl_graph)
     results["partition"] = partition_result
@@ -229,6 +245,10 @@ def validate_bricks_command(
     # Always run - cycles are independent of layer values
     cycles_result = validate_brick_cycles(bricks_file, impl_graph)
     results["cycles"] = cycles_result
+
+    # Validate tower isolation (per A-004 rules T-2 and T-3)
+    if _has_towers(bricks_file):
+        results["tower_isolation"] = validate_tower_isolation(bricks_file, impl_graph)
 
     # Format output
     if output_format == "json":

@@ -45,7 +45,7 @@ children: []
 
 - [x] WU1: Update A-001 Architecture Document — docs ✓
 - [x] WU2: Wire Intent Validation Functions — code ✓ / tests ☐
-- [ ] WU3: Wire Brick Validation Functions — code ☐ / tests ☐
+- [x] WU3: Wire Brick Validation Functions — code ✓ / tests ☐
 - [ ] WU4: Validation — SCOPE verified ☐
 - [ ] WU5: Final Verification — jigy validate ☐
 
@@ -154,17 +154,17 @@ python3 -m jig.cli.main validate intent
 **Specs Addressed**: S-024 (Brick Validation CLI Command), S-086-S-089
 
 **Acceptance Criteria**:
-- [ ] `validate_tower_format` imported and called
-- [ ] `validate_tower_isolation` imported and called (conditionally)
-- [ ] Helper `_has_towers()` added
-- [ ] Tower format validation always runs
-- [ ] Tower isolation validation only runs if any brick has tower field
-- [ ] `jigy validate bricks` passes on JIG repo
+- [x] `validate_tower_format` imported and called
+- [x] `validate_tower_isolation` imported and called (conditionally)
+- [x] Helper `_has_towers()` added
+- [x] Tower format validation always runs
+- [x] Tower isolation validation only runs if any brick has tower field
+- [x] `jigy validate bricks` passes on JIG repo
 
 **Success Gates** (all must pass):
-- [ ] `python3 -m jig.cli.main validate bricks` passes
-- [ ] No modifications to FORBIDDEN bricks (B-validation unchanged)
-- [ ] Tower format validation runs (test with invalid tower format)
+- [x] `python3 -m jig.cli.main validate bricks` passes
+- [x] No modifications to FORBIDDEN bricks (B-validation unchanged)
+- [ ] Tower format validation runs (test with invalid tower format) — deferred to WU4
 
 **Escalation Triggers** (stop and ask human if):
 - Function signatures don't match expected
