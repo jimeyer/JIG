@@ -1,7 +1,8 @@
 ---
-title: PLAN JIG CLI Phase 0 and 1
+title: "PLAN: JIG CLI Phase 0 and 1"
 type: plan
-status: draft
+status: implemented
+decision: completed
 created: 1736207400
 created_human: 2026-01-06 17:00 CST
 parent: "[[DJ007_JIGPLAN_JIG_CLI_Phase_0_1]]"

@@ -5,7 +5,7 @@ status: active
 created: 1736200000
 created_human: 2026-01-06 10:00 CST
 parent: "[[DJ003_CONCEPT_Context_Integration]]"
-children:
+children: []
 ---
 # JIG/DIG Product Strategy
 

@@ -5,7 +5,9 @@ status: active
 created: 1736300400
 created_human: "2026-01-07 16:00 PST"
 parent: null
-children: []
+children:
+  - "[[C021_CONCEPT_Alignment_Triangle_Metrics]]"
+  - "[[C022_CONCEPT_Stratified_Alignment_Verification]]"
 prompt: |
   Discussion of JIG failure modes when artifacts exist but alignment has degraded.
   Two distinct problems emerged:
