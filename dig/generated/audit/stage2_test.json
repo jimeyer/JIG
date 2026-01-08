@@ -1,0 +1,186 @@
+{
+  "stage": 2,
+  "name": "TEST",
+  "timestamp": "2026-01-08T14:47:30.059419+00:00",
+  "metrics": {
+    "T2.1_coverage_breadth": 0.8678,
+    "T2.2_coverage_depth": 13.89,
+    "T2.3_coverage_gini": 0.0661,
+    "T2.5_test_brick_alignment": 0.884,
+    "T2.7_orphan_count": 1,
+    "T2.8_hot_spot_count": 7
+  },
+  "health_score": 84,
+  "proto_specs": [
+    {
+      "id": "proto-verification-graph-analyzer",
+      "source": "tests/unit/verification_graph/test_analyzer.py",
+      "test_count": 48,
+      "desc": "Verification graph analysis and spec extraction"
+    },
+    {
+      "id": "proto-cli-show",
+      "source": "tests/cli/test_show.py",
+      "test_count": 36,
+      "desc": "CLI show commands for layers, bricks, overview"
+    },
+    {
+      "id": "proto-validation-intent",
+      "source": "tests/validation/test_intent.py",
+      "test_count": 32,
+      "desc": "Intent validation for specs, outcomes, goals"
+    },
+    {
+      "id": "proto-hashing",
+      "source": "tests/unit/test_hashing.py",
+      "test_count": 30,
+      "desc": "Content hashing for cache invalidation"
+    },
+    {
+      "id": "proto-cli-validate",
+      "source": "tests/cli/test_validate.py",
+      "test_count": 30,
+      "desc": "CLI validation commands"
+    },
+    {
+      "id": "proto-verification-discovery",
+      "source": "tests/unit/verification_graph/test_discovery.py",
+      "test_count": 29,
+      "desc": "Test file discovery and pattern matching"
+    },
+    {
+      "id": "proto-validation-bricks",
+      "source": "tests/validation/test_bricks.py",
+      "test_count": 29,
+      "desc": "Brick definition validation"
+    },
+    {
+      "id": "proto-cli-output",
+      "source": "tests/cli/test_output.py",
+      "test_count": 23,
+      "desc": "CLI output formatting (JSON, markdown, text)"
+    },
+    {
+      "id": "proto-audit-coverage",
+      "source": "tests/audit/test_coverage.py",
+      "test_count": 23,
+      "desc": "Audit coverage commands and reporting"
+    },
+    {
+      "id": "proto-cli-output-modes",
+      "source": "tests/cli/test_output_modes.py",
+      "test_count": 21,
+      "desc": "Output mode handling across commands"
+    },
+    {
+      "id": "proto-validation-filename",
+      "source": "tests/validation/test_filename_validation.py",
+      "test_count": 20,
+      "desc": "Filename validation for spec files"
+    },
+    {
+      "id": "proto-verification-builder",
+      "source": "tests/unit/verification_graph/test_builder.py",
+      "test_count": 18,
+      "desc": "Verification graph construction"
+    },
+    {
+      "id": "proto-cli-rebuild",
+      "source": "tests/cli/test_rebuild.py",
+      "test_count": 18,
+      "desc": "CLI rebuild commands for graphs"
+    },
+    {
+      "id": "proto-staleness",
+      "source": "tests/unit/test_staleness.py",
+      "test_count": 17,
+      "desc": "Graph staleness detection"
+    },
+    {
+      "id": "proto-validation-reporting",
+      "source": "tests/validation/test_reporting.py",
+      "test_count": 17,
+      "desc": "Validation result formatting and reporting"
+    },
+    {
+      "id": "proto-intent-generator",
+      "source": "tests/jig/intent_graph/test_generator.py",
+      "test_count": 16,
+      "desc": "Intent graph generation from markdown"
+    },
+    {
+      "id": "proto-auto-rebuild",
+      "source": "tests/integration/test_auto_rebuild_e2e.py",
+      "test_count": 14,
+      "desc": "Automatic graph rebuild on stale detection"
+    },
+    {
+      "id": "proto-audit-records",
+      "source": "tests/audit/test_record_writer.py",
+      "test_count": 14,
+      "desc": "Audit record persistence"
+    },
+    {
+      "id": "proto-python-analyzer",
+      "source": "tests/unit/test_python_analyzer.py",
+      "test_count": 23,
+      "desc": "Python source code analysis"
+    },
+    {
+      "id": "proto-config-schema",
+      "source": "tests/config/test_schema.py",
+      "test_count": 12,
+      "desc": "Configuration schema validation"
+    }
+  ],
+  "orphan_functions": [
+    {
+      "path": "src/jig/impl_graph/analyzers/__main__.py",
+      "coverage": 0.0,
+      "missing_lines": 3
+    }
+  ],
+  "hot_spots": [
+    {
+      "path": "src/jig/audit/record_writer.py",
+      "coverage": 100.0,
+      "lines": 56
+    },
+    {
+      "path": "src/jig/cli/output.py",
+      "coverage": 100.0,
+      "lines": 30
+    },
+    {
+      "path": "src/jig/hashing.py",
+      "coverage": 100.0,
+      "lines": 49
+    },
+    {
+      "path": "src/jig/impl_graph/analyzers/registry.py",
+      "coverage": 100.0,
+      "lines": 50
+    },
+    {
+      "path": "src/jig/impl_graph/ndjson_writer.py",
+      "coverage": 100.0,
+      "lines": 44
+    },
+    {
+      "path": "src/jig/validation/models.py",
+      "coverage": 100.0,
+      "lines": 36
+    },
+    {
+      "path": "src/jig/verification_graph/builder.py",
+      "coverage": 100.0,
+      "lines": 22
+    }
+  ],
+  "summary": {
+    "total_tests": 518,
+    "covered_lines": 3728,
+    "total_lines": 4296,
+    "files_analyzed": 40
+  }
+}

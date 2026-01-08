@@ -1,0 +1,848 @@
+{
+  "stage": 4,
+  "name": "HIERARCHY",
+  "timestamp": "2026-01-08T14:54:41.637454+00:00",
+  "metrics": {
+    "H4.1_mean_outcome_cohesion": 0.831,
+    "H4.2_mean_outcome_coupling": 0.52,
+    "H4.3_outcome_brick_affinity": 0.87,
+    "H4.4_goal_distribution_gini": 0.141,
+    "H4.5_spec_cluster_match": 0.831,
+    "H4.6_hierarchy_depth_variance": 3.26,
+    "H4.7_mean_outcome_closure": 0.978
+  },
+  "health_score": 80,
+  "outcomes": [
+    {
+      "id": "O-001",
+      "title": "Discoverable Implementation Structure",
+      "supports_goals": [
+        "G-001",
+        "G-002"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-001",
+        "S-003",
+        "S-005",
+        "S-006"
+      ],
+      "brick_distribution": {
+        "__init__": 1,
+        "impl_graph": 10
+      },
+      "dominant_brick": "impl_graph",
+      "cohesion": 0.909,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-002",
+      "title": "Automated Code-to-Specification Traceability",
+      "supports_goals": [
+        "G-004",
+        "G-001"
+      ],
+      "spec_count": 1,
+      "specs": [
+        "S-002"
+      ],
+      "brick_distribution": {
+        "__init__": 1,
+        "impl_graph": 1
+      },
+      "dominant_brick": "__init__",
+      "cohesion": 0.5,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-003",
+      "title": "Multi-Language Implementation Graph Support",
+      "supports_goals": [
+        "G-001"
+      ],
+      "spec_count": 1,
+      "specs": [
+        "S-004"
+      ],
+      "brick_distribution": {
+        "impl_graph": 2
+      },
+      "dominant_brick": "impl_graph",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-004",
+      "title": "Early Error Detection in Artifact Validation",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-023",
+        "S-024",
+        "S-025",
+        "S-027"
+      ],
+      "brick_distribution": {
+        "cli": 4
+      },
+      "dominant_brick": "cli",
+      "cohesion": 1.0,
+      "mean_closure": 0.75,
+      "verification_gaps": [
+        "S-027"
+      ]
+    },
+    {
+      "id": "O-005",
+      "title": "Actionable Error Messages",
+      "supports_goals": [
+        "G-002",
+        "G-003"
+      ],
+      "spec_count": 5,
+      "specs": [
+        "S-018",
+        "S-019",
+        "S-020",
+        "S-021",
+        "S-022"
+      ],
+      "brick_distribution": {
+        "validation": 5
+      },
+      "dominant_brick": "validation",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-006",
+      "title": "Fast Validation",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 3,
+      "specs": [
+        "S-023",
+        "S-024",
+        "S-025"
+      ],
+      "brick_distribution": {
+        "cli": 3
+      },
+      "dominant_brick": "cli",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-009",
+      "title": "Intent Graph Generation",
+      "supports_goals": [
+        "G-004",
+        "G-002"
+      ],
+      "spec_count": 1,
+      "specs": [
+        "S-028"
+      ],
+      "brick_distribution": {
+        "intent_graph": 1
+      },
+      "dominant_brick": "intent_graph",
+      "cohesion": 1.0,
+      "mean_closure": null,
+      "verification_gaps": [
+        "S-028"
+      ]
+    },
+    {
+      "id": "O-012",
+      "title": "A001-Compliant Brick Definitions",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 3,
+      "specs": [
+        "S-035",
+        "S-036",
+        "S-037"
+      ],
+      "brick_distribution": {
+        "validation": 3
+      },
+      "dominant_brick": "validation",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-013",
+      "title": "Layer Architecture Enforcement",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 2,
+      "specs": [
+        "S-038",
+        "S-039"
+      ],
+      "brick_distribution": {
+        "validation": 2
+      },
+      "dominant_brick": "validation",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-014",
+      "title": "Layer Structure Visibility",
+      "supports_goals": [
+        "G-004",
+        "G-002"
+      ],
+      "spec_count": 2,
+      "specs": [
+        "S-040",
+        "S-041"
+      ],
+      "brick_distribution": {},
+      "dominant_brick": null,
+      "cohesion": null,
+      "mean_closure": null,
+      "verification_gaps": [
+        "S-040",
+        "S-041"
+      ]
+    },
+    {
+      "id": "O-015",
+      "title": "Completeness Validation for Intent Graph",
+      "supports_goals": [
+        "G-004",
+        "G-003"
+      ],
+      "spec_count": 2,
+      "specs": [
+        "S-042",
+        "S-043"
+      ],
+      "brick_distribution": {
+        "validation": 2
+      },
+      "dominant_brick": "validation",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-016",
+      "title": "CI and Tooling Integration",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 3,
+      "specs": [
+        "S-026",
+        "S-093",
+        "S-094"
+      ],
+      "brick_distribution": {
+        "cli": 8,
+        "validation": 2
+      },
+      "dominant_brick": "cli",
+      "cohesion": 0.8,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-017",
+      "title": "Artifact Change Detection",
+      "supports_goals": [
+        "G-002",
+        "G-001"
+      ],
+      "spec_count": 7,
+      "specs": [
+        "S-044",
+        "S-045",
+        "S-046",
+        "S-047",
+        "S-048",
+        "S-049",
+        "S-050"
+      ],
+      "brick_distribution": {
+        "hashing": 6,
+        "intent_graph": 1
+      },
+      "dominant_brick": "hashing",
+      "cohesion": 0.857,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-018",
+      "title": "Test-to-Specification Traceability",
+      "supports_goals": [
+        "G-001",
+        "G-004"
+      ],
+      "spec_count": 6,
+      "specs": [
+        "S-051",
+        "S-052",
+        "S-053",
+        "S-054",
+        "S-055",
+        "S-056"
+      ],
+      "brick_distribution": {
+        "verification_graph": 5
+      },
+      "dominant_brick": "verification_graph",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": [
+        "S-056"
+      ]
+    },
+    {
+      "id": "O-019",
+      "title": "Intuitive CLI Experience",
+      "supports_goals": [
+        "G-002"
+      ],
+      "spec_count": 5,
+      "specs": [
+        "S-057",
+        "S-058",
+        "S-059",
+        "S-060",
+        "S-061"
+      ],
+      "brick_distribution": {
+        "cli": 8
+      },
+      "dominant_brick": "cli",
+      "cohesion": 1.0,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-020",
+      "title": "Configurable Project Structure",
+      "supports_goals": [
+        "G-001"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-062",
+        "S-063",
+        "S-064",
+        "S-065"
+      ],
+      "brick_distribution": {
+        "config": 3,
+        "cli": 4
+      },
+      "dominant_brick": "cli",
+      "cohesion": 0.571,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-021",
+      "title": "Verifiable Test-to-Implementation Coverage",
+      "supports_goals": [
+        "G-001",
+        "G-004"
+      ],
+      "spec_count": 2,
+      "specs": [
+        "S-066",
+        "S-067"
+      ],
+      "brick_distribution": {
+        "cli": 4,
+        "audit": 2
+      },
+      "dominant_brick": "cli",
+      "cohesion": 0.667,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-022",
+      "title": "Current Data Guarantee for Commands",
+      "supports_goals": [
+        "G-002",
+        "G-001"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-068",
+        "S-069",
+        "S-070",
+        "S-071"
+      ],
+      "brick_distribution": {
+        "impl_graph": 2,
+        "staleness": 2,
+        "intent_graph": 1,
+        "cli": 6
+      },
+      "dominant_brick": "cli",
+      "cohesion": 0.545,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-023",
+      "title": "Charter Establishes Project Goals",
+      "supports_goals": [
+        "G-005",
+        "G-004"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-072",
+        "S-073",
+        "S-074",
+        "S-075"
+      ],
+      "brick_distribution": {
+        "cli": 4,
+        "validation": 4
+      },
+      "dominant_brick": "cli",
+      "cohesion": 0.5,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-024",
+      "title": "Architecture Constrains Specifications",
+      "supports_goals": [
+        "G-003",
+        "G-005"
+      ],
+      "spec_count": 4,
+      "specs": [
+        "S-076",
+        "S-077",
+        "S-078",
+        "S-079"
+      ],
+      "brick_distribution": {
+        "cli": 2,
+        "validation": 4
+      },
+      "dominant_brick": "validation",
+      "cohesion": 0.667,
+      "mean_closure": 1.0,
+      "verification_gaps": []
+    },
+    {
+      "id": "O-025",
+      "title": "Intent Graph Captures Full Hierarchy",
+      "supports_goals": [
+        "G-005",
+        "G-002"
+      ],
+      "spec_count": 6,
+      "specs": [
+        "S-080",
+        "S-081",
+        "S-082",
+        "S-083",
+        "S-084",
+        "S-085"
+      ],
+      "brick_distribution": {
+        "intent_graph": 6
+      },
+      "dominant_brick": "intent_graph",
+      "cohesion": 1.0,
+      "mean_closure": null,
+      "verification_gaps": [
+        "S-080",
+        "S-081",
+        "S-082",
+        "S-083",
+        "S-084",
+        "S-085"
+      ]
+    },
+    {
+      "id": "O-026",
+      "title": "Towers Enforce Component Isolation",
+      "supports_goals": [
+        "G-003"
+      ],
+      "spec_count": 6,
+      "specs": [
+        "S-086",
+        "S-087",
+        "S-088",
+        "S-089",
+        "S-090",
+        "S-091"
+      ],
+      "brick_distribution": {
+        "validation": 4,
+        "intent_graph": 1,
+        "cli": 4
+      },
+      "dominant_brick": "validation",
+      "cohesion": 0.444,
+      "mean_closure": 0.833,
+      "verification_gaps": [
+        "S-086"
+      ]
+    },
+    {
+      "id": "O-027",
+      "title": "Discoverable Intent Document Naming",
+      "supports_goals": [
+        "G-001",
+        "G-004"
+      ],
+      "spec_count": 1,
+      "specs": [
+        "S-092"
+      ],
+      "brick_distribution": {},
+      "dominant_brick": null,
+      "cohesion": null,
+      "mean_closure": null,
+      "verification_gaps": [
+        "S-092"
+      ]
+    }
+  ],
+  "goals": [
+    {
+      "id": "G-001",
+      "title": "Grounding in Reality",
+      "outcome_count": 9,
+      "outcomes": [
+        "O-001",
+        "O-002",
+        "O-003",
+        "O-017",
+        "O-018",
+        "O-020",
+        "O-021",
+        "O-022",
+        "O-027"
+      ]
+    },
+    {
+      "id": "G-002",
+      "title": "Continuity Across Sessions",
+      "outcome_count": 8,
+      "outcomes": [
+        "O-001",
+        "O-005",
+        "O-009",
+        "O-014",
+        "O-017",
+        "O-019",
+        "O-022",
+        "O-025"
+      ]
+    },
+    {
+      "id": "G-003",
+      "title": "Enforcing Constraints",
+      "outcome_count": 9,
+      "outcomes": [
+        "O-004",
+        "O-005",
+        "O-006",
+        "O-012",
+        "O-013",
+        "O-015",
+        "O-016",
+        "O-024",
+        "O-026"
+      ]
+    },
+    {
+      "id": "G-004",
+      "title": "Intent Alignment",
+      "outcome_count": 8,
+      "outcomes": [
+        "O-002",
+        "O-009",
+        "O-014",
+        "O-015",
+        "O-018",
+        "O-021",
+        "O-023",
+        "O-027"
+      ]
+    },
+    {
+      "id": "G-005",
+      "title": "Full Traceability",
+      "outcome_count": 3,
+      "outcomes": [
+        "O-023",
+        "O-024",
+        "O-025"
+      ]
+    }
+  ],
+  "coupling_warnings": [
+    {
+      "spec": "S-023",
+      "outcomes": [
+        "O-004",
+        "O-006"
+      ],
+      "issue": "Spec specified by multiple outcomes"
+    },
+    {
+      "spec": "S-024",
+      "outcomes": [
+        "O-004",
+        "O-006"
+      ],
+      "issue": "Spec specified by multiple outcomes"
+    },
+    {
+      "spec": "S-025",
+      "outcomes": [
+        "O-004",
+        "O-006"
+      ],
+      "issue": "Spec specified by multiple outcomes"
+    },
+    {
+      "outcome1": "O-001",
+      "outcome2": "O-002",
+      "shared_files": [
+        "src/jig/impl_graph/analyzers/python_visitor.py",
+        "src/jig/__init__.py"
+      ],
+      "coupling": 0.333
+    },
+    {
+      "outcome1": "O-004",
+      "outcome2": "O-006",
+      "shared_files": [
+        "src/jig/cli/validate.py"
+      ],
+      "coupling": 1.0
+    },
+    {
+      "outcome1": "O-005",
+      "outcome2": "O-012",
+      "shared_files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "coupling": 0.5
+    },
+    {
+      "outcome1": "O-005",
+      "outcome2": "O-013",
+      "shared_files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "coupling": 0.5
+    },
+    {
+      "outcome1": "O-005",
+      "outcome2": "O-015",
+      "shared_files": [
+        "src/jig/validation/intent.py"
+      ],
+      "coupling": 0.5
+    },
+    {
+      "outcome1": "O-009",
+      "outcome2": "O-017",
+      "shared_files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "coupling": 0.5
+    },
+    {
+      "outcome1": "O-009",
+      "outcome2": "O-025",
+      "shared_files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "coupling": 1.0
+    },
+    {
+      "outcome1": "O-012",
+      "outcome2": "O-013",
+      "shared_files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "coupling": 1.0
+    },
+    {
+      "outcome1": "O-015",
+      "outcome2": "O-023",
+      "shared_files": [
+        "src/jig/validation/intent.py"
+      ],
+      "coupling": 0.333
+    },
+    {
+      "outcome1": "O-015",
+      "outcome2": "O-024",
+      "shared_files": [
+        "src/jig/validation/intent.py"
+      ],
+      "coupling": 0.333
+    },
+    {
+      "outcome1": "O-016",
+      "outcome2": "O-019",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "coupling": 0.429
+    },
+    {
+      "outcome1": "O-016",
+      "outcome2": "O-020",
+      "shared_files": [
+        "src/jig/cli/validate.py",
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "coupling": 0.444
+    },
+    {
+      "outcome1": "O-016",
+      "outcome2": "O-022",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py",
+        "src/jig/cli/validate.py",
+        "src/jig/cli/audit.py"
+      ],
+      "coupling": 0.455
+    },
+    {
+      "outcome1": "O-017",
+      "outcome2": "O-025",
+      "shared_files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "coupling": 0.5
+    },
+    {
+      "outcome1": "O-019",
+      "outcome2": "O-020",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "coupling": 0.375
+    },
+    {
+      "outcome1": "O-019",
+      "outcome2": "O-023",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "coupling": 0.4
+    },
+    {
+      "outcome1": "O-019",
+      "outcome2": "O-024",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "coupling": 0.4
+    },
+    {
+      "outcome1": "O-019",
+      "outcome2": "O-026",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "coupling": 0.333
+    },
+    {
+      "outcome1": "O-020",
+      "outcome2": "O-022",
+      "shared_files": [
+        "src/jig/cli/validate.py",
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "coupling": 0.308
+    },
+    {
+      "outcome1": "O-023",
+      "outcome2": "O-024",
+      "shared_files": [
+        "src/jig/validation/intent.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/show.py"
+      ],
+      "coupling": 1.0
+    },
+    {
+      "outcome1": "O-023",
+      "outcome2": "O-026",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "coupling": 0.4
+    },
+    {
+      "outcome1": "O-024",
+      "outcome2": "O-026",
+      "shared_files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "coupling": 0.4
+    }
+  ],
+  "grab_bag_outcomes": [
+    {
+      "id": "O-026",
+      "title": "Towers Enforce Component Isolation",
+      "cohesion": 0.444,
+      "brick_distribution": {
+        "validation": 4,
+        "intent_graph": 1,
+        "cli": 4
+      }
+    }
+  ],
+  "summary": {
+    "total_outcomes": 23,
+    "total_goals": 5,
+    "outcomes_with_verification_gaps": 7,
+    "high_coupling_pairs": 22,
+    "grab_bag_count": 1
+  }
+}
