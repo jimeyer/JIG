@@ -17,10 +17,11 @@ def create_minimal_jig_project(root: Path) -> None:
     (root / "jig" / "bricks").mkdir(parents=True)
     (root / "jig" / "generated").mkdir(parents=True)
 
-    # Create a minimal spec
-    (root / "jig" / "specifications" / "S-001.md").write_text(
+    # Create a minimal spec with proper filename format
+    (root / "jig" / "specifications" / "S-001_Test_Specification.md").write_text(
         """---
 id: S-001
+title: Test Specification
 type: specification
 ---
 
@@ -28,10 +29,11 @@ type: specification
 """
     )
 
-    # Create a minimal outcome
-    (root / "jig" / "outcomes" / "O-001.md").write_text(
+    # Create a minimal outcome with proper filename format
+    (root / "jig" / "outcomes" / "O-001_Test_Outcome.md").write_text(
         """---
 id: O-001
+title: Test Outcome
 type: outcome
 specifies: [S-001]
 ---
@@ -168,3 +170,217 @@ def test_rebuild_not_in_project():
 
         assert result.exit_code != 0
         assert "Not in a JIG project" in result.output or "jig/ directory" in result.output
+
+
+# ========================================================================
+# Output Format Flag Tests for S-093
+# ========================================================================
+
+
+@jig.verifies("S-093")
+def test_rebuild_impl_json_flag():
+    """jigy rebuild impl -j produces valid JSON output."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "impl", "-j"])
+
+        assert result.exit_code == 0
+        # Output should be valid JSON
+        output = json.loads(result.output)
+        assert output["status"] == "success"
+        assert "graphs" in output
+        assert "duration_ms" in output
+        # Should have impl graph info
+        impl_graph = next((g for g in output["graphs"] if g["name"] == "impl"), None)
+        assert impl_graph is not None
+        assert "nodes" in impl_graph
+        assert "edges" in impl_graph
+
+
+@jig.verifies("S-093")
+def test_rebuild_impl_markdown_flag():
+    """jigy rebuild impl -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "impl", "-m"])
+
+        assert result.exit_code == 0
+        # Output should be markdown
+        assert "# Rebuild Result" in result.output or "**Status:**" in result.output
+        assert "impl" in result.output.lower()
+
+
+@jig.verifies("S-093")
+def test_rebuild_all_json_flag():
+    """jigy rebuild -j produces valid JSON with all three graphs."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "-j"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "success"
+        assert "graphs" in output
+        # Should have all three graphs
+        graph_names = [g["name"] for g in output["graphs"]]
+        assert "impl" in graph_names
+        assert "intent" in graph_names
+        assert "verify" in graph_names
+
+
+@jig.verifies("S-093")
+def test_rebuild_all_markdown_flag():
+    """jigy rebuild -m produces markdown with all three graphs."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "-m"])
+
+        assert result.exit_code == 0
+        # Output should be markdown with all graphs
+        assert "# Rebuild Result" in result.output or "**Status:**" in result.output
+        # Should mention all graphs
+        output_lower = result.output.lower()
+        assert "impl" in output_lower
+        assert "intent" in output_lower
+        assert "verify" in output_lower
+
+
+@jig.verifies("S-093")
+def test_rebuild_json_markdown_mutually_exclusive():
+    """jigy rebuild -j -m should error (mutually exclusive)."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "-j", "-m"])
+
+        assert result.exit_code != 0
+        assert "mutually exclusive" in result.output.lower()
+
+
+@jig.verifies("S-093")
+def test_rebuild_intent_json_flag():
+    """jigy rebuild intent -j produces valid JSON output."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "intent", "-j"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "success"
+        intent_graph = next((g for g in output["graphs"] if g["name"] == "intent"), None)
+        assert intent_graph is not None
+
+
+@jig.verifies("S-093")
+def test_rebuild_verify_json_flag():
+    """jigy rebuild verify -j produces valid JSON output."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "verify", "-j"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "success"
+        verify_graph = next((g for g in output["graphs"] if g["name"] == "verify"), None)
+        assert verify_graph is not None
+
+
+@jig.verifies("S-093")
+def test_align_json_flag():
+    """jigy align -j produces combined JSON (rebuild + validate)."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["align", "-j"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "success" or output["status"] == "aligned"
+        # Should have both rebuild and validate sections
+        assert "graphs" in output or "rebuild" in output
+        assert "validation" in output or "summary" in output
+
+
+@jig.verifies("S-093")
+def test_align_markdown_flag():
+    """jigy align -m produces markdown output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["align", "-m"])
+
+        assert result.exit_code == 0
+        # Should be markdown with rebuild and validation info
+        assert "# " in result.output or "**" in result.output
+        output_lower = result.output.lower()
+        # Should mention graphs and validation
+        assert "graph" in output_lower or "rebuild" in output_lower
+        assert "validat" in output_lower or "aligned" in output_lower
+
+
+@jig.verifies("S-093")
+def test_rebuild_verbose_flag():
+    """jigy rebuild -v produces verbose output."""
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "-v"])
+
+        assert result.exit_code == 0
+        # Verbose should still work (additional detail)
+        assert "impl:" in result.output or "impl" in result.output.lower()
+
+
+@jig.verifies("S-093")
+def test_rebuild_json_verbose_flag():
+    """jigy rebuild -j -v produces verbose JSON output."""
+    import json
+
+    runner = CliRunner()
+    with runner.isolated_filesystem() as tmpdir:
+        root = Path(tmpdir)
+        create_minimal_jig_project(root)
+
+        result = runner.invoke(cli, ["rebuild", "-j", "-v"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["status"] == "success"
+        # Verbose JSON might have additional fields
+        assert "graphs" in output

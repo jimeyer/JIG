@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # @T2:START (auto-generated, do not edit)
 # JIG/DIG Primer
 
@@ -110,125 +114,89 @@ Commands require venv: `python`, `pytest`, `jigy`, `digy`
 **Only mock external I/O** (network, filesystem, database, external services).
 # @T2:END
 # @T3 (project-specific, edit freely)
-# CLAUDE.md - Agent Context for JIG
 
-This file provides guidance for AI agents working on the JIG codebase.
-
-## Project Overview
-
-JIG (Just-In-Graph) is a traceability and alignment tool that connects specifications to implementations to tests. It enables AI agents to understand and navigate complex codebases by providing machine-readable intent graphs.
-
-## Key Commands
+# Common Commands
 
 ```bash
-jigy rebuild        # Rebuild all graphs (implementation, verification, intent)
-jigy validate       # Validate all artifacts against JIG rules
-jigy layers         # Show brick layer structure
-jigy align          # Check alignment between intent, implementation, and tests
+# Setup
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+
+# Tests
+pytest                              # all tests
+pytest tests/unit/                  # unit tests only
+pytest tests/integration/           # integration tests only
+pytest tests/unit/test_hashing.py   # single file
+pytest -k "test_name"               # by name pattern
+pytest --tb=long -vv                # verbose with full tracebacks
+
+# Quality
+ruff check src/ tests/              # lint
+ruff format src/ tests/             # format
+mypy src/                           # type check
+
+# JIG alignment
+jigy align                          # full workflow: rebuild + validate + summary
+jigy validate                       # validate all artifacts
+jigy validate intent                # validate specs/outcomes only
+jigy validate bricks                # validate brick partition
+jigy rebuild                        # rebuild all graphs
+jigy show                           # project overview
+jigy show layers                    # layer hierarchy
+jigy show bricks                    # brick details
 ```
 
-## Creating JIG Intent Documents
+# Architecture
 
-When creating specifications, outcomes, or architecture documents:
+## Three Graphs
 
-### Filename Format
+JIG maintains three distinct graphs in `jig/generated/*.ndjson`:
 
-All intent documents must use the format: `{S/O/A}-{NNN}_{Title_In_Snake_Case}.md`
+1. **Intent Graph** - Human-authored specs/outcomes from `jig/specifications/` and `jig/outcomes/`
+2. **Implementation Graph** - Code structure extracted by analyzing `src/` for `@jig.implements` decorators
+3. **Verification Graph** - Test coverage extracted from `tests/` via `@jig.verifies` decorators
 
-Examples:
-- `S-001_Python_Code_Structure_Extraction.md`
-- `O-015_Completeness_Validation_for_Intent_Graph.md`
-- `A-001_JIG_Core_Architecture.md`
-
-### Title Selection
-
-**DO:**
-- Describe BEHAVIOR or CAPABILITY, not implementation
-- Use noun phrases that complete "This spec defines..."
-- Be specific enough to distinguish from other specs
-- Choose stable titles that won't change as implementation evolves
-
-**DON'T:**
-- Include version numbers (`User_Auth_v2`)
-- Use temporal words (`New_Cache`, `Old_Parser`)
-- Describe implementations (`Redis_Cache_Layer`)
-- Describe tasks (`Fix_Auth_Bug`)
-- Use vague comparatives (`Better_Error_Handling`)
-
-### Examples
-
-| Bad | Problem | Good |
-|-----|---------|------|
-| `New_Redis_Cache` | Temporal + implementation | `Response_Caching` |
-| `Fix_Auth_Bug` | Task description | `Session_Persistence` |
-| `User_Model_v2` | Version in title | `User_Profile_Schema` |
-| `Better_Logging` | Vague comparative | `Structured_Log_Output` |
-| `The_Main_Config` | Leading article | `Configuration_Loading` |
-
-### Title Stability
-
-Titles are semi-permanent. Changing a title causes:
-- File rename → appears as delete + add in git history
-- Broken external references (bookmarks, documentation links)
-- Potential merge conflicts
-
-Only rename when scope genuinely changed, not for stylistic preferences.
-
-### H1 Header
-
-The first H1 in the document body MUST match the frontmatter `title` exactly:
-
-```markdown
----
-id: S-001
-title: Python Code Structure Extraction
-type: specification
----
-
-# Python Code Structure Extraction
-
-...content...
-```
-
-## JIG Decorators
-
-Use decorators to link code to specifications:
-
-```python
-import jig
-
-@jig.implements("S-001")
-def extract_functions(source: str) -> list:
-    """Extract function definitions from Python source."""
-    ...
-
-@jig.verifies("S-001")
-def test_extract_functions():
-    """Verify function extraction works correctly."""
-    ...
-```
-
-## Project Structure
+## Source Layout
 
 ```
-jig/                    # Intent artifacts
-  Charter.md            # Project goals (G-001 through G-005)
-  architecture/         # A-NNN documents
-  outcomes/             # O-NNN documents
-  specifications/       # S-NNN documents
-  bricks.yaml           # Brick definitions
-  generated/            # Machine-generated graphs (never edit)
-
-src/jig/                # Implementation code
-tests/                  # Test code
+src/jig/
+├── __init__.py          # implements() and verifies() decorators
+├── cli/                 # Click-based CLI (jigy command)
+│   ├── main.py          # Entry point, command groups
+│   ├── rebuild.py       # Graph rebuild commands
+│   ├── validate.py      # Validation commands
+│   ├── show.py          # Display commands
+│   └── output.py        # Output formatting (json/markdown/text)
+├── config/              # Configuration loading (jig.toml)
+├── validation/          # Validation logic
+│   ├── intent.py        # Spec/outcome validation
+│   ├── bricks.py        # Brick partition validation
+│   └── reporting.py     # Error/warning formatting
+├── impl_graph/          # Implementation graph builder
+│   ├── builder.py       # Graph construction
+│   └── analyzers/       # Language-specific analyzers (Python)
+├── verification_graph/  # Test graph builder
+└── intent_graph/        # Intent graph generator
 ```
 
-## Validation
+## Key Domain Concepts
 
-Before committing, always run:
+- **Brick** = Unit of code ownership. Every function belongs to exactly one brick (partition property).
+- **Layer** = Horizontal stratification. Brick at layer N depends only on layers < N.
+- **Tower** = Vertical partition. Cross-tower dependencies forbidden.
+- **Spec (S-###)** = Observable behavior requirement, linked via `@jig.implements`.
+- **Outcome (O-###)** = Business value grouping specs, linked via `supports_goals`.
 
-```bash
-jigy rebuild && jigy validate
+## Data Flow
+
 ```
+jig/specifications/*.md  ─┐
+jig/outcomes/*.md        ─┼─→ jigy rebuild intent → jig/generated/intent.ndjson
+jig/Charter.md           ─┘
 
-If validation fails, fix the errors before proceeding.
+src/**/*.py              ─→ jigy rebuild impl   → jig/generated/impl.ndjson
+
+tests/**/*.py            ─→ jigy rebuild verify → jig/generated/verify.ndjson
+
+All graphs + bricks.yaml ─→ jigy validate       → errors/warnings
+```

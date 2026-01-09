@@ -1,0 +1,870 @@
+{
+  "stage": 3,
+  "name": "SPEC",
+  "timestamp": "2026-01-08T14:49:31.964679+00:00",
+  "metrics": {
+    "S3.1_decorator_coverage_impl": 0.5375,
+    "S3.2_decorator_coverage_verify": 0.8863,
+    "S3.3_mean_triangle_closure": 0.8767,
+    "S3.4_verification_gap": 9,
+    "S3.5_granularity_variance": 6.0,
+    "S3.6_mean_impl_scatter": 1.6,
+    "S3.8_proto_spec_match": 1.0
+  },
+  "health_score": 68,
+  "specs": [
+    {
+      "id": "S-001",
+      "title": "Python Code Structure Extraction",
+      "impl_count": 11,
+      "verify_count": 36,
+      "files": [
+        "src/jig/__init__.py",
+        "src/jig/impl_graph/analyzers/python_visitor.py",
+        "src/jig/impl_graph/builder.py",
+        "src/jig/impl_graph/analyzers/python.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-002",
+      "title": "Implements Decorator Extraction",
+      "impl_count": 3,
+      "verify_count": 23,
+      "files": [
+        "src/jig/__init__.py",
+        "src/jig/impl_graph/analyzers/python_visitor.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-003",
+      "title": "Deterministic NDJSON Output",
+      "impl_count": 5,
+      "verify_count": 21,
+      "files": [
+        "src/jig/impl_graph/graph.py",
+        "src/jig/impl_graph/ndjson_writer.py",
+        "src/jig/impl_graph/builder.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-004",
+      "title": "Language Analyzer Plugin Architecture",
+      "impl_count": 3,
+      "verify_count": 8,
+      "files": [
+        "src/jig/impl_graph/analyzers/registry.py",
+        "src/jig/impl_graph/analyzers/base.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-005",
+      "title": "External Dependency Tracking",
+      "impl_count": 4,
+      "verify_count": 7,
+      "files": [
+        "src/jig/impl_graph/analyzers/python_visitor.py",
+        "src/jig/impl_graph/analyzers/python.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-006",
+      "title": "Fail-Fast Parse Error Reporting",
+      "impl_count": 6,
+      "verify_count": 6,
+      "files": [
+        "src/jig/impl_graph/builder.py",
+        "src/jig/impl_graph/analyzers/python.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-018",
+      "title": "Specification File Validation",
+      "impl_count": 4,
+      "verify_count": 24,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-019",
+      "title": "Outcome File Validation",
+      "impl_count": 4,
+      "verify_count": 20,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-020",
+      "title": "Decorator Reference Validation",
+      "impl_count": 1,
+      "verify_count": 6,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-021",
+      "title": "Brick Definition Validation",
+      "impl_count": 1,
+      "verify_count": 7,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-022",
+      "title": "Brick Partition Validation",
+      "impl_count": 1,
+      "verify_count": 6,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-023",
+      "title": "Intent Validation CLI Command",
+      "impl_count": 1,
+      "verify_count": 3,
+      "files": [
+        "src/jig/cli/validate.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-024",
+      "title": "Brick Validation CLI Command",
+      "impl_count": 1,
+      "verify_count": 3,
+      "files": [
+        "src/jig/cli/validate.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-025",
+      "title": "Full Validation CLI Command",
+      "impl_count": 1,
+      "verify_count": 3,
+      "files": [
+        "src/jig/cli/validate.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-026",
+      "title": "JSON Output Format for CI Integration",
+      "impl_count": 8,
+      "verify_count": 16,
+      "files": [
+        "src/jig/cli/main.py",
+        "src/jig/cli/validate.py",
+        "src/jig/validation/reporting.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-027",
+      "title": "Auto-Validation in Rebuild Commands",
+      "impl_count": 1,
+      "verify_count": 0,
+      "files": [
+        "src/jig/cli/validate.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-028",
+      "title": "CLI Command to Generate Intent Graph",
+      "impl_count": 1,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-035",
+      "title": "Brick ID Format Validation",
+      "impl_count": 1,
+      "verify_count": 7,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-036",
+      "title": "Layer Field Presence Validation",
+      "impl_count": 1,
+      "verify_count": 2,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-037",
+      "title": "Layer Value Validation",
+      "impl_count": 1,
+      "verify_count": 7,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-038",
+      "title": "Layer Constraint Validation",
+      "impl_count": 1,
+      "verify_count": 11,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-039",
+      "title": "Circular Dependency Detection",
+      "impl_count": 1,
+      "verify_count": 9,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-040",
+      "title": "\"CLI Command: jigy layers\"",
+      "impl_count": 0,
+      "verify_count": 0,
+      "files": [],
+      "closure": null
+    },
+    {
+      "id": "S-041",
+      "title": "\"CLI Command: jigy layers suggest\"",
+      "impl_count": 0,
+      "verify_count": 0,
+      "files": [],
+      "closure": null
+    },
+    {
+      "id": "S-042",
+      "title": "Outcomes Must Specify Specifications",
+      "impl_count": 1,
+      "verify_count": 5,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-043",
+      "title": "Specifications Must Have Outcome Coverage",
+      "impl_count": 1,
+      "verify_count": 6,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-044",
+      "title": "Content Hash Format",
+      "impl_count": 1,
+      "verify_count": 4,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-045",
+      "title": "Intent Artifact Hashing",
+      "impl_count": 1,
+      "verify_count": 4,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-046",
+      "title": "Function Hashing via AST",
+      "impl_count": 1,
+      "verify_count": 10,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-047",
+      "title": "Test Hashing via AST",
+      "impl_count": 1,
+      "verify_count": 2,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-048",
+      "title": "Brick Definition Hashing",
+      "impl_count": 1,
+      "verify_count": 5,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-049",
+      "title": "Git Blob Optimization",
+      "impl_count": 1,
+      "verify_count": 12,
+      "files": [
+        "src/jig/hashing.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-050",
+      "title": "Graph Schema Hash Fields",
+      "impl_count": 1,
+      "verify_count": 10,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-051",
+      "title": "Test File Discovery",
+      "impl_count": 1,
+      "verify_count": 15,
+      "files": [
+        "src/jig/verification_graph/discovery.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-052",
+      "title": "Test Node Schema",
+      "impl_count": 1,
+      "verify_count": 9,
+      "files": [
+        "src/jig/verification_graph/analyzer.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-053",
+      "title": "Verifies Decorator Extraction",
+      "impl_count": 1,
+      "verify_count": 8,
+      "files": [
+        "src/jig/verification_graph/analyzer.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-054",
+      "title": "Test Function Hashing",
+      "impl_count": 1,
+      "verify_count": 6,
+      "files": [
+        "src/jig/verification_graph/analyzer.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-055",
+      "title": "Verification Graph Generation",
+      "impl_count": 1,
+      "verify_count": 11,
+      "files": [
+        "src/jig/verification_graph/builder.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-056",
+      "title": "CLI Verify Rebuild Command",
+      "impl_count": 0,
+      "verify_count": 0,
+      "files": [],
+      "closure": null
+    },
+    {
+      "id": "S-057",
+      "title": "Project Root Auto-Discovery",
+      "impl_count": 1,
+      "verify_count": 6,
+      "files": [
+        "src/jig/cli/discovery.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-058",
+      "title": "Verb-First Rebuild Commands",
+      "impl_count": 8,
+      "verify_count": 6,
+      "files": [
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-059",
+      "title": "Align Command",
+      "impl_count": 2,
+      "verify_count": 5,
+      "files": [
+        "src/jig/cli/main.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-060",
+      "title": "Show Command Structure",
+      "impl_count": 10,
+      "verify_count": 37,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-061",
+      "title": "Minimal Global Options",
+      "impl_count": 5,
+      "verify_count": 20,
+      "files": [
+        "src/jig/cli/main.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-062",
+      "title": "Configuration File Discovery",
+      "impl_count": 1,
+      "verify_count": 11,
+      "files": [
+        "src/jig/config/discovery.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-063",
+      "title": "TOML Configuration Parsing",
+      "impl_count": 1,
+      "verify_count": 11,
+      "files": [
+        "src/jig/config/parser.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-064",
+      "title": "Path Configuration with Defaults",
+      "impl_count": 1,
+      "verify_count": 12,
+      "files": [
+        "src/jig/config/schema.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-065",
+      "title": "CLI Integration with Configuration",
+      "impl_count": 30,
+      "verify_count": 9,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/validate.py",
+        "src/jig/cli/rebuild.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-066",
+      "title": "T\u2192F Edge Collection via Coverage",
+      "impl_count": 10,
+      "verify_count": 30,
+      "files": [
+        "src/jig/cli/main.py",
+        "src/jig/cli/audit.py",
+        "src/jig/audit/coverage.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-067",
+      "title": "Coverage Record Format",
+      "impl_count": 7,
+      "verify_count": 23,
+      "files": [
+        "src/jig/cli/main.py",
+        "src/jig/cli/audit.py",
+        "src/jig/audit/record_writer.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-068",
+      "title": "Graph Metadata for Staleness Detection",
+      "impl_count": 12,
+      "verify_count": 13,
+      "files": [
+        "src/jig/impl_graph/ndjson_writer.py",
+        "src/jig/staleness.py",
+        "src/jig/intent_graph/generator.py",
+        "src/jig/cli/rebuild.py",
+        "src/jig/impl_graph/builder.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-069",
+      "title": "Staleness Detection Module",
+      "impl_count": 2,
+      "verify_count": 23,
+      "files": [
+        "src/jig/staleness.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-070",
+      "title": "Auto-Rebuild Before Commands",
+      "impl_count": 8,
+      "verify_count": 16,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/audit.py",
+        "src/jig/cli/validate.py",
+        "src/jig/cli/auto_rebuild.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-071",
+      "title": "Skip Auto-Rebuild Flag",
+      "impl_count": 15,
+      "verify_count": 11,
+      "files": [
+        "src/jig/cli/main.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-072",
+      "title": "Charter File Structure",
+      "impl_count": 3,
+      "verify_count": 1,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-073",
+      "title": "Charter Defines Goals Field",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-074",
+      "title": "Goal Header Format",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-075",
+      "title": "Goal ID Format",
+      "impl_count": 4,
+      "verify_count": 1,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-076",
+      "title": "Architecture File Location",
+      "impl_count": 6,
+      "verify_count": 16,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py",
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-077",
+      "title": "Architecture ID Format",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-078",
+      "title": "Architecture Supports Goals Required",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-079",
+      "title": "Architecture Constrains References",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/intent.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-080",
+      "title": "Charter Node In Intent Graph",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-081",
+      "title": "Goal Nodes In Intent Graph",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-082",
+      "title": "Architecture Nodes In Intent Graph",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-083",
+      "title": "Defines Goal Edges",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-084",
+      "title": "Supports Goal Edges",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-085",
+      "title": "Constrains Edges",
+      "impl_count": 2,
+      "verify_count": 0,
+      "files": [
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-086",
+      "title": "Brick Tower Field Optional",
+      "impl_count": 3,
+      "verify_count": 0,
+      "files": [
+        "src/jig/validation/bricks.py",
+        "src/jig/intent_graph/generator.py"
+      ],
+      "closure": 0.0
+    },
+    {
+      "id": "S-087",
+      "title": "Tower Value Format",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-088",
+      "title": "Cross Tower Isolation",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-089",
+      "title": "Tower Isolation Validation",
+      "impl_count": 1,
+      "verify_count": 1,
+      "files": [
+        "src/jig/validation/bricks.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-090",
+      "title": "Jigy Towers Command",
+      "impl_count": 2,
+      "verify_count": 11,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-091",
+      "title": "Jigy Matrix Command",
+      "impl_count": 2,
+      "verify_count": 8,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/main.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-092",
+      "title": "Intent Document Title Requirements",
+      "impl_count": 0,
+      "verify_count": 0,
+      "files": [],
+      "closure": null
+    },
+    {
+      "id": "S-093",
+      "title": "Universal Output Format Flags",
+      "impl_count": 38,
+      "verify_count": 91,
+      "files": [
+        "src/jig/cli/show.py",
+        "src/jig/cli/audit.py",
+        "src/jig/cli/rebuild.py",
+        "src/jig/cli/main.py",
+        "src/jig/cli/validate.py"
+      ],
+      "closure": 1.0
+    },
+    {
+      "id": "S-094",
+      "title": "Markdown Output Format",
+      "impl_count": 4,
+      "verify_count": 18,
+      "files": [
+        "src/jig/cli/validate.py",
+        "src/jig/validation/reporting.py"
+      ],
+      "closure": 1.0
+    }
+  ],
+  "verification_gaps": [
+    "S-027",
+    "S-028",
+    "S-080",
+    "S-081",
+    "S-082",
+    "S-083",
+    "S-084",
+    "S-085",
+    "S-086"
+  ],
+  "orphan_specs": [
+    {
+      "id": "S-092",
+      "title": "Intent Document Title Requirements"
+    },
+    {
+      "id": "S-040",
+      "title": "\"CLI Command: jigy layers\""
+    },
+    {
+      "id": "S-041",
+      "title": "\"CLI Command: jigy layers suggest\""
+    },
+    {
+      "id": "S-056",
+      "title": "CLI Verify Rebuild Command"
+    }
+  ],
+  "low_closure_specs": [
+    "S-027",
+    "S-028",
+    "S-080",
+    "S-081",
+    "S-082",
+    "S-083",
+    "S-084",
+    "S-085",
+    "S-086"
+  ],
+  "summary": {
+    "total_specs": 77,
+    "specs_with_impl": 73,
+    "specs_with_verify": 65,
+    "total_impl_decorators": 129,
+    "total_verify_decorators": 608,
+    "entry_points_scanned": 240,
+    "test_functions_scanned": 686
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "stage": 1,
+  "name": "CODE",
+  "timestamp": "2026-01-08T14:44:26.407300+00:00",
+  "metrics": {
+    "C1.1_layer_violations": 0,
+    "C1.2_tower_isolation": 0,
+    "C1.3_brick_cycles": 0,
+    "C1.4_max_fan_out": 17,
+    "C1.5_max_fan_in": 29,
+    "C1.6_mean_cohesion": 0.19,
+    "C1.7_complexity_outliers": 37,
+    "C1.8_loc_gini": 0.52
+  },
+  "health_score": 75,
+  "violations": [],
+  "tower_violations": [],
+  "cycles": [],
+  "outliers": [
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/audit.py",
+      "function": "coverage_command",
+      "line": 137,
+      "complexity": 21
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/rebuild.py",
+      "function": "align_command",
+      "line": 428,
+      "complexity": 35
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_overview_command",
+      "line": 91,
+      "complexity": 22
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_layers_command",
+      "line": 216,
+      "complexity": 33
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_bricks_command",
+      "line": 359,
+      "complexity": 24
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_charter_command",
+      "line": 473,
+      "complexity": 18
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_goals_command",
+      "line": 576,
+      "complexity": 33
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_towers_command",
+      "line": 705,
+      "complexity": 55
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_matrix_command",
+      "line": 946,
+      "complexity": 29
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "function": "show_architecture_command",
+      "line": 1118,
+      "complexity": 33
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/validate.py",
+      "function": "validate_intent_command",
+      "line": 62,
+      "complexity": 20
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/validate.py",
+      "function": "validate_bricks_command",
+      "line": 269,
+      "complexity": 16
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/validate.py",
+      "function": "_run_intent_validation",
+      "line": 362,
+      "complexity": 12
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/impl_graph/analyzers/python.py",
+      "function": "analyze_file",
+      "line": 92,
+      "complexity": 44
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/impl_graph/analyzers/python_visitor.py",
+      "function": "_extract_signature",
+      "line": 205,
+      "complexity": 11
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/impl_graph/analyzers/python_visitor.py",
+      "function": "_extract_implements_decorators",
+      "line": 316,
+      "complexity": 14
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/intent_graph/generator.py",
+      "function": "_load_brick_nodes",
+      "line": 350,
+      "complexity": 12
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/staleness.py",
+      "function": "git_status_porcelain",
+      "line": 80,
+      "complexity": 12
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/staleness.py",
+      "function": "is_stale",
+      "line": 192,
+      "complexity": 12
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/validation/bricks.py",
+      "function": "validate_brick_definitions",
+      "line": 23,
+      "complexity": 23
+    }
+  ],
+  "high_fan_out": [
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/audit/coverage.py",
+      "fan_out": 13
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/main.py",
+      "fan_out": 12
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/rebuild.py",
+      "fan_out": 17
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/show.py",
+      "fan_out": 11
+    },
+    {
+      "file": "/Users/jmeyer/Code/jig-dev/src/jig/cli/validate.py",
+      "fan_out": 13
+    }
+  ],
+  "brick_graph": {
+    "nodes": [
+      "B-audit",
+      "B-cli",
+      "B-config",
+      "B-decorators",
+      "B-hashing",
+      "B-impl-graph",
+      "B-intent-graph",
+      "B-languages",
+      "B-staleness",
+      "B-validation",
+      "B-verification-graph"
+    ],
+    "edges": [
+      {
+        "source": "B-cli",
+        "target": "B-audit"
+      },
+      {
+        "source": "B-cli",
+        "target": "B-impl-graph"
+      },
+      {
+        "source": "B-cli",
+        "target": "B-intent-graph"
+      },
+      {
+        "source": "B-cli",
+        "target": "B-staleness"
+      },
+      {
+        "source": "B-cli",
+        "target": "B-validation"
+      },
+      {
+        "source": "B-cli",
+        "target": "B-verification-graph"
+      },
+      {
+        "source": "B-intent-graph",
+        "target": "B-hashing"
+      },
+      {
+        "source": "B-languages",
+        "target": "B-hashing"
+      },
+      {
+        "source": "B-validation",
+        "target": "B-config"
+      },
+      {
+        "source": "B-verification-graph",
+        "target": "B-hashing"
+      },
+      {
+        "source": "B-verification-graph",
+        "target": "B-impl-graph"
+      }
+    ]
+  },
+  "files_analyzed": 40,
+  "total_functions": 233
+}
