@@ -1,7 +1,8 @@
 ---
 title: JIG CLI Phase 0 and 1 Implementation
 type: scope
-status: active
+status: implemented
+decision: completed
 created: 1736207400
 created_human: 2026-01-06 16:00 CST
 parent: "[[DJ005_SCOPE_CLI_Implementation]]"
