@@ -1,19 +1,26 @@
-# JIG Feature Request: Outcome Architecture Reference
+---
+type: concept
+title: Outcome Architecture Reference
+status: active
+created: 1736726400
+created_human: 2026-01-12 16:00 PST
+parent: null
+children: []
+prompt: |
+  Feature request from ASE F083 JIG Reset (WU5.3 planning).
+  Add architecture: field to Outcome frontmatter to establish
+  explicit ownership between Outcomes and Architecture documents.
+---
 
-**Date:** 2026-01-12
-**Origin:** ASE F083 JIG Reset (WU5.3 planning)
+# Outcome Architecture Reference
+
+_Explicit alignment between Outcomes (O-###) and Architecture documents (A-###)_
 
 ---
 
-## Summary
+## Core Insight
 
-Add an `architecture:` field to Outcome (O-###) frontmatter that references one or more Architecture documents (A-###). This establishes explicit ownership between Outcomes and the architectural concerns they value.
-
----
-
-## Motivation
-
-During ASE's JIG reset, we discovered that Outcomes naturally align with Architecture documents:
+Outcomes naturally align with Architecture documents:
 
 | Category | A-doc | Example Outcomes |
 |----------|-------|------------------|
@@ -22,11 +29,12 @@ During ASE's JIG reset, we discovered that Outcomes naturally align with Archite
 | HARNESS | A-032 | Testable Components, Responsive GUI |
 | SERVER | A-034 | Plane Isolation, Reliability, Observability |
 
-This relationship is currently implicit. Making it explicit enables:
-1. **Validation:** Warn if an Outcome doesn't reference any A-doc
-2. **Navigation:** Query "which outcomes belong to A-030?"
-3. **Completeness checking:** "Does every A-doc have outcomes?"
-4. **Reassignment:** Change ownership at graph level without renaming IDs
+This relationship is currently implicit. Making it explicit via an `architecture:` field enables:
+
+1. **Validation** - Warn if an Outcome doesn't reference any A-doc
+2. **Navigation** - Query "which outcomes belong to A-030?"
+3. **Completeness checking** - "Does every A-doc have outcomes?"
+4. **Reassignment** - Change ownership at graph level without renaming IDs
 
 ---
 
@@ -54,7 +62,9 @@ specifies: [S-001, S-002]
 2. Referenced A-docs must exist in `jig/architecture/`
 3. Empty list or missing field is allowed (for Global outcomes)
 
-### Graph Representation
+---
+
+## Graph Representation
 
 Add edge type `O-### --values--> A-###` in intent graph:
 
@@ -62,6 +72,11 @@ Add edge type `O-### --values--> A-###` in intent graph:
 O-101 --values--> A-030
 O-101 --supports_goals--> G-002
 O-101 --specifies--> S-001
+```
+
+New edge in `jig/generated/intent-graph.ndjson`:
+```json
+{"source": "O-101", "target": "A-030", "relation": "values"}
 ```
 
 ---
@@ -124,18 +139,26 @@ Components can be modified, tested, and deployed independently.
 - Validate referenced A-docs exist
 - Optionally warn on empty `architecture:` (configurable)
 
-### Graph Changes
-
-`jig/generated/intent-graph.ndjson` gains new edge type:
-```json
-{"source": "O-101", "target": "A-030", "relation": "values"}
-```
-
 ### Query Capabilities
 
-Enable queries like:
-- "Which outcomes value A-030?" → filter by architecture field
-- "Which A-docs have no outcomes?" → coverage gap detection
+- "Which outcomes value A-030?" - filter by architecture field
+- "Which A-docs have no outcomes?" - coverage gap detection
+
+---
+
+## Alternatives Rejected
+
+### Architecture-prefixed IDs (O-030-01)
+
+- Renaming required if ownership changes
+- ID becomes invalid if A-doc renumbered
+- Couples ID to current organization
+
+### Tower field instead of architecture
+
+- Towers are code organization, not intent organization
+- Some outcomes span towers (HOST applies to device, gateway, cloud)
+- Architecture alignment is the deeper relationship
 
 ---
 
@@ -145,24 +168,12 @@ Existing O-### documents without `architecture:` field remain valid (field is op
 
 ---
 
-## Alternatives Considered
-
-### Architecture-prefixed IDs (O-030-01)
-
-Rejected because:
-- Renaming required if ownership changes
-- ID becomes invalid if A-doc renumbered
-- Couples ID to current organization
-
-### Tower field instead of architecture
-
-Rejected because:
-- Towers are code organization, not intent organization
-- Some outcomes span towers (HOST applies to device, gateway, cloud)
-- Architecture alignment is the deeper relationship
-
----
-
 ## Decision
 
 Adopt `architecture:` field as optional list in O-### frontmatter. Implement validation in `jigy validate`. Add to intent graph as `values` edges.
+
+---
+
+## References
+
+- [[jig-dev/dig/wip/JIG_FEATURE_Outcome_Architecture_Reference]] - Original feature request
