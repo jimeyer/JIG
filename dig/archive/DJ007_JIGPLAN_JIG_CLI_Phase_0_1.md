@@ -5,7 +5,7 @@ status: implemented
 decision: completed
 created: 1736207400
 created_human: 2026-01-06 16:30 CST
-parent: "[[DJ006_SCOPE_JIG_Phase_0_1]]"
+parent: "[[jig-dev/dig/archive/DJ006_SCOPE_JIG_Phase_0_1]]"
 children: []
 ---
 

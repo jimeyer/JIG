@@ -4,7 +4,7 @@ title: Five Stage Alignment Audit
 status: active
 created: 1736312400
 created_human: 2026-01-07 19:20 PST
-parent: "[[C022_CONCEPT_Stratified_Alignment_Verification]]"
+parent: "[[jig-dev/dig/future/C022_CONCEPT_Stratified_Alignment_Verification]]"
 children: []
 prompt: |-
   Agent-executable PLAN for running the 5-stage alignment audit manually.

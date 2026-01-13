@@ -1,12 +1,12 @@
 ---
 type: concept
-title: "JIG Alignment Inspector Agent"
+title: JIG Alignment Inspector Agent
 status: active
 created: 1736387200
-created_human: "2026-01-08 16:00 PST"
+created_human: 2026-01-08 16:00 PST
 updated: 1736402400
-updated_human: "2026-01-08 20:20 PST"
-parent: "[[C021_CONCEPT_Alignment_Triangle_Metrics]]"
+updated_human: 2026-01-08 20:20 PST
+parent: "[[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]]"
 children: []
 prompt: |
   Inspector agent for qualitative alignment review in JIG workflows.
@@ -23,7 +23,7 @@ _Qualitative alignment review integrated with quantitative audit_
 
 ## Core Insight
 
-The Five Stage Audit ([[C023_PLAN_Five_Stage_Alignment_Audit]]) produces **measurements**:
+The Five Stage Audit ([[jig-dev/dig/future/C023_PLAN_Five_Stage_Alignment_Audit]]) produces **measurements**:
 - Triangle closure: 87.7%
 - Verification gaps: 9
 - Cohesion: 83.1%
@@ -615,13 +615,13 @@ remediation = true    # Generate WU plan
 
 ## Relation to Other Concepts
 
-**[[C020_CONCEPT_Alignment_Integrity]]** - Defines drift and coherence. Inspector detects semantic drift that metrics miss.
+**[[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]]** - Defines drift and coherence. Inspector detects semantic drift that metrics miss.
 
-**[[C021_CONCEPT_Alignment_Triangle_Metrics]]** - Provides quantitative triangle metrics. Inspector provides qualitative interpretation.
+**[[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]]** - Provides quantitative triangle metrics. Inspector provides qualitative interpretation.
 
-**[[C022_CONCEPT_Stratified_Alignment_Verification]]** - Staged verification approach. Inspector is Stage 5 implementation.
+**[[jig-dev/dig/future/C022_CONCEPT_Stratified_Alignment_Verification]]** - Staged verification approach. Inspector is Stage 5 implementation.
 
-**[[C023_PLAN_Five_Stage_Alignment_Audit]]** - Audit procedure. Inspector integrates as final stage and checkpoint system.
+**[[jig-dev/dig/future/C023_PLAN_Five_Stage_Alignment_Audit]]** - Audit procedure. Inspector integrates as final stage and checkpoint system.
 
 **taskDoPLAN / taskDoWU** - Execution workflow. Inspector can review WU output before orchestrator continues.
 
@@ -1125,9 +1125,9 @@ Words in Notable field that trigger Inspector review:
 
 ## References
 
-- [[C020_CONCEPT_Alignment_Integrity]] - Drift definitions
-- [[C021_CONCEPT_Alignment_Triangle_Metrics]] - Triangle metrics
-- [[C022_CONCEPT_Stratified_Alignment_Verification]] - Staged verification
-- [[C023_PLAN_Five_Stage_Alignment_Audit]] - Audit procedure
+- [[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]] - Drift definitions
+- [[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]] - Triangle metrics
+- [[jig-dev/dig/future/C022_CONCEPT_Stratified_Alignment_Verification]] - Staged verification
+- [[jig-dev/dig/future/C023_PLAN_Five_Stage_Alignment_Audit]] - Audit procedure
 - taskDoPLAN.md - Orchestrator workflow
 - taskDoWU.md - Worker workflow

@@ -1,13 +1,13 @@
 ---
 type: exploration
-title: "Alignment Integrity"
+title: Alignment Integrity
 status: active
 created: 1736300400
-created_human: "2026-01-07 16:00 PST"
-parent: null
+created_human: 2026-01-07 16:00 PST
+parent:
 children:
-  - "[[C021_CONCEPT_Alignment_Triangle_Metrics]]"
-  - "[[C022_CONCEPT_Stratified_Alignment_Verification]]"
+  - "[[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]]"
+  - "[[jig-dev/dig/future/C022_CONCEPT_Stratified_Alignment_Verification]]"
 prompt: |
   Discussion of JIG failure modes when artifacts exist but alignment has degraded.
   Two distinct problems emerged:

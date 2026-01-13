@@ -4,9 +4,9 @@ title: Stratified Alignment Verification
 status: active
 created: 1736308800
 created_human: 2026-01-07 18:20 PST
-parent: "[[C020_CONCEPT_Alignment_Integrity]]"
+parent: "[[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]]"
 children:
-  - "[[C023_PLAN_Five_Stage_Alignment_Audit]]"
+  - "[[jig-dev/dig/future/C023_PLAN_Five_Stage_Alignment_Audit]]"
 prompt: |-
   Formalization of the 5-stage verification ladder for JIG alignment.
   Key insight: each stage provides ground truth that constrains expectations
@@ -262,7 +262,7 @@ test_health = (
 
 ### Stage 3: SPEC Metrics
 
-Maps to [[C021_CONCEPT_Alignment_Triangle_Metrics]] Categories A, B, D.
+Maps to [[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]] Categories A, B, D.
 
 | ID | Metric | C021 Ref | Computation | Signal |
 |----|--------|----------|-------------|--------|
@@ -310,7 +310,7 @@ spec_health = (
 
 ### Stage 4: HIERARCHY Metrics
 
-Maps to [[C021_CONCEPT_Alignment_Triangle_Metrics]] Category D (partial) and [[C020_CONCEPT_Alignment_Integrity]] coherence dimensions.
+Maps to [[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]] Category D (partial) and [[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]] coherence dimensions.
 
 | ID | Metric | Source | Computation | Signal |
 |----|--------|--------|-------------|--------|
@@ -354,7 +354,7 @@ hierarchy_health = (
 
 ### Stage 5: SEMANTIC Metrics
 
-Maps to [[C021_CONCEPT_Alignment_Triangle_Metrics]] Category E.
+Maps to [[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]] Category E.
 
 | ID | Metric | C021 Ref | Computation | Signal |
 |----|--------|----------|-------------|--------|
@@ -672,8 +672,8 @@ By computing expectations from lower stages before reading upper stages, we can:
 
 | Document | Contribution | This Document Adds |
 |----------|--------------|-------------------|
-| [[C020_CONCEPT_Alignment_Integrity]] | Drift vs coherence distinction | Stage-based verification order |
-| [[C021_CONCEPT_Alignment_Triangle_Metrics]] | Triangle metrics (S↔F↔T) | Stage assignment, inference methods |
+| [[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]] | Drift vs coherence distinction | Stage-based verification order |
+| [[jig-dev/dig/future/C021_CONCEPT_Alignment_Triangle_Metrics]] | Triangle metrics (S↔F↔T) | Stage assignment, inference methods |
 | **C022 (this)** | — | Stratified verification, bootstrap flow |
 
 C020 asked: "Are artifacts accurate? Are they clear?"

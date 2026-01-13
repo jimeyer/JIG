@@ -1,10 +1,10 @@
 ---
 type: exploration
-title: "Alignment Triangle Metrics"
+title: Alignment Triangle Metrics
 status: active
 created: 1736304000
-created_human: "2026-01-07 17:00 PST"
-parent: "[[C020_CONCEPT_Alignment_Integrity]]"
+created_human: 2026-01-07 17:00 PST
+parent: "[[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]]"
 children: []
 prompt: |
   Discussion of computational approaches to coherence assessment.
@@ -914,7 +914,7 @@ Options:
 
 ## Relation to C020
 
-This document extends [[C020_CONCEPT_Alignment_Integrity]]:
+This document extends [[jig-dev/dig/future/C020_CONCEPT_Alignment_Integrity]]:
 
 - C020 defined **drift** (accuracy) and **coherence** (clarity)
 - C021 provides **computational methods** for coherence assessment

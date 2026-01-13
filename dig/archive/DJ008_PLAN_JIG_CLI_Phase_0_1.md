@@ -5,7 +5,7 @@ status: implemented
 decision: completed
 created: 1736207400
 created_human: 2026-01-06 17:00 CST
-parent: "[[DJ007_JIGPLAN_JIG_CLI_Phase_0_1]]"
+parent: "[[jig-dev/dig/archive/DJ007_JIGPLAN_JIG_CLI_Phase_0_1]]"
 children: []
 ---
 
