@@ -89,26 +89,15 @@ digy
 
 ### JIG Success Criteria
 
-**SC-J0: Bug Fix — JSON Single-Line Format**
+**SC-J0: Bug Fix — JSON Single-Line Format** ✓ COMPLETE
 
-Phase 0-1 left a deviation from S-026: `rebuild` and `align` commands produce pretty-printed JSON instead of single-line compact JSON.
+Phase 0-1 left a deviation from S-026: `rebuild` and `align` commands produced pretty-printed JSON instead of single-line compact JSON. Fixed by changing `json.dumps()` calls in `rebuild.py` to use `separators=(",", ":")`.
 
 ```bash
-# Current (broken):
+# Now works correctly:
 jigy rebuild -j
-{
-  "status": "success",
-  "graphs": [
-    ...
-  ]
-}
-
-# Expected (S-026 compliant):
-jigy rebuild -j
-{"status":"success","graphs":[...]}
+{"status":"success","graphs":[...],"duration_ms":123}
 ```
-
-Fix: Change `json.dumps()` calls in `rebuild.py` to use `separators=(",", ":")`.
 
 **SC-J1: Context Command**
 ```bash
@@ -213,17 +202,17 @@ digy context DJ017              # Shows JIG specs that DJ017 created
 
 ## Part III: Phased Deliverables
 
-### Phase 0 Bug Fix: JIG JSON Single-Line Format
+### Phase 0 Bug Fix: JIG JSON Single-Line Format ✓ COMPLETE
 
 **Concern**: S-026 compliance for rebuild/align commands.
 
-| Deliverable | Description |
-|-------------|-------------|
-| Fix `rebuild -j` | Use `separators=(",", ":")` in json.dumps() |
-| Fix `align -j` | Same fix, propagates to combined output |
-| Fix rebuild subcommands | `rebuild impl -j`, `rebuild intent -j`, `rebuild verify -j` |
+| Deliverable | Description | Status |
+|-------------|-------------|--------|
+| Fix `rebuild -j` | Use `separators=(",", ":")` in json.dumps() | ✓ Done |
+| Fix `align -j` | Same fix, propagates to combined output | ✓ Done |
+| Fix rebuild subcommands | `rebuild impl -j`, `rebuild intent -j`, `rebuild verify -j` | ✓ Done |
 
-**Effort**: ~30 minutes. Single file change in `src/jig/cli/rebuild.py`.
+**Effort**: ~5 minutes. Two line changes in `src/jig/cli/rebuild.py`.
 
 **Dependencies**: None.
 
@@ -352,7 +341,7 @@ digy context DJ017              # Shows JIG specs that DJ017 created
 ```
                     DJ002 (Target Spec)
                            │
-                    Phase 0 Bug Fix
+                    Phase 0 Bug Fix ✓
                     (JIG JSON format)
                            │
               ┌────────────┼────────────┐
@@ -430,7 +419,7 @@ DJ002 conformance verified when:
 - [x] `-v` / `--verbose` on all commands (DIG)
 - [x] `-j -m` produces error (JIG)
 - [ ] `-j -m` produces error (DIG — needs verification)
-- [ ] JSON output is single-line compact (JIG rebuild/align — **bug fix needed**)
+- [x] JSON output is single-line compact (JIG rebuild/align — **fixed**)
 
 ### JIG Commands
 

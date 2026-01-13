@@ -38,7 +38,7 @@ def _format_rebuild_json(
     }
     if verbose:
         output["verbose"] = True
-    return json.dumps(output, indent=2)
+    return json.dumps(output, separators=(",", ":"))
 
 
 def _format_rebuild_markdown(
@@ -366,7 +366,7 @@ def _format_align_json(
     }
     if verbose:
         output["verbose"] = True
-    return json.dumps(output, indent=2)
+    return json.dumps(output, separators=(",", ":"))
 
 
 def _format_align_markdown(

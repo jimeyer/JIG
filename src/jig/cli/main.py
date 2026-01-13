@@ -11,7 +11,7 @@ from jig.config import ConfigError, JigConfig, load_config
 
 
 class OrderedGroup(click.Group):
-    """A Click group with explicit command ordering."""
+    """A Click group with explicit command ordering and commands-first help."""
 
     COMMAND_ORDER = ["align", "validate", "show", "audit", "rebuild"]
 
@@ -20,6 +20,41 @@ class OrderedGroup(click.Group):
         ordered = [c for c in self.COMMAND_ORDER if c in self.commands]
         others = [c for c in self.commands if c not in self.COMMAND_ORDER]
         return ordered + others
+
+    def format_help(self, ctx, formatter):
+        """Format help to show commands before options."""
+        self.format_usage(ctx, formatter)
+        self.format_help_text(ctx, formatter)
+        # Commands first
+        self.format_commands(ctx, formatter)
+        # Then options
+        self.format_options(ctx, formatter)
+
+    def format_options(self, ctx, formatter):
+        """Format options in specific order: -j, -m, -v, -h, --version, --no-rebuild."""
+        # Collect all options with their names
+        opts_by_name = {}
+        for param in self.get_params(ctx):
+            rv = param.get_help_record(ctx)
+            if rv is not None:
+                # Use first option name as key
+                name = param.opts[0] if param.opts else param.name
+                opts_by_name[name] = rv
+
+        # Define desired order
+        order = ["-j", "-m", "-v", "-h", "--version", "--no-rebuild"]
+        ordered_opts = []
+        for key in order:
+            if key in opts_by_name:
+                ordered_opts.append(opts_by_name[key])
+        # Add any remaining options not in our order
+        for key, rv in opts_by_name.items():
+            if key not in order:
+                ordered_opts.append(rv)
+
+        if ordered_opts:
+            with formatter.section("Options"):
+                formatter.write_dl(ordered_opts)
 
 
 from jig.cli.discovery import ProjectNotFoundError, find_project_root
@@ -76,20 +111,31 @@ from jig.cli.validate import (
 )
 
 
-@click.group(cls=OrderedGroup, invoke_without_command=True)
-@click.version_option()
+@click.group(
+    cls=OrderedGroup,
+    invoke_without_command=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
+)
 @click.option(
     "--no-rebuild",
     is_flag=True,
     default=False,
-    help="Skip automatic graph rebuild before commands.",
+    help="Skip automatic graph rebuild before commands",
 )
+@click.version_option(None, "--version", message="jigy version %(version)s", help="Show version number and exit")
+@click.option("-v", "--verbose", is_flag=True, help="Show detailed progress")
+@click.option("-m", "--markdown", is_flag=True, help="Output LLM-optimized markdown")
+@click.option("-j", "--json", is_flag=True, help="Output single-line JSON")
 @click.pass_context
-@jig.implements("S-061", "S-065", "S-071")
-def cli(ctx, no_rebuild: bool):
-    """JIG — Keep specs, code, and tests aligned."""
+@jig.implements("S-061", "S-065", "S-071", "S-093")
+def cli(ctx, no_rebuild: bool, json: bool, markdown: bool, verbose: bool):
+    """JIG (Jig Intent Graph) — Keep specs, code, and tests aligned."""
     ctx.ensure_object(dict)
     ctx.obj["no_rebuild"] = no_rebuild
+    # Store output options in context for subcommands that want to inherit them
+    ctx.obj["json"] = json
+    ctx.obj["markdown"] = markdown
+    ctx.obj["verbose"] = verbose
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 

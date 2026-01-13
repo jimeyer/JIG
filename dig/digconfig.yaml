@@ -3,6 +3,7 @@
 
 types:
   - exploration
+  - concept
   - scope
   - jigplan
   - plan
