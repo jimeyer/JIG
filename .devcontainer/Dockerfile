@@ -9,6 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
+    zsh \
     sudo \
     git \
     curl \
@@ -30,7 +31,7 @@ ARG USERNAME=dev
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m -s /usr/bin/zsh $USERNAME \
     && mkdir -p /home/$USERNAME/.local/bin \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/$USERNAME \
