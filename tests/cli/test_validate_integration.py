@@ -20,7 +20,7 @@ def test_validate_catches_invalid_charter():
         # Create jig directory structure
         Path("jig").mkdir()
 
-        # Create Charter.md missing defines_goals field
+        # Create Charter.md missing goals field
         (Path("jig") / "Charter.md").write_text(
             """---
 id: Charter
@@ -31,7 +31,7 @@ type: charter
 
 ## Overview
 
-This is a test charter without defines_goals.
+This is a test charter without goals.
 """
         )
 
@@ -40,12 +40,12 @@ This is a test charter without defines_goals.
         # Assert validation fails
         assert result.exit_code != 0, f"Expected validation to fail, got exit_code={result.exit_code}"
 
-        # Assert error mentions defines_goals or charter-related issue
+        # Assert error mentions goals or charter-related issue
         output_lower = result.output.lower()
         assert (
-            "defines_goals" in output_lower
+            "goals" in output_lower
             or "charter" in output_lower
-        ), f"Expected error about defines_goals or charter, got:\n{result.output}"
+        ), f"Expected error about goals or charter, got:\n{result.output}"
 
 
 @jig.verifies("S-076", "S-077", "S-078", "S-079")
@@ -59,7 +59,7 @@ def test_validate_catches_invalid_architecture():
             """---
 id: Charter
 type: charter
-defines_goals: [G-001]
+goals: [G-001]
 ---
 
 # Project Charter
@@ -81,8 +81,7 @@ This is a test goal.
 id: A-1
 type: architecture
 title: Test
-status: active
-supports_goals: [G-001]
+goals: [G-001]
 ---
 
 # Test
@@ -118,7 +117,7 @@ def test_validate_catches_invalid_goal_reference():
             """---
 id: Charter
 type: charter
-defines_goals: [G-001]
+goals: [G-001]
 ---
 
 # Project Charter
@@ -129,7 +128,7 @@ This is the only valid goal.
 """
         )
 
-        # Create Outcome with supports_goals: [G-999] (doesn't exist)
+        # Create Outcome with goals: [G-999] (doesn't exist)
         outcome_dir = Path("jig/outcomes")
         outcome_dir.mkdir(parents=True)
         (outcome_dir / "O-001_Test_Outcome.md").write_text(
@@ -137,8 +136,8 @@ This is the only valid goal.
 id: O-001
 type: outcome
 title: Test Outcome
-specifies: []
-supports_goals: [G-999]
+specifications: [S-001]
+goals: [G-999]
 ---
 
 # Test Outcome

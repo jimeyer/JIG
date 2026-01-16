@@ -167,7 +167,7 @@ def create_jig_project_with_charter(root: Path) -> None:
         """---
 id: Charter
 type: charter
-defines_goals:
+goals:
   - G-001
   - G-002
 ---
@@ -191,10 +191,9 @@ Second goal description.
 id: A-001
 title: Test Architecture
 type: architecture
-status: accepted
-supports_goals:
+goals:
   - G-001
-constrains:
+specifications:
   - S-001
 ---
 

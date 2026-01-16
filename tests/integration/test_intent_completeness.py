@@ -20,9 +20,9 @@ def test_orphaned_outcome_workflow():
     End-to-end workflow: create orphaned outcome, detect error, fix, validate pass.
 
     Workflow:
-    1. Create outcome with empty specifies array
+    1. Create outcome with empty specifications array
     2. Run validation, see error
-    3. Add specification to specifies array
+    3. Add specification to specifications array
     4. Run validation, pass
     """
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -35,7 +35,7 @@ def test_orphaned_outcome_workflow():
             """---
 id: O-001
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome
@@ -54,7 +54,7 @@ specifies: []
             """---
 id: O-001
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -109,7 +109,7 @@ type: specification
             """---
 id: O-001
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -161,7 +161,7 @@ type: specification
             """---
 id: O-001
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Outcome 1 (valid)
@@ -172,10 +172,10 @@ specifies: [S-001]
             """---
 id: O-002
 type: outcome
-specifies: []
+specifications: []
 ---
 
-# Outcome 2 (empty specifies)
+# Outcome 2 (empty specifications)
 """
         )
 
@@ -196,7 +196,7 @@ specifies: []
             """---
 id: O-002
 type: outcome
-specifies: [S-002]
+specifications: [S-002]
 ---
 
 # Outcome 2 (now references S-002)
@@ -241,7 +241,7 @@ type: specification
             """---
 id: O-001
 type: outcome
-specifies: [S-001, S-002]
+specifications: [S-001, S-002]
 ---
 
 # Outcome 1
@@ -252,7 +252,7 @@ specifies: [S-001, S-002]
             """---
 id: O-002
 type: outcome
-specifies: [S-003]
+specifications: [S-003]
 ---
 
 # Outcome 2

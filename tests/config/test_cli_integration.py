@@ -32,6 +32,8 @@ def project_dir():
 id: S-001
 type: specification
 title: Test Specification
+outcomes: [O-001]
+architecture: []
 ---
 
 # Test Specification
@@ -48,7 +50,7 @@ A test specification for validation.
 id: O-001
 type: outcome
 title: Test Outcome
-specifies:
+specifications:
   - S-001
 ---
 
@@ -87,6 +89,8 @@ def test_validate_uses_config_paths(project_dir):
 id: S-002
 type: specification
 title: Custom Specification
+outcomes: [O-002]
+architecture: []
 ---
 
 # Custom Specification
@@ -103,7 +107,7 @@ A custom specification.
 id: O-002
 type: outcome
 title: Custom Outcome
-specifies:
+specifications:
   - S-002
 ---
 
@@ -357,6 +361,8 @@ def test_full_workflow_with_config(project_dir):
 id: S-100
 type: specification
 title: Workflow Test Spec
+outcomes: [O-100]
+architecture: []
 ---
 
 # Workflow Test Spec
@@ -373,7 +379,7 @@ Test specification for full workflow.
 id: O-100
 type: outcome
 title: Workflow Test Outcome
-specifies:
+specifications:
   - S-100
 ---
 

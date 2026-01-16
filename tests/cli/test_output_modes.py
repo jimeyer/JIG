@@ -40,6 +40,8 @@ def create_full_jig_project(root: Path) -> None:
 id: S-001
 title: Test Specification
 type: specification
+outcomes: [O-001]
+architecture: [A-001]
 ---
 
 # Test Specification
@@ -52,7 +54,7 @@ type: specification
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -64,7 +66,7 @@ specifies: [S-001]
         """---
 id: Charter
 type: charter
-defines_goals:
+goals:
   - G-001
 ---
 
@@ -76,15 +78,16 @@ Test goal description.
 """
     )
 
-    # Create architecture document (using valid status: active)
+    # Create architecture document (V2 schema: no status field)
     (root / "jig" / "architecture" / "A-001_Test_Architecture.md").write_text(
         """---
 id: A-001
 title: Test Architecture
 type: architecture
-status: active
-supports_goals:
+goals:
   - G-001
+specifications:
+  - S-001
 ---
 
 # Test Architecture
