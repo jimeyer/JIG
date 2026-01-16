@@ -1,3 +1,13 @@
+---
+title: Alignment Audit Report
+type: journal
+status: active
+created: 1736348160
+created_human: "2026-01-08"
+parent: null
+children: []
+---
+
 # Alignment Audit Report
 
 **Project:** jig-dev
