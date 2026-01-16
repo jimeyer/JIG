@@ -310,7 +310,7 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
     Outcomes are optional artifacts.
 
     Checks:
-    - Required fields: id, title, type, specifies
+    - Required fields: id, title, type, specifications
     - ID format: O-{number}
     - ID uniqueness
     - No excluded fields: brick
@@ -363,13 +363,13 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
                 )
             )
 
-        if "specifies" not in frontmatter:
+        if "specifications" not in frontmatter:
             result.add_error(
                 ValidationError(
                     file=str(outcome_file),
-                    message="Missing required field: 'specifies'",
+                    message="Missing required field: 'specifications'",
                     code="MISSING_REQUIRED_FIELD",
-                    field="specifies",
+                    field="specifications",
                 )
             )
 
@@ -443,9 +443,9 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
             )
 
         # Count spec references
-        specifies = frontmatter.get("specifies", [])
-        if isinstance(specifies, list):
-            total_spec_references += len(specifies)
+        specifications = frontmatter.get("specifications", [])
+        if isinstance(specifications, list):
+            total_spec_references += len(specifications)
 
     # Set detail for display
     result.detail = f"{len(outcome_files)} files, {total_spec_references} spec references"
@@ -456,14 +456,14 @@ def validate_outcome_files(outcome_dir: Path) -> ValidationResult:
 @jig.implements("S-042")
 def validate_outcome_completeness(outcome_dir: Path) -> ValidationResult:
     """
-    Validate that outcomes have non-empty specifies arrays.
+    Validate that outcomes have non-empty specifications arrays.
 
     Per S-042: All outcomes SHALL specify at least one specification.
-    Empty specifies arrays are incomplete and prevent O→S→TDD workflow.
+    Empty specifications arrays are incomplete and prevent O→S→TDD workflow.
 
     Checks:
-    - Each outcome has 'specifies' field (checked by validate_outcome_files)
-    - 'specifies' array is non-empty (has at least one spec ID)
+    - Each outcome has 'specifications' field (checked by validate_outcome_files)
+    - 'specifications' array is non-empty (has at least one spec ID)
     """
     result = ValidationResult(passed=True, phase_name="outcome completeness")
 
@@ -482,16 +482,16 @@ def validate_outcome_completeness(outcome_dir: Path) -> ValidationResult:
             continue
 
         outcome_id = frontmatter.get("id")
-        specifies = frontmatter.get("specifies", [])
+        specifications = frontmatter.get("specifications", [])
 
-        # Check if specifies array is empty
-        if isinstance(specifies, list) and len(specifies) == 0:
+        # Check if specifications array is empty
+        if isinstance(specifications, list) and len(specifications) == 0:
             result.add_error(
                 ValidationError(
                     file=str(outcome_file),
-                    message=f"Outcome completeness: Outcome '{outcome_id}' has empty specifies array. Outcomes must decompose into at least one concrete specification.",
-                    code="EMPTY_SPECIFIES",
-                    field="specifies",
+                    message=f"Outcome completeness: Outcome '{outcome_id}' has empty specifications array. Outcomes must decompose into at least one concrete specification.",
+                    code="EMPTY_SPECIFICATIONS",
+                    field="specifications",
                 )
             )
 
@@ -512,7 +512,7 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
     3. Report specifications with empty reverse index (no outcomes point to them)
 
     Checks:
-    - Each spec is referenced in at least one outcome's 'specifies' array
+    - Each spec is referenced in at least one outcome's 'specifications' array
     """
     result = ValidationResult(passed=True, phase_name="specification coverage")
 
@@ -531,10 +531,10 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
             continue
 
         outcome_id = frontmatter.get("id")
-        specifies = frontmatter.get("specifies", [])
+        specifications = frontmatter.get("specifications", [])
 
-        if isinstance(specifies, list):
-            for spec_id in specifies:
+        if isinstance(specifications, list):
+            for spec_id in specifications:
                 if spec_id not in spec_to_outcomes:
                     spec_to_outcomes[spec_id] = []
                 spec_to_outcomes[spec_id].append(outcome_id)
@@ -559,7 +559,7 @@ def validate_specification_coverage(spec_dir: Path, outcome_dir: Path) -> Valida
                     file=str(spec_file),
                     message=f"Specification coverage: Specification '{spec_id}' is not specified by any outcome. All specifications must deliver value via at least one outcome.",
                     code="ORPHANED_SPECIFICATION",
-                    field="specifies",
+                    field="specifications",
                 )
             )
         else:
@@ -793,8 +793,8 @@ def validate_charter_file(charter_path: Path) -> ValidationResult:
     - Charter file exists at jig/Charter.md (S-072)
     - Charter has valid YAML frontmatter
     - Charter has id: Charter, type: charter
-    - Charter has defines_goals array (S-073)
-    - Goal headers match defines_goals array (S-074)
+    - Charter has goals array (S-073)
+    - Goal headers match goals array (S-074)
     - Goal IDs match G-{number} format (S-075)
     """
     result = ValidationResult(passed=True, phase_name="charter")
@@ -845,69 +845,69 @@ def validate_charter_file(charter_path: Path) -> ValidationResult:
             )
         )
 
-    # S-073: Check defines_goals array
-    defines_goals = frontmatter.get("defines_goals")
-    if not defines_goals:
+    # S-073: Check goals array
+    goals = frontmatter.get("goals")
+    if not goals:
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message="Missing required field: 'defines_goals'. Charter must define at least one goal.",
+                message="Missing required field: 'goals'. Charter must define at least one goal.",
                 code="MISSING_REQUIRED_FIELD",
-                field="defines_goals",
+                field="goals",
             )
         )
         return result
 
-    if not isinstance(defines_goals, list):
+    if not isinstance(goals, list):
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message=f"defines_goals must be an array, not {type(defines_goals).__name__}",
+                message=f"goals must be an array, not {type(goals).__name__}",
                 code="INVALID_FIELD_TYPE",
-                field="defines_goals",
+                field="goals",
             )
         )
         return result
 
-    if len(defines_goals) == 0:
+    if len(goals) == 0:
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message="defines_goals array is empty. Charter must define at least one goal.",
-                code="EMPTY_DEFINES_GOALS",
-                field="defines_goals",
+                message="goals array is empty. Charter must define at least one goal.",
+                code="EMPTY_GOALS",
+                field="goals",
             )
         )
         return result
 
     # S-075: Check goal ID format
     goal_pattern = re.compile(r"^G-\d+$")
-    for goal_id in defines_goals:
+    for goal_id in goals:
         if not goal_pattern.match(goal_id):
             result.add_error(
                 ValidationError(
                     file=str(charter_path),
                     message=f"Invalid goal ID format: '{goal_id}' (must match G-{{number}} pattern, e.g., G-001)",
                     code="INVALID_GOAL_ID_FORMAT",
-                    field="defines_goals",
+                    field="goals",
                 )
             )
 
     # Check for duplicates
-    if len(defines_goals) != len(set(defines_goals)):
+    if len(goals) != len(set(goals)):
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message="defines_goals contains duplicate goal IDs",
+                message="goals contains duplicate goal IDs",
                 code="DUPLICATE_GOAL_ID",
-                field="defines_goals",
+                field="goals",
             )
         )
 
     # S-074: Extract goal headers from body and verify they match
     body_goals = _extract_goal_headers(charter_path)
     body_goal_ids = set(body_goals.keys())
-    frontmatter_goal_ids = set(defines_goals)
+    frontmatter_goal_ids = set(goals)
 
     # Goals in frontmatter but not in body
     missing_in_body = frontmatter_goal_ids - body_goal_ids
@@ -915,9 +915,9 @@ def validate_charter_file(charter_path: Path) -> ValidationResult:
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message=f"Goal '{goal_id}' in defines_goals but no matching '### {goal_id}:' header in body",
+                message=f"Goal '{goal_id}' in goals but no matching '### {goal_id}:' header in body",
                 code="MISSING_GOAL_HEADER",
-                field="defines_goals",
+                field="goals",
             )
         )
 
@@ -927,12 +927,12 @@ def validate_charter_file(charter_path: Path) -> ValidationResult:
         result.add_error(
             ValidationError(
                 file=str(charter_path),
-                message=f"Goal header '### {goal_id}:' in body but not listed in defines_goals",
+                message=f"Goal header '### {goal_id}:' in body but not listed in goals",
                 code="UNDECLARED_GOAL_HEADER",
             )
         )
 
-    result.detail = f"1 file, {len(defines_goals)} goals defined"
+    result.detail = f"1 file, {len(goals)} goals defined"
     return result
 
 
@@ -974,8 +974,8 @@ def validate_goal_references(
     Validate that all goal references point to valid Charter goals.
 
     Checks:
-    - Outcome supports_goals reference valid goals (if present)
-    - Architecture supports_goals reference valid goals (if present)
+    - Outcome goals reference valid goals (if present)
+    - Architecture goals reference valid goals (if present)
     """
     result = ValidationResult(passed=True, phase_name="goal references")
 
@@ -983,8 +983,8 @@ def validate_goal_references(
     valid_goals = set()
     if charter_path.exists():
         frontmatter = _parse_frontmatter(charter_path)
-        if frontmatter and "defines_goals" in frontmatter:
-            valid_goals = set(frontmatter["defines_goals"])
+        if frontmatter and "goals" in frontmatter:
+            valid_goals = set(frontmatter["goals"])
 
     if not valid_goals:
         # No goals defined, skip reference validation
@@ -1000,9 +1000,9 @@ def validate_goal_references(
         if frontmatter is None:
             continue
 
-        supports_goals = frontmatter.get("supports_goals", [])
-        if isinstance(supports_goals, list):
-            for goal_id in supports_goals:
+        outcome_goals = frontmatter.get("goals", [])
+        if isinstance(outcome_goals, list):
+            for goal_id in outcome_goals:
                 total_references += 1
                 if goal_id not in valid_goals:
                     invalid_references += 1
@@ -1011,7 +1011,7 @@ def validate_goal_references(
                             file=str(outcome_file),
                             message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
                             code="INVALID_GOAL_REFERENCE",
-                            field="supports_goals",
+                            field="goals",
                         )
                     )
 
@@ -1022,9 +1022,9 @@ def validate_goal_references(
             if frontmatter is None:
                 continue
 
-            supports_goals = frontmatter.get("supports_goals", [])
-            if isinstance(supports_goals, list):
-                for goal_id in supports_goals:
+            arch_goals = frontmatter.get("goals", [])
+            if isinstance(arch_goals, list):
+                for goal_id in arch_goals:
                     total_references += 1
                     if goal_id not in valid_goals:
                         invalid_references += 1
@@ -1033,7 +1033,7 @@ def validate_goal_references(
                                 file=str(arch_file),
                                 message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
                                 code="INVALID_GOAL_REFERENCE",
-                                field="supports_goals",
+                                field="goals",
                             )
                         )
 
@@ -1060,10 +1060,9 @@ def validate_architecture_files(
     - Files are in jig/architecture/ directory (S-076)
     - Files follow A-{NNN}_{Title}.md naming pattern (S-076)
     - ID format: A-{NNN} zero-padded (S-077)
-    - Required fields: id, type, title, status, supports_goals (S-078)
-    - status enum: draft, proposed, active, deprecated
-    - supports_goals references valid Charter goals (S-078)
-    - constrains references valid spec IDs (S-079)
+    - Required fields: id, type, title, goals (S-078)
+    - goals references valid Charter goals (S-078)
+    - specifications references valid spec IDs (S-079) - optional
     """
     result = ValidationResult(passed=True, phase_name="architecture")
 
@@ -1081,7 +1080,6 @@ def validate_architecture_files(
 
     seen_ids = {}
     arch_id_pattern = re.compile(r"^A-\d{3}$")
-    valid_statuses = {"draft", "proposed", "active", "deprecated"}
 
     for arch_file in arch_files:
         # Parse frontmatter
@@ -1177,91 +1175,70 @@ def validate_architecture_files(
                 )
             )
 
-        # Check status field
-        status = frontmatter.get("status")
-        if not status:
+        # S-078: Check goals field (V2 schema - was supports_goals)
+        arch_goals = frontmatter.get("goals")
+        if not arch_goals:
             result.add_error(
                 ValidationError(
                     file=str(arch_file),
-                    message="Missing required field: 'status'",
+                    message="Missing required field: 'goals'. Architecture must support at least one goal.",
                     code="MISSING_REQUIRED_FIELD",
-                    field="status",
+                    field="goals",
                 )
             )
-        elif status not in valid_statuses:
+        elif not isinstance(arch_goals, list):
             result.add_error(
                 ValidationError(
                     file=str(arch_file),
-                    message=f"Invalid status: '{status}' (must be one of: draft, proposed, active, deprecated)",
-                    code="INVALID_STATUS",
-                    field="status",
-                )
-            )
-
-        # S-078: Check supports_goals field
-        supports_goals = frontmatter.get("supports_goals")
-        if not supports_goals:
-            result.add_error(
-                ValidationError(
-                    file=str(arch_file),
-                    message="Missing required field: 'supports_goals'. Architecture must support at least one goal.",
-                    code="MISSING_REQUIRED_FIELD",
-                    field="supports_goals",
-                )
-            )
-        elif not isinstance(supports_goals, list):
-            result.add_error(
-                ValidationError(
-                    file=str(arch_file),
-                    message=f"supports_goals must be an array, not {type(supports_goals).__name__}",
+                    message=f"goals must be an array, not {type(arch_goals).__name__}",
                     code="INVALID_FIELD_TYPE",
-                    field="supports_goals",
+                    field="goals",
                 )
             )
-        elif len(supports_goals) == 0:
+        elif len(arch_goals) == 0:
             result.add_error(
                 ValidationError(
                     file=str(arch_file),
-                    message="supports_goals array is empty. Architecture must support at least one goal.",
-                    code="EMPTY_SUPPORTS_GOALS",
-                    field="supports_goals",
+                    message="goals array is empty. Architecture must support at least one goal.",
+                    code="EMPTY_GOALS",
+                    field="goals",
                 )
             )
         else:
             # Validate goal references
-            for goal_id in supports_goals:
+            for goal_id in arch_goals:
                 if goal_id not in charter_goals:
                     result.add_error(
                         ValidationError(
                             file=str(arch_file),
                             message=f"Invalid goal reference: '{goal_id}' not defined in Charter",
                             code="INVALID_GOAL_REFERENCE",
-                            field="supports_goals",
+                            field="goals",
                         )
                     )
 
-        # S-079: Check constrains field (optional)
-        constrains = frontmatter.get("constrains")
-        if constrains is not None:
-            if not isinstance(constrains, list):
+        # S-079: Check specifications field (optional, V2 schema - was constrains)
+        specifications = frontmatter.get("specifications")
+        if specifications is not None:
+            if not isinstance(specifications, list):
                 result.add_error(
                     ValidationError(
                         file=str(arch_file),
-                        message=f"constrains must be an array, not {type(constrains).__name__}",
+                        message=f"specifications must be an array, not {type(specifications).__name__}",
                         code="INVALID_FIELD_TYPE",
-                        field="constrains",
+                        field="specifications",
                     )
                 )
             else:
                 # Validate spec references
-                for spec_id in constrains:
+                for spec_id in specifications:
                     if spec_id not in spec_ids:
                         result.add_error(
                             ValidationError(
                                 file=str(arch_file),
-                                message=f"Invalid spec reference in constrains: '{spec_id}' does not exist",
+                                message=f"Invalid spec reference in specifications: '{spec_id}' does not exist",
                                 code="INVALID_SPEC_REFERENCE",
-                                field="constrains",
+                                field="specifications",
                             )
                         )
 

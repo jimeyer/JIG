@@ -218,7 +218,7 @@ def test_validate_outcome_valid():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome
@@ -305,7 +305,7 @@ def test_validate_outcome_excluded_field():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: []
+specifications: []
 brick: B-001
 ---
 
@@ -330,7 +330,7 @@ def test_validate_outcome_missing_title():
             """---
 id: O-001
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome
@@ -506,7 +506,7 @@ def test_validate_decorator_verifies_outcome():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test
@@ -572,7 +572,7 @@ def test_validate_outcome_completeness_valid_single_spec():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -600,7 +600,7 @@ def test_validate_outcome_completeness_valid_multiple_specs():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001, S-002, S-003]
+specifications: [S-001, S-002, S-003]
 ---
 
 # Test Outcome
@@ -614,8 +614,8 @@ specifies: [S-001, S-002, S-003]
 
 
 @jig.verifies("S-042")
-def test_validate_outcome_completeness_empty_specifies():
-    """Outcome with empty specifies array fails completeness validation."""
+def test_validate_outcome_completeness_empty_specifications():
+    """Outcome with empty specifications array fails completeness validation."""
     from jig.validation.intent import validate_outcome_completeness
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -628,7 +628,7 @@ def test_validate_outcome_completeness_empty_specifies():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome
@@ -645,20 +645,20 @@ specifies: []
 
 @jig.verifies("S-042")
 def test_validate_outcome_completeness_multiple_empty():
-    """Multiple outcomes with empty specifies arrays all reported."""
+    """Multiple outcomes with empty specifications arrays all reported."""
     from jig.validation.intent import validate_outcome_completeness
 
     with tempfile.TemporaryDirectory() as tmpdir:
         outcome_dir = Path(tmpdir) / "outcomes"
         outcome_dir.mkdir()
 
-        # Outcome with empty specifies
+        # Outcome with empty specifications
         (outcome_dir / "O-001.md").write_text(
             """---
 id: O-001
 title: Test Outcome 1
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome 1
@@ -671,20 +671,20 @@ specifies: []
 id: O-002
 title: Test Outcome 2
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome 2
 """
         )
 
-        # Another outcome with empty specifies
+        # Another outcome with empty specifications
         (outcome_dir / "O-003.md").write_text(
             """---
 id: O-003
 title: Test Outcome 3
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome 3
@@ -748,7 +748,7 @@ type: specification
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -790,7 +790,7 @@ type: specification
 id: O-001
 title: Test Outcome 1
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome 1
@@ -802,7 +802,7 @@ specifies: [S-001]
 id: O-002
 title: Test Outcome 2
 type: outcome
-specifies: [S-001, S-002]
+specifications: [S-001, S-002]
 ---
 
 # Test Outcome 2
@@ -855,7 +855,7 @@ type: specification
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -921,7 +921,7 @@ type: specification
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: [S-001]
+specifications: [S-001]
 ---
 
 # Test Outcome
@@ -999,7 +999,7 @@ def test_validate_specification_coverage_no_specs():
 id: O-001
 title: Test Outcome
 type: outcome
-specifies: []
+specifications: []
 ---
 
 # Test Outcome
@@ -1010,3 +1010,189 @@ specifies: []
         assert result.passed
         assert len(result.errors) == 0
         assert result.items_checked == 0
+
+
+# --- V2 Schema: Charter uses 'goals' instead of 'defines_goals' (S-073) ---
+
+
+@jig.verifies("S-073")
+def test_validate_charter_valid_v2_schema():
+    """Charter with 'goals' field (V2 schema) passes validation."""
+    from jig.validation.intent import validate_charter_file
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        charter_path = Path(tmpdir) / "Charter.md"
+        charter_path.write_text(
+            """---
+id: Charter
+type: charter
+goals: [G-001, G-002]
+---
+
+# Charter
+
+## Goals
+
+### G-001: First Goal
+
+Description of first goal.
+
+### G-002: Second Goal
+
+Description of second goal.
+"""
+        )
+
+        result = validate_charter_file(charter_path)
+        assert result.passed
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-073")
+def test_validate_charter_missing_goals():
+    """Charter missing 'goals' field fails validation."""
+    from jig.validation.intent import validate_charter_file
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        charter_path = Path(tmpdir) / "Charter.md"
+        charter_path.write_text(
+            """---
+id: Charter
+type: charter
+---
+
+# Charter
+
+## Goals
+
+### G-001: First Goal
+
+Description.
+"""
+        )
+
+        result = validate_charter_file(charter_path)
+        assert not result.passed
+        assert len(result.errors) >= 1
+        assert any("goals" in err.message.lower() for err in result.errors)
+
+
+# --- V2 Schema: Architecture uses 'goals' and 'specifications' (S-078, S-079) ---
+
+
+@jig.verifies("S-078", "S-079")
+def test_validate_architecture_valid_v2_schema():
+    """Architecture with V2 fields (goals, specifications) passes validation."""
+    from jig.validation.intent import validate_architecture_files
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        arch_file = arch_dir / "A-001_Test_Architecture.md"
+        arch_file.write_text(
+            """---
+id: A-001
+type: architecture
+title: Test Architecture
+goals: [G-001]
+specifications: [S-001, S-002]
+---
+
+# Test Architecture
+
+Architecture content.
+"""
+        )
+
+        # V2 schema does not require status field
+        result = validate_architecture_files(arch_dir, {"G-001"}, {"S-001", "S-002"})
+        assert result.passed
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-078")
+def test_validate_architecture_missing_goals():
+    """Architecture missing 'goals' field fails validation."""
+    from jig.validation.intent import validate_architecture_files
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        arch_file = arch_dir / "A-001_Test_Architecture.md"
+        arch_file.write_text(
+            """---
+id: A-001
+type: architecture
+title: Test Architecture
+specifications: [S-001]
+---
+
+# Test Architecture
+
+Architecture content.
+"""
+        )
+
+        result = validate_architecture_files(arch_dir, {"G-001"}, {"S-001"})
+        assert not result.passed
+        assert any("goals" in err.message.lower() for err in result.errors)
+
+
+@jig.verifies("S-079")
+def test_validate_architecture_specifications_optional():
+    """Architecture without 'specifications' field passes validation (optional)."""
+    from jig.validation.intent import validate_architecture_files
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        arch_file = arch_dir / "A-001_Test_Architecture.md"
+        arch_file.write_text(
+            """---
+id: A-001
+type: architecture
+title: Test Architecture
+goals: [G-001]
+---
+
+# Test Architecture
+
+Architecture content.
+"""
+        )
+
+        result = validate_architecture_files(arch_dir, {"G-001"}, {"S-001"})
+        assert result.passed
+
+
+@jig.verifies("S-079")
+def test_validate_architecture_invalid_spec_reference():
+    """Architecture with invalid specification reference fails validation."""
+    from jig.validation.intent import validate_architecture_files
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        arch_file = arch_dir / "A-001_Test_Architecture.md"
+        arch_file.write_text(
+            """---
+id: A-001
+type: architecture
+title: Test Architecture
+goals: [G-001]
+specifications: [S-999]
+---
+
+# Test Architecture
+
+Architecture content.
+"""
+        )
+
+        result = validate_architecture_files(arch_dir, {"G-001"}, {"S-001"})
+        assert not result.passed
+        assert any("S-999" in err.message for err in result.errors)
