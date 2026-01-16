@@ -56,12 +56,20 @@ Every function should trace upward through this hierarchy to the Charter. Breaks
 | # | Artifact | Location | Authored By |
 |---|----------|----------|-------------|
 | 1 | Charter | `jig/Charter.md` | Human |
-| 2 | Architecture | `jig/architecture/A-###.md` | Human |
-| 3 | Outcome | `jig/outcomes/O-###.md` | Human |
-| 4 | Specification | `jig/specifications/S-###.md` | Human |
+| 2 | Architecture | `jig/architecture/A-###_{Title}.md` | Human |
+| 3 | Outcome | `jig/outcomes/O-###_{Title}.md` | Human |
+| 4 | Specification | `jig/specifications/S-###_{Title}.md` | Human |
 | 5 | Brick definitions | `jig/bricks.yaml` | Human |
 | 6 | @jig annotations | Source code | Human |
 | 7 | Graph files | `jig/generated/*.ndjson` | Machine (NEVER EDIT) |
+
+### Filename Format
+
+Files must match: `{TYPE}-{NNN}_{Title_In_Snake_Case}.md`
+
+- Title derived from frontmatter `title` field
+- Spaces become underscores, hyphens preserved
+- Example: title `"Multi-Device State"` → `O-152_Multi-Device_State.md`
 
 ### Frontmatter Schema
 
@@ -124,7 +132,7 @@ def test_token_expiration(): ...
 
 ---
 
-## Bricks: Layer x Tower Model
+## Bricks: Layer × Tower Model
 
 ### Partition Property
 - Every function in exactly ONE brick (no gaps, no overlaps)
@@ -158,10 +166,10 @@ Layer 2: Interface (depends on Layers 0-1)
 Cross-tower dependencies are **FORBIDDEN**. Towers communicate through shared specifications, not code imports.
 
 ```
-          |  server  |  harness  |  device  |
-Layer 2   |   B-s2   |   B-h2    |          |
-Layer 1   |   B-s1   |   B-h1    |   B-d1   |
-Layer 0   |   B-s0   |   B-h0    |   B-d0   |
+          │  server  │  harness  │  device  │
+Layer 2   │   B-s2   │   B-h2    │          │
+Layer 1   │   B-s1   │   B-h1    │   B-d1   │
+Layer 0   │   B-s0   │   B-h0    │   B-d0   │
 ```
 
 Single-tower projects omit `tower` field from all bricks.
@@ -183,8 +191,8 @@ O and S nodes remain true FOREVER, not just until PR merges.
 - [ ] Remains true after project completes
 - [ ] NOT: project goals, refactoring tasks
 
-X BAD: "Achieve 90% test coverage"
-GOOD: "Critical behaviors verified to prevent production regressions"
+❌ BAD: "Achieve 90% test coverage"  
+✓ GOOD: "Critical behaviors verified to prevent production regressions"
 
 ### Specifications = Behavioral Requirements
 
@@ -193,8 +201,8 @@ GOOD: "Critical behaviors verified to prevent production regressions"
 - [ ] Can use `@jig.verifies` on tests
 - [ ] NOT: file paths, implementation details
 
-X BAD: "Relocate file X to location Y"
-GOOD: "EraLamportClock state persists across restarts"
+❌ BAD: "Relocate file X to location Y"  
+✓ GOOD: "EraLamportClock state persists across restarts"
 
 **Test:** Can you write a decorator for it? If no, rewrite.
 
@@ -202,7 +210,7 @@ GOOD: "EraLamportClock state persists across restarts"
 
 Specs are lean behavioral contracts. Architecture docs own structure/relationships; specs own invariants.
 
-**Title:** `S-###: {Invariant Name}` -- names the property, not the implementation.
+**H1 Title:** Must exactly match frontmatter `title` field. Do NOT include ID prefix.
 
 | Section | Required | Content |
 |---------|----------|---------|
@@ -211,23 +219,23 @@ Specs are lean behavioral contracts. Architecture docs own structure/relationshi
 | **Verification** | Yes | Acceptance criteria. What would a test assert? |
 | **Boundaries** | No | What's explicitly out of scope. |
 
-**Exclude:** Rationale (-> Outcome), architecture discussion (-> arch doc link), implementation hints, history.
+**Exclude:** Rationale (→ Outcome), architecture discussion (→ arch doc link), implementation hints, history.
 
 **Example:**
 ```markdown
-# S-042: Staleness Tracking
+# Staleness Tracking
 
 Heartbeat absence triggers staleness state within bounded time.
 
 ## Invariants
-- Device marked stale after 2x heartbeat interval without contact
+- Device marked stale after 2× heartbeat interval without contact
 - Staleness merge uses min-timestamp (earliest evidence wins)
-- Stale->fresh transition requires new heartbeat, not timeout
+- Stale→fresh transition requires new heartbeat, not timeout
 
 ## Verification
-- [ ] Device receiving heartbeat at t0, none by t0+2T -> stale
-- [ ] Two hosts disagree on staleness -> merge produces stale
-- [ ] Stale device sends heartbeat -> immediately fresh
+- [ ] Device receiving heartbeat at t₀, none by t₀+2T → stale
+- [ ] Two hosts disagree on staleness → merge produces stale
+- [ ] Stale device sends heartbeat → immediately fresh
 ```
 
 Target: ~50 lines max. Architecture link in frontmatter handles the rest.
@@ -248,11 +256,23 @@ jigy rebuild        # Runs validate, rebuild, layers
 
 ## Validation Rules
 
+### Identity & References
 - All IDs unique within type, match required patterns
 - `@jig.implements` / `@jig.verifies` reference existing specs
 - `goals` references goals defined in Charter
 - `specifications` references existing specs
 - `outcomes` / `architecture` reference existing outcomes/arch docs
+
+### File Format
+- Filename matches `{TYPE}-{NNN}_{Title_Snake_Case}.md`
+- H1 exactly matches frontmatter `title` (no ID prefix)
+
+### Graph Integrity
+- **Bidirectional O↔S**: If spec lists outcome in `outcomes`, that outcome must list spec in `specifications`
+- **Outcome completeness**: Every outcome must have non-empty `specifications` array
+- **Spec coverage**: Every spec must appear in at least one outcome's `specifications` array
+
+### Brick Constraints
 - Every function in exactly one brick
 - Brick at layer N depends only on layers < N
 - Cross-tower dependencies forbidden (if towers used)
@@ -262,12 +282,12 @@ jigy rebuild        # Runs validate, rebuild, layers
 
 ## For AI Agents
 
-1. **Read before writing** -- Query graphs to understand what exists
-2. **Link your work** -- Use `@jig.implements()` and `@jig.verifies()`
-3. **Validate continuously** -- Run `jigy validate` before committing
-4. **Understand intent first** -- Read S-### and O-### before modifying code
-5. **Respect architecture** -- Check layer and tower constraints
-6. **Trace to goals** -- Know which G-### your work supports
+1. **Read before writing** — Query graphs to understand what exists
+2. **Link your work** — Use `@jig.implements()` and `@jig.verifies()`
+3. **Validate continuously** — Run `jigy validate` before committing
+4. **Understand intent first** — Read S-### and O-### before modifying code
+5. **Respect architecture** — Check layer and tower constraints
+6. **Trace to goals** — Know which G-### your work supports
 
 ---
 

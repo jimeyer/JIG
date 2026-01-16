@@ -37,7 +37,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Set up Python environment
-ENV PATH="/home/$USERNAME/.local/bin:$PATH"
+ENV PATH="/tools/bin:/home/$USERNAME/.local/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
 
