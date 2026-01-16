@@ -2,7 +2,6 @@
 id: S-082
 title: Architecture Nodes In Intent Graph
 type: specification
-outcome: O-025
 outcomes: [O-025]
 architecture: [A-001]
 ---
@@ -20,17 +19,16 @@ architecture: [A-001]
    - id: A-{NNN}
    - type: "architecture"
    - title: from frontmatter
-   - status: from frontmatter (draft, proposed, active, deprecated)
-   - supports_goals: array from frontmatter
+   - goals: array from frontmatter
    - file: relative path to architecture file
 
 3. **Optional fields included when present**
-   - constrains: array of spec IDs (if defined)
+   - specifications: array of spec IDs (if defined)
 
 ## NDJSON Format
 
 ```json
-{"id":"A-001","type":"architecture","title":"JIG Core Architecture","status":"active","supports_goals":["G-001","G-003","G-004","G-005"],"constrains":["S-072","S-073"],"file":"jig/architecture/A-001_JIG_Core_Architecture.md"}
+{"id":"A-001","type":"architecture","title":"JIG Core Architecture","goals":["G-001","G-003","G-004","G-005"],"specifications":["S-072","S-073"],"file":"jig/architecture/A-001_JIG_Core_Architecture.md"}
 ```
 
 ## Validation Rules

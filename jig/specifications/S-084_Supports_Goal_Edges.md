@@ -2,7 +2,6 @@
 id: S-084
 title: Supports Goal Edges
 type: specification
-outcome: O-025
 outcomes: [O-025]
 architecture: [A-001]
 ---
@@ -15,13 +14,13 @@ architecture: [A-001]
    - Edge type: "supports_goal"
    - Source: Architecture node
    - Target: Goal node
-   - One edge per goal in architecture.supports_goals array
+   - One edge per goal in architecture.goals array
 
 2. **Intent graph MUST include O→Goal edges (supports_goal)**
    - Edge type: "supports_goal"
    - Source: Outcome node
    - Target: Goal node
-   - One edge per goal in outcome.supports_goals array
+   - One edge per goal in outcome.goals array
 
 3. **Edge format**
    - source: artifact ID (A-001 or O-001)
@@ -39,7 +38,7 @@ architecture: [A-001]
 
 ## Edge Count
 
-Total supports_goal edges = sum of all (architecture.supports_goals + outcome.supports_goals) arrays
+Total supports_goal edges = sum of all (architecture.goals + outcome.goals) arrays
 
 ## Rationale
 

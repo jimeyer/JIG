@@ -3,7 +3,7 @@ id: O-025
 type: outcome
 title: Intent Graph Captures Full Hierarchy
 goals: [G-005, G-002]
-specifications: [S-080, S-081, S-082, S-083, S-084, S-085]
+specifications: [S-080, S-081, S-082, S-083, S-084, S-085, S-095]
 ---
 
 # Intent Graph Captures Full Hierarchy

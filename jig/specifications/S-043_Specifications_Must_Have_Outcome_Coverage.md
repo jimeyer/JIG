@@ -8,21 +8,21 @@ architecture: [A-004]
 
 # Specifications Must Have Outcome Coverage
 
-All specifications SHALL be referenced in at least one outcome's `specifies` array.
+All specifications SHALL be referenced in at least one outcome's `specifications` array.
 
 **Acceptance Criteria**:
-- Validation builds reverse index: spec_id → list of outcomes that specify it
+- Validation builds reverse index: spec_id -> list of outcomes that specify it
 - Specifications not referenced by any outcome are reported as errors
 - Error message lists which specification(s) are orphaned
 - Error message explains that specifications must deliver measurable value via outcomes
-- Suggests action: "Create an outcome that includes this specification in its `specifies` array, or remove the orphaned specification"
+- Suggests action: "Create an outcome that includes this specification in its `specifications` array, or remove the orphaned specification"
 
 **Rationale**: Specifications define WHAT to build (concrete requirements). Without linkage to an outcome (WHY we build it), specifications lack business justification and cannot be prioritized or evaluated for value delivery. Every specification should contribute to at least one measurable outcome. Orphaned specifications indicate incomplete intent modeling or deprecated requirements that should be removed.
 
 **Valid Example**:
 ```markdown
 # In O-001.md
-specifies: [S-001, S-002, S-003]
+specifications: [S-001, S-002, S-003]
 
 # S-001.md, S-002.md, S-003.md are all covered by O-001
 ```
@@ -30,7 +30,7 @@ specifies: [S-001, S-002, S-003]
 **Invalid Example**:
 ```markdown
 # In O-001.md
-specifies: [S-001, S-002]
+specifications: [S-001, S-002]
 
 # S-003.md exists but is not referenced by any outcome
 # ERROR: S-003 is orphaned
@@ -41,18 +41,18 @@ specifies: [S-001, S-002]
 ERROR: Specification coverage validation failed
   - Specification 'S-003' (jig/specifications/S-003.md) is not specified by any outcome
   - All specifications must deliver value via at least one outcome
-  - Fix: Add 'S-003' to an outcome's 'specifies' array, or remove the specification if it's no longer needed
+  - Fix: Add 'S-003' to an outcome's 'specifications' array, or remove the specification if it's no longer needed
 ```
 
 **Algorithm**:
 1. Load all outcome nodes from intent graph
 2. Build reverse index: `spec_to_outcomes = defaultdict(list)`
-3. For each outcome O with `specifies: [S1, S2, ...]`, add O to `spec_to_outcomes[S1]`, `spec_to_outcomes[S2]`, etc.
+3. For each outcome O with `specifications: [S1, S2, ...]`, add O to `spec_to_outcomes[S1]`, `spec_to_outcomes[S2]`, etc.
 4. Load all specification nodes from intent graph
 5. For each specification S, check if `spec_to_outcomes[S]` is non-empty
 6. Report specifications where `spec_to_outcomes[S]` is empty (not referenced by any outcome)
 
 **References**:
 - A001 Section 2: Specification Files (specifications exist to satisfy outcomes)
-- A001 Section 3: Outcome Files (specifies field links outcomes to specifications)
+- A001 Section 3: Outcome Files (specifications field links outcomes to specifications)
 - O-015: Completeness validation for intent graph

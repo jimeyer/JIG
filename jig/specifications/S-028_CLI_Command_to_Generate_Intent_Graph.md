@@ -18,9 +18,9 @@ The `jigy intent rebuild` command MUST generate intent-graph.ndjson from specifi
 - Outputs to `jig/generated/intent-graph.ndjson` (default, configurable via `--output`)
 - First line contains metadata object per A001 §6.1: `{"_meta": {"version": "1.0", "generated": "ISO-timestamp", "spec_count": N, "outcome_count": M, "brick_count": K}}`
 - Spec nodes follow A001 schema: `{"id":"S-001","type":"specification","file":"jig/specifications/S-001.md"}`
-- Outcome nodes follow A001 schema: `{"id":"O-001","type":"outcome","file":"jig/outcomes/O-001.md","specifies":["S-001","S-002"]}`
+- Outcome nodes follow A001 schema: `{"id":"O-001","type":"outcome","file":"jig/outcomes/O-001.md","specifications":["S-001","S-002"]}`
 - Brick nodes follow A001 schema with units extension: `{"id":"B-001","type":"brick","name":"Brick Name","file":"jig/bricks.yaml","units":["M-module","C-class"]}`
-- O→S edges created for outcome specifies relationships: `{"source":"O-001","target":"S-001","type":"specifies"}`
+- O→S edges created for outcome specifications relationships: `{"source":"O-001","target":"S-001","type":"specifications"}`
 - Help text available via `jigy intent rebuild --help`
 - Exit code 0 on success, non-zero on failure
 

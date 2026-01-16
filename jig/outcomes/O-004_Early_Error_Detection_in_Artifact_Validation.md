@@ -4,7 +4,7 @@ title: Early Error Detection in Artifact Validation
 type: outcome
 theme: [Validation]
 goals: [G-003]
-specifications: [S-023, S-024, S-025, S-027]
+specifications: [S-023, S-024, S-025, S-027, S-095]
 ---
 
 # Early Error Detection in Artifact Validation

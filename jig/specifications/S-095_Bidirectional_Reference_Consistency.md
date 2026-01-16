@@ -2,6 +2,8 @@
 id: S-095
 title: Bidirectional Reference Consistency
 type: specification
+outcomes: [O-004, O-025]
+architecture: [A-004]
 ---
 
 # Bidirectional Reference Consistency
