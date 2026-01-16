@@ -64,3 +64,30 @@ escalated: false
 
 ---
 
+### Entry 3 | 2026-01-16 16:50 PST | WU2 Complete
+
+```yaml
+type: outcome
+wu: WU2
+spec: S-028, S-084, S-085
+escalated: false
+```
+
+**Status:** COMPLETE - All gates passed.
+
+**Changes:**
+- `src/jig/intent_graph/generator.py` (59 changes)
+- `tests/jig/intent_graph/test_generator.py` (279 insertions)
+
+**Field migrations in NDJSON output:**
+- Charter nodes: `defines_goals` → `goals`
+- Architecture nodes: `supports_goals` → `goals`, `constrains` → `specifications`, removed `status`
+- Outcome nodes: `supports_goals` → `goals`, `specifies` → `specifications`
+- Edge type: `constrains` → `specifications`
+
+**Notable:** Function `_create_constrains_edges` renamed to `_create_specifications_edges`. Clean implementation, TDD worked well.
+
+**Decision:** CONTINUE to WU3.
+
+---
+

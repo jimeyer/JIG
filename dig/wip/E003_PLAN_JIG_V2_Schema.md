@@ -101,7 +101,7 @@ WU7 (Spec Files) ─────────────────────
 ## Work Unit Checklist
 
 - [x] WU1: Update Validation Code — tests ☑ / code ☑
-- [ ] WU2: Update Intent Graph Generator — tests ☐ / code ☐
+- [x] WU2: Update Intent Graph Generator — tests ☑ / code ☑
 - [ ] WU3: Add Bidirectional Consistency Validation — tests ☐ / code ☐ / spec ☐
 - [ ] WU4: Create Migration Script — script ☐
 - [ ] WU5: Execute Content Migration — charter ☐ / arch ☐ / outcomes ☐ / specs ☐

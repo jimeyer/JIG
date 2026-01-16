@@ -80,8 +80,8 @@ def generate_intent_graph(
     # Architecture/Outcome→Goal supports_goal edges (S-084)
     edges.extend(_create_supports_goal_edges(architecture_nodes, outcome_nodes))
 
-    # Architecture→Spec constrains edges (S-085)
-    edges.extend(_create_constrains_edges(architecture_nodes))
+    # Architecture→Spec specifications edges (S-085, V2 schema)
+    edges.extend(_create_specifications_edges(architecture_nodes))
 
     # Outcome→Spec specifies edges
     edges.extend(_create_specifies_edges(outcome_nodes))
@@ -151,7 +151,7 @@ def _load_charter_node(charter_file: Path) -> Optional[Dict[str, Any]]:
     charter_node = {
         "id": "Charter",
         "type": "charter",
-        "defines_goals": frontmatter.get("defines_goals", []),
+        "goals": frontmatter.get("goals", []),
         "file": "jig/Charter.md",
         "jig_hash": hash_intent_artifact(charter_file),
     }
@@ -235,16 +235,15 @@ def _load_architecture_nodes(architecture_dir: Path) -> List[Dict[str, Any]]:
             "id": arch_id,
             "type": "architecture",
             "title": frontmatter.get("title", ""),
-            "status": frontmatter.get("status", ""),
-            "supports_goals": frontmatter.get("supports_goals", []),
+            "goals": frontmatter.get("goals", []),
             "file": relative_path,
             "jig_hash": hash_intent_artifact(arch_file),
         }
 
-        # Add constrains field if present
-        constrains = frontmatter.get("constrains")
-        if constrains:
-            arch_node["constrains"] = constrains
+        # Add specifications field if present (V2 schema: replaces 'constrains')
+        specifications = frontmatter.get("specifications")
+        if specifications:
+            arch_node["specifications"] = specifications
 
         # Add optional git_blob for tiered rebuild optimization (S-049)
         git_blob = git_blob_hash(arch_file)
@@ -328,13 +327,13 @@ def _load_outcome_nodes(outcome_dir: Path) -> List[Dict[str, Any]]:
             "type": "outcome",
             "file": relative_path,
             "jig_hash": hash_intent_artifact(outcome_file),
-            "specifies": frontmatter.get("specifies", []),
+            "specifications": frontmatter.get("specifications", []),
         }
 
-        # Add supports_goals if present (S-084)
-        supports_goals = frontmatter.get("supports_goals")
-        if supports_goals:
-            outcome_node["supports_goals"] = supports_goals
+        # Add goals if present (V2 schema: replaces 'supports_goals')
+        goals = frontmatter.get("goals")
+        if goals:
+            outcome_node["goals"] = goals
 
         # Add optional git_blob for tiered rebuild optimization (S-049)
         git_blob = git_blob_hash(outcome_file)
@@ -433,7 +432,7 @@ def _create_defines_goal_edges(charter_node: Optional[Dict[str, Any]]) -> List[D
     """Create Charter→Goal defines_goal edges.
 
     Args:
-        charter_node: Charter node dictionary with defines_goals field.
+        charter_node: Charter node dictionary with goals field (V2 schema).
 
     Returns:
         List of edge dictionaries with source, target, type.
@@ -442,7 +441,7 @@ def _create_defines_goal_edges(charter_node: Optional[Dict[str, Any]]) -> List[D
         return []
 
     edges = []
-    goal_ids = charter_node.get("defines_goals", [])
+    goal_ids = charter_node.get("goals", [])
 
     for goal_id in goal_ids:
         edge = {"source": "Charter", "target": goal_id, "type": "defines_goal"}
@@ -467,21 +466,21 @@ def _create_supports_goal_edges(
     """
     edges = []
 
-    # Architecture→Goal edges
+    # Architecture→Goal edges (V2 schema: uses 'goals' field)
     for arch in architecture_nodes:
         arch_id = arch["id"]
-        supports_goals = arch.get("supports_goals", [])
+        goals = arch.get("goals", [])
 
-        for goal_id in supports_goals:
+        for goal_id in goals:
             edge = {"source": arch_id, "target": goal_id, "type": "supports_goal"}
             edges.append(edge)
 
-    # Outcome→Goal edges
+    # Outcome→Goal edges (V2 schema: uses 'goals' field)
     for outcome in outcome_nodes:
         outcome_id = outcome["id"]
-        supports_goals = outcome.get("supports_goals", [])
+        goals = outcome.get("goals", [])
 
-        for goal_id in supports_goals:
+        for goal_id in goals:
             edge = {"source": outcome_id, "target": goal_id, "type": "supports_goal"}
             edges.append(edge)
 
@@ -489,8 +488,10 @@ def _create_supports_goal_edges(
 
 
 @jig.implements("S-085")
-def _create_constrains_edges(architecture_nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]:
-    """Create A→S constrains edges.
+def _create_specifications_edges(architecture_nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    """Create A→S specifications edges.
+
+    V2 schema: uses 'specifications' field and edge type (replaces 'constrains').
 
     Args:
         architecture_nodes: List of architecture node dictionaries.
@@ -502,10 +503,10 @@ def _create_constrains_edges(architecture_nodes: List[Dict[str, Any]]) -> List[D
 
     for arch in architecture_nodes:
         arch_id = arch["id"]
-        constrains = arch.get("constrains", [])
+        specifications = arch.get("specifications", [])
 
-        for spec_id in constrains:
-            edge = {"source": arch_id, "target": spec_id, "type": "constrains"}
+        for spec_id in specifications:
+            edge = {"source": arch_id, "target": spec_id, "type": "specifications"}
             edges.append(edge)
 
     return edges
@@ -513,6 +514,8 @@ def _create_constrains_edges(architecture_nodes: List[Dict[str, Any]]) -> List[D
 
 def _create_specifies_edges(outcome_nodes: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     """Create O→S specifies edges from outcome nodes.
+
+    V2 schema: reads from 'specifications' field, edge type remains 'specifies'.
 
     Args:
         outcome_nodes: List of outcome node dictionaries.
@@ -523,7 +526,7 @@ def _create_specifies_edges(outcome_nodes: List[Dict[str, Any]]) -> List[Dict[st
     edges = []
     for outcome in outcome_nodes:
         outcome_id = outcome["id"]
-        spec_ids = outcome.get("specifies", [])
+        spec_ids = outcome.get("specifications", [])
 
         for spec_id in spec_ids:
             edge = {"source": outcome_id, "target": spec_id, "type": "specifies"}
