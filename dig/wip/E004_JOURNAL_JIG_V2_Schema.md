@@ -212,3 +212,32 @@ escalated: false
 
 ---
 
+### Entry 9 | 2026-01-16 17:50 PST | WU8 Complete
+
+```yaml
+type: outcome
+wu: WU8
+spec: null
+escalated: false
+```
+
+**Status:** COMPLETE - SCOPE VALIDATED
+
+**Validation results:**
+- jigy rebuild: 122 nodes, 196 edges (intent graph version 2.0)
+- jigy validate: All validations passed (78 specs, 0 orphaned, 0 bidirectional inconsistencies)
+- pytest: 868 tests passed (11 new V2 schema integration tests)
+- V2 schema in graph: ✓ (uses `goals`, `specifications`)
+- No V1 field names in frontmatter: ✓
+
+**Integration test:** `tests/integration/test_v2_schema.py` (11 tests in 3 classes)
+- TestV2SchemaFieldNames (5 tests)
+- TestV2BidirectionalConsistency (2 tests)
+- TestV2GraphGeneration (4 tests)
+
+**SCOPE Delivered:** "Align JIG implementation with the V2 schema" - VERIFIED
+
+**Decision:** CONTINUE to WU9.
+
+---
+

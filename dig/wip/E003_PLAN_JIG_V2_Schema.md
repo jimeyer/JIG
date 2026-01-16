@@ -107,7 +107,7 @@ WU7 (Spec Files) ─────────────────────
 - [x] WU5: Execute Content Migration — charter ☑ / arch ☑ / outcomes ☑ / specs ☑
 - [x] WU6: Update Test Files — fixtures ☑ / assertions ☑
 - [x] WU7: Update Spec Files — field names ☑ / back-refs ☑
-- [ ] WU8: Validation — SCOPE verified ☐
+- [x] WU8: Validation — SCOPE verified ☑
 - [ ] WU9: Finalize Context — context updated ☐
 
 ---
