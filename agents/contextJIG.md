@@ -8,24 +8,26 @@ JIG measures alignment between **intent** (specifications), **implementation** (
 
 ```
                       CHARTER
-                    (defines G-#)
-                    /          \
-                   /            \
-          ARCHITECTURE         OUTCOMES
-               A-###              O-###
-           supports_goals     supports_goals
-           constrains ──┐    ┌── specifies
-                        │    │
-                        ▼    ▼
-                    SPECIFICATIONS
-                         S-###
-                       /      \
-                      /        \
-                 verifies   implements
+                     (defines G-#)
                     /            \
                    /              \
-               TESTS              CODE
-                T-###              C-###
+          ARCHITECTURE          OUTCOMES
+               A-###               O-###
+              goals               goals
+                │                   │
+                │ specifications    │ specifications
+                │    ┌──────────────┘
+                ▼    ▼
+            SPECIFICATIONS
+                 S-###
+           (outcomes, architecture)
+               /      \
+              /        \
+         verifies   implements
+            /            \
+           /              \
+       TESTS              CODE
+        T-###              C-###
 ```
 
 Every function should trace upward through this hierarchy to the Charter. Breaks indicate misalignment.
@@ -37,9 +39,9 @@ Every function should trace upward through this hierarchy to the Charter. Breaks
 | Type | Format | Example |
 |------|--------|---------|
 | Charter | `Charter` | `Charter` (singleton) |
-| Goal | `G-{number}` | G-001, G-005 |
-| Architecture | `A-{number}` | A-001 |
-| Outcome | `O-{number}` | O-001 |
+| Goal | `G-{number}` | G-1, G-2, G-3 |
+| Architecture | `A-{number}` | A-010, A-030 |
+| Outcome | `O-{number}` | O-101, O-107 |
 | Specification | `S-{number}` | S-001, S-042 |
 | Brick | `B-{kebab-case}` | B-auth-session |
 | Code | `C-{path}` | C-jig.cli.main |
@@ -61,36 +63,54 @@ Every function should trace upward through this hierarchy to the Charter. Breaks
 | 6 | @jig annotations | Source code | Human |
 | 7 | Graph files | `jig/generated/*.ndjson` | Machine (NEVER EDIT) |
 
-### Frontmatter Examples
+### Frontmatter Schema
 
-**Specification:**
+Frontmatter contains **graph edges** (identity + relationships). Operational metadata goes in body.
+
+**Charter:**
 ```yaml
 ---
-id: S-001
-type: specification
-status: active
----
-```
-
-**Outcome:**
-```yaml
----
-id: O-001
-type: outcome
-supports_goals: [G-001]
-specifies: [S-001, S-002]
+id: Charter
+type: charter
+goals: [G-1, G-2, G-3]
 ---
 ```
 
 **Architecture:**
 ```yaml
 ---
-id: A-001
+id: A-030
 type: architecture
-supports_goals: [G-001, G-003]
-constrains: [S-072, S-073]
+title: ANK Architecture
+goals: [G-1, G-3]
+specifications: [S-001, S-004, S-006]
 ---
 ```
+
+**Outcome:**
+```yaml
+---
+id: O-101
+type: outcome
+title: Distributed State Convergence
+goals: [G-2, G-3]
+architecture: [A-022, A-030]
+specifications: [S-001, S-002]
+---
+```
+
+**Specification:**
+```yaml
+---
+id: S-001
+type: specification
+title: CID Properties
+outcomes: [O-101, O-103]
+architecture: [A-030, A-022]
+---
+```
+
+**Not in frontmatter** (goes in body if needed): `status`, `related`, `brick`, `consolidates`
 
 ### Decorators (in source code)
 
@@ -104,7 +124,7 @@ def test_token_expiration(): ...
 
 ---
 
-## Bricks: Layer × Tower Model
+## Bricks: Layer x Tower Model
 
 ### Partition Property
 - Every function in exactly ONE brick (no gaps, no overlaps)
@@ -138,10 +158,10 @@ Layer 2: Interface (depends on Layers 0-1)
 Cross-tower dependencies are **FORBIDDEN**. Towers communicate through shared specifications, not code imports.
 
 ```
-          │  server  │  harness  │  device  │
-Layer 2   │   B-s2   │   B-h2    │          │
-Layer 1   │   B-s1   │   B-h1    │   B-d1   │
-Layer 0   │   B-s0   │   B-h0    │   B-d0   │
+          |  server  |  harness  |  device  |
+Layer 2   |   B-s2   |   B-h2    |          |
+Layer 1   |   B-s1   |   B-h1    |   B-d1   |
+Layer 0   |   B-s0   |   B-h0    |   B-d0   |
 ```
 
 Single-tower projects omit `tower` field from all bricks.
@@ -159,12 +179,12 @@ O and S nodes remain true FOREVER, not just until PR merges.
 ### Outcomes = Business Value
 
 - [ ] WHY the system behaves this way
-- [ ] `supports_goals` links to Charter goals
+- [ ] `goals` links to Charter goals
 - [ ] Remains true after project completes
 - [ ] NOT: project goals, refactoring tasks
 
-❌ BAD: "Achieve 90% test coverage"  
-✓ GOOD: "Critical behaviors verified to prevent production regressions"
+X BAD: "Achieve 90% test coverage"
+GOOD: "Critical behaviors verified to prevent production regressions"
 
 ### Specifications = Behavioral Requirements
 
@@ -173,10 +193,44 @@ O and S nodes remain true FOREVER, not just until PR merges.
 - [ ] Can use `@jig.verifies` on tests
 - [ ] NOT: file paths, implementation details
 
-❌ BAD: "Relocate file X to location Y"  
-✓ GOOD: "EraLamportClock state persists across restarts"
+X BAD: "Relocate file X to location Y"
+GOOD: "EraLamportClock state persists across restarts"
 
 **Test:** Can you write a decorator for it? If no, rewrite.
+
+### Specification Body Structure
+
+Specs are lean behavioral contracts. Architecture docs own structure/relationships; specs own invariants.
+
+**Title:** `S-###: {Invariant Name}` -- names the property, not the implementation.
+
+| Section | Required | Content |
+|---------|----------|---------|
+| **Statement** | Yes | 1-3 sentences. What must be true. No "how." |
+| **Invariants** | Yes | Bullet list of always-true conditions. Each falsifiable. |
+| **Verification** | Yes | Acceptance criteria. What would a test assert? |
+| **Boundaries** | No | What's explicitly out of scope. |
+
+**Exclude:** Rationale (-> Outcome), architecture discussion (-> arch doc link), implementation hints, history.
+
+**Example:**
+```markdown
+# S-042: Staleness Tracking
+
+Heartbeat absence triggers staleness state within bounded time.
+
+## Invariants
+- Device marked stale after 2x heartbeat interval without contact
+- Staleness merge uses min-timestamp (earliest evidence wins)
+- Stale->fresh transition requires new heartbeat, not timeout
+
+## Verification
+- [ ] Device receiving heartbeat at t0, none by t0+2T -> stale
+- [ ] Two hosts disagree on staleness -> merge produces stale
+- [ ] Stale device sends heartbeat -> immediately fresh
+```
+
+Target: ~50 lines max. Architecture link in frontmatter handles the rest.
 
 ---
 
@@ -196,8 +250,9 @@ jigy rebuild        # Runs validate, rebuild, layers
 
 - All IDs unique within type, match required patterns
 - `@jig.implements` / `@jig.verifies` reference existing specs
-- `supports_goals` references goals defined in Charter
-- `constrains` / `specifies` reference existing specs
+- `goals` references goals defined in Charter
+- `specifications` references existing specs
+- `outcomes` / `architecture` reference existing outcomes/arch docs
 - Every function in exactly one brick
 - Brick at layer N depends only on layers < N
 - Cross-tower dependencies forbidden (if towers used)
@@ -207,12 +262,12 @@ jigy rebuild        # Runs validate, rebuild, layers
 
 ## For AI Agents
 
-1. **Read before writing** — Query graphs to understand what exists
-2. **Link your work** — Use `@jig.implements()` and `@jig.verifies()`
-3. **Validate continuously** — Run `jigy validate` before committing
-4. **Understand intent first** — Read S-### and O-### before modifying code
-5. **Respect architecture** — Check layer and tower constraints
-6. **Trace to goals** — Know which G-### your work supports
+1. **Read before writing** -- Query graphs to understand what exists
+2. **Link your work** -- Use `@jig.implements()` and `@jig.verifies()`
+3. **Validate continuously** -- Run `jigy validate` before committing
+4. **Understand intent first** -- Read S-### and O-### before modifying code
+5. **Respect architecture** -- Check layer and tower constraints
+6. **Trace to goals** -- Know which G-### your work supports
 
 ---
 
