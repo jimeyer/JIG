@@ -20,6 +20,7 @@ from jig.validation.bricks import (
 )
 from jig.validation.intent import (
     validate_architecture_files,
+    validate_bidirectional_consistency,
     validate_charter_file,
     validate_decorator_files,
     validate_goal_references,
@@ -139,6 +140,18 @@ def validate_intent_command(
     else:
         from jig.validation.models import ValidationResult
         results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
+
+    # Validate bidirectional consistency (S-095)
+    if spec_dir.exists() and outcome_dir.exists():
+        arch_dir = config.paths.architecture
+        results["bidirectional_consistency"] = validate_bidirectional_consistency(
+            spec_dir,
+            outcome_dir,
+            arch_dir,
+        )
+    else:
+        from jig.validation.models import ValidationResult
+        results["bidirectional_consistency"] = ValidationResult(passed=True, phase_name="bidirectional consistency", items_checked=0)
 
     # Validate decorators
     test_dir = config.paths.tests
@@ -422,6 +435,17 @@ def _run_intent_validation(config: JigConfig) -> dict:
         results["specification_coverage"] = validate_specification_coverage(spec_dir, outcome_dir)
     else:
         results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
+
+    # Validate bidirectional consistency (S-095)
+    if spec_dir.exists() and outcome_dir.exists():
+        arch_dir = config.paths.architecture
+        results["bidirectional_consistency"] = validate_bidirectional_consistency(
+            spec_dir,
+            outcome_dir,
+            arch_dir,
+        )
+    else:
+        results["bidirectional_consistency"] = ValidationResult(passed=True, phase_name="bidirectional consistency", items_checked=0)
 
     # Validate decorators
     test_dir = config.paths.tests

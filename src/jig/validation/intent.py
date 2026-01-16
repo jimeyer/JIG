@@ -1244,3 +1244,183 @@ def validate_architecture_files(
 
     result.detail = f"{len(arch_files)} files"
     return result
+
+
+# ============================================================================
+# Bidirectional Reference Consistency Validation (S-095)
+# ============================================================================
+
+
+@jig.implements("S-095")
+def validate_bidirectional_consistency(
+    spec_dir: Path,
+    outcome_dir: Path,
+    architecture_dir: Path,
+) -> ValidationResult:
+    """
+    Validate bidirectional consistency between specifications and outcomes/architecture.
+
+    Per S-095: Specification back-references must be consistent with forward-references
+    from outcomes and architecture.
+
+    Checks:
+    - If O.specifications contains S, then S.outcomes must contain O
+    - If S.outcomes contains O, then O.specifications must contain S
+    - If A.specifications contains S, then S.architecture must contain A
+    - If S.architecture contains A, then A.specifications must contain S
+
+    Algorithm:
+    1. Build forward index from outcomes: O-id -> [S-ids]
+    2. Build forward index from architecture: A-id -> [S-ids]
+    3. Build back index from specifications: S-id -> {outcomes: [O-ids], architecture: [A-ids]}
+    4. Check forward -> back consistency (outcomes/arch reference specs)
+    5. Check back -> forward consistency (specs reference outcomes/arch)
+    """
+    result = ValidationResult(passed=True, phase_name="bidirectional consistency")
+
+    # Load specification back-references
+    spec_back_refs: dict[str, dict[str, list[str]]] = {}
+    spec_files = sorted(spec_dir.glob("S-*.md"))
+
+    for spec_file in spec_files:
+        frontmatter = _parse_frontmatter(spec_file)
+        if frontmatter is None:
+            continue
+
+        spec_id = frontmatter.get("id")
+        if not spec_id:
+            continue
+
+        outcomes = frontmatter.get("outcomes", [])
+        architecture = frontmatter.get("architecture", [])
+
+        spec_back_refs[spec_id] = {
+            "outcomes": outcomes if isinstance(outcomes, list) else [],
+            "architecture": architecture if isinstance(architecture, list) else [],
+            "file": str(spec_file),
+        }
+
+    result.items_checked = len(spec_files)
+
+    # If no specs, validation passes
+    if len(spec_files) == 0:
+        return result
+
+    # Build forward index from outcomes
+    outcome_forward_refs: dict[str, list[str]] = {}
+    outcome_files: dict[str, str] = {}
+
+    for outcome_file in sorted(outcome_dir.glob("O-*.md")):
+        frontmatter = _parse_frontmatter(outcome_file)
+        if frontmatter is None:
+            continue
+
+        outcome_id = frontmatter.get("id")
+        if not outcome_id:
+            continue
+
+        specifications = frontmatter.get("specifications", [])
+        outcome_forward_refs[outcome_id] = specifications if isinstance(specifications, list) else []
+        outcome_files[outcome_id] = str(outcome_file)
+
+    # Build forward index from architecture
+    arch_forward_refs: dict[str, list[str]] = {}
+    arch_files: dict[str, str] = {}
+
+    if architecture_dir.exists():
+        for arch_file in sorted(architecture_dir.glob("A-*.md")):
+            frontmatter = _parse_frontmatter(arch_file)
+            if frontmatter is None:
+                continue
+
+            arch_id = frontmatter.get("id")
+            if not arch_id:
+                continue
+
+            specifications = frontmatter.get("specifications", [])
+            arch_forward_refs[arch_id] = specifications if isinstance(specifications, list) else []
+            arch_files[arch_id] = str(arch_file)
+
+    # Check: Outcome -> Spec (forward) must have Spec -> Outcome (back)
+    for outcome_id, spec_ids in outcome_forward_refs.items():
+        for spec_id in spec_ids:
+            if spec_id in spec_back_refs:
+                spec_outcomes = spec_back_refs[spec_id].get("outcomes", [])
+                if outcome_id not in spec_outcomes:
+                    result.add_error(
+                        ValidationError(
+                            file=outcome_files.get(outcome_id, "unknown"),
+                            message=(
+                                f"Bidirectional inconsistency: Outcome '{outcome_id}' references "
+                                f"specification '{spec_id}' in its specifications array, but "
+                                f"'{spec_id}' does not include '{outcome_id}' in its outcomes array. "
+                                f"Add '{outcome_id}' to {spec_id}'s outcomes field."
+                            ),
+                            code="MISSING_BACK_REFERENCE",
+                        )
+                    )
+
+    # Check: Spec -> Outcome (back) must have Outcome -> Spec (forward)
+    for spec_id, refs in spec_back_refs.items():
+        for outcome_id in refs.get("outcomes", []):
+            if outcome_id in outcome_forward_refs:
+                outcome_specs = outcome_forward_refs[outcome_id]
+                if spec_id not in outcome_specs:
+                    result.add_error(
+                        ValidationError(
+                            file=refs.get("file", "unknown"),
+                            message=(
+                                f"Bidirectional inconsistency: Specification '{spec_id}' references "
+                                f"outcome '{outcome_id}' in its outcomes array, but "
+                                f"'{outcome_id}' does not include '{spec_id}' in its specifications array. "
+                                f"Add '{spec_id}' to {outcome_id}'s specifications field."
+                            ),
+                            code="MISSING_FORWARD_REFERENCE",
+                        )
+                    )
+
+    # Check: Architecture -> Spec (forward) must have Spec -> Architecture (back)
+    for arch_id, spec_ids in arch_forward_refs.items():
+        for spec_id in spec_ids:
+            if spec_id in spec_back_refs:
+                spec_arch = spec_back_refs[spec_id].get("architecture", [])
+                if arch_id not in spec_arch:
+                    result.add_error(
+                        ValidationError(
+                            file=arch_files.get(arch_id, "unknown"),
+                            message=(
+                                f"Bidirectional inconsistency: Architecture '{arch_id}' references "
+                                f"specification '{spec_id}' in its specifications array, but "
+                                f"'{spec_id}' does not include '{arch_id}' in its architecture array. "
+                                f"Add '{arch_id}' to {spec_id}'s architecture field."
+                            ),
+                            code="MISSING_BACK_REFERENCE",
+                        )
+                    )
+
+    # Check: Spec -> Architecture (back) must have Architecture -> Spec (forward)
+    for spec_id, refs in spec_back_refs.items():
+        for arch_id in refs.get("architecture", []):
+            if arch_id in arch_forward_refs:
+                arch_specs = arch_forward_refs[arch_id]
+                if spec_id not in arch_specs:
+                    result.add_error(
+                        ValidationError(
+                            file=refs.get("file", "unknown"),
+                            message=(
+                                f"Bidirectional inconsistency: Specification '{spec_id}' references "
+                                f"architecture '{arch_id}' in its architecture array, but "
+                                f"'{arch_id}' does not include '{spec_id}' in its specifications array. "
+                                f"Add '{spec_id}' to {arch_id}'s specifications field."
+                            ),
+                            code="MISSING_FORWARD_REFERENCE",
+                        )
+                    )
+
+    # Set detail
+    outcome_count = len(outcome_forward_refs)
+    arch_count = len(arch_forward_refs)
+    error_count = len(result.errors)
+    result.detail = f"{len(spec_files)} specs, {outcome_count} outcomes, {arch_count} architectures, {error_count} inconsistencies"
+
+    return result

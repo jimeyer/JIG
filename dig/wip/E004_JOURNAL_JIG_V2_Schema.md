@@ -91,3 +91,28 @@ escalated: false
 
 ---
 
+### Entry 4 | 2026-01-16 16:55 PST | WU3 Complete
+
+```yaml
+type: outcome
+wu: WU3
+spec: S-095
+escalated: false
+```
+
+**Status:** COMPLETE - All gates passed.
+
+**Changes:**
+- `jig/specifications/S-095_Bidirectional_Reference_Consistency.md` (NEW)
+- `src/jig/validation/intent.py` (180 insertions)
+- `src/jig/cli/validate.py` (24 insertions)
+- `tests/validation/test_intent.py` (430 insertions)
+
+**New capability:** `validate_bidirectional_consistency()` checks that spec back-refs (outcomes, architecture) match forward-refs from O/A (specifications). Algorithm is O(S+O+A) - efficient.
+
+**Notable:** Currently reports 0 inconsistencies because content hasn't migrated yet (specs lack outcomes/architecture fields). This is expected - WU5 will add the fields.
+
+**Decision:** CONTINUE to WU4.
+
+---
+

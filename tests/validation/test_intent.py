@@ -1196,3 +1196,433 @@ Architecture content.
         result = validate_architecture_files(arch_dir, {"G-001"}, {"S-001"})
         assert not result.passed
         assert any("S-999" in err.message for err in result.errors)
+
+
+# --- S-095: Bidirectional Reference Consistency Validation ---
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_outcome_spec_valid():
+    """Bidirectional consistency passes when outcome->spec and spec->outcome match."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that references outcome
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: [O-001]
+architecture: []
+---
+
+# Test Spec
+"""
+        )
+
+        # Create outcome that references spec
+        (outcome_dir / "O-001_Test_Outcome.md").write_text(
+            """---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_missing_back_ref_from_spec():
+    """Missing back-reference from spec to outcome detected."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that does NOT reference outcome
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: []
+architecture: []
+---
+
+# Test Spec
+"""
+        )
+
+        # Create outcome that references spec
+        (outcome_dir / "O-001_Test_Outcome.md").write_text(
+            """---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "O-001" in result.errors[0].message
+        assert "S-001" in result.errors[0].message
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_missing_forward_ref_from_outcome():
+    """Missing forward-reference from outcome to spec detected."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that references outcome
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: [O-001]
+architecture: []
+---
+
+# Test Spec
+"""
+        )
+
+        # Create outcome that does NOT reference spec
+        (outcome_dir / "O-001_Test_Outcome.md").write_text(
+            """---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: []
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "O-001" in result.errors[0].message
+        assert "S-001" in result.errors[0].message
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_arch_spec_valid():
+    """Bidirectional consistency passes when architecture->spec and spec->architecture match."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that references architecture
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: []
+architecture: [A-001]
+---
+
+# Test Spec
+"""
+        )
+
+        # Create architecture that references spec
+        (arch_dir / "A-001_Test_Arch.md").write_text(
+            """---
+id: A-001
+title: Test Arch
+type: architecture
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Arch
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_missing_back_ref_from_spec_to_arch():
+    """Missing back-reference from spec to architecture detected."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that does NOT reference architecture
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: []
+architecture: []
+---
+
+# Test Spec
+"""
+        )
+
+        # Create architecture that references spec
+        (arch_dir / "A-001_Test_Arch.md").write_text(
+            """---
+id: A-001
+title: Test Arch
+type: architecture
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Arch
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "A-001" in result.errors[0].message
+        assert "S-001" in result.errors[0].message
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_missing_forward_ref_from_arch():
+    """Missing forward-reference from architecture to spec detected."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec that references architecture
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: []
+architecture: [A-001]
+---
+
+# Test Spec
+"""
+        )
+
+        # Create architecture that does NOT reference spec
+        (arch_dir / "A-001_Test_Arch.md").write_text(
+            """---
+id: A-001
+title: Test Arch
+type: architecture
+goals: [G-001]
+specifications: []
+---
+
+# Test Arch
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        assert len(result.errors) == 1
+        assert "A-001" in result.errors[0].message
+        assert "S-001" in result.errors[0].message
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_multiple_inconsistencies():
+    """Multiple bidirectional inconsistencies all detected and reported."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec with missing refs
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: []
+architecture: []
+---
+
+# Test Spec
+"""
+        )
+
+        # Create another spec with missing refs
+        (spec_dir / "S-002_Test_Spec_2.md").write_text(
+            """---
+id: S-002
+title: Test Spec 2
+type: specification
+outcomes: []
+architecture: []
+---
+
+# Test Spec 2
+"""
+        )
+
+        # Outcome references both specs
+        (outcome_dir / "O-001_Test_Outcome.md").write_text(
+            """---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: [S-001, S-002]
+---
+
+# Test Outcome
+"""
+        )
+
+        # Architecture references S-001
+        (arch_dir / "A-001_Test_Arch.md").write_text(
+            """---
+id: A-001
+title: Test Arch
+type: architecture
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Arch
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        # Should detect 3 inconsistencies:
+        # - O-001 -> S-001 but S-001 doesn't reference O-001
+        # - O-001 -> S-002 but S-002 doesn't reference O-001
+        # - A-001 -> S-001 but S-001 doesn't reference A-001
+        assert len(result.errors) == 3
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_no_specs():
+    """Validation passes when no specification files exist."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert result.passed
+        assert len(result.errors) == 0
+
+
+@jig.verifies("S-095")
+def test_validate_bidirectional_consistency_spec_missing_outcomes_field():
+    """Specs without outcomes field treated as empty array for bidirectional check."""
+    from jig.validation.intent import validate_bidirectional_consistency
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        spec_dir = Path(tmpdir) / "specifications"
+        spec_dir.mkdir()
+        outcome_dir = Path(tmpdir) / "outcomes"
+        outcome_dir.mkdir()
+        arch_dir = Path(tmpdir) / "architecture"
+        arch_dir.mkdir()
+
+        # Create spec WITHOUT outcomes field (V1 style)
+        (spec_dir / "S-001_Test_Spec.md").write_text(
+            """---
+id: S-001
+title: Test Spec
+type: specification
+---
+
+# Test Spec
+"""
+        )
+
+        # Create outcome that references spec
+        (outcome_dir / "O-001_Test_Outcome.md").write_text(
+            """---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Outcome
+"""
+        )
+
+        result = validate_bidirectional_consistency(spec_dir, outcome_dir, arch_dir)
+        assert not result.passed
+        # Should detect that O-001 references S-001 but S-001 has no outcomes field
+        assert len(result.errors) == 1
+        assert "O-001" in result.errors[0].message
+        assert "S-001" in result.errors[0].message
