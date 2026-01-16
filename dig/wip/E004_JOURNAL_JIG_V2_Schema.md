@@ -116,3 +116,29 @@ escalated: false
 
 ---
 
+### Entry 5 | 2026-01-16 17:00 PST | WU4 Complete
+
+```yaml
+type: outcome
+wu: WU4
+spec: null
+escalated: false
+```
+
+**Status:** COMPLETE - All gates passed.
+
+**Changes:**
+- `scripts/migrate_v2_schema.py` (NEW - 25KB)
+
+**Dry-run summary:**
+- 106 files processed
+- 105 would be modified (1 already V2: S-095)
+- 184 total changes
+- 0 errors
+
+**Notable:** Script is idempotent (running twice produces 0 changes on second run). Back-ref computation correctly indexes 77 specs with outcome refs and 48 specs with architecture refs.
+
+**Decision:** CONTINUE to WU5.
+
+---
+
