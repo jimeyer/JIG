@@ -5,7 +5,7 @@ status: active
 created: 1768595487
 created_human: "2026-01-16 10:31 PST"
 parent: "[[E001_SCOPE_JIG_V2_Schema]]"
-children: []
+children: ["[[E003_PLAN_JIG_V2_Schema]]"]
 prompt: |
   now create the jigplan
   follow @agents/taskMakeJIGPLAN.md
@@ -76,12 +76,13 @@ No new outcomes needed—V2 is a schema normalization, not new functionality.
 
 #### S-019: Outcome File Validation
 
-**Current fields:** `supports_goals`, `specifies`
+**Current validation:** Basic frontmatter (id, type, title) only. No validation of goal/spec references.
 
 **Changes:**
-- RENAME: `supports_goals` → `goals`
-- RENAME: `specifies` → `specifications`
-- ADD: Optional `architecture` array (outcomes can reference architecture)
+- ADD: Required `goals` array validation (non-empty, G-### format)
+- ADD: Required `specifications` array validation (non-empty, S-### format)
+- ADD: Optional `architecture` array validation (A-### format if present)
+- ADD: Reference existence checking (goals/specs/arch must exist)
 
 #### S-028: CLI Command to Generate Intent Graph
 
@@ -182,11 +183,11 @@ Specification back-references must be consistent with forward-references from ou
 
 | Action | Brick | Layer | Rationale |
 |--------|-------|-------|-----------|
-| MODIFY | B-validation | 1 | Field name changes in validation logic |
-| MODIFY | B-intent-graph | 1 | Field name changes in graph generation |
-| MODIFY | B-cli | 2 | Output format changes |
-| FORBIDDEN | B-impl-graph | 1 | Implementation graph unaffected |
-| FORBIDDEN | B-verify-graph | 1 | Verification graph unaffected |
+| MODIFY | B-validation | 0 | Field name changes in validation logic |
+| MODIFY | B-intent-graph | 0 | Field name changes in graph generation |
+| MODIFY | B-cli | 1 | Output format changes |
+| FORBIDDEN | B-impl-graph | 0 | Implementation graph unaffected |
+| FORBIDDEN | B-verification-graph | 1 | Verification graph unaffected |
 | UNAFFECTED | B-config | 0 | No schema changes in config |
 
 ---
@@ -218,24 +219,22 @@ Specification back-references must be consistent with forward-references from ou
 
 #### FORBIDDEN Bricks
 
-- **B-impl-graph** (layer 1): Implementation graph uses code AST, not intent frontmatter
-- **B-verify-graph** (layer 1): Verification graph uses test AST, not intent frontmatter
+- **B-impl-graph** (layer 0): Implementation graph uses code AST, not intent frontmatter
+- **B-verification-graph** (layer 1): Verification graph uses test AST, not intent frontmatter
 
 ---
 
 ## Layer/Dependency Analysis
 
 ```
-Layer 0: UNAFFECTED
+Layer 0: AFFECTED
   B-config ← no changes
+  B-validation (MODIFY)
+    └─► depends on: external libs only ✓
+  B-intent-graph (MODIFY)
+    └─► depends on: external libs only ✓
 
 Layer 1: AFFECTED
-  B-validation (MODIFY)
-    └─► depends on: B-config ✓
-  B-intent-graph (MODIFY)
-    └─► depends on: B-config ✓
-
-Layer 2: AFFECTED
   B-cli (MODIFY)
     └─► depends on: B-validation, B-intent-graph ✓
 ```
@@ -351,6 +350,31 @@ A migration script will:
 
 ---
 
+## Fresh Agent Review Summary
+
+Review performed: 2026-01-16
+
+### Review Findings
+
+| Category | Type | Severity | Issue | Resolution |
+|----------|------|----------|-------|------------|
+| 3 | MECHANICAL | BLOCKER | Brick layers wrong: E002 said B-validation/B-intent-graph at layer 1, actual is layer 0 | Fixed layer assignments in Brick Scope and Layer/Dependency Analysis |
+| 1 | MECHANICAL | WARNING | S-019 description said "rename fields" but S-019 doesn't currently validate those fields | Changed to "ADD validation" for goals/specifications fields |
+| 3 | MECHANICAL | NOTE | Brick name B-verify-graph should be B-verification-graph per bricks.yaml | Fixed brick name in FORBIDDEN table |
+| 5 | MECHANICAL | NOTE | S-095 file creation deferred due to bootstrap constraint | Documented in Bootstrap Constraint section |
+
+### Bootstrap Constraint (S-095)
+
+Per taskMakeJIGPLAN.md Step 5, new spec files should be written to disk. However, S-095 requires V2 frontmatter (`outcomes`, `architecture` fields) which the current validator would reject.
+
+**Resolution:** S-095 creation is deferred to the atomic migration commit. The spec content is fully specified in this JIGPLAN. This is a valid exception to the "write files in Step 5" rule because the migration itself changes validation rules.
+
+### Judgment Decisions
+
+No JUDGMENT issues requiring Charter philosophy application.
+
+---
+
 ## Approval Checklist
 
 Before human approval:
@@ -361,6 +385,9 @@ Before human approval:
 - [x] FORBIDDEN bricks identified
 - [x] @jig decorator plan complete
 - [x] Clean break actions specified
+- [x] **Fresh Agent Review completed (Step 9)**
+- [x] All MECHANICAL issues resolved
+- [x] All JUDGMENT issues resolved via Charter philosophy OR escalated (N/A - none found)
 - [ ] Human approval pending
 
 ---
