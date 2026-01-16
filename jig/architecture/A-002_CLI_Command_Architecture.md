@@ -2,9 +2,8 @@
 id: A-002
 type: architecture
 title: CLI Command Architecture
-status: active
-supports_goals: [G-002, G-004]
-constrains: [S-023, S-024, S-025, S-027, S-028, S-040, S-041, S-056, S-057, S-058, S-059, S-060, S-061, S-070, S-071, S-090, S-091]
+goals: [G-002, G-004]
+specifications: [S-023, S-024, S-025, S-027, S-028, S-040, S-041, S-056, S-057, S-058, S-059, S-060, S-061, S-070, S-071, S-090, S-091]
 ---
 
 # CLI Command Architecture

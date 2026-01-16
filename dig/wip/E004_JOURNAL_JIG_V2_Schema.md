@@ -142,3 +142,27 @@ escalated: false
 
 ---
 
+### Entry 6 | 2026-01-16 17:05 PST | WU5 Complete
+
+```yaml
+type: outcome
+wu: WU5
+spec: null
+escalated: false
+```
+
+**Status:** COMPLETE - All gates passed.
+
+**Migration results:**
+- 105 files modified, 182 insertions, 61 deletions
+- Charter: `defines_goals` → `goals`
+- 4 Architecture: `supports_goals` → `goals`, `constrains` → `specifications`, `status` removed
+- 23 Outcomes: `supports_goals` → `goals`, `specifies` → `specifications`
+- 77 Specs: back-refs added (outcomes/architecture)
+
+**Notable:** S-095 is orphaned (no outcome refs it) - expected since it was just created in WU3 and not yet connected to an outcome.
+
+**Decision:** CONTINUE to WU6.
+
+---
+

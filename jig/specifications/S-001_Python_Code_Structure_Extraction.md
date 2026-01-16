@@ -2,6 +2,7 @@
 id: S-001
 title: Python Code Structure Extraction
 type: specification
+outcomes: [O-001]
 ---
 
 # Python Code Structure Extraction

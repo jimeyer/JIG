@@ -2,6 +2,7 @@
 id: S-066
 title: T→F Edge Collection via Coverage
 type: specification
+outcomes: [O-021]
 ---
 
 # T→F Edge Collection via Coverage

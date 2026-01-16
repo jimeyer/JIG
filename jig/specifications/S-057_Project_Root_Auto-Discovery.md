@@ -2,6 +2,8 @@
 id: S-057
 title: Project Root Auto-Discovery
 type: specification
+outcomes: [O-019]
+architecture: [A-002]
 ---
 
 # Project Root Auto-Discovery

@@ -2,6 +2,7 @@
 id: S-049
 title: Git Blob Optimization
 type: specification
+outcomes: [O-017]
 ---
 
 # Git Blob Optimization

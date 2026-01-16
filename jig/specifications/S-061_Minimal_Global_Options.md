@@ -3,6 +3,8 @@ id: S-061
 title: Minimal Global Options
 type: specification
 outcome: O-019
+outcomes: [O-019]
+architecture: [A-002]
 ---
 
 # Minimal Global Options

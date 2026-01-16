@@ -2,6 +2,8 @@
 id: S-065
 title: CLI Integration with Configuration
 type: specification
+outcomes: [O-020]
+architecture: [A-003]
 ---
 
 # CLI Integration with Configuration

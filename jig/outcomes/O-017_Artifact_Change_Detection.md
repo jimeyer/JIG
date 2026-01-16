@@ -3,8 +3,8 @@ id: O-017
 title: Artifact Change Detection
 type: outcome
 theme: [Continuity]
-supports_goals: [G-002, G-001]
-specifies: [S-044, S-045, S-046, S-047, S-048, S-049, S-050]
+goals: [G-002, G-001]
+specifications: [S-044, S-045, S-046, S-047, S-048, S-049, S-050]
 ---
 
 # Artifact Change Detection

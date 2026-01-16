@@ -3,6 +3,8 @@ id: S-080
 title: Charter Node In Intent Graph
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Charter Node In Intent Graph

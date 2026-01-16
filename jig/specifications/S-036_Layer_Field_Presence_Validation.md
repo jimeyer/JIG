@@ -2,6 +2,7 @@
 id: S-036
 title: Layer Field Presence Validation
 type: specification
+outcomes: [O-012]
 ---
 
 # Layer Field Presence Validation

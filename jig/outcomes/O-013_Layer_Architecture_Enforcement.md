@@ -3,8 +3,8 @@ id: O-013
 title: Layer Architecture Enforcement
 type: outcome
 theme: [Architecture]
-supports_goals: [G-003]
-specifies: [S-038, S-039]
+goals: [G-003]
+specifications: [S-038, S-039]
 ---
 
 # Layer Architecture Enforcement

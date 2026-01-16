@@ -3,6 +3,8 @@ id: S-085
 title: Constrains Edges
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Constrains Edges

@@ -3,8 +3,8 @@ id: O-012
 title: A001-Compliant Brick Definitions
 type: outcome
 theme: [Architecture, Validation]
-supports_goals: [G-003]
-specifies: [S-035, S-036, S-037]
+goals: [G-003]
+specifications: [S-035, S-036, S-037]
 ---
 
 # A001-Compliant Brick Definitions

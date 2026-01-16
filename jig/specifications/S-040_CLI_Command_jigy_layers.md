@@ -1,7 +1,9 @@
 ---
 id: S-040
-title: "CLI Command: jigy layers"
+title: 'CLI Command: jigy layers'
 type: specification
+outcomes: [O-014]
+architecture: [A-002]
 ---
 
 # CLI Command: jigy layers

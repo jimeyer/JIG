@@ -1,7 +1,9 @@
 ---
 id: S-041
-title: "CLI Command: jigy layers suggest"
+title: 'CLI Command: jigy layers suggest'
 type: specification
+outcomes: [O-014]
+architecture: [A-002]
 ---
 
 # CLI Command: jigy layers suggest

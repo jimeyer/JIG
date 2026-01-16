@@ -3,8 +3,8 @@ id: O-002
 title: Automated Code-to-Specification Traceability
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-004, G-001]
-specifies: [S-002]
+goals: [G-004, G-001]
+specifications: [S-002]
 ---
 
 # Automated Code-to-Specification Traceability

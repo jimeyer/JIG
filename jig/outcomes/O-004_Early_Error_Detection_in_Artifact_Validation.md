@@ -3,8 +3,8 @@ id: O-004
 title: Early Error Detection in Artifact Validation
 type: outcome
 theme: [Validation]
-supports_goals: [G-003]
-specifies: [S-023, S-024, S-025, S-027]
+goals: [G-003]
+specifications: [S-023, S-024, S-025, S-027]
 ---
 
 # Early Error Detection in Artifact Validation

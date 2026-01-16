@@ -2,6 +2,8 @@
 id: S-071
 title: Skip Auto-Rebuild Flag
 type: specification
+outcomes: [O-022]
+architecture: [A-002]
 ---
 
 # Skip Auto-Rebuild Flag

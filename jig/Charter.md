@@ -1,7 +1,7 @@
 ---
 id: Charter
 type: charter
-defines_goals: [G-001, G-002, G-003, G-004, G-005]
+goals: [G-001, G-002, G-003, G-004, G-005]
 ---
 
 # JIG Charter

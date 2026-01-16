@@ -3,6 +3,8 @@ id: S-082
 title: Architecture Nodes In Intent Graph
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Architecture Nodes In Intent Graph

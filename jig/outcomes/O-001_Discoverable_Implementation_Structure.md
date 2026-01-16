@@ -3,8 +3,8 @@ id: O-001
 title: Discoverable Implementation Structure
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-001, G-002]
-specifies: [S-001, S-003, S-005, S-006]
+goals: [G-001, G-002]
+specifications: [S-001, S-003, S-005, S-006]
 ---
 
 # Discoverable Implementation Structure

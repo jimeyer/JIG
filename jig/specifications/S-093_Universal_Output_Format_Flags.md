@@ -3,6 +3,7 @@ id: S-093
 title: Universal Output Format Flags
 type: specification
 outcome: O-016
+outcomes: [O-016]
 ---
 
 # Universal Output Format Flags

@@ -3,6 +3,8 @@ id: S-087
 title: Tower Value Format
 type: specification
 outcome: O-026
+outcomes: [O-026]
+architecture: [A-001, A-004]
 ---
 
 # Tower Value Format

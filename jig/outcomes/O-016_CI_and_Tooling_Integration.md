@@ -3,8 +3,8 @@ id: O-016
 title: CI and Tooling Integration
 type: outcome
 theme: [Continuity]
-supports_goals: [G-003]
-specifies: [S-026, S-093, S-094]
+goals: [G-003]
+specifications: [S-026, S-093, S-094]
 ---
 
 # CI and Tooling Integration

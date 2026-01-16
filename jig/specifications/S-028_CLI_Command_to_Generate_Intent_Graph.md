@@ -2,6 +2,8 @@
 id: S-028
 title: CLI Command to Generate Intent Graph
 type: specification
+outcomes: [O-009]
+architecture: [A-002]
 ---
 
 # CLI Command to Generate Intent Graph

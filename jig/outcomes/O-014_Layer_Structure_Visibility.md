@@ -3,8 +3,8 @@ id: O-014
 title: Layer Structure Visibility
 type: outcome
 theme: [Architecture]
-supports_goals: [G-004, G-002]
-specifies: [S-040, S-041]
+goals: [G-004, G-002]
+specifications: [S-040, S-041]
 ---
 
 # Layer Structure Visibility

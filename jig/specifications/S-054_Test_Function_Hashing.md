@@ -2,6 +2,7 @@
 id: S-054
 title: Test Function Hashing
 type: specification
+outcomes: [O-018]
 ---
 
 # Test Function Hashing

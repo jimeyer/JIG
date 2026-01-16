@@ -2,6 +2,7 @@
 id: S-048
 title: Brick Definition Hashing
 type: specification
+outcomes: [O-017]
 ---
 
 # Brick Definition Hashing

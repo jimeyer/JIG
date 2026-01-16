@@ -2,6 +2,8 @@
 id: S-024
 title: Brick Validation CLI Command
 type: specification
+outcomes: [O-004, O-006]
+architecture: [A-002, A-004]
 ---
 
 # Brick Validation CLI Command

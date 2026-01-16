@@ -3,6 +3,8 @@ id: S-073
 title: Charter Defines Goals Field
 type: specification
 outcome: O-023
+outcomes: [O-023]
+architecture: [A-001, A-004]
 ---
 
 # Charter Defines Goals Field

@@ -3,6 +3,8 @@ id: S-089
 title: Tower Isolation Validation
 type: specification
 outcome: O-026
+outcomes: [O-026]
+architecture: [A-004]
 ---
 
 # Tower Isolation Validation

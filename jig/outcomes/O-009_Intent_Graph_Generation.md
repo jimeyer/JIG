@@ -3,8 +3,8 @@ id: O-009
 title: Intent Graph Generation
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-004, G-002]
-specifies: [S-028]
+goals: [G-004, G-002]
+specifications: [S-028]
 ---
 
 # Intent Graph Generation

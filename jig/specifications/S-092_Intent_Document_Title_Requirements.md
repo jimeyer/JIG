@@ -2,6 +2,7 @@
 id: S-092
 title: Intent Document Title Requirements
 type: specification
+outcomes: [O-027]
 ---
 
 # Intent Document Title Requirements

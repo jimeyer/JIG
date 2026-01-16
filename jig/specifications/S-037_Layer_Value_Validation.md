@@ -2,6 +2,7 @@
 id: S-037
 title: Layer Value Validation
 type: specification
+outcomes: [O-012]
 ---
 
 # Layer Value Validation

@@ -3,6 +3,7 @@ id: S-026
 title: JSON Output Format for CI Integration
 type: specification
 outcome: O-016
+outcomes: [O-016]
 ---
 
 # JSON Output Format for CI Integration

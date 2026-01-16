@@ -2,6 +2,8 @@
 id: S-063
 title: TOML Configuration Parsing
 type: specification
+outcomes: [O-020]
+architecture: [A-003]
 ---
 
 # TOML Configuration Parsing

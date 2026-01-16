@@ -2,6 +2,8 @@
 id: S-025
 title: Full Validation CLI Command
 type: specification
+outcomes: [O-004, O-006]
+architecture: [A-002, A-004]
 ---
 
 # Full Validation CLI Command

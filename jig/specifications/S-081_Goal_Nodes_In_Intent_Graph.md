@@ -3,6 +3,8 @@ id: S-081
 title: Goal Nodes In Intent Graph
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Goal Nodes In Intent Graph

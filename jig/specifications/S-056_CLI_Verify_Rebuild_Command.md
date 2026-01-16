@@ -2,6 +2,8 @@
 id: S-056
 title: CLI Verify Rebuild Command
 type: specification
+outcomes: [O-018]
+architecture: [A-002]
 ---
 
 # CLI Verify Rebuild Command

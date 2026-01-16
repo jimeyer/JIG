@@ -3,8 +3,8 @@ id: O-020
 title: Configurable Project Structure
 type: outcome
 theme: [Experience]
-supports_goals: [G-001]
-specifies: [S-062, S-063, S-064, S-065]
+goals: [G-001]
+specifications: [S-062, S-063, S-064, S-065]
 ---
 
 # Configurable Project Structure

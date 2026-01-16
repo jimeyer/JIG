@@ -3,8 +3,8 @@ id: O-003
 title: Multi-Language Implementation Graph Support
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-001]
-specifies: [S-004]
+goals: [G-001]
+specifications: [S-004]
 ---
 
 # Multi-Language Implementation Graph Support

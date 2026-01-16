@@ -2,8 +2,8 @@
 id: O-026
 type: outcome
 title: Towers Enforce Component Isolation
-supports_goals: [G-003]
-specifies: [S-086, S-087, S-088, S-089, S-090, S-091]
+goals: [G-003]
+specifications: [S-086, S-087, S-088, S-089, S-090, S-091]
 ---
 
 # Towers Enforce Component Isolation

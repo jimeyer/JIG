@@ -2,6 +2,8 @@
 id: S-058
 title: Verb-First Rebuild Commands
 type: specification
+outcomes: [O-019]
+architecture: [A-002]
 ---
 
 # Verb-First Rebuild Commands

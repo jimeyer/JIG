@@ -2,8 +2,8 @@
 id: O-023
 type: outcome
 title: Charter Establishes Project Goals
-supports_goals: [G-005, G-004]
-specifies: [S-072, S-073, S-074, S-075]
+goals: [G-005, G-004]
+specifications: [S-072, S-073, S-074, S-075]
 ---
 
 # Charter Establishes Project Goals

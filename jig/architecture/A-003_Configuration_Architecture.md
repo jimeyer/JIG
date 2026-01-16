@@ -2,9 +2,8 @@
 id: A-003
 type: architecture
 title: Configuration Architecture
-status: active
-supports_goals: [G-001]
-constrains: [S-062, S-063, S-064, S-065]
+goals: [G-001]
+specifications: [S-062, S-063, S-064, S-065]
 ---
 
 # Configuration Architecture

@@ -3,8 +3,8 @@ id: O-006
 title: Fast Validation
 type: outcome
 theme: [Validation]
-supports_goals: [G-003]
-specifies: [S-023, S-024, S-025]
+goals: [G-003]
+specifications: [S-023, S-024, S-025]
 ---
 
 # Fast Validation

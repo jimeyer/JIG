@@ -2,6 +2,7 @@
 id: S-006
 title: Fail-Fast Parse Error Reporting
 type: specification
+outcomes: [O-001]
 ---
 
 # Fail-Fast Parse Error Reporting

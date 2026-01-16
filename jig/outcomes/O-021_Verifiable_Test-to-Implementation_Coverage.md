@@ -3,8 +3,8 @@ id: O-021
 title: Verifiable Test-to-Implementation Coverage
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-001, G-004]
-specifies: [S-066, S-067]
+goals: [G-001, G-004]
+specifications: [S-066, S-067]
 ---
 
 # Verifiable Test-to-Implementation Coverage

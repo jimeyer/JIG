@@ -2,6 +2,8 @@
 id: S-027
 title: Auto-Validation in Rebuild Commands
 type: specification
+outcomes: [O-004]
+architecture: [A-002]
 ---
 
 # Auto-Validation in Rebuild Commands

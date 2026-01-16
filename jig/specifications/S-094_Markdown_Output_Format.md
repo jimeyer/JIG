@@ -3,6 +3,7 @@ id: S-094
 title: Markdown Output Format
 type: specification
 outcome: O-016
+outcomes: [O-016]
 ---
 
 # Markdown Output Format

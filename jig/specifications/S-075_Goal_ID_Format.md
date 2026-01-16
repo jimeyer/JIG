@@ -3,6 +3,8 @@ id: S-075
 title: Goal ID Format
 type: specification
 outcome: O-023
+outcomes: [O-023]
+architecture: [A-001, A-004]
 ---
 
 # Goal ID Format

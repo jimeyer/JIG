@@ -2,6 +2,8 @@
 id: S-070
 title: Auto-Rebuild Before Commands
 type: specification
+outcomes: [O-022]
+architecture: [A-002]
 ---
 
 # Auto-Rebuild Before Commands

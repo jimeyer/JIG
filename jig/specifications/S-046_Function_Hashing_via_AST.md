@@ -2,6 +2,7 @@
 id: S-046
 title: Function Hashing via AST
 type: specification
+outcomes: [O-017]
 ---
 
 # Function Hashing via AST

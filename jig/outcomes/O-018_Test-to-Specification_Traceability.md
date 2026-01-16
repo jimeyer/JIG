@@ -3,8 +3,8 @@ id: O-018
 title: Test-to-Specification Traceability
 type: outcome
 theme: [Alignment Graph]
-supports_goals: [G-001, G-004]
-specifies: [S-051, S-052, S-053, S-054, S-055, S-056]
+goals: [G-001, G-004]
+specifications: [S-051, S-052, S-053, S-054, S-055, S-056]
 ---
 
 # Test-to-Specification Traceability

@@ -2,6 +2,8 @@
 id: S-021
 title: Brick Definition Validation
 type: specification
+outcomes: [O-005]
+architecture: [A-004]
 ---
 
 # Brick Definition Validation

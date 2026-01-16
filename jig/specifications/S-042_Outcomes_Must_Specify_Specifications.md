@@ -2,6 +2,8 @@
 id: S-042
 title: Outcomes Must Specify Specifications
 type: specification
+outcomes: [O-015]
+architecture: [A-004]
 ---
 
 # Outcomes Must Specify Specifications

@@ -2,6 +2,7 @@
 id: S-005
 title: External Dependency Tracking
 type: specification
+outcomes: [O-001]
 ---
 
 # External Dependency Tracking

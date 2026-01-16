@@ -2,6 +2,8 @@
 id: S-039
 title: Circular Dependency Detection
 type: specification
+outcomes: [O-013]
+architecture: [A-004]
 ---
 
 # Circular Dependency Detection

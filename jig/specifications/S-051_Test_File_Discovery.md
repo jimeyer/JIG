@@ -2,6 +2,7 @@
 id: S-051
 title: Test File Discovery
 type: specification
+outcomes: [O-018]
 ---
 
 # Test File Discovery

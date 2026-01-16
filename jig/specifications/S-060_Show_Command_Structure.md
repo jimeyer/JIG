@@ -3,6 +3,8 @@ id: S-060
 title: Show Command Structure
 type: specification
 outcome: O-019
+outcomes: [O-019]
+architecture: [A-002]
 ---
 
 # Show Command Structure

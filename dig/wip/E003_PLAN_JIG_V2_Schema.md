@@ -104,7 +104,7 @@ WU7 (Spec Files) ─────────────────────
 - [x] WU2: Update Intent Graph Generator — tests ☑ / code ☑
 - [x] WU3: Add Bidirectional Consistency Validation — tests ☑ / code ☑ / spec ☑
 - [x] WU4: Create Migration Script — script ☑
-- [ ] WU5: Execute Content Migration — charter ☐ / arch ☐ / outcomes ☐ / specs ☐
+- [x] WU5: Execute Content Migration — charter ☑ / arch ☑ / outcomes ☑ / specs ☑
 - [ ] WU6: Update Test Files — fixtures ☐ / assertions ☐
 - [ ] WU7: Update Spec Files — field names ☐ / back-refs ☐
 - [ ] WU8: Validation — SCOPE verified ☐

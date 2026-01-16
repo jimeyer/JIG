@@ -2,6 +2,8 @@
 id: S-035
 title: Brick ID Format Validation
 type: specification
+outcomes: [O-012]
+architecture: [A-004]
 ---
 
 # Brick ID Format Validation

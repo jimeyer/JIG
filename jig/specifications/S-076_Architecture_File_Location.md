@@ -3,6 +3,8 @@ id: S-076
 title: Architecture File Location
 type: specification
 outcome: O-024
+outcomes: [O-024]
+architecture: [A-001, A-004]
 ---
 
 # Architecture File Location

@@ -2,6 +2,7 @@
 id: S-045
 title: Intent Artifact Hashing
 type: specification
+outcomes: [O-017]
 ---
 
 # Intent Artifact Hashing

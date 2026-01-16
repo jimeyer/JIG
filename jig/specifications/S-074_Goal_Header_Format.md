@@ -3,6 +3,8 @@ id: S-074
 title: Goal Header Format
 type: specification
 outcome: O-023
+outcomes: [O-023]
+architecture: [A-001, A-004]
 ---
 
 # Goal Header Format

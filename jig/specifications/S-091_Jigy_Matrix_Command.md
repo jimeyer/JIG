@@ -3,6 +3,8 @@ id: S-091
 title: Jigy Matrix Command
 type: specification
 outcome: O-026
+outcomes: [O-026]
+architecture: [A-002]
 ---
 
 # Jigy Matrix Command

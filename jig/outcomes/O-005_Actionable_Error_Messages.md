@@ -3,8 +3,8 @@ id: O-005
 title: Actionable Error Messages
 type: outcome
 theme: [Validation]
-supports_goals: [G-002, G-003]
-specifies: [S-018, S-019, S-020, S-021, S-022]
+goals: [G-002, G-003]
+specifications: [S-018, S-019, S-020, S-021, S-022]
 ---
 
 # Actionable Error Messages

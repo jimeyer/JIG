@@ -2,6 +2,7 @@
 id: S-002
 title: Implements Decorator Extraction
 type: specification
+outcomes: [O-002]
 ---
 
 # Implements Decorator Extraction

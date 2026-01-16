@@ -2,9 +2,8 @@
 id: A-004
 type: architecture
 title: Validation Architecture
-status: active
-supports_goals: [G-003, G-005]
-constrains: [S-018, S-020, S-021, S-022, S-023, S-024, S-025, S-035, S-038, S-039, S-042, S-043, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088, S-089]
+goals: [G-003, G-005]
+specifications: [S-018, S-020, S-021, S-022, S-023, S-024, S-025, S-035, S-038, S-039, S-042, S-043, S-072, S-073, S-074, S-075, S-076, S-077, S-078, S-079, S-086, S-087, S-088, S-089]
 ---
 
 # Validation Architecture

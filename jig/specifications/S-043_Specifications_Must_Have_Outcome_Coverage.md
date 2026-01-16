@@ -2,6 +2,8 @@
 id: S-043
 title: Specifications Must Have Outcome Coverage
 type: specification
+outcomes: [O-015]
+architecture: [A-004]
 ---
 
 # Specifications Must Have Outcome Coverage

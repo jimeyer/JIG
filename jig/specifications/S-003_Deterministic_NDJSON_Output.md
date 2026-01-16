@@ -2,6 +2,7 @@
 id: S-003
 title: Deterministic NDJSON Output
 type: specification
+outcomes: [O-001]
 ---
 
 # Deterministic NDJSON Output

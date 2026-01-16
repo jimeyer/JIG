@@ -2,6 +2,7 @@
 id: S-055
 title: Verification Graph Generation
 type: specification
+outcomes: [O-018]
 ---
 
 # Verification Graph Generation

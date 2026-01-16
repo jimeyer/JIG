@@ -3,6 +3,8 @@ id: S-084
 title: Supports Goal Edges
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Supports Goal Edges

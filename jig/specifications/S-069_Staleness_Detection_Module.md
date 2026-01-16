@@ -2,6 +2,7 @@
 id: S-069
 title: Staleness Detection Module
 type: specification
+outcomes: [O-022]
 ---
 
 # Staleness Detection Module

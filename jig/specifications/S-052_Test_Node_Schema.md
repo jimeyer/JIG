@@ -2,6 +2,7 @@
 id: S-052
 title: Test Node Schema
 type: specification
+outcomes: [O-018]
 ---
 
 # Test Node Schema

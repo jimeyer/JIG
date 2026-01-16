@@ -2,6 +2,8 @@
 id: S-018
 title: Specification File Validation
 type: specification
+outcomes: [O-005]
+architecture: [A-004]
 ---
 
 # Specification File Validation

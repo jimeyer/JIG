@@ -2,6 +2,8 @@
 id: S-020
 title: Decorator Reference Validation
 type: specification
+outcomes: [O-005]
+architecture: [A-004]
 ---
 
 # Decorator Reference Validation

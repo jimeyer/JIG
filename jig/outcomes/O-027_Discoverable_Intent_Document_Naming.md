@@ -3,8 +3,8 @@ id: O-027
 title: Discoverable Intent Document Naming
 type: outcome
 theme: [Validation]
-supports_goals: [G-001, G-004]
-specifies: [S-092]
+goals: [G-001, G-004]
+specifications: [S-092]
 ---
 
 # Discoverable Intent Document Naming

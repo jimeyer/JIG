@@ -2,6 +2,8 @@
 id: S-062
 title: Configuration File Discovery
 type: specification
+outcomes: [O-020]
+architecture: [A-003]
 ---
 
 # Configuration File Discovery

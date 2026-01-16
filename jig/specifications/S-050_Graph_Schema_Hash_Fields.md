@@ -2,6 +2,7 @@
 id: S-050
 title: Graph Schema Hash Fields
 type: specification
+outcomes: [O-017]
 ---
 
 # Graph Schema Hash Fields

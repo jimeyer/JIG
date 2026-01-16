@@ -2,6 +2,7 @@
 id: S-044
 title: Content Hash Format
 type: specification
+outcomes: [O-017]
 ---
 
 # Content Hash Format

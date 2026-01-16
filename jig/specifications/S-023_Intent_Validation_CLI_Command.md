@@ -2,6 +2,8 @@
 id: S-023
 title: Intent Validation CLI Command
 type: specification
+outcomes: [O-004, O-006]
+architecture: [A-002, A-004]
 ---
 
 # Intent Validation CLI Command

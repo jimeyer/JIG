@@ -3,8 +3,8 @@ id: O-022
 title: Current Data Guarantee for Commands
 type: outcome
 theme: [Continuity]
-supports_goals: [G-002, G-001]
-specifies: [S-068, S-069, S-070, S-071]
+goals: [G-002, G-001]
+specifications: [S-068, S-069, S-070, S-071]
 ---
 
 # Current Data Guarantee for Commands

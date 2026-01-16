@@ -2,6 +2,8 @@
 id: S-038
 title: Layer Constraint Validation
 type: specification
+outcomes: [O-013]
+architecture: [A-004]
 ---
 
 # Layer Constraint Validation

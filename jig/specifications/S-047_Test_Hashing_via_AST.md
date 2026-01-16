@@ -2,6 +2,7 @@
 id: S-047
 title: Test Hashing via AST
 type: specification
+outcomes: [O-017]
 ---
 
 # Test Hashing via AST

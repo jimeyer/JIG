@@ -2,6 +2,7 @@
 id: S-068
 title: Graph Metadata for Staleness Detection
 type: specification
+outcomes: [O-022]
 ---
 
 # Graph Metadata for Staleness Detection

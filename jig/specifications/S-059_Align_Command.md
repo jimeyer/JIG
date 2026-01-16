@@ -2,6 +2,8 @@
 id: S-059
 title: Align Command
 type: specification
+outcomes: [O-019]
+architecture: [A-002]
 ---
 
 # Align Command

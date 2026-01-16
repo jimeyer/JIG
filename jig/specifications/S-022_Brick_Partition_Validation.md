@@ -2,6 +2,8 @@
 id: S-022
 title: Brick Partition Validation
 type: specification
+outcomes: [O-005]
+architecture: [A-004]
 ---
 
 # Brick Partition Validation

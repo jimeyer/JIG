@@ -3,8 +3,8 @@ id: O-015
 title: Completeness Validation for Intent Graph
 type: outcome
 theme: [Validation]
-supports_goals: [G-004, G-003]
-specifies: [S-042, S-043]
+goals: [G-004, G-003]
+specifications: [S-042, S-043]
 ---
 
 # Completeness Validation for Intent Graph

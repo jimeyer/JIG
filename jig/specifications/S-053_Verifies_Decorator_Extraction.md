@@ -2,6 +2,7 @@
 id: S-053
 title: Verifies Decorator Extraction
 type: specification
+outcomes: [O-018]
 ---
 
 # Verifies Decorator Extraction

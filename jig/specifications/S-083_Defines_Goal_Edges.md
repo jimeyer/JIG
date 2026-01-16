@@ -3,6 +3,8 @@ id: S-083
 title: Defines Goal Edges
 type: specification
 outcome: O-025
+outcomes: [O-025]
+architecture: [A-001]
 ---
 
 # Defines Goal Edges

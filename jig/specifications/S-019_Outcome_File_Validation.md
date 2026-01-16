@@ -2,6 +2,7 @@
 id: S-019
 title: Outcome File Validation
 type: specification
+outcomes: [O-005]
 ---
 
 # Outcome File Validation

@@ -3,8 +3,8 @@ id: O-019
 title: Intuitive CLI Experience
 type: outcome
 theme: [Experience]
-supports_goals: [G-002]
-specifies: [S-057, S-058, S-059, S-060, S-061]
+goals: [G-002]
+specifications: [S-057, S-058, S-059, S-060, S-061]
 ---
 
 # Intuitive CLI Experience

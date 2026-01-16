@@ -2,8 +2,8 @@
 id: O-024
 type: outcome
 title: Architecture Constrains Specifications
-supports_goals: [G-003, G-005]
-specifies: [S-076, S-077, S-078, S-079]
+goals: [G-003, G-005]
+specifications: [S-076, S-077, S-078, S-079]
 ---
 
 # Architecture Constrains Specifications

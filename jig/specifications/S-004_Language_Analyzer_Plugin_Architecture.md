@@ -2,6 +2,7 @@
 id: S-004
 title: Language Analyzer Plugin Architecture
 type: specification
+outcomes: [O-003]
 ---
 
 # Language Analyzer Plugin Architecture

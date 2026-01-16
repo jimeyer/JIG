@@ -2,6 +2,7 @@
 id: S-067
 title: Coverage Record Format
 type: specification
+outcomes: [O-021]
 ---
 
 # Coverage Record Format

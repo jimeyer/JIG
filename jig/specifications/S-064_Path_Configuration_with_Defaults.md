@@ -2,6 +2,8 @@
 id: S-064
 title: Path Configuration with Defaults
 type: specification
+outcomes: [O-020]
+architecture: [A-003]
 ---
 
 # Path Configuration with Defaults
