@@ -33,7 +33,7 @@ The CLI must:
 1. Auto-discover project root by walking up directories
 2. Use verb-first command pattern: `jigy {verb} [target]`
 3. Require no configuration for projects with standard layout
-4. Support only `--help` and `--version` as global flags
+4. Limit global flags to: `--help`, `--version`, `--no-rebuild`, plus universal output flags (`-j`, `-m`, `-v`)
 5. Provide consistent error messages with actionable guidance
 6. Complete command dispatch in <100ms before actual work begins
 

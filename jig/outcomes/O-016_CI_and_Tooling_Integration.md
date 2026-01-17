@@ -11,7 +11,7 @@ specifications: [S-026, S-093, S-094]
 
 **Value:** Validation integrates seamlessly into CI pipelines and editor tooling via machine-parseable output, enabling automated quality gates and real-time feedback.
 
-**Acceptance:** `jigy validate --format json` produces structured, parseable output with error codes, file locations, and severity levels that CI systems and editors can consume programmatically.
+**Acceptance:** `jigy validate -j` produces structured, parseable JSON output with a `valid` boolean, domain-specific `summary`, and `errors` array that CI systems and agents can consume programmatically.
 
 ## AI Agent Benefit
 
@@ -35,13 +35,13 @@ By providing a machine-parseable JSON format alongside human-readable output, we
 ## Success Criteria
 
 The CI integration must:
-1. Provide `--format json` flag on all validate commands
+1. Provide `-j/--json` flag on all commands (per S-093)
 2. Output valid, parseable JSON with no syntax errors
-3. Include structured error codes for programmatic handling (e.g., `MISSING_REQUIRED_FIELD`, `INVALID_SPEC_REFERENCE`)
-4. Include file paths, line numbers, error messages, and severity for each error
-5. Include summary statistics: `total_errors`, `total_warnings`, validation status per phase
+3. Use `valid: true/false` boolean for ergonomic programmatic checks
+4. Include domain-specific counts in `summary` object
+5. Include `errors` array at top level (empty on success, populated on failure)
 6. Maintain schema consistency across all validation commands
-7. Default to human-readable format (no breaking changes to existing workflows)
+7. Default to human-readable format (no flags = terminal output)
 8. Complete with same performance as human-readable format
 
 ## Specified By

@@ -23,15 +23,22 @@ CLI commands produce LLM-optimized markdown output when `-m/--markdown` flag is 
 ### Validation Commands
 
 ```markdown
-# Validation Result
+# JIG Validation: Passed
 
-**Status:** Passed | Failed
-**Checked:** 91 specs, 11 bricks
+- **Specs:** 78 | **Outcomes:** 23 | **Bricks:** 11
+- **Coverage:** 115 functions, 604 tests decorated
+```
 
-## Errors (if any)
+On failure:
+```markdown
+# JIG Validation: Failed
 
-- **S-042.md:7** - `INVALID_REFERENCE`: Reference O-999 does not exist
-- **S-043.md:12** - `MISSING_FIELD`: Required field 'outcome' missing
+- **Specs:** 78 | **Outcomes:** 23 | **Bricks:** 11
+
+## Errors
+
+- **S-042.md:7** - Reference O-999 does not exist
+- **S-043.md:12** - Required field 'outcome' missing
 ```
 
 ### Display Commands

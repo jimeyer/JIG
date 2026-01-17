@@ -22,30 +22,45 @@ CLI commands produce structured JSON output when `-j/--json` flag is used.
 ## Validation Output Schema
 
 ```json
+{"valid":true,"summary":{"specs":78,"outcomes":23,"goals":5,"bricks":11,"functions":115,"tests":604},"errors":[]}
+```
+
+Expanded for readability:
+```json
 {
-  "status": "passed|failed",
-  "phases": {
-    "phase_name": {
-      "passed": true,
-      "errors": [
-        {
-          "file": "path/to/file.md",
-          "line": 7,
-          "code": "INVALID_REFERENCE",
-          "message": "Reference O-999 does not exist",
-          "severity": "error"
-        }
-      ]
-    }
-  },
+  "valid": true,
   "summary": {
-    "total_errors": 0,
-    "total_warnings": 0,
-    "specs_checked": 91,
-    "bricks_checked": 11
-  }
+    "specs": 78,
+    "outcomes": 23,
+    "goals": 5,
+    "bricks": 11,
+    "functions": 115,
+    "tests": 604
+  },
+  "errors": []
 }
 ```
+
+On failure, `errors` contains structured error objects:
+```json
+{
+  "valid": false,
+  "summary": {...},
+  "errors": [
+    {
+      "file": "path/to/file.md",
+      "line": 7,
+      "code": "INVALID_REFERENCE",
+      "message": "Reference O-999 does not exist"
+    }
+  ]
+}
+```
+
+Key design choices:
+- `valid: true` boolean (not `status: "passed"`) for ergonomic agent code
+- Flat `errors` array at top level (agents don't iterate phases to find failures)
+- `summary` contains domain-specific counts, not generic totals
 
 ## Rebuild Output Schema
 
@@ -68,10 +83,7 @@ CLI commands produce structured JSON output when `-j/--json` flag is used.
 
 ## Verbose Mode (-j -v)
 
-Verbose JSON adds additional fields:
-- `metadata`: timestamps, versions
-- `context`: related information
-- `suggestions`: actionable next steps for errors
+Verbose JSON may add additional fields within `summary` for detailed breakdowns. The core schema (`valid`, `summary`, `errors`) remains consistent.
 
 ## Rationale
 

@@ -101,13 +101,21 @@ Simple, memorable, predictable. No flags required for common operations.
 
 ### 1. Radical Simplicity
 
-The CLI has exactly **three global flags**:
+The CLI has minimal global flags plus universal output format flags:
 
+**Global flags:**
 | Flag | Purpose |
 |------|---------|
 | `--help` | Show help for any command |
 | `--version` | Show version (root command only) |
 | `--no-rebuild` | Skip automatic graph rebuild |
+
+**Output format flags (all commands):**
+| Flag | Purpose |
+|------|---------|
+| `-j/--json` | Machine-parseable JSON output |
+| `-m/--markdown` | LLM-optimized markdown output |
+| `-v/--verbose` | Additional detail in any format |
 
 ### 2. Sensible Discovery
 
@@ -147,17 +155,19 @@ jigy validate bricks # Just brick validation
 jigy show layers    # Just layer hierarchy
 ```
 
-### 5. Designed for Humans
+### 5. Three Output Modes
 
-Output is crafted for terminal reading:
+Every command supports three output modes per S-093:
 
-- Clear section headers
-- Consistent formatting
-- Color when appropriate (respects `NO_COLOR`)
-- Counts and summaries for large outputs
-- Exit codes for scripting (success = 0, failure = non-zero)
+| Mode | Flag | Audience | Characteristics |
+|------|------|----------|-----------------|
+| Human | (default) | Terminal | Clear headers, color, summaries |
+| JSON | `-j` | CI/Agents | Single-line, typed, complete |
+| Markdown | `-m` | LLMs | Structured, semantic, dense |
 
-Scripts that need machine-readable output should use the graph files directly (`jig/generated/*.ndjson`) or a future API.
+Human output is the default—crafted for terminal reading with clear section headers, color (respects `NO_COLOR`), and summary counts. Exit codes work for scripting (success = 0, failure = non-zero).
+
+JSON and Markdown modes enable CI pipelines, AI agents, and LLM context injection without fragile text parsing.
 
 ### 6. Fail Fast, Fail Clearly
 
@@ -320,6 +330,9 @@ jigy
 | `--help` | All commands | Show help for the command |
 | `--version` | Root only | Show JIG version |
 | `--no-rebuild` | Root | Skip automatic graph rebuild before commands |
+| `-j/--json` | All commands | Machine-parseable JSON output (S-026) |
+| `-m/--markdown` | All commands | LLM-optimized markdown output (S-094) |
+| `-v/--verbose` | All commands | Additional detail in any format |
 
 ---
 
