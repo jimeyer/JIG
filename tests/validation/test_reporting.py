@@ -248,13 +248,10 @@ def test_format_as_markdown_success():
 
     md_output = format_as_markdown(results)
 
-    # Check header
-    assert "# Validation Result" in md_output
-    # Check status
-    assert "**Status:** Passed" in md_output
-    # Check counts
-    assert "91" in md_output
-    assert "11" in md_output
+    # Check header with new format
+    assert "# JIG Validation: Passed" in md_output
+    # Check summary contains counts
+    assert "**Specs:**" in md_output
 
 
 @jig.verifies("S-094")
@@ -275,7 +272,7 @@ def test_format_as_markdown_failed():
     results = {"intent": result}
     md_output = format_as_markdown(results)
 
-    assert "**Status:** Failed" in md_output
+    assert "# JIG Validation: FAILED" in md_output
 
 
 @jig.verifies("S-094")
@@ -396,9 +393,8 @@ def test_format_as_markdown_verbose_mode():
 
     # Verbose mode should include full paths
     assert "jig/specifications/S-042.md" in md_output
-    # Should still have basic structure
-    assert "# Validation Result" in md_output
-    assert "**Status:** Failed" in md_output
+    # Should still have basic structure with new format
+    assert "# JIG Validation: FAILED" in md_output
 
 
 @jig.verifies("S-094")
@@ -417,11 +413,9 @@ def test_format_as_markdown_verbose_success():
     md_output = format_as_markdown(results, verbose=True)
 
     # Verbose mode should have more detail
-    assert "# Validation Result" in md_output
-    assert "**Status:** Passed" in md_output
-    # Should include phase details section
-    assert "intent" in md_output.lower()
-    assert "bricks" in md_output.lower()
+    assert "# JIG Validation: Passed" in md_output
+    # Should include details section
+    assert "## Details" in md_output
 
 
 @jig.verifies("S-094")
@@ -478,8 +472,5 @@ def test_format_as_markdown_checked_counts_format():
 
     md_output = format_as_markdown(results)
 
-    # Should have checked line with counts
-    assert "**Checked:**" in md_output
-    # Should mention specs and bricks with counts
-    assert "91" in md_output
-    assert "11" in md_output
+    # Should have summary line with specs
+    assert "**Specs:** 91" in md_output

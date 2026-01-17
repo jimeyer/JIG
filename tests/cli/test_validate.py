@@ -211,9 +211,9 @@ title: Test Specification
         # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
         result = runner.invoke(cli, ["--no-rebuild", "validate"])
         assert result.exit_code == 0
-        # Should run both validations
-        assert "intent" in result.output.lower() or "specification" in result.output.lower()
-        assert "brick" in result.output.lower()
+        # Should run both validations (new format uses "specs" and "bricks")
+        assert "specs" in result.output.lower()
+        assert "bricks" in result.output.lower()
 
 
 @jig.verifies("S-025")
@@ -405,10 +405,12 @@ def test_validate_json_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "-j"])
         assert result.exit_code == 0
 
-        # Output must be valid JSON
+        # Output must be valid JSON with new schema
         data = json.loads(result.output)
-        assert "status" in data
-        assert data["status"] == "passed"
+        assert "valid" in data
+        assert data["valid"] is True
+        assert "summary" in data
+        assert "errors" in data
 
 
 @jig.verifies("S-026", "S-093")
@@ -421,10 +423,11 @@ def test_validate_intent_json_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-j"])
         assert result.exit_code == 0
 
-        # Output must be valid JSON
+        # Output must be valid JSON with new schema
         data = json.loads(result.output)
-        assert "status" in data
-        assert data["status"] == "passed"
+        assert "valid" in data
+        assert data["valid"] is True
+        assert "summary" in data
 
 
 @jig.verifies("S-026", "S-093")
@@ -437,10 +440,11 @@ def test_validate_bricks_json_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks", "-j"])
         assert result.exit_code == 0
 
-        # Output must be valid JSON
+        # Output must be valid JSON with new schema
         data = json.loads(result.output)
-        assert "status" in data
-        assert data["status"] == "passed"
+        assert "valid" in data
+        assert data["valid"] is True
+        assert "summary" in data
 
 
 @jig.verifies("S-093", "S-094")
@@ -453,9 +457,9 @@ def test_validate_markdown_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "-m"])
         assert result.exit_code == 0
 
-        # Output should be markdown (contains header)
-        assert "# Validation Result" in result.output
-        assert "**Status:**" in result.output
+        # Output should be markdown with new format
+        assert "# JIG Validation:" in result.output
+        assert "**Specs:**" in result.output
 
 
 @jig.verifies("S-093", "S-094")
@@ -468,9 +472,9 @@ def test_validate_intent_markdown_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "intent", "-m"])
         assert result.exit_code == 0
 
-        # Output should be markdown
-        assert "# Validation Result" in result.output
-        assert "**Status:**" in result.output
+        # Output should be markdown with new format
+        assert "# JIG Validation:" in result.output
+        assert "**Specs:**" in result.output
 
 
 @jig.verifies("S-093", "S-094")
@@ -483,9 +487,9 @@ def test_validate_bricks_markdown_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks", "-m"])
         assert result.exit_code == 0
 
-        # Output should be markdown
-        assert "# Validation Result" in result.output
-        assert "**Status:**" in result.output
+        # Output should be markdown with new format
+        assert "# JIG Validation:" in result.output
+        assert "**Specs:**" in result.output
 
 
 @jig.verifies("S-093")
@@ -512,9 +516,9 @@ def test_validate_json_verbose_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "-j", "-v"])
         assert result.exit_code == 0
 
-        # Output must be valid JSON
+        # Output must be valid JSON with new schema
         data = json.loads(result.output)
-        assert "status" in data
+        assert "valid" in data
 
 
 @jig.verifies("S-093", "S-094")
@@ -527,9 +531,9 @@ def test_validate_markdown_verbose_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "-m", "-v"])
         assert result.exit_code == 0
 
-        # Verbose markdown should have phases section
-        assert "# Validation Result" in result.output
-        assert "## Phases" in result.output
+        # Verbose markdown should have details section
+        assert "# JIG Validation:" in result.output
+        assert "## Details" in result.output
 
 
 @jig.verifies("S-093")
@@ -598,9 +602,9 @@ def test_validate_json_with_errors():
 
         # Output must be valid JSON with error details
         data = json.loads(result.output)
-        assert data["status"] == "failed"
-        assert "summary" in data
-        assert data["summary"]["total_errors"] > 0
+        assert data["valid"] is False
+        assert "errors" in data
+        assert len(data["errors"]) > 0
 
 
 @jig.verifies("S-093", "S-094")
@@ -614,8 +618,7 @@ def test_validate_markdown_with_errors():
         assert result.exit_code == 1
 
         # Markdown should have errors section
-        assert "# Validation Result" in result.output
-        assert "**Status:** Failed" in result.output
+        assert "# JIG Validation: FAILED" in result.output
         assert "## Errors" in result.output
 
 
@@ -629,9 +632,9 @@ def test_validate_full_json_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "full", "-j"])
         assert result.exit_code == 0
 
-        # Output must be valid JSON
+        # Output must be valid JSON with new schema
         data = json.loads(result.output)
-        assert "status" in data
+        assert "valid" in data
 
 
 @jig.verifies("S-093", "S-094")
@@ -644,5 +647,5 @@ def test_validate_full_markdown_flag():
         result = runner.invoke(cli, ["--no-rebuild", "validate", "full", "-m"])
         assert result.exit_code == 0
 
-        # Output should be markdown
-        assert "# Validation Result" in result.output
+        # Output should be markdown with new format
+        assert "# JIG Validation:" in result.output

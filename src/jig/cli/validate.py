@@ -217,47 +217,68 @@ def _format_json_output(results: dict) -> dict:
         results: Dictionary mapping phase name to ValidationResult.
 
     Returns:
-        JSON-serializable dictionary with status, phases, and summary.
+        JSON-serializable dictionary with valid, summary, and errors.
     """
-    output = {}
-
-    # Add each phase
-    for phase_name, result in results.items():
-        phase_data = {
-            "passed": result.passed,
-            "errors": [],
-        }
-
-        for error in result.errors:
-            error_data = {
-                "file": error.file,
-                "line": error.line,
-                "code": error.code,
-                "message": error.message,
-                "severity": error.severity,
-            }
-
-            # Add optional field if present
-            if error.field:
-                error_data["field"] = error.field
-
-            phase_data["errors"].append(error_data)
-
-        output[phase_name] = phase_data
+    import re
 
     # Overall status
     all_passed = all(result.passed for result in results.values())
-    output["status"] = "passed" if all_passed else "failed"
 
-    # Summary
-    total_errors = sum(len(result.errors) for result in results.values())
-    total_warnings = sum(
-        len([e for e in result.errors if e.severity == "warning"]) for result in results.values()
-    )
+    # Extract counts for summary
+    spec_result = results.get("specifications")
+    spec_count = spec_result.items_checked if spec_result else 0
 
-    output["summary"] = {
-        "total_errors": total_errors,
-        "total_warnings": total_warnings,
+    outcome_result = results.get("outcomes")
+    outcome_count = outcome_result.items_checked if outcome_result else 0
+
+    brick_result = results.get("brick_definitions")
+    brick_count = brick_result.items_checked if brick_result else 0
+
+    # Extract goal count from charter detail
+    goal_count = 0
+    charter_result = results.get("charter")
+    if charter_result and charter_result.detail:
+        match = re.search(r"(\d+) goals", charter_result.detail)
+        if match:
+            goal_count = int(match.group(1))
+
+    # Extract decorator counts
+    func_count = 0
+    test_count = 0
+    decorator_result = results.get("decorators")
+    if decorator_result and decorator_result.detail:
+        match = re.search(r"(\d+) functions, (\d+) tests", decorator_result.detail)
+        if match:
+            func_count = int(match.group(1))
+            test_count = int(match.group(2))
+
+    # Collect all errors (only when there are errors)
+    all_errors = []
+    for result in results.values():
+        for error in result.errors:
+            error_data = {
+                "code": error.code,
+                "file": error.file,
+                "message": error.message,
+            }
+            if error.line is not None:
+                error_data["line"] = error.line
+            if error.field:
+                error_data["field"] = error.field
+            all_errors.append(error_data)
+
+    # Build output
+    output = {
+        "valid": all_passed,
+        "summary": {
+            "specs": spec_count,
+            "outcomes": outcome_count,
+            "goals": goal_count,
+            "bricks": brick_count,
+            "functions": func_count,
+            "tests": test_count,
+        },
+        "errors": all_errors,
     }
 
     return output
@@ -525,54 +546,151 @@ def validate_full_command(
     """
     # Auto-rebuild all stale graphs before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
-    ensure_graphs_current(["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild)
+    rebuild_summary = ensure_graphs_current(
+        ["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild, verbose=verbose
+    )
 
-    # For human output, run sub-commands directly
-    if output_format == "human":
-        click.echo("=== Validating Intent ===\n")
-        intent_exit_code = validate_intent_command(config, output_format, skip_rebuild=True, verbose=verbose)
-
-        # Conditionally run brick validation if implementation graph exists
-        impl_graph = config.paths.generated / "implementation-graph.ndjson"
-        if impl_graph.exists():
-            click.echo("\n=== Validating Bricks ===\n")
-            brick_exit_code = validate_bricks_command(config, output_format, skip_rebuild=True, verbose=verbose)
-        else:
-            click.echo("\n=== Skipping Brick Validation ===")
-            click.echo("(Implementation graph not found)")
-            brick_exit_code = 0
-
-        # Overall result
-        if intent_exit_code == 0 and brick_exit_code == 0:
-            click.echo("\n✓ All validations passed.")
-        else:
-            click.echo("\n✗ Validation failed.")
-
-        return 0 if (intent_exit_code == 0 and brick_exit_code == 0) else 1
-
-    # For JSON/markdown output, collect all results and output once
-    all_results = {}
-
-    # Run intent validation (collect results without output)
+    # Collect all results
     intent_results = _run_intent_validation(config)
-    all_results.update(intent_results)
 
     # Run brick validation if graph exists
     impl_graph = config.paths.generated / "implementation-graph.ndjson"
+    brick_results = {}
     if impl_graph.exists():
         brick_results = _run_bricks_validation(config)
-        all_results.update(brick_results)
 
-    # Format output
+    all_results = {**intent_results, **brick_results}
+    all_passed = all(r.passed for r in all_results.values())
+
+    # Format output based on mode
     if output_format == "json":
         import json
         click.echo(json.dumps(_format_json_output(all_results), separators=(",", ":")))
     elif output_format == "markdown":
         click.echo(format_as_markdown(all_results, verbose=verbose))
+    else:
+        # Human output
+        _output_human_validation(
+            intent_results=intent_results,
+            brick_results=brick_results,
+            rebuild_summary=rebuild_summary,
+            all_passed=all_passed,
+            verbose=verbose,
+        )
 
-    # Return exit code
-    all_passed = all(r.passed for r in all_results.values())
     return 0 if all_passed else 1
+
+
+def _output_human_validation(
+    intent_results: dict,
+    brick_results: dict,
+    rebuild_summary: str,
+    all_passed: bool,
+    verbose: bool,
+) -> None:
+    """Output validation results in human-readable format.
+
+    Args:
+        intent_results: Results from intent validation.
+        brick_results: Results from brick validation.
+        rebuild_summary: Summary of rebuild operations (e.g., "Rebuilt 3 graphs.").
+        all_passed: Whether all validations passed.
+        verbose: Whether to show detailed per-step output.
+    """
+    # Extract counts for summary
+    spec_result = intent_results.get("specifications")
+    spec_num = spec_result.items_checked if spec_result else 0
+    outcome_result = intent_results.get("outcomes")
+    outcome_num = outcome_result.items_checked if outcome_result else 0
+    charter_result = intent_results.get("charter")
+    arch_result = intent_results.get("architecture")
+    arch_num = arch_result.items_checked if arch_result else 0
+    decorator_result = intent_results.get("decorators")
+    coverage_result = intent_results.get("specification_coverage")
+    brick_def_result = brick_results.get("brick_definitions")
+    brick_num = brick_def_result.items_checked if brick_def_result else 0
+    partition_result = brick_results.get("brick_partition")
+    layer_result = brick_results.get("layer_constraints")
+    cycles_result = brick_results.get("brick_cycles")
+
+    if verbose:
+        # Verbose: category-based output matching digy style
+        if rebuild_summary:
+            click.echo(rebuild_summary)
+            click.echo()
+
+        # Intent artifacts
+        intent_total = spec_num + outcome_num + arch_num
+        # Extract goal count from charter detail if available
+        goal_num = 0
+        if charter_result and charter_result.detail:
+            # detail format: "1 file, 5 goals defined"
+            import re
+            match = re.search(r"(\d+) goals", charter_result.detail)
+            if match:
+                goal_num = int(match.group(1))
+
+        click.echo(f"Intent: {intent_total + goal_num} artifacts")
+        click.echo(f"  ✓ {spec_num} specifications")
+        click.echo(f"  ✓ {outcome_num} outcomes")
+        click.echo(f"  ✓ {goal_num} goals")
+        click.echo(f"  ✓ {arch_num} architecture docs")
+        click.echo()
+
+        # Coverage metrics
+        click.echo("Coverage:")
+        if coverage_result and coverage_result.detail:
+            # detail format: "78 specs: 78 covered, 0 orphaned"
+            click.echo(f"  ✓ {coverage_result.detail}")
+        else:
+            click.echo(f"  ✓ {spec_num}/{spec_num} specs covered by outcomes")
+
+        if decorator_result and decorator_result.detail:
+            # detail format: "93 files: 115 functions, 604 tests"
+            import re
+            match = re.search(r"(\d+) functions, (\d+) tests", decorator_result.detail)
+            if match:
+                click.echo(f"  ✓ {match.group(1)} functions decorated")
+                click.echo(f"  ✓ {match.group(2)} tests decorated")
+        click.echo()
+
+        # Bricks
+        if brick_results:
+            click.echo(f"Bricks: {brick_num} definitions")
+            partition_files = partition_result.items_checked if partition_result else 0
+            click.echo(f"  ✓ {partition_files} files partitioned")
+            layer_violations = layer_result.items_checked if layer_result else 0
+            click.echo(f"  ✓ {layer_violations} layer violations")
+            cycle_count = cycles_result.items_checked if cycles_result else 0
+            click.echo(f"  ✓ {cycle_count} cycles")
+            click.echo()
+
+        # Final summary line (same as default)
+        click.echo(f"Validated {spec_num} specs, {outcome_num} outcomes, {brick_num} bricks.")
+
+        # Show errors if any
+        if not all_passed:
+            click.echo()
+            all_results = {**intent_results, **brick_results}
+            for result in all_results.values():
+                for error in result.errors:
+                    click.echo(str(error))
+    else:
+        # Default: one-line summary
+        if all_passed:
+            parts = []
+            if rebuild_summary:
+                parts.append(rebuild_summary)
+            parts.append(f"Validated {spec_num} specs, {outcome_num} outcomes, {brick_num} bricks.")
+            click.echo(" ".join(parts))
+        else:
+            # Show errors
+            all_results = {**intent_results, **brick_results}
+            if rebuild_summary:
+                click.echo(rebuild_summary)
+            for result in all_results.values():
+                for error in result.errors:
+                    click.echo(str(error))
 
 
 @jig.implements("S-027", "S-065")

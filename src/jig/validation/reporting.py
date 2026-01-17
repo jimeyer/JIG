@@ -98,65 +98,84 @@ def format_as_markdown(results: dict[str, ValidationResult], verbose: bool = Fal
     Returns:
         Markdown string with headers, bullets, and emphasis
     """
-    lines = []
+    import re
 
-    # Header
-    lines.append("# Validation Result")
-    lines.append("")
+    lines = []
 
     # Overall status
     all_passed = all(result.passed for result in results.values())
-    status = "Passed" if all_passed else "Failed"
-    lines.append(f"**Status:** {status}")
+    status = "Passed" if all_passed else "FAILED"
 
-    # Checked counts - build a summary line
-    checked_parts = []
-    for phase_name, result in results.items():
-        checked_parts.append(f"{result.items_checked} {phase_name}")
-    lines.append(f"**Checked:** {', '.join(checked_parts)}")
+    # Header with status
+    lines.append(f"# JIG Validation: {status}")
     lines.append("")
 
-    # Verbose mode: add phase details section
-    if verbose:
-        lines.append("## Phases")
-        lines.append("")
-        for phase_name, result in results.items():
-            phase_status = "Passed" if result.passed else "Failed"
-            lines.append(f"- **{phase_name}**: {phase_status} ({result.items_checked} checked)")
-        lines.append("")
+    # Extract key counts
+    spec_result = results.get("specifications")
+    spec_count = spec_result.items_checked if spec_result else 0
 
-    # Collect all errors from all phases
+    outcome_result = results.get("outcomes")
+    outcome_count = outcome_result.items_checked if outcome_result else 0
+
+    brick_result = results.get("brick_definitions")
+    brick_count = brick_result.items_checked if brick_result else 0
+
+    # Extract decorator counts from detail string
+    func_count = 0
+    test_count = 0
+    decorator_result = results.get("decorators")
+    if decorator_result and decorator_result.detail:
+        match = re.search(r"(\d+) functions, (\d+) tests", decorator_result.detail)
+        if match:
+            func_count = int(match.group(1))
+            test_count = int(match.group(2))
+
+    # Summary line
+    lines.append(f"- **Specs:** {spec_count} | **Outcomes:** {outcome_count} | **Bricks:** {brick_count}")
+    lines.append(f"- **Coverage:** {func_count} functions, {test_count} tests decorated")
+
+    # Verbose: add more detail
+    if verbose:
+        lines.append("")
+        lines.append("## Details")
+
+        # Extract goal count
+        goal_count = 0
+        charter_result = results.get("charter")
+        if charter_result and charter_result.detail:
+            match = re.search(r"(\d+) goals", charter_result.detail)
+            if match:
+                goal_count = int(match.group(1))
+
+        arch_result = results.get("architecture")
+        arch_count = arch_result.items_checked if arch_result else 0
+
+        lines.append(f"- Goals: {goal_count}")
+        lines.append(f"- Architecture docs: {arch_count}")
+
+        partition_result = results.get("brick_partition")
+        partition_count = partition_result.items_checked if partition_result else 0
+        lines.append(f"- Files partitioned: {partition_count}")
+
+    # Collect all errors
     all_errors = []
-    for phase_name, result in results.items():
+    for result in results.values():
         for error in result.errors:
             all_errors.append(error)
 
     # Errors section (only if there are errors)
     if all_errors:
+        lines.append("")
         lines.append("## Errors")
         lines.append("")
         for error in all_errors:
-            # Format file location
-            if verbose:
-                # Verbose mode: use full path
-                file_display = error.file
-            else:
-                # Normal mode: use basename only
-                file_display = Path(error.file).name
-
-            # Add line number if present
-            if error.line is not None:
-                location = f"{file_display}:{error.line}"
-            else:
-                location = file_display
-
-            # Format error code
+            file_display = Path(error.file).name if not verbose else error.file
+            location = f"{file_display}:{error.line}" if error.line else file_display
             code_display = f"`{error.code}`" if error.code else ""
 
-            # Build the error line
             if code_display:
-                lines.append(f"- **{location}** - {code_display}: {error.message}")
+                lines.append(f"- **{location}** {code_display}: {error.message}")
             else:
-                lines.append(f"- **{location}** - {error.message}")
+                lines.append(f"- **{location}**: {error.message}")
 
     return "\n".join(lines)

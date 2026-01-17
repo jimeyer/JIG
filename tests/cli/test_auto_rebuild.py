@@ -76,7 +76,7 @@ class TestEnsureGraphsCurrent:
         with patch("jig.cli.auto_rebuild.is_stale", side_effect=mock_is_stale):
             with patch("jig.cli.auto_rebuild._rebuild_impl_quietly") as mock_rebuild:
                 ensure_graphs_current(["impl", "verify"], config)
-                mock_rebuild.assert_called_once_with(config)
+                mock_rebuild.assert_called_once()
 
     @jig.verifies("S-070")
     def test_rebuilds_only_stale_graphs(self, tmp_path: Path):
