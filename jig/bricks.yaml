@@ -97,3 +97,10 @@ bricks:
     layer: 0
     units:
       - M-jig.init
+
+  - id: B-rules
+    name: Rules Engine
+    layer: 0
+    units:
+      - M-jig.rules.base
+      - M-jig.rules.context
