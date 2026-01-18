@@ -93,7 +93,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 - [x] WU2: Core Init Logic — tests ☑ / code ☑
 - [x] WU3: Skill Installation — tests ☑ / code ☑
 - [x] WU4: CLI Command Integration — tests ☑ / code ☑
-- [ ] WU5: Validation — SCOPE verified ☐
+- [x] WU5: Validation — SCOPE verified ☑
 - [ ] WU6: Version Bump — version 0.2.0 ☐
 
 ---
@@ -485,7 +485,7 @@ jigy rebuild && jigy validate
 
 ### WU4: CLI Command Integration
 **Status:** COMPLETE ✓
-**Commit:** (this commit)
+**Commit:** 01ddc16
 **Gates:** 4/4 passed
 - Tests: 23/23 passed
 - jigy validate: PASS - NO ERRORS (M-jig.cli.init now resolved)
@@ -501,6 +501,20 @@ jigy rebuild && jigy validate
 - jig/outcomes/O-028_Easy_Project_Onboarding.md (fixed V1 supports_goals → goals)
 
 **Notes:** All jigy validate errors now resolved. Fixed O-028 V1 schema issue discovered during verification.
+
+### WU5: Validation
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 4/4 passed
+- Tests: 22/22 integration tests passed
+- jigy validate: PASS - NO ERRORS
+- FORBIDDEN bricks: untouched
+- SCOPE verified: YES
+
+**Files Created:**
+- tests/integration/test_init_integration.py
+
+**Notes:** Comprehensive integration tests verify full init → validate cycle, idempotency, all flags, and skill installation. SCOPE problem "jigy init bootstraps a project with idempotent directory/file creation" is verified solved.
 
 ---
 

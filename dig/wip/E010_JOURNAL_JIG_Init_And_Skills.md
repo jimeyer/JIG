@@ -149,3 +149,34 @@ WU4 (CLI Command Integration) completed successfully.
 
 ---
 
+### Entry 6 | 2026-01-18 16:25 | WU5 Complete
+
+```yaml
+type: outcome
+wu: WU5
+spec: S-096, S-097, S-098, S-099, S-100, S-101, S-102, S-103
+escalated: false
+```
+
+WU5 (Validation) completed successfully.
+
+**Gates:** 4/4 passed
+- Tests: 22/22 integration tests passed
+- jigy validate: PASS - NO ERRORS
+- FORBIDDEN bricks: untouched
+- SCOPE verified: YES
+
+**Decision:** CONTINUE - SCOPE problem verified solved.
+
+**SCOPE Verification:**
+"jigy init bootstraps a project with idempotent directory/file creation. One skill (/jig) bootstraps agent awareness"
+
+Integration tests verify:
+- Full init → validate cycle works
+- Idempotent behavior (second run creates nothing new)
+- All flags work correctly
+- Skills installation (local and global)
+- DIG detection and gitignore management
+
+---
+
