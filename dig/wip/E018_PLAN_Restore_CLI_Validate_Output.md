@@ -74,7 +74,7 @@ WU1 (Engine) ── WU2 (CLI) ── WU3 (Validation)
 
 - [x] WU1: Validation Engine Counts — tests ✓ / code ✓
 - [x] WU2: CLI Output Formatting — tests ✓ / code ✓
-- [ ] WU3: Validation — SCOPE verified ☐
+- [x] WU3: Validation — SCOPE verified ✓
 
 ---
 
@@ -273,6 +273,16 @@ Completed 2026-01-18.
 - jigy validate: PASS
 - FORBIDDEN bricks: untouched
 - Linting: no new errors (4 pre-existing unused imports)
+
+**Commit:** 3094652
+
+### WU3: Validation
+**Status:** COMPLETE - SCOPE VERIFIED
+**Verification:**
+- Human: "Rebuilt 2 graphs. Validated 92 specs, 25 outcomes, 15 bricks." ✓
+- JSON: summary.specs present ✓
+- Markdown: counts line shows actual values ✓
+- Integration tests: 4/4 passed ✓
 
 **Commit:** (this commit)
 
