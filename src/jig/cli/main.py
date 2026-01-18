@@ -13,7 +13,7 @@ from jig.config import ConfigError, JigConfig, load_config
 class OrderedGroup(click.Group):
     """A Click group with explicit command ordering and commands-first help."""
 
-    COMMAND_ORDER = ["align", "validate", "show", "audit", "rebuild"]
+    COMMAND_ORDER = ["init", "align", "validate", "show", "audit", "rebuild"]
 
     def list_commands(self, ctx):
         # Return commands in explicit order, then any others
@@ -86,6 +86,7 @@ def get_no_rebuild(ctx: click.Context) -> bool:
 
 
 from jig.cli.audit import coverage_command
+from jig.cli.init import init_command
 from jig.cli.output import add_output_options, resolve_format
 from jig.cli.rebuild import (
     align_command,
@@ -138,6 +139,85 @@ def cli(ctx, no_rebuild: bool, json: bool, markdown: bool, verbose: bool):
     ctx.obj["verbose"] = verbose
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
+
+
+# Init command (S-103)
+@cli.command(name="init")
+@click.option(
+    "-p",
+    "--project",
+    "project_name",
+    default=None,
+    help="Project name for Charter filename (default: directory name)",
+)
+@click.option(
+    "--no-skills",
+    is_flag=True,
+    default=False,
+    help="Skip skill installation",
+)
+@click.option(
+    "--skills-only",
+    is_flag=True,
+    default=False,
+    help="Only install skills, skip jig/ structure",
+)
+@click.option(
+    "--global-skills",
+    is_flag=True,
+    default=False,
+    help="Install skills to ~/.agent/skills/ instead of .agent/skills/",
+)
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    default=False,
+    help="Overwrite existing jig.toml (does not overwrite Charter or bricks.yaml)",
+)
+@add_output_options
+@jig.implements("S-103")
+def init_cli(
+    project_name: str | None,
+    no_skills: bool,
+    skills_only: bool,
+    global_skills: bool,
+    force: bool,
+    json: bool,
+    markdown: bool,
+    verbose: bool,
+) -> None:
+    """Initialize a new JIG project.
+
+    Creates the JIG directory structure and configuration files:
+    - jig.toml configuration file
+    - jig/ directory with Charter, specifications, outcomes, architecture
+    - .agent/skills/jig/ with AI agent skill files
+
+    Examples:
+        jigy init                    # Initialize with defaults
+        jigy init -p myproject       # Set project name
+        jigy init --no-skills        # Skip skill installation
+        jigy init --skills-only      # Only install skills
+        jigy init --global-skills    # Install skills globally
+        jigy init -f                 # Force overwrite jig.toml
+        jigy init -j                 # JSON output
+    """
+    # Check mutual exclusivity
+    if no_skills and skills_only:
+        raise click.UsageError("--no-skills and --skills-only are mutually exclusive")
+
+    output_format = resolve_format(json, markdown)
+    exit_code = init_command(
+        project_name=project_name,
+        no_skills=no_skills,
+        skills_only=skills_only,
+        global_skills=global_skills,
+        force=force,
+        output_format=output_format,
+        verbose=verbose,
+    )
+    sys.exit(exit_code)
 
 
 # Verb-first rebuild command group (S-058)

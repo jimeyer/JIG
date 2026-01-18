@@ -121,3 +121,31 @@ WU3 (Skill Installation) completed successfully.
 
 ---
 
+### Entry 5 | 2026-01-18 16:20 | WU4 Complete
+
+```yaml
+type: outcome
+wu: WU4
+spec: S-103
+escalated: false
+```
+
+WU4 (CLI Command Integration) completed successfully.
+
+**Gates:** 4/4 passed
+- Tests: 23/23 passed
+- jigy validate: PASS - NO ERRORS! All forward references resolved
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Decision:** CONTINUE - all gates passed.
+
+**Notable observations:**
+- jigy validate now passes with no errors - M-jig.cli.init exists
+- Fixed O-028 V1 schema issue (supports_goals → goals) discovered during verification
+- COMMAND_ORDER updated with "init" as first item
+- Mutual exclusivity pattern (--no-skills/--skills-only) works correctly
+- All three output formats (human, JSON, markdown) working
+
+---
+

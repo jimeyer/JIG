@@ -2,7 +2,7 @@
 id: O-028
 title: Easy Project Onboarding
 type: outcome
-supports_goals: [G-002]
+goals: [G-002]
 specifications: [S-096, S-097, S-098, S-099, S-100, S-101, S-102, S-103]
 ---
 # Easy Project Onboarding

@@ -92,7 +92,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 - [x] WU1: Template Content Module — tests ☑ / code ☑
 - [x] WU2: Core Init Logic — tests ☑ / code ☑
 - [x] WU3: Skill Installation — tests ☑ / code ☑
-- [ ] WU4: CLI Command Integration — tests ☐ / code ☐
+- [x] WU4: CLI Command Integration — tests ☑ / code ☑
 - [ ] WU5: Validation — SCOPE verified ☐
 - [ ] WU6: Version Bump — version 0.2.0 ☐
 
@@ -470,7 +470,7 @@ jigy rebuild && jigy validate
 
 ### WU3: Skill Installation
 **Status:** COMPLETE ✓
-**Commit:** (this commit)
+**Commit:** 5d20638
 **Gates:** 4/4 passed
 - Tests: 12/12 skill tests passed (40/40 total test_init.py)
 - jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4 scope)
@@ -482,6 +482,25 @@ jigy rebuild && jigy validate
 - tests/unit/test_init.py (added 12 skill tests)
 
 **Notes:** Templates from WU1 integrated cleanly. Used monkeypatch for global path testing. Skills always overwrite unlike Charter/bricks.yaml.
+
+### WU4: CLI Command Integration
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 4/4 passed
+- Tests: 23/23 passed
+- jigy validate: PASS - NO ERRORS (M-jig.cli.init now resolved)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Files Created:**
+- src/jig/cli/init.py
+- tests/cli/test_init.py
+
+**Files Modified:**
+- src/jig/cli/main.py (added import, command registration, COMMAND_ORDER)
+- jig/outcomes/O-028_Easy_Project_Onboarding.md (fixed V1 supports_goals → goals)
+
+**Notes:** All jigy validate errors now resolved. Fixed O-028 V1 schema issue discovered during verification.
 
 ---
 
