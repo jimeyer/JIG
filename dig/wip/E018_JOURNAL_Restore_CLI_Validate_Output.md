@@ -10,7 +10,7 @@ parent: "[[E018_PLAN_Restore_CLI_Validate_Output]]"
 
 **PLAN:** dig/wip/E018_PLAN_Restore_CLI_Validate_Output.md
 **Started:** 2026-01-18 15:33 CST
-**Status:** In Progress
+**Status:** Complete
 
 ---
 
@@ -122,16 +122,19 @@ WU3 Validation complete. SCOPE problem solved.
 
 ## Synthesis
 
-(To be completed in post-execution)
-
 ### Patterns
-- (pending)
+- WU dependencies worked cleanly: WU1 output (counts) consumed by WU2 without issues
+- Fresh Agent Review findings in PLAN (bricks is list, goals excluded) prevented confusion
+- Resolved Context table with line numbers and types saved sub-agent exploration time
 
 ### Friction Summary
-- (pending)
+- None significant. Pre-existing lint errors (unused imports, Optional vs |) existed before this work.
 
 ### Suggestions
-- (pending)
+- PLAN's "Resolved Context" table is highly valuable - continue using it
+- Integration test verification (WU3) was fast since existing tests already covered output format
 
 ### Wins
-- (pending)
+- All 3 WUs completed without escalation
+- No deviations from JIGPLAN
+- Clean execution: 3 focused commits, each with specific WU scope

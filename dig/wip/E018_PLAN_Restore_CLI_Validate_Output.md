@@ -291,17 +291,57 @@ Completed 2026-01-18.
 ## Completion Summary
 
 **Scope Delivered:**
-- (to be filled)
+- Human output format with artifact counts: "Validated X specs, Y outcomes, Z bricks."
+- JSON output with counts in summary
+- Markdown output with actual counts (not placeholders)
+- Rebuild summary combined with validation summary
 
 **JIG Summary:**
-- (to be filled)
+
+### O/S Node Changes (vs JIGPLAN)
+
+| Planned | Actual | Node | Notes |
+|---------|--------|------|-------|
+| REUSE | ✓ REUSED | O-004 | Early Error Detection |
+| REUSE | ✓ REUSED | O-016 | CI and Tooling Integration |
+| UPDATE | ✓ UPDATED | S-025 | Already had correct format in spec |
+| REUSE | ✓ REUSED | S-026 | JSON format unchanged |
+| REUSE | ✓ REUSED | S-094 | Markdown format unchanged |
+
+### Brick Changes (vs JIGPLAN)
+
+| Planned | Actual | Brick | Notes |
+|---------|--------|-------|-------|
+| MODIFY | ✓ MODIFIED | B-validation | Added counts to validate() return |
+| MODIFY | ✓ MODIFIED | B-cli | Updated all output formatters |
+| FORBIDDEN | ✓ UNTOUCHED | B-rules | |
+| FORBIDDEN | ✓ UNTOUCHED | B-decorators | |
+| FORBIDDEN | ✓ UNTOUCHED | B-mend | |
+
+### @jig Decorator Changes (vs JIGPLAN)
+
+**Added:** 1 verifies (test_validate_returns_counts)
+**Removed:** 0
+**Modified:** 0
+
+### Validation Results
+
+```
+jigy rebuild && jigy validate: PASS
+Validated 92 specs, 25 outcomes, 15 bricks.
+pytest: 1042 passed
+```
+
+### Deviations from JIGPLAN
+
+None - implementation matched JIGPLAN exactly.
 
 **Clean Break Actions:**
-- [ ] No deprecated O/S nodes to delete
-- [ ] No legacy code to delete
-- [ ] Final jigy rebuild && jigy validate passed
+- [x] No deprecated O/S nodes to delete
+- [x] No legacy code to delete
+- [x] Final jigy rebuild && jigy validate passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: (to be filled)
-- Systemic frictions: (to be filled)
-- Open questions: (to be filled)
+- Repeatable wins: PLAN's resolved context (line numbers, attr types) enabled fast execution
+- Systemic frictions: None encountered
+- Open questions: None
