@@ -58,6 +58,44 @@ class TestValidateFunction:
             assert "auto_fixable" in result["summary"]
             assert "manual" in result["summary"]
 
+    @jig.verifies("S-025", "S-026")
+    def test_validate_returns_counts(self):
+        """validate() returns counts with specs, outcomes, architectures, bricks."""
+        from jig.validation.engine import validate
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jig_dir = Path(tmpdir) / "jig"
+            spec_dir = jig_dir / "specifications"
+            outcome_dir = jig_dir / "outcomes"
+            arch_dir = jig_dir / "architecture"
+            spec_dir.mkdir(parents=True)
+            outcome_dir.mkdir(parents=True)
+            arch_dir.mkdir(parents=True)
+
+            # Create 2 specs
+            (spec_dir / "S-001_Test.md").write_text(
+                "---\nid: S-001\ntitle: Test\ntype: specification\noutcomes: [O-001]\n---\n# Test\n"
+            )
+            (spec_dir / "S-002_Another.md").write_text(
+                "---\nid: S-002\ntitle: Another\ntype: specification\noutcomes: [O-001]\n---\n# Another\n"
+            )
+            # Create 1 outcome
+            (outcome_dir / "O-001_Outcome.md").write_text(
+                "---\nid: O-001\ntitle: Outcome\ntype: outcome\nspecifications: [S-001, S-002]\nsupports_goals: [G-001]\n---\n# Outcome\n"
+            )
+            # Create 1 architecture
+            (arch_dir / "A-001_Arch.md").write_text(
+                "---\nid: A-001\ntitle: Arch\ntype: architecture\n---\n# Arch\n"
+            )
+
+            result = validate(Path(tmpdir))
+            assert "counts" in result
+            counts = result["counts"]
+            assert counts["specs"] == 2
+            assert counts["outcomes"] == 1
+            assert counts["architectures"] == 1
+            assert counts["bricks"] == 0  # No bricks.yaml created
+
     @jig.verifies("S-108")
     def test_errors_have_stable_id(self):
         """Each error has stable id field (12-char hex)."""

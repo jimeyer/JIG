@@ -73,7 +73,16 @@ def validate(project_root: Path) -> dict[str, Any]:
         "manual": manual_count,
     }
 
+    # Build counts for artifact types
+    counts = {
+        "specs": len(ctx.specifications),
+        "outcomes": len(ctx.outcomes),
+        "architectures": len(ctx.architectures),
+        "bricks": len(ctx.bricks),
+    }
+
     return {
         "errors": errors,
         "summary": summary,
+        "counts": counts,
     }
