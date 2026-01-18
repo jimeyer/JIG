@@ -19,6 +19,7 @@ bricks:
       - M-jig.cli.output
       - M-jig.cli.init
       - M-jig.cli.mend
+      - M-jig.cli.context
 
   - id: B-validation
     name: Artifact Validation
