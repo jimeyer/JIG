@@ -90,7 +90,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 ## Work Unit Checklist
 
 - [x] WU1: Template Content Module — tests ☑ / code ☑
-- [ ] WU2: Core Init Logic — tests ☐ / code ☐
+- [x] WU2: Core Init Logic — tests ☑ / code ☑
 - [ ] WU3: Skill Installation — tests ☐ / code ☐
 - [ ] WU4: CLI Command Integration — tests ☐ / code ☐
 - [ ] WU5: Validation — SCOPE verified ☐
@@ -436,7 +436,7 @@ jigy rebuild && jigy validate
 
 ### WU1: Template Content Module
 **Status:** COMPLETE ✓
-**Commit:** (this commit)
+**Commit:** 3225690
 **Gates:** 4/4 passed
 - Tests: 23/23 passed
 - jigy validate: PASS (2 pre-existing errors for WU2/WU3 modules)
@@ -452,6 +452,21 @@ jigy rebuild && jigy validate
 - jig/bricks.yaml (corrected unit reference M-jig.templates → M-jig.templates.templates)
 
 **Notes:** Used package structure (templates/__init__.py + templates.py) following existing patterns. Forward references to M-jig.cli.init and M-jig.init will resolve in WU2-WU4.
+
+### WU2: Core Init Logic
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 4/4 passed
+- Tests: 28/28 passed
+- jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4 scope)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Files Created:**
+- src/jig/init.py
+- tests/unit/test_init.py
+
+**Notes:** M-jig.init error from WU1 now resolved. TDD flow was smooth - tests driven from spec acceptance criteria. Gitignore handling accounts for files without trailing newlines.
 
 ---
 

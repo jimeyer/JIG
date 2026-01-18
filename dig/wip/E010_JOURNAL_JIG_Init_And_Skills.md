@@ -67,3 +67,30 @@ WU1 (Template Content Module) completed successfully.
 
 ---
 
+### Entry 3 | 2026-01-18 16:10 | WU2 Complete
+
+```yaml
+type: outcome
+wu: WU2
+spec: S-096, S-100, S-102
+escalated: false
+```
+
+WU2 (Core Init Logic) completed successfully.
+
+**Gates:** 4/4 passed
+- Tests: 28/28 passed
+- jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Decision:** CONTINUE - all gates passed, independent verification matched.
+
+**Notable observations:**
+- M-jig.init error from WU1 now resolved
+- Templates module (WU1) integrated cleanly - imports worked without issues
+- Gitignore handling accounts for edge cases (no trailing newline, duplicate detection)
+- InitResult dataclass pattern is clean and testable
+
+---
+
