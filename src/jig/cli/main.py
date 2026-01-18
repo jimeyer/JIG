@@ -13,7 +13,7 @@ from jig.config import ConfigError, JigConfig, load_config
 class OrderedGroup(click.Group):
     """A Click group with explicit command ordering and commands-first help."""
 
-    COMMAND_ORDER = ["init", "align", "validate", "mend", "show", "audit", "rebuild"]
+    COMMAND_ORDER = ["init", "align", "validate", "mend", "show", "context", "audit", "rebuild"]
 
     def list_commands(self, ctx):
         # Return commands in explicit order, then any others
@@ -111,6 +111,7 @@ from jig.cli.validate import (
     validate_full_command,
     validate_intent_command,
 )
+from jig.cli.context import context_command
 
 
 @click.group(
@@ -560,6 +561,56 @@ def show_matrix_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     config = get_config(ctx)
     skip_rebuild = get_no_rebuild(ctx)
     exit_code = show_matrix_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
+    sys.exit(exit_code)
+
+
+# Context command (S-110)
+@cli.command(name="context")
+@click.argument("identifier")
+@click.option(
+    "--max",
+    "max_nodes",
+    type=int,
+    default=50,
+    help="Maximum total nodes in response (default: 50)",
+)
+@add_output_options
+@click.pass_context
+@jig.implements("S-110")
+def context_cli(
+    ctx, identifier: str, max_nodes: int, json: bool, markdown: bool, verbose: bool
+) -> None:
+    """Get graph neighborhood for an identifier.
+
+    Returns ancestors and descendants of a node in the JIG graphs.
+    Useful for understanding context before modifying code.
+
+    IDENTIFIER can be:
+      S-### (specification), O-### (outcome), G-### (goal),
+      A-### (architecture), B-* (brick), F-* (function),
+      T-* (test), Charter, or a file path.
+
+    Example:
+        jigy context S-042           # Human-readable output
+        jigy context S-042 -j        # JSON for agents
+        jigy context S-042 --max 20  # Limit response size
+        jigy context Charter -m      # Markdown output
+    """
+    output_format = resolve_format(json, markdown)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=identifier,
+        project_root=project_root,
+        max_nodes=max_nodes,
+        output_format=output_format.value,
+    )
+    click.echo(output)
     sys.exit(exit_code)
 
 

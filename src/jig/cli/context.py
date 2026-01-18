@@ -360,3 +360,290 @@ def traverse_graph(
         "descendants": descendants,
         "more": more,
     }
+
+
+# Edge type to parent edge name mapping
+# These are the edge names used in the JSON output
+EDGE_TO_PARENT = {
+    "defines_goal": "parent",  # Charter defines goal -> goal's parent edge
+    "supports_goal": "parent",  # O/A supports goal -> O/A's parent edge
+    "specifies": "parent",  # O specifies S -> S's parent edge
+    "specifications": "parent",  # A has specifications -> S's parent edge
+    "implements": "implements",  # F implements S -> F's edge is "implements"
+    "verifies": "verifies",  # T verifies S -> T's edge is "verifies"
+}
+
+
+def _compute_depths(
+    root_id: str,
+    parents_of: dict[str, list[str]],
+    children_of: dict[str, list[str]],
+    all_nodes: dict[str, dict],
+) -> dict[str, int]:
+    """Compute depth from root for all reachable nodes.
+
+    Negative depths are ancestors, positive are descendants.
+    """
+    depths: dict[str, int] = {root_id: 0}
+
+    # BFS for ancestors (negative depths)
+    visited_up = {root_id}
+    queue = deque([(p, -1) for p in parents_of.get(root_id, [])])
+    while queue:
+        node_id, depth = queue.popleft()
+        if node_id in visited_up:
+            continue
+        visited_up.add(node_id)
+        depths[node_id] = depth
+        for parent in parents_of.get(node_id, []):
+            if parent not in visited_up:
+                queue.append((parent, depth - 1))
+
+    # BFS for descendants (positive depths)
+    visited_down = {root_id}
+    queue = deque([(c, 1) for c in children_of.get(root_id, [])])
+    while queue:
+        node_id, depth = queue.popleft()
+        if node_id in visited_down:
+            continue
+        visited_down.add(node_id)
+        depths[node_id] = depth
+        for child in children_of.get(node_id, []):
+            if child not in visited_down:
+                queue.append((child, depth + 1))
+
+    return depths
+
+
+def _get_edge_type_for_node(
+    node_id: str,
+    root_id: str,
+    depth: int,
+    all_edges: list[dict],
+) -> str:
+    """Determine the edge type connecting this node toward root.
+
+    For ancestors (depth < 0), find the edge where node is the parent.
+    For descendants (depth > 0), find the edge where node is the child.
+    """
+    if depth < 0:
+        # Ancestor - find edge where this node connects to its child (toward root)
+        for edge in all_edges:
+            source = edge.get("source", "")
+            target = edge.get("target", "")
+            edge_type = edge.get("type", "")
+
+            direction = EDGE_DIRECTIONS.get(edge_type, {"source_is_parent": True})
+            if direction["source_is_parent"]:
+                # source is parent, target is child
+                if source == node_id:
+                    return "parent"
+            else:
+                # target is parent, source is child
+                if target == node_id:
+                    return "parent"
+        return "parent"  # Default for ancestors
+
+    else:
+        # Descendant - find edge where this node connects to its parent (toward root)
+        for edge in all_edges:
+            source = edge.get("source", "")
+            target = edge.get("target", "")
+            edge_type = edge.get("type", "")
+
+            direction = EDGE_DIRECTIONS.get(edge_type, {"source_is_parent": True})
+            if direction["source_is_parent"]:
+                # source is parent, target is child
+                if target == node_id:
+                    return edge_type
+            else:
+                # target is parent, source is child
+                if source == node_id:
+                    return edge_type
+        return "child"  # Default for descendants
+
+
+@jig.implements("S-113")
+def format_response(
+    traversal_result: dict[str, Any],
+    all_edges: list[dict],
+) -> dict[str, Any]:
+    """Format traversal result into S-113 response schema.
+
+    Args:
+        traversal_result: Output from traverse_graph()
+        all_edges: All edges from graphs (for edge type lookup)
+
+    Returns:
+        Dict matching S-113 schema with root, nodes, more fields
+    """
+    root_node = traversal_result["root"]
+    root_id = root_node["id"]
+
+    # Build adjacency for depth computation
+    parents_of, children_of = _build_adjacency(all_edges)
+
+    # Compute depths
+    all_nodes_map = {root_id: root_node}
+    for node in traversal_result.get("ancestors", []):
+        all_nodes_map[node["id"]] = node
+    for node in traversal_result.get("children", []):
+        all_nodes_map[node["id"]] = node
+    for node in traversal_result.get("descendants", []):
+        all_nodes_map[node["id"]] = node
+
+    depths = _compute_depths(root_id, parents_of, children_of, all_nodes_map)
+
+    # Build flat node list
+    nodes = []
+    for node in (
+        traversal_result.get("ancestors", [])
+        + traversal_result.get("children", [])
+        + traversal_result.get("descendants", [])
+    ):
+        node_id = node["id"]
+        depth = depths.get(node_id, 0)
+        edge_type = _get_edge_type_for_node(node_id, root_id, depth, all_edges)
+
+        nodes.append(
+            {
+                "id": node_id,
+                "type": node.get("type", "unknown"),
+                "file": node.get("file", ""),
+                "edge": edge_type,
+                "depth": depth,
+            }
+        )
+
+    # Sort by depth (ancestors first), then by ID
+    nodes.sort(key=lambda n: (n["depth"], n["id"]))
+
+    return {
+        "root": root_id,
+        "nodes": nodes,
+        "more": traversal_result.get("more", 0),
+    }
+
+
+def format_human(response: dict[str, Any]) -> str:
+    """Format response for human-readable terminal output."""
+    lines = []
+    root = response["root"]
+    lines.append(f"Context for: {root}")
+    lines.append("")
+
+    # Group by depth
+    ancestors = [n for n in response["nodes"] if n["depth"] < 0]
+    descendants = [n for n in response["nodes"] if n["depth"] > 0]
+
+    if ancestors:
+        lines.append("Ancestors:")
+        for node in ancestors:
+            indent = "  " * abs(node["depth"])
+            lines.append(f"{indent}{node['id']} ({node['type']})")
+        lines.append("")
+
+    if descendants:
+        lines.append("Descendants:")
+        for node in descendants:
+            indent = "  " * node["depth"]
+            edge_info = f" [{node['edge']}]" if node["edge"] != "child" else ""
+            lines.append(f"{indent}{node['id']} ({node['type']}){edge_info}")
+        lines.append("")
+
+    more = response.get("more", 0)
+    if more > 0:
+        lines.append(f"... and {more} more descendants (use --max to increase)")
+
+    return "\n".join(lines)
+
+
+def format_markdown(response: dict[str, Any]) -> str:
+    """Format response for LLM-optimized markdown output."""
+    lines = []
+    root = response["root"]
+    lines.append(f"# Context: {root}")
+    lines.append("")
+
+    ancestors = [n for n in response["nodes"] if n["depth"] < 0]
+    descendants = [n for n in response["nodes"] if n["depth"] > 0]
+
+    if ancestors:
+        lines.append("## Ancestors")
+        lines.append("")
+        lines.append("| ID | Type | File | Depth |")
+        lines.append("|---|---|---|---|")
+        for node in ancestors:
+            lines.append(
+                f"| {node['id']} | {node['type']} | {node['file']} | {node['depth']} |"
+            )
+        lines.append("")
+
+    if descendants:
+        lines.append("## Descendants")
+        lines.append("")
+        lines.append("| ID | Type | File | Edge | Depth |")
+        lines.append("|---|---|---|---|---|")
+        for node in descendants:
+            lines.append(
+                f"| {node['id']} | {node['type']} | {node['file']} | {node['edge']} | {node['depth']} |"
+            )
+        lines.append("")
+
+    more = response.get("more", 0)
+    if more > 0:
+        lines.append(f"*{more} more descendants not shown*")
+
+    return "\n".join(lines)
+
+
+@jig.implements("S-110")
+def context_command(
+    identifier: str,
+    project_root: Path,
+    max_nodes: int = 50,
+    output_format: str = "human",
+) -> tuple[int, str]:
+    """Execute context command and return exit code and output.
+
+    Args:
+        identifier: Node identifier to explore
+        project_root: Project root directory
+        max_nodes: Maximum nodes in response
+        output_format: Output format (human, json, markdown)
+
+    Returns:
+        Tuple of (exit_code, output_string)
+    """
+    # Build graph paths
+    generated_dir = project_root / "jig" / "generated"
+    graphs = {
+        "intent": generated_dir / "intent-graph.ndjson",
+        "impl": generated_dir / "implementation-graph.ndjson",
+        "verify": generated_dir / "verification-graph.ndjson",
+        "project_root": project_root,
+    }
+
+    try:
+        # Traverse and format
+        traversal_result = traverse_graph(identifier, graphs, max_nodes)
+        _, all_edges = _load_all_graphs(graphs)
+        response = format_response(traversal_result, all_edges)
+
+        # Format output based on requested format
+        if output_format == "json":
+            output = json.dumps(response)
+        elif output_format == "markdown":
+            output = format_markdown(response)
+        else:
+            output = format_human(response)
+
+        return 0, output
+
+    except IdentifierError as e:
+        error_msg = str(e)
+        if output_format == "json":
+            output = json.dumps({"error": error_msg})
+        else:
+            output = f"Error: {error_msg}"
+        return 1, output
