@@ -58,7 +58,11 @@ class TestV2SchemaFieldNames:
     @jig.verifies("S-095")
     def test_charter_uses_goals_field(self):
         """Verify Charter frontmatter uses 'goals' not 'defines_goals'."""
-        charter_path = PROJECT_ROOT / "jig" / "Charter.md"
+        # Find charter file (supports both Charter.md and Charter_<name>.md)
+        jig_dir = PROJECT_ROOT / "jig"
+        charter_files = list(jig_dir.glob("Charter*.md"))
+        assert charter_files, "No Charter file found in jig/"
+        charter_path = charter_files[0]
         content = charter_path.read_text()
 
         # Check frontmatter (between first two ---)
