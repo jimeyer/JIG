@@ -491,11 +491,11 @@ def show_charter_command(
 
     if not charter_path.exists():
         if output_format == OutputFormat.JSON:
-            click.echo(json_module.dumps({"error": "No Charter.md found", "expected_path": str(charter_path)}))
+            click.echo(json_module.dumps({"error": "No charter file found", "expected_path": str(charter_path)}))
         elif output_format == OutputFormat.MARKDOWN:
-            click.echo(f"# Project Charter\n\nNo Charter.md found.\n\nExpected location: `{charter_path}`")
+            click.echo(f"# Project Charter\n\nNo charter file found.\n\nExpected location: `{charter_path}`")
         else:
-            click.echo("No Charter.md found.")
+            click.echo("No charter file found.")
             click.echo(f"  Expected location: {charter_path}")
         return 1
 
@@ -599,11 +599,11 @@ def show_goals_command(
 
     if not charter_path.exists():
         if output_format == OutputFormat.JSON:
-            click.echo(json_module.dumps({"error": "No Charter.md found - goals come from Charter"}))
+            click.echo(json_module.dumps({"error": "No charter file found - goals come from Charter"}))
         elif output_format == OutputFormat.MARKDOWN:
-            click.echo("# Project Goals\n\nNo Charter.md found - goals come from Charter.")
+            click.echo("# Project Goals\n\nNo charter file found - goals come from Charter.")
         else:
-            click.echo("No Charter.md found - goals come from Charter.")
+            click.echo("No charter file found - goals come from Charter.")
         return 1
 
     # Load charter for goals

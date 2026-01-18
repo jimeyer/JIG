@@ -18,6 +18,30 @@ import jig
 from jig.hashing import git_blob_hash, hash_brick, hash_intent_artifact
 
 
+def _find_charter_file(jig_dir: Path) -> Optional[Path]:
+    """Find the charter file in the jig directory.
+
+    Supports both legacy Charter.md and new Charter_<project>.md naming.
+
+    Args:
+        jig_dir: The jig directory to search in.
+
+    Returns:
+        Path to charter file if found, None otherwise.
+    """
+    # Try legacy Charter.md first
+    legacy_path = jig_dir / "Charter.md"
+    if legacy_path.exists():
+        return legacy_path
+
+    # Try Charter_*.md pattern
+    charter_candidates = sorted(jig_dir.glob("Charter_*.md"))
+    if charter_candidates:
+        return charter_candidates[0]
+
+    return None
+
+
 @jig.implements("S-028", "S-050", "S-068", "S-080", "S-081", "S-082", "S-083", "S-084", "S-085", "S-086")
 def generate_intent_graph(
     project_root: Path,
@@ -47,17 +71,18 @@ def generate_intent_graph(
         output_path = project_root / "jig" / "generated" / "intent-graph.ndjson"
 
     # Define paths to intent artifacts
-    charter_file = project_root / "jig" / "Charter.md"
+    jig_dir = project_root / "jig"
+    charter_file = _find_charter_file(jig_dir)
     architecture_dir = project_root / "jig" / "architecture"
     spec_dir = project_root / "jig" / "specifications"
     outcome_dir = project_root / "jig" / "outcomes"
     bricks_file = project_root / "jig" / "bricks.yaml"
 
     # Load charter node (S-080)
-    charter_node = _load_charter_node(charter_file)
+    charter_node = _load_charter_node(charter_file, project_root)
 
     # Load goal nodes from charter (S-081)
-    goal_nodes = _load_goal_nodes(charter_file)
+    goal_nodes = _load_goal_nodes(charter_file, project_root)
 
     # Load architecture nodes (S-082)
     architecture_nodes = _load_architecture_nodes(architecture_dir)
@@ -132,16 +157,17 @@ def generate_intent_graph(
 
 
 @jig.implements("S-080")
-def _load_charter_node(charter_file: Path) -> Optional[Dict[str, Any]]:
-    """Load Charter node from Charter.md.
+def _load_charter_node(charter_file: Optional[Path], project_root: Path) -> Optional[Dict[str, Any]]:
+    """Load Charter node from charter file.
 
     Args:
-        charter_file: Path to Charter.md.
+        charter_file: Path to charter file (Charter.md or Charter_<name>.md).
+        project_root: Project root for computing relative paths.
 
     Returns:
         Charter node dictionary, or None if file doesn't exist.
     """
-    if not charter_file.exists():
+    if charter_file is None or not charter_file.exists():
         return None
 
     frontmatter = _parse_frontmatter(charter_file)
@@ -152,7 +178,7 @@ def _load_charter_node(charter_file: Path) -> Optional[Dict[str, Any]]:
         "id": "Charter",
         "type": "charter",
         "goals": frontmatter.get("goals", []),
-        "file": "jig/Charter.md",
+        "file": str(charter_file.relative_to(project_root)),
         "jig_hash": hash_intent_artifact(charter_file),
     }
 
@@ -165,20 +191,22 @@ def _load_charter_node(charter_file: Path) -> Optional[Dict[str, Any]]:
 
 
 @jig.implements("S-081")
-def _load_goal_nodes(charter_file: Path) -> List[Dict[str, Any]]:
-    """Load Goal nodes extracted from Charter.md body.
+def _load_goal_nodes(charter_file: Optional[Path], project_root: Path) -> List[Dict[str, Any]]:
+    """Load Goal nodes extracted from charter file body.
 
     Args:
-        charter_file: Path to Charter.md.
+        charter_file: Path to charter file (Charter.md or Charter_<name>.md).
+        project_root: Project root for computing relative paths.
 
     Returns:
         List of goal node dictionaries.
     """
-    if not charter_file.exists():
+    if charter_file is None or not charter_file.exists():
         return []
 
     goal_nodes = []
     goal_header_pattern = re.compile(r"^###\s+(G-\d+):\s*(.*)$", re.MULTILINE)
+    relative_path = str(charter_file.relative_to(project_root))
 
     try:
         content = charter_file.read_text()
@@ -196,7 +224,7 @@ def _load_goal_nodes(charter_file: Path) -> List[Dict[str, Any]]:
                 "id": goal_id,
                 "type": "goal",
                 "title": title,
-                "file": "jig/Charter.md",
+                "file": relative_path,
             }
             goal_nodes.append(goal_node)
 

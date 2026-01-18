@@ -28,6 +28,7 @@ from jig.rules.types import (
     ReferenceValidityRule,
     RequiredFieldRule,
     UniquenessRule,
+    normalize_architecture_id,
     normalize_outcome_id,
     normalize_spec_id,
 )
@@ -253,6 +254,72 @@ OUTCOME_HEADER_SYNC = HeaderSyncRule(
 )
 
 
+# --- ARCHITECTURE RULES (S-076, S-077, S-078) ---
+
+ARCH_REQUIRED_TITLE = RequiredFieldRule(
+    field="title",
+    artifact_filter=is_architecture,
+    default_value="",
+    auto_fix=False,
+    _code="ARCH_REQUIRED_TITLE",
+    _spec="S-076",
+)
+
+ARCH_REQUIRED_TYPE = RequiredFieldRule(
+    field="type",
+    artifact_filter=is_architecture,
+    default_value="architecture",
+    auto_fix=True,
+    _code="ARCH_REQUIRED_TYPE",
+    _spec="S-076",
+)
+
+ARCH_REQUIRED_ID = RequiredFieldRule(
+    field="id",
+    artifact_filter=is_architecture,
+    default_value="",
+    auto_fix=False,
+    _code="ARCH_REQUIRED_ID",
+    _spec="S-077",
+)
+
+ARCH_REQUIRED_GOALS = RequiredFieldRule(
+    field="goals",
+    artifact_filter=is_architecture,
+    default_value=[],
+    auto_fix=False,  # Need human to assign goals
+    _code="ARCH_REQUIRED_GOALS",
+    _spec="S-078",
+)
+
+ARCH_ID_FORMAT = IdFormatRule(
+    pattern=r"^A-\d{3}$",
+    normalizer=normalize_architecture_id,
+    artifact_filter=is_architecture,
+    _code="ARCH_ID_FORMAT",
+    _spec="S-077",
+)
+
+ARCH_UNIQUENESS = UniquenessRule(
+    key_extractor=lambda a: a.id if is_architecture(a) else None,
+    artifact_filter=is_architecture,
+    _code="ARCH_UNIQUENESS",
+    _spec="S-077",
+)
+
+ARCH_FILENAME_SYNC = FilenameSyncRule(
+    artifact_filter=is_architecture,
+    _code="ARCH_FILENAME_SYNC",
+    _spec="S-076",
+)
+
+ARCH_HEADER_SYNC = HeaderSyncRule(
+    artifact_filter=is_architecture,
+    _code="ARCH_HEADER_SYNC",
+    _spec="S-076",
+)
+
+
 # --- CHARTER RULES (S-072) ---
 
 CHARTER_REQUIRED_GOALS = RequiredFieldRule(
@@ -280,6 +347,22 @@ OUTCOME_GOAL_REFS_VALID = ReferenceValidityRule(
     valid_ids_fn=get_goal_ids,
     artifact_filter=is_outcome,
     _code="OUTCOME_GOAL_REFS_VALID",
+    _spec="S-075",  # S-075 covers goal reference validity
+)
+
+ARCH_GOAL_REFS_VALID = ReferenceValidityRule(
+    field="goals",
+    valid_ids_fn=get_goal_ids,
+    artifact_filter=is_architecture,
+    _code="ARCH_GOAL_REFS_VALID",
+    _spec="S-078",
+)
+
+ARCH_SPEC_REFS_VALID = ReferenceValidityRule(
+    field="specifications",
+    valid_ids_fn=get_spec_ids,
+    artifact_filter=is_architecture,
+    _code="ARCH_SPEC_REFS_VALID",
     _spec="S-079",
 )
 
@@ -491,9 +574,20 @@ def _build_rules_list() -> list:
         OUTCOME_UNIQUENESS,
         OUTCOME_FILENAME_SYNC,
         OUTCOME_HEADER_SYNC,
+        # Architecture rules (S-076, S-077, S-078, S-079)
+        ARCH_REQUIRED_ID,
+        ARCH_REQUIRED_TITLE,
+        ARCH_REQUIRED_TYPE,
+        ARCH_REQUIRED_GOALS,
+        ARCH_ID_FORMAT,
+        ARCH_UNIQUENESS,
+        ARCH_FILENAME_SYNC,
+        ARCH_HEADER_SYNC,
+        ARCH_GOAL_REFS_VALID,
+        ARCH_SPEC_REFS_VALID,
         # Charter rules (S-072)
         CHARTER_REQUIRED_GOALS,
-        # Reference validity (S-020, S-079)
+        # Reference validity (S-020, S-075)
         SPEC_OUTCOME_REFS_VALID,
         OUTCOME_GOAL_REFS_VALID,
         # Bidirectional consistency (S-095)

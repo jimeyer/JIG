@@ -20,9 +20,9 @@ architecture: [A-001]
    - id: G-{number}
    - type: "goal"
    - title: extracted from Charter header
-   - file: path to Charter.md (source file)
+   - file: path to charter file (source file)
 
-3. **Goal nodes MUST correspond to Charter.defines_goals**
+3. **Goal nodes MUST correspond to Charter.goals**
    - One-to-one mapping
    - No orphan goals in graph
    - No missing goals
@@ -30,13 +30,13 @@ architecture: [A-001]
 ## NDJSON Format
 
 ```json
-{"id":"G-001","type":"goal","title":"Grounding in Reality","file":"jig/Charter.md"}
-{"id":"G-002","type":"goal","title":"Continuity Across Sessions","file":"jig/Charter.md"}
+{"id":"G-001","type":"goal","title":"Grounding in Reality","file":"jig/Charter_MyProject.md"}
+{"id":"G-002","type":"goal","title":"Continuity Across Sessions","file":"jig/Charter_MyProject.md"}
 ```
 
 ## Extraction Process
 
-1. Read Charter.md body content
+1. Read charter file body content (discovered per S-072)
 2. Find all `### G-{number}: {Title}` headers
 3. Extract goal ID and title from each
 4. Generate one Goal node per header

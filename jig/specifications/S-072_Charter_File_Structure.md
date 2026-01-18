@@ -11,14 +11,15 @@ architecture: [A-001, A-004]
 
 ## Constraints
 
-1. **Charter MUST be a single file at jig/Charter.md**
+1. **Charter MUST be a single file in the jig directory**
    - Exactly one Charter file per project
    - Located at the root of the jig directory
-   - Named `Charter.md` (case-sensitive)
+   - Named `Charter.md` OR `Charter_<project>.md` (case-sensitive)
+   - Discovery order: `Charter.md` first, then `Charter_*.md` alphabetically
 
 2. **Charter MUST have valid YAML frontmatter**
    - Frontmatter delimited by `---` lines
-   - Contains required fields: id, type, defines_goals
+   - Contains required fields: id, type, goals
 
 3. **Charter id MUST be "Charter"**
    - Literal string, not a pattern
@@ -30,8 +31,8 @@ architecture: [A-001, A-004]
 
 ## Validation Rules
 
-- `jigy validate` MUST fail if Charter.md does not exist
-- `jigy validate` MUST fail if Charter.md has invalid frontmatter
+- `jigy validate` MUST fail if no charter file exists
+- `jigy validate` MUST fail if charter file has invalid frontmatter
 - `jigy validate` MUST fail if multiple Charter files detected
 
 ## Rationale

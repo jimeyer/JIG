@@ -50,7 +50,6 @@ This is a test charter without goals.
         ), f"Expected error about goals or charter, got:\n{result.output}"
 
 
-@pytest.mark.skip(reason="Architecture file discovery not working in isolated filesystem - needs investigation")
 @jig.verifies("S-076", "S-077", "S-078", "S-079")
 def test_validate_catches_invalid_architecture():
     """Verify jigy validate actually runs architecture validation."""
@@ -73,6 +72,9 @@ This is a test goal.
 """
         )
 
+        # Create bricks.yaml (required for rebuild)
+        (Path("jig") / "bricks.yaml").write_text("bricks: []\n")
+
         # Create architecture directory
         arch_dir = Path("jig/architecture")
         arch_dir.mkdir(parents=True)
@@ -93,7 +95,7 @@ Test architecture.
 """
         )
 
-        result = runner.invoke(cli, ["--no-rebuild", "validate"])
+        result = runner.invoke(cli, ["validate"])
 
         # Assert validation fails due to title mismatch
         assert result.exit_code != 0, f"Expected validation to fail, got exit_code={result.exit_code}"

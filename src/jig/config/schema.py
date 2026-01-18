@@ -99,6 +99,34 @@ def load_config(project_root: Optional[Path] = None) -> JigConfig:
     )
 
 
+def _find_charter_path(jig_root: Path, config_charter: Optional[str]) -> Path:
+    """Find the charter file path, supporting both naming conventions.
+
+    Args:
+        jig_root: The jig directory.
+        config_charter: Charter path from config, or None to auto-discover.
+
+    Returns:
+        Path to charter file (may not exist yet).
+    """
+    # If explicitly configured, use that
+    if config_charter:
+        return jig_root / config_charter
+
+    # Try legacy Charter.md first
+    legacy_path = jig_root / DEFAULT_CHARTER
+    if legacy_path.exists():
+        return legacy_path
+
+    # Try Charter_*.md pattern
+    charter_candidates = sorted(jig_root.glob("Charter_*.md"))
+    if charter_candidates:
+        return charter_candidates[0]
+
+    # Default to legacy path if nothing found
+    return legacy_path
+
+
 def _extract_paths_config(raw_config: dict[str, Any], project_root: Path) -> PathsConfig:
     """Extract and resolve paths configuration from raw config.
 
@@ -125,7 +153,7 @@ def _extract_paths_config(raw_config: dict[str, Any], project_root: Path) -> Pat
     outcomes = jig_root / paths_dict.get("outcomes", DEFAULT_OUTCOMES)
     bricks = jig_root / paths_dict.get("bricks", DEFAULT_BRICKS)
     generated = jig_root / paths_dict.get("generated", DEFAULT_GENERATED)
-    charter = jig_root / paths_dict.get("charter", DEFAULT_CHARTER)
+    charter = _find_charter_path(jig_root, paths_dict.get("charter"))
     architecture = jig_root / paths_dict.get("architecture", DEFAULT_ARCHITECTURE)
 
     return PathsConfig(

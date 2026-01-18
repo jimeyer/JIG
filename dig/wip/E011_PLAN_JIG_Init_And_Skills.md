@@ -1,13 +1,13 @@
 ---
-title: "PLAN: JIG Init and Skills"
+title: PLAN JIG Init and Skills
 type: plan
 status: active
 created: 1737237600
-created_human: "2026-01-18 16:00 CST"
+created_human: 2026-01-18 16:00 CST
 parent: "[[E009_JIGPLAN_JIG_Init_And_Skills]]"
 children: []
 ---
-# PLAN: JIG Init and Skills
+# PLAN JIG Init and Skills
 
 - **SCOPE**: dig/wip/E006_SCOPE_JIG_Init_And_Skills.md
 - **JIGPLAN**: dig/wip/E009_JIGPLAN_JIG_Init_And_Skills.md
