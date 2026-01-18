@@ -91,7 +91,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 
 - [x] WU1: Template Content Module — tests ☑ / code ☑
 - [x] WU2: Core Init Logic — tests ☑ / code ☑
-- [ ] WU3: Skill Installation — tests ☐ / code ☐
+- [x] WU3: Skill Installation — tests ☑ / code ☑
 - [ ] WU4: CLI Command Integration — tests ☐ / code ☐
 - [ ] WU5: Validation — SCOPE verified ☐
 - [ ] WU6: Version Bump — version 0.2.0 ☐
@@ -455,7 +455,7 @@ jigy rebuild && jigy validate
 
 ### WU2: Core Init Logic
 **Status:** COMPLETE ✓
-**Commit:** (this commit)
+**Commit:** 970e0e9
 **Gates:** 4/4 passed
 - Tests: 28/28 passed
 - jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4 scope)
@@ -467,6 +467,21 @@ jigy rebuild && jigy validate
 - tests/unit/test_init.py
 
 **Notes:** M-jig.init error from WU1 now resolved. TDD flow was smooth - tests driven from spec acceptance criteria. Gitignore handling accounts for files without trailing newlines.
+
+### WU3: Skill Installation
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 4/4 passed
+- Tests: 12/12 skill tests passed (40/40 total test_init.py)
+- jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4 scope)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Files Modified:**
+- src/jig/init.py (added install_skills function)
+- tests/unit/test_init.py (added 12 skill tests)
+
+**Notes:** Templates from WU1 integrated cleanly. Used monkeypatch for global path testing. Skills always overwrite unlike Charter/bricks.yaml.
 
 ---
 

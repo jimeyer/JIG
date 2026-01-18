@@ -12,7 +12,9 @@ import jig
 from jig.templates import (
     BRICKS_YAML_TEMPLATE,
     CHARTER_MD_TEMPLATE,
+    CONTEXT_JIG_MD_TEMPLATE,
     JIG_TOML_TEMPLATE,
+    SKILL_MD_TEMPLATE,
 )
 
 
@@ -168,3 +170,47 @@ def init_project(
 
     except Exception as e:
         return InitResult(success=False, paths_created=paths_created, error=str(e))
+
+
+@jig.implements("S-101")
+def install_skills(project_root: Path, global_install: bool = False) -> list[Path]:
+    """Install JIG skill files for AI agents.
+
+    Creates skill files that help AI agents understand and work with JIG:
+        - SKILL.md - Skill definition for /jig command
+        - contextJIG.md - Universal JIG mental model
+
+    Args:
+        project_root: Path to the project root directory (used for local install).
+        global_install: If True, installs to ~/.agent/skills/jig/ instead of
+            project-local .agent/skills/jig/.
+
+    Returns:
+        List of paths created/overwritten.
+
+    Notes:
+        - Skills are always overwritten (they are templates, not user content)
+        - Works independently of jig/ structure existence
+    """
+    paths_created: list[Path] = []
+
+    # Determine installation directory
+    if global_install:
+        install_dir = Path.home() / ".agent" / "skills" / "jig"
+    else:
+        install_dir = project_root / ".agent" / "skills" / "jig"
+
+    # Create directory structure
+    install_dir.mkdir(parents=True, exist_ok=True)
+
+    # Install SKILL.md (always overwrite)
+    skill_path = install_dir / "SKILL.md"
+    skill_path.write_text(SKILL_MD_TEMPLATE)
+    paths_created.append(skill_path)
+
+    # Install contextJIG.md (always overwrite)
+    context_path = install_dir / "contextJIG.md"
+    context_path.write_text(CONTEXT_JIG_MD_TEMPLATE)
+    paths_created.append(context_path)
+
+    return paths_created

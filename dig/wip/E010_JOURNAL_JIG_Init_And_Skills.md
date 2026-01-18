@@ -94,3 +94,30 @@ WU2 (Core Init Logic) completed successfully.
 
 ---
 
+### Entry 4 | 2026-01-18 16:15 | WU3 Complete
+
+```yaml
+type: outcome
+wu: WU3
+spec: S-101
+escalated: false
+```
+
+WU3 (Skill Installation) completed successfully.
+
+**Gates:** 4/4 passed
+- Tests: 12/12 skill tests passed (40/40 total in test_init.py)
+- jigy validate: PASS (1 pre-existing error for M-jig.cli.init - WU4)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Decision:** CONTINUE - all gates passed.
+
+**Notable observations:**
+- Templates (SKILL_MD_TEMPLATE, CONTEXT_JIG_MD_TEMPLATE) from WU1 integrated cleanly
+- Used monkeypatch for testing global installation without touching real home directory
+- install_skills() is deliberately simple and stateless
+- Skills always overwrite (unlike Charter/bricks.yaml) - this is by design per SCOPE
+
+---
+
