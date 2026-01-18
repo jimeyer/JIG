@@ -211,8 +211,11 @@ def test_validate_full_success():
         # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
         result = runner.invoke(cli, ["--no-rebuild", "validate"])
         assert result.exit_code == 0
-        # New engine outputs "Validation passed." on success
-        assert "passed" in result.output.lower()
+        # Per S-025, full validation outputs "Validated X specs, Y outcomes, Z bricks."
+        assert "validated" in result.output.lower()
+        assert "specs" in result.output.lower()
+        assert "outcomes" in result.output.lower()
+        assert "bricks" in result.output.lower()
 
 
 @jig.verifies("S-025")

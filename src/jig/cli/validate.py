@@ -22,21 +22,24 @@ def _format_engine_results_as_json(result: dict[str, Any]) -> dict[str, Any]:
     """Format engine results for JSON output per S-026.
 
     Args:
-        result: Engine result with 'errors' and 'summary'.
+        result: Engine result with 'errors', 'summary', and 'counts'.
 
     Returns:
         JSON-serializable output with valid, summary, errors.
     """
     errors = result.get("errors", [])
-    summary = result.get("summary", {})
+    counts = result.get("counts", {})
+
+    # Build summary with artifact counts per S-026
+    summary_out = {
+        "specs": counts.get("specs", 0),
+        "outcomes": counts.get("outcomes", 0),
+        "bricks": counts.get("bricks", 0),
+    }
 
     return {
         "valid": len(errors) == 0,
-        "summary": {
-            "total": summary.get("total", 0),
-            "auto_fixable": summary.get("auto_fixable", 0),
-            "manual": summary.get("manual", 0),
-        },
+        "summary": summary_out,
         "errors": [
             {
                 "id": e.get("id", ""),
@@ -55,7 +58,7 @@ def _format_engine_results_as_markdown(result: dict[str, Any], verbose: bool = F
     """Format engine results as markdown for LLM-optimized output per S-094.
 
     Args:
-        result: Engine result with 'errors' and 'summary'.
+        result: Engine result with 'errors', 'summary', and 'counts'.
         verbose: If True, include additional detail.
 
     Returns:
@@ -65,6 +68,7 @@ def _format_engine_results_as_markdown(result: dict[str, Any], verbose: bool = F
 
     errors = result.get("errors", [])
     summary = result.get("summary", {})
+    counts = result.get("counts", {})
 
     lines = []
 
@@ -73,8 +77,12 @@ def _format_engine_results_as_markdown(result: dict[str, Any], verbose: bool = F
     lines.append(f"# JIG Validation: {status}")
     lines.append("")
 
-    # Summary line - use placeholder counts since we don't have full context
-    lines.append("- **Specs:** 0 | **Outcomes:** 0 | **Bricks:** 0")
+    # Summary line with actual counts from result["counts"]
+    specs_count = counts.get("specs", 0)
+    outcomes_count = counts.get("outcomes", 0)
+    bricks_count = counts.get("bricks", 0)
+    lines.append(f"- **Specs:** {specs_count} | **Outcomes:** {outcomes_count} | **Bricks:** {bricks_count}")
+    # Coverage deferred - leave as 0 per SCOPE
     lines.append("- **Coverage:** 0 functions, 0 tests decorated")
 
     # Verbose adds details section
@@ -107,18 +115,37 @@ def _format_engine_results_as_markdown(result: dict[str, Any], verbose: bool = F
     return "\n".join(lines)
 
 
-def _output_human_results(result: dict[str, Any], verbose: bool = False) -> None:
+def _output_human_results(
+    result: dict[str, Any],
+    verbose: bool = False,
+    rebuild_summary: str | None = None,
+    counts: dict[str, int] | None = None,
+) -> None:
     """Output validation results in human-readable format.
 
     Args:
         result: Engine result with 'errors' and 'summary'.
         verbose: Whether to show detailed output.
+        rebuild_summary: Optional rebuild summary from ensure_graphs_current().
+        counts: Optional artifact counts dict with specs, outcomes, bricks keys.
     """
     errors = result.get("errors", [])
     summary = result.get("summary", {})
 
     if not errors:
-        click.echo("Validation passed.")
+        # Build single-line success message per S-025
+        parts = []
+        if rebuild_summary:
+            parts.append(rebuild_summary.rstrip("."))
+        if counts:
+            parts.append(
+                f"Validated {counts.get('specs', 0)} specs, "
+                f"{counts.get('outcomes', 0)} outcomes, "
+                f"{counts.get('bricks', 0)} bricks"
+            )
+        else:
+            parts.append("Validation passed")
+        click.echo(". ".join(parts) + ".")
         return
 
     # Group errors by file
@@ -320,9 +347,13 @@ def validate_full_command(
     elif output_format == "markdown":
         click.echo(_format_engine_results_as_markdown(result, verbose=verbose))
     else:
-        if rebuild_summary:
-            click.echo(rebuild_summary)
-        _output_human_results(result, verbose=verbose)
+        # Pass rebuild_summary and counts to _output_human_results per S-025
+        _output_human_results(
+            result,
+            verbose=verbose,
+            rebuild_summary=rebuild_summary,
+            counts=result.get("counts"),
+        )
 
     return 0 if len(result.get("errors", [])) == 0 else 1
 

@@ -68,6 +68,35 @@ WU1 completed successfully. Sub-agent added `counts` dict to validate() return v
 
 ---
 
+### Entry 3 | 2026-01-18 15:48 | WU2 Complete
+
+```yaml
+type: outcome
+wu: WU2
+spec: S-025, S-026, S-094
+escalated: false
+```
+
+WU2 completed successfully. All 3 output formats now show artifact counts.
+
+**Changes:**
+- `src/jig/cli/validate.py`: +51/-17 lines
+- `tests/cli/test_validate.py`: +7/-2 lines
+
+**Output Examples:**
+- Human: `Validated 92 specs, 25 outcomes, 15 bricks.`
+- JSON: `summary.specs`, `summary.outcomes`, `summary.bricks` present
+- Markdown: `**Specs:** 92 | **Outcomes:** 25 | **Bricks:** 15`
+
+**Observations:**
+- WU1 dependency worked perfectly - result["counts"] available
+- Clean separation of rebuild_summary and counts as params
+- Coverage left as 0 per SCOPE deferral
+
+**Decision:** CONTINUE to WU3 (Validation)
+
+---
+
 ## Synthesis
 
 (To be completed after all WUs)

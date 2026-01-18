@@ -73,7 +73,7 @@ WU1 (Engine) ── WU2 (CLI) ── WU3 (Validation)
 ## Work Unit Checklist
 
 - [x] WU1: Validation Engine Counts — tests ✓ / code ✓
-- [ ] WU2: CLI Output Formatting — tests ☐ / code ☐
+- [x] WU2: CLI Output Formatting — tests ✓ / code ✓
 - [ ] WU3: Validation — SCOPE verified ☐
 
 ---
@@ -263,6 +263,16 @@ Completed 2026-01-18.
 - jigy validate: PASS
 - FORBIDDEN bricks: untouched
 - Linting: no new errors (pre-existing UP045 in models.py)
+
+**Commit:** 9555cbf
+
+### WU2: CLI Output Formatting
+**Status:** COMPLETE
+**Gates:** 4/4 passed
+- Tests: 30/30 passed
+- jigy validate: PASS
+- FORBIDDEN bricks: untouched
+- Linting: no new errors (4 pre-existing unused imports)
 
 **Commit:** (this commit)
 
