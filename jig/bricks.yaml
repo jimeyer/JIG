@@ -104,3 +104,19 @@ bricks:
     units:
       - M-jig.rules.base
       - M-jig.rules.context
+      - M-jig.rules.types.__init__
+      - M-jig.rules.types.required_field
+      - M-jig.rules.types.id_format
+      - M-jig.rules.types.uniqueness
+      - M-jig.rules.types.filename_sync
+      - M-jig.rules.types.header_sync
+      - M-jig.rules.types.excluded_field
+      - M-jig.rules.types.field_type
+      - M-jig.rules.types.field_value
+      - M-jig.rules.types.reference_validity
+      - M-jig.rules.types.bidirectional_link
+      - M-jig.rules.types.coverage
+      - M-jig.rules.types.partition
+      - M-jig.rules.types.dag
+      - M-jig.rules.types.layer_constraint
+      - M-jig.rules.types.isolation
