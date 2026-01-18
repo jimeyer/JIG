@@ -94,7 +94,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 - [x] WU3: Skill Installation — tests ☑ / code ☑
 - [x] WU4: CLI Command Integration — tests ☑ / code ☑
 - [x] WU5: Validation — SCOPE verified ☑
-- [ ] WU6: Version Bump — version 0.2.0 ☐
+- [x] WU6: Version Bump — version 0.2.0 ☑
 
 ---
 
@@ -504,7 +504,7 @@ jigy rebuild && jigy validate
 
 ### WU5: Validation
 **Status:** COMPLETE ✓
-**Commit:** (this commit)
+**Commit:** 354feed
 **Gates:** 4/4 passed
 - Tests: 22/22 integration tests passed
 - jigy validate: PASS - NO ERRORS
@@ -516,24 +516,42 @@ jigy rebuild && jigy validate
 
 **Notes:** Comprehensive integration tests verify full init → validate cycle, idempotency, all flags, and skill installation. SCOPE problem "jigy init bootstraps a project with idempotent directory/file creation" is verified solved.
 
+### WU6: Version Bump
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 3/3 passed
+- jigy --version: 0.2.0
+- All tests: 975 passed, 1 skipped
+- jigy validate: PASS - NO ERRORS
+
+**Files Modified:**
+- src/jig/__init__.py (version 0.1.0 → 0.2.0)
+- pyproject.toml (version 0.1.0 → 0.2.0)
+
 ---
 
 ## Completion Summary
 
-(Filled in after all WUs complete)
-
 **Scope Delivered:**
-- <to be filled>
+- `jigy init` command with idempotent project bootstrapping
+- `/jig` agent skill with contextJIG.md
+- All CLI flags: --project, --no-skills, --skills-only, --global-skills, --force
+- JSON/markdown output formats
+- Integration with existing CLI infrastructure
 
 **JIG Summary:**
-- <to be filled>
+- O/S Nodes: 1 outcome created (O-028), 8 specs created (S-096 through S-103)
+- Bricks: 2 bricks created (B-templates, B-init), 1 brick modified (B-cli)
+- Decorators: 4 @jig.implements, 89 @jig.verifies added
+- Tests: 113 new tests (23 templates, 40 init, 23 CLI, 22 integration + 5 other)
+- Version: 0.1.0 → 0.2.0
 
 **Clean Break Actions:**
 - [x] No deprecated O/S nodes to delete (greenfield)
 - [x] No legacy code to delete (greenfield)
-- [ ] Final jigy rebuild && jigy validate passed
+- [x] Final jigy rebuild && jigy validate passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: <patterns that worked>
-- Systemic frictions: <process issues>
-- Open questions: <items for future work>
+- Repeatable wins: TDD flow worked well, sub-agent structured reports were accurate
+- Systemic frictions: Forward references in bricks.yaml caused expected validation errors during development
+- Open questions: None - clean greenfield implementation

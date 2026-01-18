@@ -2,7 +2,7 @@
 
 from typing import Callable, TypeVar, Union
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Type variable for decorated functions/classes
 F = TypeVar("F", bound=Callable)
