@@ -90,7 +90,7 @@ bricks:
     name: Template Content
     layer: 0
     units:
-      - M-jig.templates
+      - M-jig.templates.templates
 
   - id: B-init
     name: Project Initialization

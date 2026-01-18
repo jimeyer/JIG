@@ -89,7 +89,7 @@ WU1 (Templates) ──┬── WU2 (Core Init) ── WU4 (CLI) ── WU5 (Val
 
 ## Work Unit Checklist
 
-- [ ] WU1: Template Content Module — tests ☐ / code ☐
+- [x] WU1: Template Content Module — tests ☑ / code ☑
 - [ ] WU2: Core Init Logic — tests ☐ / code ☐
 - [ ] WU3: Skill Installation — tests ☐ / code ☐
 - [ ] WU4: CLI Command Integration — tests ☐ / code ☐
@@ -434,7 +434,24 @@ jigy rebuild && jigy validate
 
 ## Execution Log
 
-(Filled in by orchestrator during execution)
+### WU1: Template Content Module
+**Status:** COMPLETE ✓
+**Commit:** (this commit)
+**Gates:** 4/4 passed
+- Tests: 23/23 passed
+- jigy validate: PASS (2 pre-existing errors for WU2/WU3 modules)
+- FORBIDDEN bricks: untouched
+- Linting: no errors
+
+**Files Created:**
+- src/jig/templates/__init__.py
+- src/jig/templates/templates.py
+- tests/unit/test_templates.py
+
+**Files Modified:**
+- jig/bricks.yaml (corrected unit reference M-jig.templates → M-jig.templates.templates)
+
+**Notes:** Used package structure (templates/__init__.py + templates.py) following existing patterns. Forward references to M-jig.cli.init and M-jig.init will resolve in WU2-WU4.
 
 ---
 
