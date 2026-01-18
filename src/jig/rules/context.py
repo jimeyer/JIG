@@ -129,16 +129,28 @@ class ValidationContext:
             jig_dir / "goals", "G-*.md", self.project_root
         )
 
-        # Load charter
+        # Load charter - try Charter.md first, then any Charter_*.md
+        self.charter = None
         charter_path = jig_dir / "Charter.md"
         if charter_path.exists():
             frontmatter = _parse_frontmatter(charter_path)
-            if frontmatter is not None:
+            if frontmatter is not None and frontmatter.get("id") == "Charter":
                 self.charter = Artifact(
                     id="Charter",
                     file=str(charter_path.relative_to(self.project_root)),
                     frontmatter=frontmatter,
                 )
+        # Try Charter_*.md pattern if Charter.md not found
+        if self.charter is None:
+            for charter_candidate in sorted(jig_dir.glob("Charter_*.md")):
+                frontmatter = _parse_frontmatter(charter_candidate)
+                if frontmatter is not None and frontmatter.get("id") == "Charter":
+                    self.charter = Artifact(
+                        id="Charter",
+                        file=str(charter_candidate.relative_to(self.project_root)),
+                        frontmatter=frontmatter,
+                    )
+                    break
 
         # Load bricks
         bricks_path = jig_dir / "bricks.yaml"

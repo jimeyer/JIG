@@ -21,12 +21,13 @@ bricks:
 
   - id: B-validation
     name: Artifact Validation
-    layer: 0 
+    layer: 0
     units:
       - M-jig.validation.intent
       - M-jig.validation.bricks
       - M-jig.validation.models
       - M-jig.validation.reporting
+      - M-jig.validation.engine
 
   - id: B-impl-graph
     name: Implementation Graph
@@ -104,6 +105,7 @@ bricks:
     units:
       - M-jig.rules.base
       - M-jig.rules.context
+      - M-jig.rules.registry
       - M-jig.rules.types.__init__
       - M-jig.rules.types.required_field
       - M-jig.rules.types.id_format

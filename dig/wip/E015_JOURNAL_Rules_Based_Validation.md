@@ -128,6 +128,43 @@ Sub-agent successfully implemented all 15 rule type classes:
 
 ---
 
+### Entry 4 | 2026-01-18 22:30 | WU3 Complete
+
+```yaml
+type: outcome
+wu: WU3
+spec: S-105, S-106, S-107 (infrastructure)
+```
+
+**Status:** COMPLETE (all 4 gates passed)
+
+Sub-agent successfully implemented mend infrastructure:
+
+**Fix Actions (7):**
+- `apply_set_field` - sets frontmatter field value
+- `apply_add_field_value` - appends to array field
+- `apply_remove_field_value` - removes from array field
+- `apply_delete_field` - removes field entirely
+- `apply_rename_file` - renames file using shutil.move
+- `apply_sync_title` - syncs H1 and frontmatter title
+- `apply_set_h1` - sets H1 heading
+
+**YAML Editor:**
+- `FrontmatterFile` dataclass for clean manipulation
+- `parse_frontmatter_file()` / `write_frontmatter_file()` helpers
+- PyYAML-based parsing (accepts minor reformatting)
+
+**Results:**
+- 32 tests pass (18 in test_actions.py, 14 in test_yaml_editor.py)
+- jigy validate passes (92 specs, 25 outcomes, 15 bricks)
+- B-mend brick added (layer 0, depends on B-rules)
+- MendContext refactored to use mend actions module
+- No FORBIDDEN bricks touched
+
+**Commit:** 8a59f5e
+
+---
+
 ## Synthesis
 
 ### Patterns

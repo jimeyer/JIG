@@ -73,7 +73,7 @@ class TestValidationContext:
             jig_dir.mkdir(parents=True)
 
             (jig_dir / "Charter.md").write_text(
-                "---\nname: TestProject\nversion: 1.0\n---\n# Charter\n"
+                "---\nid: Charter\nname: TestProject\nversion: 1.0\n---\n# Charter\n"
             )
 
             ctx = ValidationContext(project_root=Path(tmpdir))
