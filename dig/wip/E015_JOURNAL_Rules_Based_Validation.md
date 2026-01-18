@@ -165,6 +165,50 @@ Sub-agent successfully implemented mend infrastructure:
 
 ---
 
+### Entry 5 | 2026-01-18 23:00 | WU4 Complete
+
+```yaml
+type: outcome
+wu: WU4
+spec: S-104, S-108, S-109
+```
+
+**Status:** COMPLETE (all 4 gates passed)
+
+Sub-agent created validation engine:
+
+**Registry (17 rules):**
+- RULES list with all rule instances
+- RULES_BY_CODE index for code-based lookup
+- RULES_BY_SPEC index for spec-based lookup
+- Artifact filters (is_specification, is_outcome, etc.)
+
+**Rule Instances:**
+- Spec: required outcomes/title/type, ID format, uniqueness, filename sync, H1 sync
+- Outcome: required title/type, ID format, uniqueness, filename sync, H1 sync
+- References: spec outcome refs, outcome goal refs
+- Bidirectional: spec<->outcome consistency
+- Coverage: all specs covered by outcomes
+
+**Engine:**
+- `validate(project_root)` runs all rules, returns structured output
+- Each error has: id (12-char hex), spec, fix (action template), file, line, message
+- Summary: total, auto_fixable, manual counts
+
+**Results:**
+- 32 tests pass (17 registry, 15 engine)
+- jigy validate passes (92 specs, 25 outcomes, 15 bricks)
+- No FORBIDDEN bricks touched
+
+**Notable:**
+- CLI wiring deferred to cleanup phase (old validation remains active)
+- New engine available via `from jig.validation.engine import validate`
+- Enhanced charter loading to support `Charter_*.md` pattern
+
+**Commit:** f599fed
+
+---
+
 ## Synthesis
 
 ### Patterns

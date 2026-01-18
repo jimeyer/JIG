@@ -13,7 +13,7 @@ from jig.config import ConfigError, JigConfig, load_config
 class OrderedGroup(click.Group):
     """A Click group with explicit command ordering and commands-first help."""
 
-    COMMAND_ORDER = ["init", "align", "validate", "show", "audit", "rebuild"]
+    COMMAND_ORDER = ["init", "align", "validate", "mend", "show", "audit", "rebuild"]
 
     def list_commands(self, ctx):
         # Return commands in explicit order, then any others
@@ -87,6 +87,7 @@ def get_no_rebuild(ctx: click.Context) -> bool:
 
 from jig.cli.audit import coverage_command
 from jig.cli.init import init_command
+from jig.cli.mend import mend_command
 from jig.cli.output import add_output_options, resolve_format
 from jig.cli.rebuild import (
     align_command,
@@ -560,6 +561,10 @@ def show_matrix_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     skip_rebuild = get_no_rebuild(ctx)
     exit_code = show_matrix_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
     sys.exit(exit_code)
+
+
+# Mend command (S-105, S-106, S-107)
+cli.add_command(mend_command)
 
 
 # Audit command group (S-066)

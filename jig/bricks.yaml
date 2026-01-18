@@ -18,6 +18,7 @@ bricks:
       - M-jig.cli.auto_rebuild
       - M-jig.cli.output
       - M-jig.cli.init
+      - M-jig.cli.mend
 
   - id: B-validation
     name: Artifact Validation
@@ -130,3 +131,4 @@ bricks:
       - M-jig.mend.__init__
       - M-jig.mend.yaml_editor
       - M-jig.mend.actions
+      - M-jig.mend.engine
