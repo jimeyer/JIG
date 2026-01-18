@@ -109,12 +109,12 @@ WU7 (Cleanup)
 
 ## Work Unit Checklist
 
-- [ ] WU1: Rules Infrastructure — tests ☐ / code ☐
-- [ ] WU2: Rule Types — tests ☐ / code ☐
-- [ ] WU3: Mend Infrastructure — tests ☐ / code ☐
-- [ ] WU4: Validation Engine — tests ☐ / code ☐
-- [ ] WU5: Mend Command — tests ☐ / code ☐
-- [ ] WU6: Integration & Validation — SCOPE verified ☐
+- [x] WU1: Rules Infrastructure — tests ✓ / code ✓
+- [x] WU2: Rule Types — tests ✓ / code ✓
+- [x] WU3: Mend Infrastructure — tests ✓ / code ✓
+- [x] WU4: Validation Engine — tests ✓ / code ✓
+- [x] WU5: Mend Command — tests ✓ / code ✓
+- [x] WU6: Integration & Validation — SCOPE verified ✓
 - [ ] WU7: Cleanup — legacy deleted ☐
 
 ---
@@ -431,12 +431,12 @@ jigy rebuild && jigy validate
 **Validation Approach**: Integration Test (preferred)
 
 **Acceptance Criteria**:
-- [ ] Integration test: validate → mend --auto → validate cycle
-- [ ] Integration test: validate → fill fixes → mend --apply → validate cycle
-- [ ] Test confirms same rule produces both error and fix
-- [ ] Test confirms mend actually resolves the error
-- [ ] All specs S-104 through S-109 have @jig.verifies coverage
-- [ ] jigy rebuild && jigy validate passes
+- [x] Integration test: validate → mend --auto → validate cycle
+- [x] Integration test: validate → fill fixes → mend --apply → validate cycle
+- [x] Test confirms same rule produces both error and fix
+- [x] Test confirms mend actually resolves the error
+- [x] All specs S-104 through S-109 have @jig.verifies coverage
+- [x] jigy rebuild && jigy validate passes
 
 **Verification Steps**:
 ```bash
@@ -451,9 +451,9 @@ jigy validate -j | jq '.errors[0].fix'  # Verify fix template present
 - The validate-mend cycle converges to zero errors for auto-fixable issues
 
 **Success Gates** (all must pass):
-- [ ] All integration tests pass
-- [ ] jigy rebuild && jigy validate passes
-- [ ] Manual cycle test succeeds
+- [x] All integration tests pass
+- [x] jigy rebuild && jigy validate passes
+- [x] Manual cycle test succeeds
 
 **Deliverable**:
 - [x] Integration test added: tests/integration/test_validate_mend_cycle.py

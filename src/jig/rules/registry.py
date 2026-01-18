@@ -31,26 +31,41 @@ from jig.rules.types import (
 # =============================================================================
 # ARTIFACT FILTERS - predicates for filtering artifacts by type
 # =============================================================================
+# NOTE: Filters use ID pattern matching rather than frontmatter 'type' field
+# because we need to validate artifacts that may be missing the 'type' field.
+# Artifacts are already loaded by directory location in ValidationContext.
 
 
 def is_specification(a: Artifact) -> bool:
-    """Filter for specification artifacts."""
-    return a.kind == "specification"
+    """Filter for specification artifacts.
+
+    Uses ID pattern (S-###) since type field may be missing.
+    """
+    return a.id.startswith("S-")
 
 
 def is_outcome(a: Artifact) -> bool:
-    """Filter for outcome artifacts."""
-    return a.kind == "outcome"
+    """Filter for outcome artifacts.
+
+    Uses ID pattern (O-###) since type field may be missing.
+    """
+    return a.id.startswith("O-")
 
 
 def is_architecture(a: Artifact) -> bool:
-    """Filter for architecture artifacts."""
-    return a.kind == "architecture"
+    """Filter for architecture artifacts.
+
+    Uses ID pattern (A-###) since type field may be missing.
+    """
+    return a.id.startswith("A-")
 
 
 def is_goal(a: Artifact) -> bool:
-    """Filter for goal artifacts."""
-    return a.kind == "goal"
+    """Filter for goal artifacts.
+
+    Uses ID pattern (G-###) since type field may be missing.
+    """
+    return a.id.startswith("G-")
 
 
 def is_charter(a: Artifact) -> bool:
