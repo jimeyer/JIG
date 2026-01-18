@@ -5,6 +5,7 @@ creating the directory structure, configuration files, and managing
 idempotent behavior.
 """
 
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -78,6 +79,45 @@ def _update_gitignore(project_root: Path, entry: str = "jig/generated/") -> bool
     return True
 
 
+def _read_project_name_from_toml(project_root: Path) -> str | None:
+    """Read project name from existing jig.toml if present.
+
+    Args:
+        project_root: Path to the project root directory.
+
+    Returns:
+        The project name if found in jig.toml, None otherwise.
+    """
+    jig_toml_path = project_root / "jig.toml"
+    if not jig_toml_path.exists():
+        return None
+
+    try:
+        with open(jig_toml_path, "rb") as f:
+            config = tomllib.load(f)
+        return config.get("name")
+    except Exception:
+        return None
+
+
+def _find_existing_charter(jig_dir: Path) -> Path | None:
+    """Find an existing Charter file in the jig directory.
+
+    Supports both legacy Charter.md and new Charter_<name>.md naming.
+
+    Args:
+        jig_dir: Path to the jig/ directory.
+
+    Returns:
+        Path to existing charter file if found, None otherwise.
+    """
+    if not jig_dir.exists():
+        return None
+
+    charters = list(jig_dir.glob("Charter*.md"))
+    return charters[0] if charters else None
+
+
 @jig.implements("S-096", "S-100", "S-102")
 def init_project(
     project_root: Path,
@@ -117,7 +157,9 @@ def init_project(
     paths_created: list[Path] = []
 
     try:
-        # Derive project name from directory if not provided
+        # Derive project name: CLI flag > jig.toml > directory name
+        if project_name is None:
+            project_name = _read_project_name_from_toml(project_root)
         if project_name is None:
             project_name = project_root.name
 
@@ -127,8 +169,8 @@ def init_project(
         # Create jig.toml
         jig_toml_path = project_root / "jig.toml"
         if not jig_toml_path.exists() or force:
-            # Generate content with correct include_dig value
-            content = JIG_TOML_TEMPLATE
+            # Generate content with project name and correct include_dig value
+            content = JIG_TOML_TEMPLATE.format(name=project_name)
             if not include_dig:
                 content = content.replace("include_dig = true", "include_dig = false")
             jig_toml_path.write_text(content)
@@ -148,10 +190,11 @@ def init_project(
                 subdir_path.mkdir(parents=True)
                 paths_created.append(subdir_path)
 
-        # Create Charter_<project>.md (NEVER overwrite)
-        charter_filename = f"Charter_{project_name}.md"
-        charter_path = jig_dir / charter_filename
-        if not charter_path.exists():
+        # Create Charter_<project>.md (NEVER overwrite, skip if any Charter exists)
+        existing_charter = _find_existing_charter(jig_dir)
+        if existing_charter is None:
+            charter_filename = f"Charter_{project_name}.md"
+            charter_path = jig_dir / charter_filename
             charter_path.write_text(CHARTER_MD_TEMPLATE)
             paths_created.append(charter_path)
 

@@ -446,6 +446,108 @@ class TestJigTomlContent:
         assert "ignore" in parsed["scan"]
         assert isinstance(parsed["scan"]["ignore"], list)
 
+    @jig.verifies("S-097")
+    def test_jig_toml_has_name_field(self, tmp_path: Path):
+        """Generated jig.toml has top-level name field."""
+        from jig.init import init_project
+
+        init_project(tmp_path, project_name="myproject")
+
+        content = (tmp_path / "jig.toml").read_text()
+        parsed = tomllib.loads(content)
+        assert "name" in parsed
+        assert parsed["name"] == "myproject"
+
+
+class TestProjectNameFromToml:
+    """Tests for reading project name from existing jig.toml."""
+
+    @jig.verifies("S-097")
+    def test_reads_project_name_from_existing_jig_toml(self, tmp_path: Path):
+        """init_project reads project name from existing jig.toml."""
+        from jig.init import init_project
+
+        # Create jig.toml with name before init
+        (tmp_path / "jig.toml").write_text('name = "existing-project"\n')
+
+        result = init_project(tmp_path)
+
+        assert result.success
+        # Charter should use name from jig.toml
+        charter_path = tmp_path / "jig" / "Charter_existing-project.md"
+        assert charter_path.exists()
+
+    @jig.verifies("S-097")
+    def test_cli_project_name_overrides_jig_toml(self, tmp_path: Path):
+        """CLI --project flag takes precedence over jig.toml name."""
+        from jig.init import init_project
+
+        # Create jig.toml with name
+        (tmp_path / "jig.toml").write_text('name = "toml-name"\n')
+
+        # But pass different name via project_name parameter
+        result = init_project(tmp_path, project_name="cli-name")
+
+        assert result.success
+        # Charter should use CLI name
+        charter_path = tmp_path / "jig" / "Charter_cli-name.md"
+        assert charter_path.exists()
+        # Should NOT create Charter_toml-name.md
+        assert not (tmp_path / "jig" / "Charter_toml-name.md").exists()
+
+
+class TestExistingCharterDetection:
+    """Tests for detecting existing Charter files."""
+
+    @jig.verifies("S-102")
+    def test_skips_charter_creation_when_legacy_charter_exists(self, tmp_path: Path):
+        """init_project skips Charter creation when Charter.md exists."""
+        from jig.init import init_project
+
+        # Create jig/ with legacy Charter.md
+        jig_dir = tmp_path / "jig"
+        jig_dir.mkdir()
+        legacy_charter = jig_dir / "Charter.md"
+        legacy_charter.write_text("# My Legacy Charter\n")
+
+        result = init_project(tmp_path, project_name="newproj")
+
+        assert result.success
+        # Should NOT create Charter_newproj.md
+        assert not (jig_dir / "Charter_newproj.md").exists()
+        # Legacy charter should be untouched
+        assert legacy_charter.read_text() == "# My Legacy Charter\n"
+
+    @jig.verifies("S-102")
+    def test_skips_charter_creation_when_named_charter_exists(self, tmp_path: Path):
+        """init_project skips Charter creation when Charter_*.md exists."""
+        from jig.init import init_project
+
+        # Create jig/ with existing named charter
+        jig_dir = tmp_path / "jig"
+        jig_dir.mkdir()
+        existing_charter = jig_dir / "Charter_oldname.md"
+        existing_charter.write_text("# Old Charter\n")
+
+        result = init_project(tmp_path, project_name="newname")
+
+        assert result.success
+        # Should NOT create Charter_newname.md
+        assert not (jig_dir / "Charter_newname.md").exists()
+        # Existing charter should be untouched
+        assert existing_charter.read_text() == "# Old Charter\n"
+
+    @jig.verifies("S-102")
+    def test_creates_charter_when_no_charter_exists(self, tmp_path: Path):
+        """init_project creates Charter when none exists."""
+        from jig.init import init_project
+
+        result = init_project(tmp_path, project_name="newproj")
+
+        assert result.success
+        charter_path = tmp_path / "jig" / "Charter_newproj.md"
+        assert charter_path.exists()
+
 
 class TestInstallSkillsLocalInstallation:
     """Tests for S-101: install_skills() creates local skill files."""

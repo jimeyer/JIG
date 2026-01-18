@@ -5,6 +5,8 @@ Templates are plain string constants, not Jinja2 templates.
 """
 
 JIG_TOML_TEMPLATE = """\
+name = "{name}"
+
 [integration]
 include_dig = true
 
