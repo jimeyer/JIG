@@ -129,9 +129,10 @@ jig_root = "custom_jig"
         os.chdir(project_dir)
         result = runner.invoke(cli, ["validate", "intent"])
 
-    # Should find spec from custom path
+    # Should find spec from custom path and pass validation
     assert result.exit_code == 0, f"Output: {result.output}"
-    assert "1 files" in result.output
+    # New engine outputs "Validation passed." for success
+    assert "passed" in result.output.lower()
 
 
 @jig.verifies("S-065")

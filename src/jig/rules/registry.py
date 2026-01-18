@@ -18,9 +18,13 @@ from jig.rules.base import Artifact
 from jig.rules.types import (
     BidirectionalLinkRule,
     CoverageRule,
+    DAGRule,
     FilenameSyncRule,
     HeaderSyncRule,
     IdFormatRule,
+    IsolationRule,
+    LayerConstraintRule,
+    PartitionRule,
     ReferenceValidityRule,
     RequiredFieldRule,
     UniquenessRule,
@@ -39,17 +43,23 @@ from jig.rules.types import (
 def is_specification(a: Artifact) -> bool:
     """Filter for specification artifacts.
 
-    Uses ID pattern (S-###) since type field may be missing.
+    Uses ID pattern (S-###) for normal artifacts, or file path for orphans.
     """
-    return a.id.startswith("S-")
+    if a.id:
+        return a.id.startswith("S-")
+    # For orphans (missing ID), check if file path indicates specification
+    return "specifications" in a.file
 
 
 def is_outcome(a: Artifact) -> bool:
     """Filter for outcome artifacts.
 
-    Uses ID pattern (O-###) since type field may be missing.
+    Uses ID pattern (O-###) for normal artifacts, or file path for orphans.
     """
-    return a.id.startswith("O-")
+    if a.id:
+        return a.id.startswith("O-")
+    # For orphans (missing ID), check if file path indicates outcome
+    return "outcomes" in a.file
 
 
 def is_architecture(a: Artifact) -> bool:
@@ -155,6 +165,15 @@ SPEC_REQUIRED_TYPE = RequiredFieldRule(
     _spec="S-018",
 )
 
+SPEC_REQUIRED_ID = RequiredFieldRule(
+    field="id",
+    artifact_filter=is_specification,
+    default_value="",
+    auto_fix=False,  # ID must be manually assigned
+    _code="SPEC_REQUIRED_ID",
+    _spec="S-018",
+)
+
 SPEC_ID_FORMAT = IdFormatRule(
     pattern=r"^S-\d{3}$",
     normalizer=normalize_spec_id,
@@ -234,6 +253,18 @@ OUTCOME_HEADER_SYNC = HeaderSyncRule(
 )
 
 
+# --- CHARTER RULES (S-072) ---
+
+CHARTER_REQUIRED_GOALS = RequiredFieldRule(
+    field="goals",
+    artifact_filter=is_charter,
+    default_value=[],
+    auto_fix=False,  # Need human to define goals
+    _code="CHARTER_REQUIRED_GOALS",
+    _spec="S-072",
+)
+
+
 # --- REFERENCE VALIDITY RULES (S-020, S-075, S-079) ---
 
 SPEC_OUTCOME_REFS_VALID = ReferenceValidityRule(
@@ -278,6 +309,164 @@ SPEC_COVERAGE = CoverageRule(
 
 
 # =============================================================================
+# BRICK VALIDATION RULES (S-022, S-038, S-039, S-087, S-088, S-089)
+# =============================================================================
+
+
+# --- TOWER FORMAT RULE (S-087) ---
+
+import re as _re
+from jig.rules.base import Fix, Violation
+
+
+class TowerFormatRule:
+    """Rule that validates tower field values are kebab-case.
+
+    Per S-087, tower values must be kebab-case:
+    - Lowercase letters, numbers, and hyphens only
+    - Must start with a letter
+    - Must not end with a hyphen
+    """
+
+    _code: str = "TOWER_FORMAT"
+    _spec: str = "S-087"
+
+    # Regex per S-087: ^[a-z][a-z0-9-]*[a-z0-9]$|^[a-z]$
+    _TOWER_PATTERN = _re.compile(r"^[a-z][a-z0-9-]*[a-z0-9]$|^[a-z]$")
+
+    @property
+    def code(self) -> str:
+        return self._code
+
+    @property
+    def spec(self) -> str:
+        return self._spec
+
+    def violations(self, ctx) -> list[Violation]:
+        """Detect bricks with invalid tower format."""
+        result = []
+        for brick in ctx.bricks:
+            tower = brick.get("tower")
+            if tower is None:
+                continue  # tower is optional
+
+            if not self._TOWER_PATTERN.match(tower):
+                brick_id = brick.get("id", "unknown")
+                result.append(
+                    Violation(
+                        rule_code=self.code,
+                        artifact_id=brick_id,
+                        file="jig/bricks.yaml",
+                        line=None,
+                        message=f"Tower '{tower}' in brick '{brick_id}' must be kebab-case",
+                        context={"brick_id": brick_id, "tower": tower},
+                    )
+                )
+        return result
+
+    def fix_for(self, violation: Violation) -> Fix | None:
+        """Tower format violations require manual fix."""
+        tower = violation.context.get("tower", "")
+        # Suggest converting to kebab-case
+        suggested = tower.lower().replace("_", "-")
+        return Fix(
+            action="manual_review",
+            target=violation.file,
+            params={"tower": tower},
+            auto=False,
+            suggestions=[
+                f"Change tower to kebab-case (e.g., '{suggested}')",
+                "Tower must: start with letter, use only lowercase/numbers/hyphens",
+            ],
+        )
+
+    def apply(self, fix: Fix, ctx) -> None:
+        """Tower format fixes require manual editing of bricks.yaml."""
+        pass  # Manual fix required
+
+
+TOWER_FORMAT = TowerFormatRule()
+
+
+# Context helper functions for brick rules
+
+def get_all_function_ids(ctx):
+    """Get set of all function IDs from implementation graph."""
+    return ctx.get_function_ids()
+
+
+def get_brick_to_functions(ctx):
+    """Get dict mapping brick_id -> list of function IDs it contains."""
+    return ctx.get_brick_to_functions()
+
+
+def get_brick_layers(ctx):
+    """Get dict mapping brick_id -> layer number."""
+    return ctx.get_brick_layers()
+
+
+def get_brick_dependency_edges(ctx):
+    """Get list of (source_brick, target_brick) dependency edges."""
+    return ctx.get_brick_dependency_edges()
+
+
+def get_brick_dependency_graph(ctx):
+    """Get adjacency list: brick_id -> set of brick_ids it depends on."""
+    return ctx.get_brick_dependency_graph()
+
+
+def get_brick_towers(ctx):
+    """Get dict mapping brick_id -> tower name (or None)."""
+    return ctx.get_brick_towers()
+
+
+# --- BRICK PARTITION RULES (S-022) ---
+
+BRICK_PARTITION = PartitionRule(
+    items_fn=get_all_function_ids,
+    containers_fn=get_brick_to_functions,
+    item_label="function",
+    container_label="brick",
+    _code="BRICK_PARTITION",
+    _spec="S-022",
+)
+
+
+# --- BRICK DAG RULE (S-039) ---
+
+BRICK_DAG = DAGRule(
+    graph_fn=get_brick_dependency_graph,
+    node_label="brick",
+    _code="BRICK_DAG",
+    _spec="S-039",
+)
+
+
+# --- BRICK LAYER CONSTRAINTS (S-038) ---
+
+BRICK_LAYER_CONSTRAINT = LayerConstraintRule(
+    layers_fn=get_brick_layers,
+    edges_fn=get_brick_dependency_edges,
+    node_label="brick",
+    _code="BRICK_LAYER_CONSTRAINT",
+    _spec="S-038",
+)
+
+
+# --- TOWER ISOLATION RULES (S-088, S-089) ---
+
+TOWER_ISOLATION = IsolationRule(
+    partition_fn=get_brick_towers,
+    edges_fn=get_brick_dependency_edges,
+    skip_if_single=True,  # S-089: skip if single tower
+    node_label="brick",
+    partition_label="tower",
+    _code="TOWER_ISOLATION",
+    _spec="S-088",
+)
+
+
+# =============================================================================
 # RULES REGISTRY - the main list and indexes
 # =============================================================================
 
@@ -287,6 +476,7 @@ def _build_rules_list() -> list:
     """Build the list of all rule instances."""
     return [
         # Spec rules (S-018)
+        SPEC_REQUIRED_ID,
         SPEC_REQUIRED_OUTCOMES,
         SPEC_REQUIRED_TITLE,
         SPEC_REQUIRED_TYPE,
@@ -301,6 +491,8 @@ def _build_rules_list() -> list:
         OUTCOME_UNIQUENESS,
         OUTCOME_FILENAME_SYNC,
         OUTCOME_HEADER_SYNC,
+        # Charter rules (S-072)
+        CHARTER_REQUIRED_GOALS,
         # Reference validity (S-020, S-079)
         SPEC_OUTCOME_REFS_VALID,
         OUTCOME_GOAL_REFS_VALID,
@@ -308,6 +500,12 @@ def _build_rules_list() -> list:
         SPEC_OUTCOME_BIDIRECTIONAL,
         # Coverage (S-043)
         SPEC_COVERAGE,
+        # Brick rules (S-022, S-038, S-039, S-087, S-088, S-089)
+        BRICK_PARTITION,
+        BRICK_DAG,
+        BRICK_LAYER_CONSTRAINT,
+        TOWER_FORMAT,
+        TOWER_ISOLATION,
     ]
 
 

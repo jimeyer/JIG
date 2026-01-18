@@ -24,8 +24,6 @@ bricks:
     name: Artifact Validation
     layer: 0
     units:
-      - M-jig.validation.intent
-      - M-jig.validation.bricks
       - M-jig.validation.models
       - M-jig.validation.reporting
       - M-jig.validation.engine

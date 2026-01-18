@@ -443,11 +443,7 @@ def align_command(
     from jig.cli.validate import auto_validate_decorators
     from jig.impl_graph.builder import build_graph
     from jig.intent_graph.generator import generate_intent_graph
-    from jig.validation.bricks import validate_brick_definitions, validate_brick_partition
-    from jig.validation.intent import (
-        validate_outcome_files,
-        validate_specification_files,
-    )
+    from jig.validation.engine import validate as run_validation
     from jig.verification_graph.builder import build_verification_graph
 
     start_time = time.time()
@@ -529,23 +525,22 @@ def align_command(
             click.echo(f"  intent: FAILED - {e}", err=True)
         return 1
 
-    # Step 5: Validate
+    # Step 5: Validate using the rules-based engine
     if output_format == OutputFormat.HUMAN:
         click.echo("\nValidating...")
 
-    # Validate intent
-    spec_dir = config.paths.specifications
-    outcome_dir = config.paths.outcomes
+    validation_result = run_validation(config.project_root)
+    validation_errors = validation_result.get("errors", [])
 
-    intent_ok = True
-    if spec_dir.exists():
-        spec_result = validate_specification_files(spec_dir)
-        if not spec_result.passed:
-            intent_ok = False
-    if outcome_dir.exists():
-        outcome_result = validate_outcome_files(outcome_dir)
-        if not outcome_result.passed:
-            intent_ok = False
+    # Separate intent errors from brick errors for reporting
+    intent_specs = {"S-018", "S-019", "S-020", "S-042", "S-043", "S-079", "S-095"}
+    brick_specs = {"S-021", "S-022", "S-035", "S-036", "S-037", "S-038", "S-039", "S-086", "S-087", "S-088", "S-089"}
+
+    intent_errors = [e for e in validation_errors if e.get("spec", "") in intent_specs]
+    brick_errors = [e for e in validation_errors if e.get("spec", "") in brick_specs]
+
+    intent_ok = len(intent_errors) == 0
+    bricks_ok = len(brick_errors) == 0
 
     validation_results["phases"]["intent"] = {"passed": intent_ok}
     if not intent_ok:
@@ -556,31 +551,30 @@ def align_command(
             click.echo("  intent: OK")
         else:
             click.echo("  intent: FAILED")
+            for err in intent_errors:
+                click.echo(f"    {err.get('message', '')}")
             return 1
 
-    # Validate bricks
+    # Count bricks and layers for summary
     bricks_file = config.paths.bricks
-    bricks_ok = True
     brick_count = 0
     layer_count = 0
     if bricks_file.exists():
-        def_result = validate_brick_definitions(bricks_file, impl_output)
-        part_result = validate_brick_partition(bricks_file, impl_output)
+        import yaml
+        with open(bricks_file) as f:
+            bricks_data = yaml.safe_load(f)
+        brick_count = len(bricks_data.get("bricks", []))
+        layers = set(b.get("layer", 0) for b in bricks_data.get("bricks", []))
+        layer_count = len(layers)
 
-        if def_result.passed and part_result.passed:
-            # Count bricks and layers
-            import yaml
-            with open(bricks_file) as f:
-                bricks_data = yaml.safe_load(f)
-            brick_count = len(bricks_data.get("bricks", []))
-            layers = set(b.get("layer", 0) for b in bricks_data.get("bricks", []))
-            layer_count = len(layers)
+        if bricks_ok:
             if output_format == OutputFormat.HUMAN:
                 click.echo(f"  bricks: OK ({brick_count} bricks, {layer_count} layers)")
         else:
-            bricks_ok = False
             if output_format == OutputFormat.HUMAN:
                 click.echo("  bricks: FAILED")
+                for err in brick_errors:
+                    click.echo(f"    {err.get('message', '')}")
                 return 1
     else:
         if output_format == OutputFormat.HUMAN:

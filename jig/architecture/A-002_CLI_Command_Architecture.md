@@ -205,6 +205,7 @@ jigy
 │   ├── intent                  # Intent artifacts only
 │   ├── bricks                  # Brick definitions only
 │   └── full                    # Explicit full validation
+├── mend [--dry-run]            # Auto-fix validation errors
 ├── show [target]               # Display structural information
 │   ├── (none)                  # Bricks + layers overview
 │   ├── layers                  # Layer hierarchy only
@@ -279,6 +280,39 @@ jigy
 **Output:** Validation results with errors and warnings.
 
 **Exit code:** 0 if valid, non-zero if validation fails.
+
+---
+
+#### `jigy mend`
+
+**Purpose:** Auto-fix validation errors that have machine-applicable fixes.
+
+**Options:**
+| Option | Purpose |
+|--------|---------|
+| `--dry-run` | Show what would be fixed without applying changes |
+
+**Behavior:**
+1. Run validation to identify errors
+2. For each error with `auto: true` in its fix template, apply the fix
+3. Report changes made (or to be made in dry-run mode)
+
+**Fix Types (per S-104):**
+| Action | Description |
+|--------|-------------|
+| `set_field` | Set a frontmatter field value |
+| `rename_file` | Rename a file to match conventions |
+| `update_header` | Update H1 header to match title |
+| `manual_review` | Cannot be auto-fixed (skipped) |
+
+**Output:**
+- Human mode: List of fixes applied with file paths
+- JSON mode: Structured fix report per S-104
+- Dry-run: "Would fix..." prefixes
+
+**Exit code:** 0 if all auto-fixable errors resolved, 1 if manual fixes remain.
+
+**Related specs:** S-104 (fix templates), S-105 (mend command), S-106 (dry-run mode)
 
 ---
 

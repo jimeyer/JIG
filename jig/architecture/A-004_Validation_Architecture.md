@@ -40,25 +40,45 @@ Validation happens at multiple layers:
 
 ---
 
-## Validation Domains
+## Rules-Based Architecture
 
-JIG validates seven artifact types. Each domain has:
-- **Rules**: Normative statements in this document
-- **Specs**: Formal specifications that implementations must satisfy
-- **Functions**: Code that enforces the rules
+Validation is implemented using a declarative rules engine. Each validation concern is expressed as a rule type that can be instantiated with configuration.
+
+### Rule Types
+
+| Rule Type | Purpose | Specs |
+|-----------|---------|-------|
+| RequiredFieldRule | Validate required frontmatter fields | S-018, S-019 |
+| IdFormatRule | Validate ID patterns (S-###, O-###) | S-018, S-019 |
+| UniquenessRule | Validate unique IDs | S-018, S-019 |
+| FilenameSyncRule | Validate filename matches frontmatter | S-018, S-019 |
+| HeaderSyncRule | Validate H1 matches title | S-018, S-019 |
+| ReferenceValidityRule | Validate cross-references | S-020, S-079 |
+| BidirectionalLinkRule | Validate bidirectional references | S-095 |
+| CoverageRule | Validate coverage (specs by outcomes) | S-043 |
+| PartitionRule | Validate partition property (brick partition) | S-022 |
+| DAGRule | Validate acyclic graphs (brick dependencies) | S-039 |
+| LayerConstraintRule | Validate layer hierarchy | S-038 |
+| IsolationRule | Validate tower isolation | S-088, S-089 |
+
+### Key Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| ValidationContext | `src/jig/rules/context.py` | Loads all artifacts into queryable structure |
+| Rule Registry | `src/jig/rules/registry.py` | Instantiates and indexes all rules |
+| Validation Engine | `src/jig/validation/engine.py` | Runs all rules, produces structured output |
 
 ### Domain Overview
 
-| Domain | Rules | Specs | Function |
-|--------|-------|-------|----------|
-| Charter | 4 | S-072, S-073, S-074 | `validate_charter_file()` |
-| Goal References | 2 | S-075 | `validate_goal_references()` |
-| Architecture | 7 | S-076, S-077, S-078, S-079 | `validate_architecture_files()` |
-| Outcome | 7 | S-018, S-042 | `validate_outcome_files()`, `validate_outcome_completeness()` |
-| Specification | 5 | S-018, S-043 | `validate_specification_files()`, `validate_specification_coverage()` |
-| Brick | 8 | S-021, S-022, S-035, S-038, S-039 | `validate_brick_*()` |
-| Tower | 3 | S-086, S-087, S-088, S-089 | `validate_tower_format()`, `validate_tower_isolation()` |
-| Decorator | 3 | S-020 | `validate_decorator_files()` |
+| Domain | Specs | Rule Types Used |
+|--------|-------|-----------------|
+| Specification | S-018, S-043 | RequiredFieldRule, IdFormatRule, UniquenessRule, FilenameSyncRule, HeaderSyncRule, CoverageRule |
+| Outcome | S-019, S-079 | RequiredFieldRule, IdFormatRule, UniquenessRule, FilenameSyncRule, HeaderSyncRule, ReferenceValidityRule |
+| Bidirectional | S-095 | BidirectionalLinkRule |
+| Brick Partition | S-022 | PartitionRule |
+| Brick Dependencies | S-038, S-039 | LayerConstraintRule, DAGRule |
+| Tower | S-088, S-089 | IsolationRule |
 
 ---
 
@@ -223,18 +243,19 @@ Bricks partition the codebase into architectural units. Every function must belo
 | B-7 | Brick dependencies SHALL respect layer hierarchy (no upward deps) | S-038 |
 | B-8 | Brick dependency graph SHALL be acyclic (DAG constraint) | S-039 |
 
-### Functions
+### Rule Instances
 
-```
-validate_brick_definitions(bricks_file: Path, impl_graph: Path) -> ValidationResult
-validate_brick_partition(bricks_file: Path, impl_graph: Path) -> ValidationResult
-validate_brick_layer_constraints(bricks_file: Path, impl_graph: Path) -> ValidationResult
-validate_brick_cycles(bricks_file: Path, impl_graph: Path) -> ValidationResult
-```
+Brick validation uses the rules-based engine with these rule instances:
 
-**Location:** `src/jig/validation/bricks.py`
+| Rule Instance | Type | Spec |
+|---------------|------|------|
+| BRICK_PARTITION | PartitionRule | S-022 |
+| BRICK_DAG | DAGRule | S-039 |
+| BRICK_LAYER_CONSTRAINT | LayerConstraintRule | S-038 |
 
-**Called by:** `validate_bricks_command()`
+**Location:** `src/jig/rules/registry.py`
+
+**Called by:** Validation engine via `validate()` in `src/jig/validation/engine.py`
 
 ---
 
@@ -250,18 +271,19 @@ Towers partition the codebase vertically. Cross-tower dependencies are forbidden
 | T-2 | Cross-tower dependencies SHALL be detected and reported as errors | S-088 |
 | T-3 | Single-tower projects (no tower fields declared) SHALL skip tower validation | S-089 |
 
-### Functions
+### Rule Instances
 
-```
-validate_tower_format(bricks_file: Path) -> ValidationResult
-validate_tower_isolation(bricks_file: Path, impl_graph: Path) -> ValidationResult
-```
+Tower validation uses the rules-based engine:
 
-**Location:** `src/jig/validation/bricks.py`
+| Rule Instance | Type | Spec |
+|---------------|------|------|
+| TOWER_ISOLATION | IsolationRule | S-088, S-089 |
 
-**Called by:** `validate_bricks_command()`
+**Location:** `src/jig/rules/registry.py`
 
-**Note:** `validate_tower_isolation()` is only called if any brick declares a `tower` field.
+**Called by:** Validation engine via `validate()` in `src/jig/validation/engine.py`
+
+**Note:** IsolationRule with `skip_if_single=True` handles S-089 (skip validation for single-tower projects).
 
 ---
 
@@ -300,39 +322,44 @@ validate_decorator_files(
 
 | Command | Validations Executed |
 |---------|---------------------|
-| `jigy validate` | All intent + all bricks |
-| `jigy validate intent` | Charter, goal refs, architecture, outcomes, specs, coverage, decorators |
-| `jigy validate bricks` | Brick definitions, partition, layers, cycles, towers |
+| `jigy validate` | All rules from registry |
+| `jigy validate intent` | Rules for specs S-018, S-019, S-020, S-042, S-043, S-079, S-095 |
+| `jigy validate bricks` | Rules for specs S-021, S-022, S-035-S-039, S-086-S-089 |
+| `jigy mend` | Run validation, then auto-apply fixes for fixable errors |
 | `jigy align` | Full rebuild + `jigy validate` |
 
-### Validation Order
+### Unified Validation Engine
 
-Within `validate_intent_command()`:
+All CLI commands use the unified validation engine (`src/jig/validation/engine.py`):
 
-```
-1. Charter validation (extract goals)
-2. Specification validation (extract spec IDs)
-3. Architecture validation (uses goals, spec IDs)
-4. Outcome validation
-5. Goal reference validation (uses goals)
-6. Specification coverage validation
-7. Decorator validation
+```python
+result = validate(project_root)
+# result = {
+#   "errors": [...],
+#   "summary": {"total": N, "auto_fixable": N, "manual": N}
+# }
 ```
 
-Within `validate_bricks_command()`:
+The CLI commands filter errors by spec ID to show domain-specific results.
+
+### Rule Execution
+
+The validation engine iterates over all rules in the registry:
 
 ```
-1. Brick definitions validation
-2. Tower format validation
-3. Brick partition validation
-4. Brick layer constraints validation
-5. Brick cycles validation
-6. Tower isolation validation (if towers declared)
+1. Load ValidationContext (artifacts, bricks, impl graph)
+2. For each rule in RULES:
+   a. Call rule.violations(ctx) to get violations
+   b. For each violation, compute error ID and fix template
+3. Return aggregated errors and summary
 ```
 
 ### Error Aggregation
 
-All validation functions return `ValidationResult` objects. Errors are aggregated and reported together—validation does not short-circuit on first error.
+Validation does not short-circuit on first error. All rules are evaluated and all errors are reported together. Each error includes:
+- Stable ID (per S-108)
+- Spec reference (per S-109)
+- Fix template (per S-104)
 
 ---
 
@@ -369,5 +396,6 @@ This document supersedes the "Validation Rules" section of A-001. A-001 retains 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 2.0 | 2026-01-18 | Migrated to rules-based architecture. Added rule types table. Updated brick/tower sections to reference rule instances. Updated execution model for unified engine. |
 | 1.0 | 2026-01-06 | Activated. Fixed spec references (S-016/S-017→S-018, S-030/S-034→S-021/S-022). Fixed `validate_goal_references` signature. |
 | Draft | 2026-01-06 | Initial creation from A-001 validation rules + C018 analysis |

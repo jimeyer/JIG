@@ -209,6 +209,75 @@ Sub-agent created validation engine:
 
 ---
 
+### Entry 6 | 2026-01-18 23:30 | WU5 Complete
+
+```yaml
+type: outcome
+wu: WU5
+spec: S-105, S-106, S-107
+```
+
+**Status:** COMPLETE (all 5 gates passed)
+
+Sub-agent implemented mend command:
+
+**Mend Engine:**
+- `mend_auto()` - applies all fixes where auto=true
+- `mend_apply()` - applies fixes from JSON file
+- `mend_combined()` - combines both modes
+- Fixed-point iteration (max 3) until no new errors
+
+**CLI Command:**
+- `jigy mend --auto` - auto-fix mode
+- `jigy mend --apply fixes.json` - explicit fix mode
+- `--dry-run` - preview without changes
+- `-j` - JSON output
+- Exit codes: 0=success, 1=partial, 2=error
+
+**Results:**
+- 23 tests pass
+- jigy validate passes (92 specs, 25 outcomes, 15 bricks)
+- No FORBIDDEN bricks touched
+
+**Commit:** fb9a4d5
+
+---
+
+### Entry 7 | 2026-01-18 23:45 | WU6 Complete
+
+```yaml
+type: outcome
+wu: WU6
+spec: S-104, S-105, S-106, S-107, S-108, S-109
+escalated: false
+```
+
+**Status:** COMPLETE (all 6 gates passed)
+
+Integration tests verify the SCOPE claim: "A rule knows how to detect violations, describe repairs, and execute fixes."
+
+**Tests (13):**
+- validate -> mend --auto -> validate cycle converges
+- validate -> mend --apply -> validate cycle
+- Same rule produces both error and fix (rule unity)
+- Mend actually resolves errors
+- Error ID stability (S-108)
+- Spec traceability (S-109)
+- Complete end-to-end workflow
+
+**Fix Applied:**
+Changed artifact filters from `a.kind == "specification"` to `a.id.startswith("S-")`.
+This enables detection of artifacts with missing type fields.
+
+**Results:**
+- 13 integration tests pass
+- jigy validate passes
+- No FORBIDDEN bricks touched
+
+**Commit:** 539ffeb
+
+---
+
 ## Synthesis
 
 ### Patterns

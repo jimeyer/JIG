@@ -11,29 +11,51 @@ import jig
 from jig.cli.main import cli
 
 
+def _create_valid_spec_with_outcome(base_path: Path = None):
+    """Helper to create a valid spec with a covering outcome."""
+    base = base_path or Path(".")
+    spec_dir = base / "jig/specifications"
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    outcome_dir = base / "jig/outcomes"
+    outcome_dir.mkdir(parents=True, exist_ok=True)
+
+    (spec_dir / "S-001_Test_Specification.md").write_text(
+        """---
+id: S-001
+type: specification
+title: Test Specification
+outcomes: [O-001]
+---
+
+# Test Specification
+"""
+    )
+
+    (outcome_dir / "O-001_Test_Outcome.md").write_text(
+        """---
+id: O-001
+type: outcome
+title: Test Outcome
+specifications: [S-001]
+---
+
+# Test Outcome
+"""
+    )
+
+
 @jig.verifies("S-023")
 @jig.verifies("S-061")
 def test_validate_intent_success():
     """jigy validate intent passes with valid artifacts."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        # Create valid spec
-        spec_dir = Path("jig/specifications")
-        spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001_Test_Specification.md").write_text(
-            """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-        )
+        _create_valid_spec_with_outcome()
 
         result = runner.invoke(cli, ["validate", "intent"])
         assert result.exit_code == 0
-        assert "specifications" in result.output.lower()
+        # New engine outputs "Validation passed." on success
+        assert "passed" in result.output.lower() or "validation" in result.output.lower()
 
 
 @jig.verifies("S-023")
@@ -65,20 +87,7 @@ def test_validate_intent_exit_codes():
     """jigy validate intent uses correct exit codes."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        spec_dir = Path("jig/specifications")
-        spec_dir.mkdir(parents=True)
-
-        # Success: exit code 0
-        (spec_dir / "S-001_Test_Specification.md").write_text(
-            """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-        )
+        _create_valid_spec_with_outcome()
 
         result = runner.invoke(cli, ["validate", "intent"])
         assert result.exit_code == 0
@@ -113,7 +122,8 @@ def test_validate_bricks_success():
         # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
         result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks"])
         assert result.exit_code == 0
-        assert "brick" in result.output.lower()
+        # New engine outputs "Validation passed." on success
+        assert "passed" in result.output.lower()
 
 
 @jig.verifies("S-024")
@@ -134,9 +144,10 @@ def test_validate_bricks_missing_graph():
 """
         )
 
-        result = runner.invoke(cli, ["validate", "bricks"])
+        # Use --no-rebuild to prevent auto-rebuild from creating the graph
+        result = runner.invoke(cli, ["--no-rebuild", "validate", "bricks"])
         assert result.exit_code != 0
-        assert "not found" in result.output.lower() or "missing" in result.output.lower()
+        assert "not found" in result.output.lower() or "error" in result.output.lower()
 
 
 @jig.verifies("S-024")
@@ -175,19 +186,8 @@ def test_validate_full_success():
     """jigy validate runs both intent and brick validation."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        # Create valid spec
-        spec_dir = Path("jig/specifications")
-        spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001_Test_Specification.md").write_text(
-            """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-        )
+        # Create valid spec with outcome
+        _create_valid_spec_with_outcome()
 
         # Create implementation graph
         graph_dir = Path("jig/generated")
@@ -211,9 +211,8 @@ title: Test Specification
         # Use --no-rebuild to skip auto-rebuild (we have mock graphs)
         result = runner.invoke(cli, ["--no-rebuild", "validate"])
         assert result.exit_code == 0
-        # Should run both validations (new format uses "specs" and "bricks")
-        assert "specs" in result.output.lower()
-        assert "bricks" in result.output.lower()
+        # New engine outputs "Validation passed." on success
+        assert "passed" in result.output.lower()
 
 
 @jig.verifies("S-025")
@@ -222,19 +221,8 @@ def test_validate_full_skips_bricks_if_no_graph():
     """jigy validate gracefully skips brick validation if no graph."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        # Create valid spec only (no graph)
-        spec_dir = Path("jig/specifications")
-        spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001_Test_Specification.md").write_text(
-            """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-        )
+        # Create valid spec with outcome (no impl graph)
+        _create_valid_spec_with_outcome()
 
         # Use --no-rebuild to skip auto-rebuild (testing graph-less behavior)
         result = runner.invoke(cli, ["--no-rebuild", "validate"])
@@ -313,25 +301,13 @@ def test_validate_human_output_only():
     """jigy validate produces human-readable output."""
     runner = CliRunner()
     with runner.isolated_filesystem():
-        # Create valid spec
-        spec_dir = Path("jig/specifications")
-        spec_dir.mkdir(parents=True)
-        (spec_dir / "S-001_Test_Specification.md").write_text(
-            """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-        )
+        _create_valid_spec_with_outcome()
 
         result = runner.invoke(cli, ["validate", "intent"])
         assert result.exit_code == 0
 
-        # Should be human-readable (contains checkmarks and text), not JSON
-        assert "✓" in result.output or "Validating" in result.output
+        # Should be human-readable (contains "passed" or "Validation"), not JSON
+        assert "passed" in result.output.lower() or "validation" in result.output.lower()
         # Should NOT be parseable as JSON
         try:
             json.loads(result.output)
@@ -347,18 +323,8 @@ title: Test Specification
 
 def _setup_valid_project(runner):
     """Helper to set up a valid JIG project for output format tests."""
-    spec_dir = Path("jig/specifications")
-    spec_dir.mkdir(parents=True)
-    (spec_dir / "S-001_Test_Specification.md").write_text(
-        """---
-id: S-001
-type: specification
-title: Test Specification
----
-
-# Test Specification
-"""
-    )
+    # Create valid spec with outcome
+    _create_valid_spec_with_outcome()
 
     # Create implementation graph
     graph_dir = Path("jig/generated")

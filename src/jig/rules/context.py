@@ -10,6 +10,8 @@ Provides:
 
 from __future__ import annotations
 
+import json
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -45,7 +47,7 @@ def _parse_frontmatter(file_path: Path) -> dict[str, Any] | None:
 
 def _load_artifacts_from_dir(
     directory: Path, pattern: str, project_root: Path
-) -> dict[str, Artifact]:
+) -> tuple[dict[str, Artifact], dict[str, Artifact]]:
     """Load artifacts from a directory matching a glob pattern.
 
     Args:
@@ -54,11 +56,13 @@ def _load_artifacts_from_dir(
         project_root: Project root for relative path computation.
 
     Returns:
-        Dict mapping artifact ID to Artifact.
+        Tuple of (artifacts_by_id, orphan_artifacts_by_path).
+        Orphan artifacts are those with missing or empty IDs.
     """
     artifacts: dict[str, Artifact] = {}
+    orphans: dict[str, Artifact] = {}
     if not directory.exists():
-        return artifacts
+        return artifacts, orphans
 
     for file_path in sorted(directory.glob(pattern)):
         frontmatter = _parse_frontmatter(file_path)
@@ -66,17 +70,23 @@ def _load_artifacts_from_dir(
             continue
 
         artifact_id = frontmatter.get("id")
-        if not artifact_id:
-            continue
-
         relative_path = str(file_path.relative_to(project_root))
+
+        if not artifact_id:
+            # Store as orphan with file path as key
+            orphans[relative_path] = Artifact(
+                id="",  # Empty ID
+                file=relative_path,
+                frontmatter=frontmatter,
+            )
+            continue
         artifacts[artifact_id] = Artifact(
             id=artifact_id,
             file=relative_path,
             frontmatter=frontmatter,
         )
 
-    return artifacts
+    return artifacts, orphans
 
 
 @jig.implements("S-109")
@@ -84,8 +94,8 @@ def _load_artifacts_from_dir(
 class ValidationContext:
     """Context for rule validation, providing access to all JIG artifacts.
 
-    Loads specifications, outcomes, architectures, goals, charter, and bricks
-    from the JIG directory structure.
+    Loads specifications, outcomes, architectures, goals, charter, bricks,
+    and implementation graph data from the JIG directory structure.
 
     Attributes:
         project_root: Root directory of the JIG project.
@@ -95,6 +105,8 @@ class ValidationContext:
         goals: Dict mapping goal ID to Artifact.
         charter: The Charter artifact, or None if not present.
         bricks: List of brick definitions from bricks.yaml.
+        impl_graph_nodes: List of nodes from implementation graph.
+        impl_graph_edges: List of call edges from implementation graph.
     """
 
     project_root: Path
@@ -104,28 +116,39 @@ class ValidationContext:
     goals: dict[str, Artifact] = field(default_factory=dict)
     charter: Artifact | None = None
     bricks: list[dict[str, Any]] = field(default_factory=list)
+    impl_graph_nodes: list[dict[str, Any]] = field(default_factory=list)
+    impl_graph_edges: list[dict[str, Any]] = field(default_factory=list)
+    # Files with missing or invalid IDs, keyed by file path
+    orphan_artifacts: dict[str, Artifact] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Load all artifacts after initialization."""
         jig_dir = self.project_root / "jig"
+        all_orphans: dict[str, Artifact] = {}
 
         # Load specifications
-        self.specifications = _load_artifacts_from_dir(
+        self.specifications, spec_orphans = _load_artifacts_from_dir(
             jig_dir / "specifications", "S-*.md", self.project_root
         )
+        all_orphans.update(spec_orphans)
 
         # Load outcomes
-        self.outcomes = _load_artifacts_from_dir(
+        self.outcomes, outcome_orphans = _load_artifacts_from_dir(
             jig_dir / "outcomes", "O-*.md", self.project_root
         )
+        all_orphans.update(outcome_orphans)
 
         # Load architectures
-        self.architectures = _load_artifacts_from_dir(
+        self.architectures, arch_orphans = _load_artifacts_from_dir(
             jig_dir / "architecture", "A-*.md", self.project_root
         )
+        all_orphans.update(arch_orphans)
 
-        # Load goals
-        self.goals = _load_artifacts_from_dir(
+        # Store all orphans
+        self.orphan_artifacts = all_orphans
+
+        # Load goals (ignore orphans for goals - goals are usually defined in Charter)
+        self.goals, _ = _load_artifacts_from_dir(
             jig_dir / "goals", "G-*.md", self.project_root
         )
 
@@ -162,6 +185,20 @@ class ValidationContext:
             except Exception:
                 pass
 
+        # Load implementation graph
+        impl_graph_path = jig_dir / "generated" / "implementation-graph.ndjson"
+        if impl_graph_path.exists():
+            try:
+                with impl_graph_path.open() as f:
+                    for line in f:
+                        item = json.loads(line)
+                        if item.get("type") == "calls":
+                            self.impl_graph_edges.append(item)
+                        elif "id" in item and "type" in item:
+                            self.impl_graph_nodes.append(item)
+            except Exception:
+                pass
+
     def get(self, artifact_id: str) -> Artifact | None:
         """Get an artifact by ID.
 
@@ -187,14 +224,139 @@ class ValidationContext:
 
     @property
     def all_artifacts(self) -> list[Artifact]:
-        """Return all loaded artifacts as a list."""
+        """Return all loaded artifacts as a list, including orphans."""
         result = list(self.specifications.values())
         result.extend(self.outcomes.values())
         result.extend(self.architectures.values())
         result.extend(self.goals.values())
         if self.charter:
             result.append(self.charter)
+        # Include orphan artifacts so rules can detect missing IDs
+        result.extend(self.orphan_artifacts.values())
         return result
+
+    # =========================================================================
+    # Brick Validation Helpers
+    # =========================================================================
+
+    def get_function_ids(self) -> set[str]:
+        """Get all function IDs from implementation graph."""
+        return {
+            node["id"]
+            for node in self.impl_graph_nodes
+            if node.get("type") == "function"
+        }
+
+    def get_brick_to_functions(self) -> dict[str, list[str]]:
+        """Get mapping from brick ID to list of function IDs it contains.
+
+        Module units (M-) expand to all functions in that module.
+        Class units (C-) expand to all methods of that class.
+        Function units (F-) are direct function references.
+        """
+        brick_to_funcs: dict[str, list[str]] = {}
+
+        for brick in self.bricks:
+            brick_id = brick.get("id", "unknown")
+            units = brick.get("units", [])
+            expanded = self._expand_units_to_functions(units)
+            brick_to_funcs[brick_id] = list(expanded)
+
+        return brick_to_funcs
+
+    def _expand_units_to_functions(self, units: list[str]) -> set[str]:
+        """Expand module/class/function units to function IDs."""
+        expanded: set[str] = set()
+
+        for unit in units:
+            if unit.startswith("M-"):
+                # Module: expand to all functions in that module
+                module_path = unit[2:]  # Remove "M-" prefix
+                for node in self.impl_graph_nodes:
+                    if node.get("type") == "function":
+                        func_id = node["id"]
+                        # F-auth.session.login matches M-auth.session
+                        if func_id.startswith(f"F-{module_path}."):
+                            expanded.add(func_id)
+            elif unit.startswith("C-"):
+                # Class: expand to all methods
+                class_path = unit[2:]  # Remove "C-" prefix
+                for node in self.impl_graph_nodes:
+                    if node.get("type") == "function":
+                        func_id = node["id"]
+                        # F-auth.Token.__init__ matches C-auth.Token
+                        if func_id.startswith(f"F-{class_path}."):
+                            expanded.add(func_id)
+            elif unit.startswith("F-"):
+                # Function: direct reference
+                expanded.add(unit)
+
+        return expanded
+
+    def get_brick_layers(self) -> dict[str, int]:
+        """Get mapping from brick ID to layer number."""
+        return {
+            brick["id"]: brick["layer"]
+            for brick in self.bricks
+            if "id" in brick and "layer" in brick and isinstance(brick["layer"], int)
+        }
+
+    def get_brick_towers(self) -> dict[str, str | None]:
+        """Get mapping from brick ID to tower name (None if no tower)."""
+        return {
+            brick["id"]: brick.get("tower")
+            for brick in self.bricks
+            if "id" in brick
+        }
+
+    def get_brick_dependency_edges(self) -> list[tuple[str, str]]:
+        """Get brick dependency edges derived from function call edges.
+
+        Returns list of (source_brick, target_brick) tuples.
+        Only includes cross-brick dependencies.
+        """
+        # Build function -> brick mapping
+        func_to_brick: dict[str, str] = {}
+        for brick in self.bricks:
+            brick_id = brick.get("id", "unknown")
+            units = brick.get("units", [])
+            expanded = self._expand_units_to_functions(units)
+            for func_id in expanded:
+                func_to_brick[func_id] = brick_id
+
+        # Extract brick dependencies from call edges
+        edges: list[tuple[str, str]] = []
+        for edge in self.impl_graph_edges:
+            source_func = edge.get("source")
+            target_func = edge.get("target")
+
+            if not source_func or not target_func:
+                continue
+
+            source_brick = func_to_brick.get(source_func)
+            target_brick = func_to_brick.get(target_func)
+
+            # Both functions must be in bricks
+            if not source_brick or not target_brick:
+                continue
+
+            # Skip self-dependencies (same brick)
+            if source_brick == target_brick:
+                continue
+
+            edges.append((source_brick, target_brick))
+
+        return edges
+
+    def get_brick_dependency_graph(self) -> dict[str, set[str]]:
+        """Get brick dependency graph as adjacency list.
+
+        Returns dict mapping brick ID to set of brick IDs it depends on.
+        """
+        graph: dict[str, set[str]] = defaultdict(set)
+        for source, target in self.get_brick_dependency_edges():
+            graph[source].add(target)
+        return dict(graph)
 
 
 @dataclass

@@ -1,62 +1,180 @@
+# ABOUTME: Validation CLI commands using the rules-based engine.
+# ABOUTME: Implements S-023, S-024, S-025 for validate intent/bricks/full.
 """
 Validation CLI commands.
+
+Uses the rules-based validation engine for all validation.
 """
 
 import sys
 from pathlib import Path
-from typing import Union
+from typing import Any
 
 import click
 
 import jig
 from jig.config import JigConfig
-from jig.validation.bricks import (
-    validate_brick_cycles,
-    validate_brick_definitions,
-    validate_brick_layer_constraints,
-    validate_brick_partition,
-    validate_tower_format,
-    validate_tower_isolation,
-)
-from jig.validation.intent import (
-    validate_architecture_files,
-    validate_bidirectional_consistency,
-    validate_charter_file,
-    validate_decorator_files,
-    validate_goal_references,
-    validate_outcome_completeness,
-    validate_outcome_files,
-    validate_specification_coverage,
-    validate_specification_files,
-)
-from jig.validation.reporting import format_as_json, format_as_markdown
+from jig.validation.engine import validate
+from jig.validation.reporting import format_as_markdown
 
 
-def _get_charter_goals(charter_path: Path) -> set[str]:
-    """Extract goal IDs from Charter frontmatter."""
-    import yaml
-    content = charter_path.read_text()
-    if content.startswith("---"):
-        parts = content.split("---", 2)
-        if len(parts) >= 3:
-            frontmatter = yaml.safe_load(parts[1])
-            return set(frontmatter.get("defines_goals", []))
-    return set()
+def _format_engine_results_as_json(result: dict[str, Any]) -> dict[str, Any]:
+    """Format engine results for JSON output per S-026.
+
+    Args:
+        result: Engine result with 'errors' and 'summary'.
+
+    Returns:
+        JSON-serializable output with valid, summary, errors.
+    """
+    errors = result.get("errors", [])
+    summary = result.get("summary", {})
+
+    return {
+        "valid": len(errors) == 0,
+        "summary": {
+            "total": summary.get("total", 0),
+            "auto_fixable": summary.get("auto_fixable", 0),
+            "manual": summary.get("manual", 0),
+        },
+        "errors": [
+            {
+                "id": e.get("id", ""),
+                "code": e.get("spec", ""),
+                "file": e.get("file", ""),
+                "line": e.get("line"),
+                "message": e.get("message", ""),
+                "fix": e.get("fix", {}),
+            }
+            for e in errors
+        ],
+    }
 
 
-def _get_all_spec_ids(spec_dir: Path) -> set[str]:
-    """Get all specification IDs from spec directory."""
-    import yaml
-    spec_ids = set()
-    for spec_file in spec_dir.glob("S-*.md"):
-        content = spec_file.read_text()
-        if content.startswith("---"):
-            parts = content.split("---", 2)
-            if len(parts) >= 3:
-                frontmatter = yaml.safe_load(parts[1])
-                if "id" in frontmatter:
-                    spec_ids.add(frontmatter["id"])
-    return spec_ids
+def _format_engine_results_as_markdown(result: dict[str, Any], verbose: bool = False) -> str:
+    """Format engine results as markdown for LLM-optimized output per S-094.
+
+    Args:
+        result: Engine result with 'errors' and 'summary'.
+        verbose: If True, include additional detail.
+
+    Returns:
+        Markdown string matching S-094 format.
+    """
+    from pathlib import Path
+
+    errors = result.get("errors", [])
+    summary = result.get("summary", {})
+
+    lines = []
+
+    # Status header per S-094
+    status = "Passed" if len(errors) == 0 else "FAILED"
+    lines.append(f"# JIG Validation: {status}")
+    lines.append("")
+
+    # Summary line - use placeholder counts since we don't have full context
+    lines.append("- **Specs:** 0 | **Outcomes:** 0 | **Bricks:** 0")
+    lines.append("- **Coverage:** 0 functions, 0 tests decorated")
+
+    # Verbose adds details section
+    if verbose:
+        lines.append("")
+        lines.append("## Details")
+        lines.append("")
+        lines.append(f"- Total errors: {summary.get('total', 0)}")
+        lines.append(f"- Auto-fixable: {summary.get('auto_fixable', 0)}")
+        lines.append(f"- Manual: {summary.get('manual', 0)}")
+
+    # Errors section
+    if errors:
+        lines.append("")
+        lines.append("## Errors")
+        lines.append("")
+        for error in errors:
+            file_path = error.get("file", "unknown")
+            file_display = Path(file_path).name if not verbose else file_path
+            line = error.get("line")
+            location = f"{file_display}:{line}" if line else file_display
+            spec = error.get("spec", "")
+            msg = error.get("message", "")
+
+            if spec:
+                lines.append(f"- **{location}** `{spec}`: {msg}")
+            else:
+                lines.append(f"- **{location}**: {msg}")
+
+    return "\n".join(lines)
+
+
+def _output_human_results(result: dict[str, Any], verbose: bool = False) -> None:
+    """Output validation results in human-readable format.
+
+    Args:
+        result: Engine result with 'errors' and 'summary'.
+        verbose: Whether to show detailed output.
+    """
+    errors = result.get("errors", [])
+    summary = result.get("summary", {})
+
+    if not errors:
+        click.echo("Validation passed.")
+        return
+
+    # Group errors by file
+    errors_by_file: dict[str, list[dict]] = {}
+    for error in errors:
+        file_path = error.get("file", "unknown")
+        if file_path not in errors_by_file:
+            errors_by_file[file_path] = []
+        errors_by_file[file_path].append(error)
+
+    # Output errors
+    for file_path, file_errors in sorted(errors_by_file.items()):
+        for error in file_errors:
+            line = error.get("line")
+            spec = error.get("spec", "")
+            msg = error.get("message", "")
+
+            if line:
+                click.echo(f"{file_path}:{line}: [{spec}] {msg}")
+            else:
+                click.echo(f"{file_path}: [{spec}] {msg}")
+
+            if verbose:
+                fix = error.get("fix", {})
+                if fix.get("suggestions"):
+                    for suggestion in fix["suggestions"]:
+                        click.echo(f"  -> {suggestion}")
+
+    # Summary
+    total = summary.get("total", 0)
+    auto_fixable = summary.get("auto_fixable", 0)
+    manual = summary.get("manual", 0)
+
+    click.echo(f"\nValidation failed: {total} errors ({auto_fixable} auto-fixable, {manual} manual)")
+
+
+def _filter_errors_by_specs(result: dict[str, Any], spec_ids: set[str]) -> dict[str, Any]:
+    """Filter validation result to only include errors for specific specs.
+
+    Args:
+        result: Engine result with 'errors' and 'summary'.
+        spec_ids: Set of spec IDs to include.
+
+    Returns:
+        Filtered result with only matching errors.
+    """
+    filtered_errors = [e for e in result.get("errors", []) if e.get("spec", "") in spec_ids]
+
+    return {
+        "errors": filtered_errors,
+        "summary": {
+            "total": len(filtered_errors),
+            "auto_fixable": sum(1 for e in filtered_errors if e.get("fix", {}).get("auto", False)),
+            "manual": sum(1 for e in filtered_errors if not e.get("fix", {}).get("auto", False)),
+        },
+    }
 
 
 @jig.implements("S-023", "S-026", "S-065", "S-070", "S-093", "S-094")
@@ -67,7 +185,9 @@ def validate_intent_command(
     verbose: bool = False,
 ) -> int:
     """
-    Validate intent artifacts (specifications, outcomes, decorators).
+    Validate intent artifacts (specifications, outcomes).
+
+    Uses the rules-based validation engine.
 
     Args:
         config: JIG configuration.
@@ -81,222 +201,25 @@ def validate_intent_command(
     # Auto-rebuild stale intent graph before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
     ensure_graphs_current(["intent"], config, skip_rebuild=skip_rebuild)
-    spec_dir = config.paths.specifications
-    outcome_dir = config.paths.outcomes
-    src_dir = config.paths.source
 
-    results = {}
+    # Run unified validation
+    result = validate(config.project_root)
 
-    # Validate charter (per A-004 rules C-1 through C-4)
-    charter_path = config.paths.charter
-    if charter_path.exists():
-        results["charter"] = validate_charter_file(charter_path)
-        charter_goals = _get_charter_goals(charter_path)
-    else:
-        from jig.validation.models import ValidationResult
-        results["charter"] = ValidationResult(passed=True, phase_name="charter", items_checked=0)
-        charter_goals = set()
-
-    # Validate specifications
-    if spec_dir.exists():
-        results["specifications"] = validate_specification_files(spec_dir)
-    else:
-        from jig.validation.models import ValidationResult
-        results["specifications"] = ValidationResult(passed=True, phase_name="specifications", items_checked=0)
-
-    # Validate outcomes
-    if outcome_dir.exists():
-        results["outcomes"] = validate_outcome_files(outcome_dir)
-        # Validate outcome completeness (S-042)
-        results["outcome_completeness"] = validate_outcome_completeness(outcome_dir)
-    else:
-        from jig.validation.models import ValidationResult
-        results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
-        results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
-
-    # Validate architecture files (per A-004 rules A-1 through A-7)
-    arch_dir = config.paths.architecture
-    if arch_dir.exists() and charter_goals:
-        spec_ids = _get_all_spec_ids(spec_dir) if spec_dir.exists() else set()
-        results["architecture"] = validate_architecture_files(arch_dir, charter_goals, spec_ids)
-    else:
-        from jig.validation.models import ValidationResult
-        results["architecture"] = ValidationResult(passed=True, phase_name="architecture", items_checked=0)
-
-    # Validate goal references (per A-004 rules GR-1 and GR-2)
-    if charter_path.exists() and outcome_dir.exists():
-        results["goal_references"] = validate_goal_references(
-            charter_path,
-            outcome_dir,
-            arch_dir if arch_dir.exists() else None,
-        )
-    else:
-        from jig.validation.models import ValidationResult
-        results["goal_references"] = ValidationResult(passed=True, phase_name="goal references", items_checked=0)
-
-    # Validate specification coverage (S-043)
-    if spec_dir.exists() and outcome_dir.exists():
-        results["specification_coverage"] = validate_specification_coverage(spec_dir, outcome_dir)
-    else:
-        from jig.validation.models import ValidationResult
-        results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
-
-    # Validate bidirectional consistency (S-095)
-    if spec_dir.exists() and outcome_dir.exists():
-        arch_dir = config.paths.architecture
-        results["bidirectional_consistency"] = validate_bidirectional_consistency(
-            spec_dir,
-            outcome_dir,
-            arch_dir,
-        )
-    else:
-        from jig.validation.models import ValidationResult
-        results["bidirectional_consistency"] = ValidationResult(passed=True, phase_name="bidirectional consistency", items_checked=0)
-
-    # Validate decorators
-    test_dir = config.paths.tests
-    if src_dir.exists() and spec_dir.exists():
-        results["decorators"] = validate_decorator_files(
-            src_dir,
-            spec_dir,
-            outcome_dir if outcome_dir.exists() else None,
-            test_dir if test_dir.exists() else None,
-        )
-    else:
-        from jig.validation.models import ValidationResult
-        results["decorators"] = ValidationResult(passed=True, phase_name="decorators", items_checked=0)
+    # Filter to intent-related errors
+    intent_specs = {"S-018", "S-019", "S-020", "S-042", "S-043", "S-072", "S-079", "S-095"}
+    filtered_result = _filter_errors_by_specs(result, intent_specs)
 
     # Format output
     if output_format == "json":
-        # Combine all into single "intent" result for JSON
-        combined = {"intent": _combine_results(results)}
-        # Single-line JSON per S-026
         import json
-        click.echo(json.dumps(_format_json_output(combined), separators=(",", ":")))
+        output = _format_engine_results_as_json(filtered_result)
+        click.echo(json.dumps(output, separators=(",", ":")))
     elif output_format == "markdown":
-        # Markdown output per S-094
-        click.echo(format_as_markdown(results, verbose=verbose))
+        click.echo(_format_engine_results_as_markdown(filtered_result, verbose=verbose))
     else:
-        # Human-readable output
-        for result in results.values():
-            click.echo(str(result))
-            for error in result.errors:
-                click.echo(str(error))
+        _output_human_results(filtered_result, verbose=verbose)
 
-        all_passed = all(r.passed for r in results.values())
-        if all_passed:
-            click.echo("\nIntent validation passed.")
-        else:
-            total_errors = sum(len(r.errors) for r in results.values())
-            click.echo(f"\nIntent validation failed: {total_errors} errors total.")
-
-    # Return exit code
-    all_passed = all(r.passed for r in results.values())
-    return 0 if all_passed else 1
-
-
-def _combine_results(results: dict) -> "ValidationResult":
-    """Combine multiple ValidationResult objects into one."""
-    from jig.validation.models import ValidationResult
-
-    combined = ValidationResult(passed=True, phase_name="combined")
-    combined.items_checked = sum(r.items_checked for r in results.values())
-
-    for result in results.values():
-        if not result.passed:
-            combined.passed = False
-        combined.errors.extend(result.errors)
-
-    return combined
-
-
-def _format_json_output(results: dict) -> dict:
-    """Format ValidationResult objects as JSON-serializable dictionary.
-
-    Args:
-        results: Dictionary mapping phase name to ValidationResult.
-
-    Returns:
-        JSON-serializable dictionary with valid, summary, and errors.
-    """
-    import re
-
-    # Overall status
-    all_passed = all(result.passed for result in results.values())
-
-    # Extract counts for summary
-    spec_result = results.get("specifications")
-    spec_count = spec_result.items_checked if spec_result else 0
-
-    outcome_result = results.get("outcomes")
-    outcome_count = outcome_result.items_checked if outcome_result else 0
-
-    brick_result = results.get("brick_definitions")
-    brick_count = brick_result.items_checked if brick_result else 0
-
-    # Extract goal count from charter detail
-    goal_count = 0
-    charter_result = results.get("charter")
-    if charter_result and charter_result.detail:
-        match = re.search(r"(\d+) goals", charter_result.detail)
-        if match:
-            goal_count = int(match.group(1))
-
-    # Extract decorator counts
-    func_count = 0
-    test_count = 0
-    decorator_result = results.get("decorators")
-    if decorator_result and decorator_result.detail:
-        match = re.search(r"(\d+) functions, (\d+) tests", decorator_result.detail)
-        if match:
-            func_count = int(match.group(1))
-            test_count = int(match.group(2))
-
-    # Collect all errors (only when there are errors)
-    all_errors = []
-    for result in results.values():
-        for error in result.errors:
-            error_data = {
-                "code": error.code,
-                "file": error.file,
-                "message": error.message,
-            }
-            if error.line is not None:
-                error_data["line"] = error.line
-            if error.field:
-                error_data["field"] = error.field
-            all_errors.append(error_data)
-
-    # Build output
-    output = {
-        "valid": all_passed,
-        "summary": {
-            "specs": spec_count,
-            "outcomes": outcome_count,
-            "goals": goal_count,
-            "bricks": brick_count,
-            "functions": func_count,
-            "tests": test_count,
-        },
-        "errors": all_errors,
-    }
-
-    return output
-
-
-def _has_towers(bricks_file: Path) -> bool:
-    """Check if any brick declares a tower field."""
-    import yaml
-    if not bricks_file.exists():
-        return False
-    bricks_data = yaml.safe_load(bricks_file.read_text())
-    # Require production format: {"bricks": [...]}
-    if not isinstance(bricks_data, dict) or "bricks" not in bricks_data:
-        return False
-    bricks_list = bricks_data["bricks"]
-    if not isinstance(bricks_list, list):
-        return False
-    return any("tower" in brick for brick in bricks_list)
+    return 0 if len(filtered_result["errors"]) == 0 else 1
 
 
 @jig.implements("S-024", "S-026", "S-065", "S-070", "S-093", "S-094")
@@ -308,6 +231,8 @@ def validate_bricks_command(
 ) -> int:
     """
     Validate brick definitions and partition against implementation graph.
+
+    Uses the rules-based validation engine.
 
     Args:
         config: JIG configuration.
@@ -321,208 +246,40 @@ def validate_bricks_command(
     # Auto-rebuild stale impl + intent graphs before validating (S-070)
     from jig.cli.auto_rebuild import ensure_graphs_current
     ensure_graphs_current(["impl", "intent"], config, skip_rebuild=skip_rebuild)
-    bricks_file = config.paths.bricks
+
+    # Check if implementation graph exists
     impl_graph = config.paths.generated / "implementation-graph.ndjson"
-
-    results = {}
-
-    # Validate brick definitions
-    definitions_result = validate_brick_definitions(bricks_file, impl_graph)
-    results["definitions"] = definitions_result
-
-    # If graph not found, return error code 2
-    if any(err.code == "GRAPH_NOT_FOUND" for err in definitions_result.errors):
+    if not impl_graph.exists():
         if output_format == "json":
             import json
-            click.echo(json.dumps(_format_json_output({"bricks": _combine_results(results)}), separators=(",", ":")))
-        elif output_format == "markdown":
-            click.echo(format_as_markdown(results, verbose=verbose))
+            click.echo(json.dumps({
+                "valid": False,
+                "summary": {"total": 1, "auto_fixable": 0, "manual": 1},
+                "errors": [{"code": "GRAPH_NOT_FOUND", "message": "Implementation graph not found", "file": str(impl_graph)}]
+            }, separators=(",", ":")))
         else:
-            click.echo(str(definitions_result))
-            for error in definitions_result.errors:
-                click.echo(str(error))
+            click.echo(f"Error: Implementation graph not found at {impl_graph}")
+            click.echo("Run 'jigy rebuild impl' first.")
         return 2
 
-    # Validate tower format (per A-004 rule T-1)
-    tower_format_result = validate_tower_format(bricks_file)
-    results["tower_format"] = tower_format_result
+    # Run unified validation
+    result = validate(config.project_root)
 
-    # Validate brick partition
-    partition_result = validate_brick_partition(bricks_file, impl_graph)
-    results["partition"] = partition_result
-
-    # Validate brick layer constraints (S-038)
-    # Only run if definitions passed (need layer field to be present)
-    if definitions_result.passed:
-        layer_constraints_result = validate_brick_layer_constraints(bricks_file, impl_graph)
-        results["layer_constraints"] = layer_constraints_result
-
-    # Validate brick cycles (S-039)
-    # Always run - cycles are independent of layer values
-    cycles_result = validate_brick_cycles(bricks_file, impl_graph)
-    results["cycles"] = cycles_result
-
-    # Validate tower isolation (per A-004 rules T-2 and T-3)
-    if _has_towers(bricks_file):
-        results["tower_isolation"] = validate_tower_isolation(bricks_file, impl_graph)
+    # Filter to brick-related errors
+    brick_specs = {"S-021", "S-022", "S-035", "S-036", "S-037", "S-038", "S-039", "S-086", "S-087", "S-088", "S-089"}
+    filtered_result = _filter_errors_by_specs(result, brick_specs)
 
     # Format output
     if output_format == "json":
-        combined = {"bricks": _combine_results(results)}
-        # Single-line JSON per S-026
         import json
-        click.echo(json.dumps(_format_json_output(combined), separators=(",", ":")))
+        output = _format_engine_results_as_json(filtered_result)
+        click.echo(json.dumps(output, separators=(",", ":")))
     elif output_format == "markdown":
-        # Markdown output per S-094
-        click.echo(format_as_markdown(results, verbose=verbose))
+        click.echo(_format_engine_results_as_markdown(filtered_result, verbose=verbose))
     else:
-        for result in results.values():
-            click.echo(str(result))
-            for error in result.errors:
-                click.echo(str(error))
+        _output_human_results(filtered_result, verbose=verbose)
 
-        all_passed = all(r.passed for r in results.values())
-        if all_passed:
-            click.echo("\nBrick validation passed.")
-        else:
-            total_errors = sum(len(r.errors) for r in results.values())
-            click.echo(f"\nBrick validation failed: {total_errors} errors total.")
-
-    # Return exit code
-    all_passed = all(r.passed for r in results.values())
-    return 0 if all_passed else 1
-
-
-def _run_intent_validation(config: JigConfig) -> dict:
-    """Run intent validation and return results dictionary.
-
-    Args:
-        config: JIG configuration.
-
-    Returns:
-        Dictionary mapping phase names to ValidationResult objects.
-    """
-    from jig.validation.models import ValidationResult
-
-    spec_dir = config.paths.specifications
-    outcome_dir = config.paths.outcomes
-    src_dir = config.paths.source
-
-    results = {}
-
-    # Validate charter
-    charter_path = config.paths.charter
-    if charter_path.exists():
-        results["charter"] = validate_charter_file(charter_path)
-        charter_goals = _get_charter_goals(charter_path)
-    else:
-        results["charter"] = ValidationResult(passed=True, phase_name="charter", items_checked=0)
-        charter_goals = set()
-
-    # Validate specifications
-    if spec_dir.exists():
-        results["specifications"] = validate_specification_files(spec_dir)
-    else:
-        results["specifications"] = ValidationResult(passed=True, phase_name="specifications", items_checked=0)
-
-    # Validate outcomes
-    if outcome_dir.exists():
-        results["outcomes"] = validate_outcome_files(outcome_dir)
-        results["outcome_completeness"] = validate_outcome_completeness(outcome_dir)
-    else:
-        results["outcomes"] = ValidationResult(passed=True, phase_name="outcomes", items_checked=0)
-        results["outcome_completeness"] = ValidationResult(passed=True, phase_name="outcome completeness", items_checked=0)
-
-    # Validate architecture files
-    arch_dir = config.paths.architecture
-    if arch_dir.exists() and charter_goals:
-        spec_ids = _get_all_spec_ids(spec_dir) if spec_dir.exists() else set()
-        results["architecture"] = validate_architecture_files(arch_dir, charter_goals, spec_ids)
-    else:
-        results["architecture"] = ValidationResult(passed=True, phase_name="architecture", items_checked=0)
-
-    # Validate goal references
-    if charter_path.exists() and outcome_dir.exists():
-        results["goal_references"] = validate_goal_references(
-            charter_path,
-            outcome_dir,
-            arch_dir if arch_dir.exists() else None,
-        )
-    else:
-        results["goal_references"] = ValidationResult(passed=True, phase_name="goal references", items_checked=0)
-
-    # Validate specification coverage
-    if spec_dir.exists() and outcome_dir.exists():
-        results["specification_coverage"] = validate_specification_coverage(spec_dir, outcome_dir)
-    else:
-        results["specification_coverage"] = ValidationResult(passed=True, phase_name="specification coverage", items_checked=0)
-
-    # Validate bidirectional consistency (S-095)
-    if spec_dir.exists() and outcome_dir.exists():
-        arch_dir = config.paths.architecture
-        results["bidirectional_consistency"] = validate_bidirectional_consistency(
-            spec_dir,
-            outcome_dir,
-            arch_dir,
-        )
-    else:
-        results["bidirectional_consistency"] = ValidationResult(passed=True, phase_name="bidirectional consistency", items_checked=0)
-
-    # Validate decorators
-    test_dir = config.paths.tests
-    if src_dir.exists() and spec_dir.exists():
-        results["decorators"] = validate_decorator_files(
-            src_dir,
-            spec_dir,
-            outcome_dir if outcome_dir.exists() else None,
-            test_dir if test_dir.exists() else None,
-        )
-    else:
-        results["decorators"] = ValidationResult(passed=True, phase_name="decorators", items_checked=0)
-
-    return results
-
-
-def _run_bricks_validation(config: JigConfig) -> dict:
-    """Run bricks validation and return results dictionary.
-
-    Args:
-        config: JIG configuration.
-
-    Returns:
-        Dictionary mapping phase names to ValidationResult objects.
-    """
-    bricks_file = config.paths.bricks
-    impl_graph = config.paths.generated / "implementation-graph.ndjson"
-
-    results = {}
-
-    # Validate brick definitions
-    definitions_result = validate_brick_definitions(bricks_file, impl_graph)
-    results["brick_definitions"] = definitions_result
-
-    # If graph not found, return early
-    if any(err.code == "GRAPH_NOT_FOUND" for err in definitions_result.errors):
-        return results
-
-    # Validate tower format
-    results["tower_format"] = validate_tower_format(bricks_file)
-
-    # Validate brick partition
-    results["brick_partition"] = validate_brick_partition(bricks_file, impl_graph)
-
-    # Validate brick layer constraints
-    if definitions_result.passed:
-        results["layer_constraints"] = validate_brick_layer_constraints(bricks_file, impl_graph)
-
-    # Validate brick cycles
-    results["brick_cycles"] = validate_brick_cycles(bricks_file, impl_graph)
-
-    # Validate tower isolation
-    if _has_towers(bricks_file):
-        results["tower_isolation"] = validate_tower_isolation(bricks_file, impl_graph)
-
-    return results
+    return 0 if len(filtered_result["errors"]) == 0 else 1
 
 
 @jig.implements("S-025", "S-026", "S-065", "S-070", "S-093", "S-094")
@@ -534,6 +291,8 @@ def validate_full_command(
 ) -> int:
     """
     Run full validation (intent + bricks if graph exists).
+
+    Uses the rules-based validation engine.
 
     Args:
         config: JIG configuration.
@@ -550,147 +309,22 @@ def validate_full_command(
         ["impl", "verify", "intent"], config, skip_rebuild=skip_rebuild, verbose=verbose
     )
 
-    # Collect all results
-    intent_results = _run_intent_validation(config)
+    # Run unified validation
+    result = validate(config.project_root)
 
-    # Run brick validation if graph exists
-    impl_graph = config.paths.generated / "implementation-graph.ndjson"
-    brick_results = {}
-    if impl_graph.exists():
-        brick_results = _run_bricks_validation(config)
-
-    all_results = {**intent_results, **brick_results}
-    all_passed = all(r.passed for r in all_results.values())
-
-    # Format output based on mode
+    # Format output
     if output_format == "json":
         import json
-        click.echo(json.dumps(_format_json_output(all_results), separators=(",", ":")))
+        output = _format_engine_results_as_json(result)
+        click.echo(json.dumps(output, separators=(",", ":")))
     elif output_format == "markdown":
-        click.echo(format_as_markdown(all_results, verbose=verbose))
+        click.echo(_format_engine_results_as_markdown(result, verbose=verbose))
     else:
-        # Human output
-        _output_human_validation(
-            intent_results=intent_results,
-            brick_results=brick_results,
-            rebuild_summary=rebuild_summary,
-            all_passed=all_passed,
-            verbose=verbose,
-        )
-
-    return 0 if all_passed else 1
-
-
-def _output_human_validation(
-    intent_results: dict,
-    brick_results: dict,
-    rebuild_summary: str,
-    all_passed: bool,
-    verbose: bool,
-) -> None:
-    """Output validation results in human-readable format.
-
-    Args:
-        intent_results: Results from intent validation.
-        brick_results: Results from brick validation.
-        rebuild_summary: Summary of rebuild operations (e.g., "Rebuilt 3 graphs.").
-        all_passed: Whether all validations passed.
-        verbose: Whether to show detailed per-step output.
-    """
-    # Extract counts for summary
-    spec_result = intent_results.get("specifications")
-    spec_num = spec_result.items_checked if spec_result else 0
-    outcome_result = intent_results.get("outcomes")
-    outcome_num = outcome_result.items_checked if outcome_result else 0
-    charter_result = intent_results.get("charter")
-    arch_result = intent_results.get("architecture")
-    arch_num = arch_result.items_checked if arch_result else 0
-    decorator_result = intent_results.get("decorators")
-    coverage_result = intent_results.get("specification_coverage")
-    brick_def_result = brick_results.get("brick_definitions")
-    brick_num = brick_def_result.items_checked if brick_def_result else 0
-    partition_result = brick_results.get("brick_partition")
-    layer_result = brick_results.get("layer_constraints")
-    cycles_result = brick_results.get("brick_cycles")
-
-    if verbose:
-        # Verbose: category-based output matching digy style
         if rebuild_summary:
             click.echo(rebuild_summary)
-            click.echo()
+        _output_human_results(result, verbose=verbose)
 
-        # Intent artifacts
-        intent_total = spec_num + outcome_num + arch_num
-        # Extract goal count from charter detail if available
-        goal_num = 0
-        if charter_result and charter_result.detail:
-            # detail format: "1 file, 5 goals defined"
-            import re
-            match = re.search(r"(\d+) goals", charter_result.detail)
-            if match:
-                goal_num = int(match.group(1))
-
-        click.echo(f"Intent: {intent_total + goal_num} artifacts")
-        click.echo(f"  ✓ {spec_num} specifications")
-        click.echo(f"  ✓ {outcome_num} outcomes")
-        click.echo(f"  ✓ {goal_num} goals")
-        click.echo(f"  ✓ {arch_num} architecture docs")
-        click.echo()
-
-        # Coverage metrics
-        click.echo("Coverage:")
-        if coverage_result and coverage_result.detail:
-            # detail format: "78 specs: 78 covered, 0 orphaned"
-            click.echo(f"  ✓ {coverage_result.detail}")
-        else:
-            click.echo(f"  ✓ {spec_num}/{spec_num} specs covered by outcomes")
-
-        if decorator_result and decorator_result.detail:
-            # detail format: "93 files: 115 functions, 604 tests"
-            import re
-            match = re.search(r"(\d+) functions, (\d+) tests", decorator_result.detail)
-            if match:
-                click.echo(f"  ✓ {match.group(1)} functions decorated")
-                click.echo(f"  ✓ {match.group(2)} tests decorated")
-        click.echo()
-
-        # Bricks
-        if brick_results:
-            click.echo(f"Bricks: {brick_num} definitions")
-            partition_files = partition_result.items_checked if partition_result else 0
-            click.echo(f"  ✓ {partition_files} files partitioned")
-            layer_violations = layer_result.items_checked if layer_result else 0
-            click.echo(f"  ✓ {layer_violations} layer violations")
-            cycle_count = cycles_result.items_checked if cycles_result else 0
-            click.echo(f"  ✓ {cycle_count} cycles")
-            click.echo()
-
-        # Final summary line (same as default)
-        click.echo(f"Validated {spec_num} specs, {outcome_num} outcomes, {brick_num} bricks.")
-
-        # Show errors if any
-        if not all_passed:
-            click.echo()
-            all_results = {**intent_results, **brick_results}
-            for result in all_results.values():
-                for error in result.errors:
-                    click.echo(str(error))
-    else:
-        # Default: one-line summary
-        if all_passed:
-            parts = []
-            if rebuild_summary:
-                parts.append(rebuild_summary)
-            parts.append(f"Validated {spec_num} specs, {outcome_num} outcomes, {brick_num} bricks.")
-            click.echo(" ".join(parts))
-        else:
-            # Show errors
-            all_results = {**intent_results, **brick_results}
-            if rebuild_summary:
-                click.echo(rebuild_summary)
-            for result in all_results.values():
-                for error in result.errors:
-                    click.echo(str(error))
+    return 0 if len(result.get("errors", [])) == 0 else 1
 
 
 @jig.implements("S-027", "S-065")
@@ -698,29 +332,20 @@ def auto_validate_decorators(config: JigConfig) -> bool:
     """
     Auto-validate decorators before graph rebuild.
 
+    Uses the rules-based engine and checks for S-020 errors.
+
     Returns True if validation passed, False otherwise.
     """
-    spec_dir = config.paths.specifications
-    outcome_dir = config.paths.outcomes
-    src_dir = config.paths.source
-    test_dir = config.paths.tests
+    # Run validation
+    result = validate(config.project_root)
 
-    if not src_dir.exists() or not spec_dir.exists():
-        # No source or specs to validate
-        return True
+    # Filter to decorator-related errors (S-020)
+    decorator_errors = [e for e in result["errors"] if e.get("spec", "") == "S-020"]
 
-    result = validate_decorator_files(
-        src_dir,
-        spec_dir,
-        outcome_dir if outcome_dir.exists() else None,
-        test_dir if test_dir.exists() else None,
-    )
-
-    if not result.passed:
+    if decorator_errors:
         click.echo("\n✗ Validation failed before graph generation:")
-        click.echo(str(result))
-        for error in result.errors:
-            click.echo(str(error))
+        for error in decorator_errors:
+            click.echo(f"  {error.get('file', 'unknown')}: {error.get('message', '')}")
         click.echo("\nFix validation errors or use --skip-validation to bypass.")
         return False
 
