@@ -94,9 +94,9 @@ Sequential - each WU depends on the previous.
 
 ## Work Unit Checklist
 
-- [ ] WU1: Core context module — tests ☐ / code ☐
-- [ ] WU2: CLI integration — tests ☐ / code ☐
-- [ ] WU3: Validation — SCOPE verified ☐
+- [x] WU1: Core context module — tests ✓ / code ✓
+- [x] WU2: CLI integration — tests ✓ / code ✓
+- [x] WU3: Validation — SCOPE verified ✓
 
 ---
 
@@ -258,24 +258,53 @@ jigy context G-001
 
 ## Execution Log
 
-(Filled in by orchestrator)
+| WU | Status | Commit | Notes |
+|----|--------|--------|-------|
+| WU1 | COMPLETE | 4d3b809 | Core context module (S-111, S-112) |
+| WU2 | COMPLETE | 08ba98f | CLI integration (S-110, S-113) |
+| WU3 | COMPLETE | e3a8674 | Validation - SCOPE verified |
 
 ---
 
 ## Completion Summary
 
 **Scope Delivered:**
-- (to be filled)
+- `jigy context <identifier>` command with `--max/-j/-m` flags
+- Graph neighborhood exploration for specs, outcomes, goals, functions, tests
+- Asymmetric traversal: full ancestors, budget-limited descendants
+- JSON response per S-113 schema
 
 **JIG Summary:**
-- (to be filled)
+
+| Planned | Actual | Node | Notes |
+|---------|--------|------|-------|
+| CREATE | ✓ CREATED | O-030 | Graph Neighborhood Exploration |
+| CREATE | ✓ CREATED | S-110 | Context CLI Command |
+| CREATE | ✓ CREATED | S-111 | Context Identifier Resolution |
+| CREATE | ✓ CREATED | S-112 | Context Graph Traversal |
+| CREATE | ✓ CREATED | S-113 | Context Response Schema |
+| REUSE | ✓ REUSED | O-019 | Intuitive CLI Experience |
+| REUSE | ✓ REUSED | S-057 | Project Root Auto-Discovery |
+| REUSE | ✓ REUSED | S-093 | Universal Output Format Flags |
+
+| Planned | Actual | Brick | Notes |
+|---------|--------|-------|-------|
+| MODIFY | ✓ MODIFIED | B-cli | Added M-jig.cli.context |
+| FORBIDDEN | ✓ UNTOUCHED | B-decorators | |
+| FORBIDDEN | ✓ UNTOUCHED | B-intent-graph | |
+| FORBIDDEN | ✓ UNTOUCHED | B-impl-graph | |
+| FORBIDDEN | ✓ UNTOUCHED | B-verification-graph | |
+
+Decorators added: 4 implements, 27 verifies (46 tests total)
+
+Final validation: Validated 96 specs, 26 outcomes, 15 bricks. 1088 tests passed.
 
 **Clean Break Actions:**
-- [ ] No deprecated O/S nodes to delete
-- [ ] No legacy code to delete
-- [ ] Final jigy rebuild && jigy validate passed
+- [x] No deprecated O/S nodes to delete (new feature)
+- [x] No legacy code to delete (new feature)
+- [x] Final jigy rebuild && jigy validate passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: (to be filled)
-- Systemic frictions: (to be filled)
-- Open questions: (to be filled)
+- Repeatable wins: TDD approach kept WUs focused; sub-agent reports accurate
+- Systemic frictions: None significant
+- Open questions: None
