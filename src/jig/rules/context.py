@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 
@@ -273,6 +273,55 @@ class MendContext:
             )
         )
 
+    def rename_file(self, old_path: str, new_path: str) -> None:
+        """Rename a file to a new path.
+
+        Args:
+            old_path: Current file path.
+            new_path: New file path.
+        """
+        self.pending_changes.append(
+            _PendingChange(
+                action="rename_file",
+                file=old_path,
+                params={"new_path": new_path},
+            )
+        )
+
+    def sync_title(
+        self, file: str, direction: Literal["to_h1", "to_frontmatter"]
+    ) -> None:
+        """Sync H1 heading and frontmatter title.
+
+        Args:
+            file: Path to the file.
+            direction: Direction of sync:
+                - "to_h1": Copy frontmatter title to H1 heading
+                - "to_frontmatter": Copy H1 heading to frontmatter title
+        """
+        self.pending_changes.append(
+            _PendingChange(
+                action="sync_title",
+                file=file,
+                params={"direction": direction},
+            )
+        )
+
+    def set_h1(self, file: str, heading: str) -> None:
+        """Set the H1 heading.
+
+        Args:
+            file: Path to the file.
+            heading: New H1 heading text.
+        """
+        self.pending_changes.append(
+            _PendingChange(
+                action="set_h1",
+                file=file,
+                params={"heading": heading},
+            )
+        )
+
     def rollback(self) -> None:
         """Discard all pending changes."""
         self.pending_changes.clear()
@@ -280,80 +329,53 @@ class MendContext:
     def commit(self) -> None:
         """Apply all pending changes to files.
 
-        Groups changes by file and applies them in order.
+        Applies changes in order using the mend actions module.
         """
-        # Group changes by file
-        changes_by_file: dict[str, list[_PendingChange]] = {}
         for change in self.pending_changes:
-            if change.file not in changes_by_file:
-                changes_by_file[change.file] = []
-            changes_by_file[change.file].append(change)
-
-        # Apply changes to each file
-        for file_path_str, changes in changes_by_file.items():
-            self._apply_changes_to_file(file_path_str, changes)
+            self._apply_change(change)
 
         # Clear pending changes
         self.pending_changes.clear()
 
-    def _apply_changes_to_file(
-        self, file_path_str: str, changes: list[_PendingChange]
-    ) -> None:
-        """Apply a list of changes to a single file.
+    def _apply_change(self, change: _PendingChange) -> None:
+        """Apply a single change using mend actions.
 
         Args:
-            file_path_str: Path to the file.
-            changes: List of changes to apply.
+            change: The change to apply.
         """
-        file_path = Path(file_path_str)
+        # Import here to avoid circular imports
+        from jig.mend.actions import (
+            apply_add_field_value,
+            apply_delete_field,
+            apply_remove_field_value,
+            apply_rename_file,
+            apply_set_field,
+            apply_set_h1,
+            apply_sync_title,
+        )
+
+        file_path = Path(change.file)
         if not file_path.is_absolute():
             file_path = self.project_root / file_path
 
-        if not file_path.exists():
-            return
-
-        # Read file content
-        content = file_path.read_text()
-
-        # Parse frontmatter and body
-        if not content.startswith("---"):
-            return
-
-        parts = content.split("---", 2)
-        if len(parts) < 3:
-            return
-
-        try:
-            frontmatter = yaml.safe_load(parts[1]) or {}
-        except Exception:
-            return
-
-        body = parts[2]
-
-        # Apply each change to frontmatter
-        for change in changes:
-            if change.action == "set_field":
-                frontmatter[change.params["field"]] = change.params["value"]
-            elif change.action == "add_field_value":
-                field_name = change.params["field"]
-                if field_name not in frontmatter:
-                    frontmatter[field_name] = []
-                if isinstance(frontmatter[field_name], list):
-                    frontmatter[field_name].append(change.params["value"])
-            elif change.action == "remove_field_value":
-                field_name = change.params["field"]
-                if field_name in frontmatter and isinstance(
-                    frontmatter[field_name], list
-                ):
-                    value = change.params["value"]
-                    frontmatter[field_name] = [
-                        v for v in frontmatter[field_name] if v != value
-                    ]
-            elif change.action == "delete_field":
-                field_name = change.params["field"]
-                if field_name in frontmatter:
-                    del frontmatter[field_name]
-
-        # Write back
-        new_content = "---\n" + yaml.dump(frontmatter, default_flow_style=False) + "---" + body
-        file_path.write_text(new_content)
+        if change.action == "set_field":
+            apply_set_field(file_path, change.params["field"], change.params["value"])
+        elif change.action == "add_field_value":
+            apply_add_field_value(
+                file_path, change.params["field"], change.params["value"]
+            )
+        elif change.action == "remove_field_value":
+            apply_remove_field_value(
+                file_path, change.params["field"], change.params["value"]
+            )
+        elif change.action == "delete_field":
+            apply_delete_field(file_path, change.params["field"])
+        elif change.action == "rename_file":
+            new_path = Path(change.params["new_path"])
+            if not new_path.is_absolute():
+                new_path = self.project_root / new_path
+            apply_rename_file(file_path, new_path)
+        elif change.action == "sync_title":
+            apply_sync_title(file_path, change.params["direction"])
+        elif change.action == "set_h1":
+            apply_set_h1(file_path, change.params["heading"])

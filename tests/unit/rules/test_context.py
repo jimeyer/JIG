@@ -306,3 +306,79 @@ class TestMendContext:
             content = spec_file.read_text()
             assert "New Title" in content
             assert "outcomes" in content
+
+    def test_rename_file(self):
+        """MendContext.rename_file renames file to new path."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jig_dir = Path(tmpdir) / "jig"
+            spec_dir = jig_dir / "specifications"
+            spec_dir.mkdir(parents=True)
+
+            old_file = spec_dir / "S-001_Old_Name.md"
+            new_file = spec_dir / "S-001_New_Name.md"
+            old_file.write_text("---\nid: S-001\n---\n# Test\n")
+
+            ctx = MendContext(project_root=Path(tmpdir))
+            ctx.rename_file(str(old_file), str(new_file))
+            ctx.commit()
+
+            assert not old_file.exists()
+            assert new_file.exists()
+
+    def test_sync_title_to_h1(self):
+        """MendContext.sync_title syncs frontmatter title to H1."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jig_dir = Path(tmpdir) / "jig"
+            spec_dir = jig_dir / "specifications"
+            spec_dir.mkdir(parents=True)
+
+            spec_file = spec_dir / "S-001_Test.md"
+            spec_file.write_text(
+                "---\nid: S-001\ntitle: Correct Title\n---\n# Wrong Title\n"
+            )
+
+            ctx = MendContext(project_root=Path(tmpdir))
+            ctx.sync_title(str(spec_file), "to_h1")
+            ctx.commit()
+
+            content = spec_file.read_text()
+            assert "# Correct Title" in content
+
+    def test_sync_title_to_frontmatter(self):
+        """MendContext.sync_title syncs H1 to frontmatter title."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jig_dir = Path(tmpdir) / "jig"
+            spec_dir = jig_dir / "specifications"
+            spec_dir.mkdir(parents=True)
+
+            spec_file = spec_dir / "S-001_Test.md"
+            spec_file.write_text(
+                "---\nid: S-001\ntitle: Wrong Title\n---\n# Correct Title\n"
+            )
+
+            ctx = MendContext(project_root=Path(tmpdir))
+            ctx.sync_title(str(spec_file), "to_frontmatter")
+            ctx.commit()
+
+            content = spec_file.read_text()
+            assert "title: Correct Title" in content
+
+    def test_set_h1(self):
+        """MendContext.set_h1 sets the H1 heading."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            jig_dir = Path(tmpdir) / "jig"
+            spec_dir = jig_dir / "specifications"
+            spec_dir.mkdir(parents=True)
+
+            spec_file = spec_dir / "S-001_Test.md"
+            spec_file.write_text(
+                "---\nid: S-001\n---\n# Old Heading\n"
+            )
+
+            ctx = MendContext(project_root=Path(tmpdir))
+            ctx.set_h1(str(spec_file), "New Heading")
+            ctx.commit()
+
+            content = spec_file.read_text()
+            assert "# New Heading" in content
+            assert "# Old Heading" not in content

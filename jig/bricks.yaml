@@ -120,3 +120,11 @@ bricks:
       - M-jig.rules.types.dag
       - M-jig.rules.types.layer_constraint
       - M-jig.rules.types.isolation
+
+  - id: B-mend
+    name: Mend Actions
+    layer: 0
+    units:
+      - M-jig.mend.__init__
+      - M-jig.mend.yaml_editor
+      - M-jig.mend.actions
