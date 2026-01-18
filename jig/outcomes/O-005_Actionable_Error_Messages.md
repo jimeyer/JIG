@@ -4,7 +4,7 @@ title: Actionable Error Messages
 type: outcome
 theme: [Validation]
 goals: [G-002, G-003]
-specifications: [S-018, S-019, S-020, S-021, S-022]
+specifications: [S-018, S-019, S-020, S-021, S-022, S-104, S-108, S-109]
 ---
 
 # Actionable Error Messages
