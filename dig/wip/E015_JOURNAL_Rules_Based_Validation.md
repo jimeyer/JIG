@@ -13,7 +13,7 @@ children: []
 **PLAN:** dig/wip/E014_PLAN_Rules_Based_Validation.md
 **JIGPLAN:** dig/wip/E013_JIGPLAN_Rules_Based_Validation.md
 **Started:** 2026-01-18 21:00 CST
-**Status:** In Progress
+**Status:** Complete
 
 ---
 
@@ -278,16 +278,57 @@ This enables detection of artifacts with missing type fields.
 
 ---
 
+### Entry 8 | 2026-01-19 00:30 | WU7 Complete
+
+```yaml
+type: outcome
+wu: WU7
+spec: null
+escalated: true
+```
+
+**Status:** COMPLETE (all gates passed after brick rules added)
+
+**Escalation:** Sub-agent discovered brick rules weren't registered. Human approved adding them before cleanup.
+
+**Changes:**
+- Deleted `src/jig/validation/intent.py` and `bricks.py` (clean break)
+- Deleted obsolete tests (test_intent.py, test_bricks*.py)
+- Wired CLI validate.py to use rules engine
+- Added missing rules: BRICK_PARTITION, BRICK_DAG, BRICK_LAYER_CONSTRAINT, TOWER_ISOLATION, TOWER_FORMAT, CHARTER_REQUIRED_GOALS
+- Updated A-004 and A-002 architecture docs
+- Updated CLI tests for new output format
+
+**Results:**
+- 1038 tests pass (1 pre-existing failure unrelated to this work)
+- jigy validate passes
+- 7489 lines deleted, 866 lines added
+
+**Commit:** 37a2ba6
+
+---
+
 ## Synthesis
 
 ### Patterns
-- (to be filled)
+- TDD approach worked consistently across all WUs
+- Sub-agents with clear WU scope and success gates produced reliable results
+- Clean break is easier than maintaining compatibility shims
+- Rules-based architecture provides better extensibility than procedural functions
 
 ### Friction Summary
-- (to be filled)
+- WU4 didn't register brick rules (discovered in WU7) - gap in coverage parity verification
+- Artifact filters initially used `a.kind` which requires `type` field - fixed to use ID patterns
+- Pre-existing test failure (`test_charter_node_has_goals_field`) caused confusion about whether it was related
 
 ### Suggestions
-- (to be filled)
+- JIGPLAN should explicitly list all rule instances needed, not just rule types
+- Integration tests should verify coverage parity between old and new systems before cleanup WU
+- Consider adding Charter node to intent graph (addresses pre-existing test failure)
 
 ### Wins
-- (to be filled)
+- Clean break achieved: 7489 lines of procedural code deleted
+- Rules engine extensible: adding new validation is just instantiating rule types
+- Mend command works: validate->mend->validate cycle converges
+- Architecture docs updated to reflect new model
+- All specs S-104 through S-109 implemented and verified

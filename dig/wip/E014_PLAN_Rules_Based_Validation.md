@@ -115,7 +115,7 @@ WU7 (Cleanup)
 - [x] WU4: Validation Engine — tests ✓ / code ✓
 - [x] WU5: Mend Command — tests ✓ / code ✓
 - [x] WU6: Integration & Validation — SCOPE verified ✓
-- [ ] WU7: Cleanup — legacy deleted ☐
+- [x] WU7: Cleanup — legacy deleted ✓
 
 ---
 
@@ -530,26 +530,51 @@ python -c "from jig.validation import intent"  # Should fail (module deleted)
 
 ## Execution Log
 
-(Filled in by orchestrator during execution)
+| WU | Status | Commit | Notes |
+|----|--------|--------|-------|
+| WU1 | Complete | 0ed52ee | Rules infrastructure (Rule protocol, Violation, Fix, Artifact, ValidationContext, MendContext) |
+| WU2 | Complete | 86b2c47 | All 15 rule types implemented |
+| WU3 | Complete | 8a59f5e | Mend actions and YAML editor |
+| WU4 | Complete | f599fed | Validation engine and registry |
+| WU5 | Complete | fb9a4d5 | Mend CLI command |
+| WU6 | Complete | 539ffeb | Integration tests verify SCOPE |
+| WU7 | Complete | 37a2ba6 | Cleanup - deleted old code, wired CLI |
 
 ---
 
 ## Completion Summary
 
-(Filled in after all WUs complete)
-
 **Scope Delivered:**
-- <to be filled>
+- Rules-based validation architecture where each rule is the unit of abstraction
+- Each rule knows how to detect violations, describe repairs, and execute fixes
+- `jigy mend --auto` command for automated repair
+- `jigy mend --apply` command for explicit fix application
+- Fixed-point iteration (max 3) for cascading repairs
+- Stable error IDs (S-108), spec traceability (S-109), fix templates (S-104)
 
 **JIG Summary:**
-- <to be filled>
+
+| Planned | Actual | Node | Notes |
+|---------|--------|------|-------|
+| CREATE | ✓ CREATED | O-029 | Automated Validation Repair |
+| CREATE | ✓ CREATED | S-104 | Validation Fix Template Output |
+| CREATE | ✓ CREATED | S-105 | Mend Command Auto Mode |
+| CREATE | ✓ CREATED | S-106 | Mend Command Apply Mode |
+| CREATE | ✓ CREATED | S-107 | Mend Fixed Point Iteration |
+| CREATE | ✓ CREATED | S-108 | Validation Error ID Stability |
+| CREATE | ✓ CREATED | S-109 | Rule Spec Traceability |
+| CREATE | ✓ CREATED | B-rules | Rules engine (layer 0) |
+| CREATE | ✓ CREATED | B-mend | Mend engine (layer 0) |
+| MODIFY | ✓ MODIFIED | B-validation | Uses rules engine |
+| MODIFY | ✓ MODIFIED | B-cli | Added mend command |
+| FORBIDDEN | ✓ UNTOUCHED | B-decorators, B-impl-graph, etc. | 11 bricks |
 
 **Clean Break Actions:**
-- [ ] Deleted deprecated O/S nodes
-- [ ] Deleted legacy code modules (intent.py, bricks.py)
-- [ ] Final jigy rebuild && jigy validate passed
+- [x] No deprecated O/S nodes to delete (none planned)
+- [x] Deleted legacy code modules (intent.py, bricks.py - 7489 lines)
+- [x] Final jigy rebuild && jigy validate passed
 
 **Reflection Roll-Up:**
-- Repeatable wins: <patterns that worked>
-- Systemic frictions: <process issues>
-- Open questions: <items for future work>
+- Repeatable wins: TDD with clear success gates, sub-agent architecture, clean break default
+- Systemic frictions: Coverage parity not verified before cleanup, artifact filter design issue
+- Open questions: Charter node in intent graph (pre-existing test failure)
