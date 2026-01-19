@@ -4,6 +4,31 @@ JIG measures alignment between **intent** (specifications), **implementation** (
 
 ---
 
+## Start Here: Graph Exploration
+
+Before modifying code, understand its context in the JIG graph:
+
+```bash
+jigy context S-042        # What implements/verifies this spec? What outcome owns it?
+jigy context G-001        # What outcomes and specs support this goal?
+jigy context F-jig.cli.main.validate  # What specs does this function implement?
+jigy context src/auth/tokens.py       # What specs do functions in this file implement?
+```
+
+**Output includes:**
+- **Ancestors** (negative depth): Charter, goals, outcomes that own the node
+- **Descendants** (positive depth): Code/tests that implement/verify, called functions
+- **`more` count**: How many nodes were truncated (use `--max N` to increase)
+
+**Flags:**
+- `-j` — JSON output (for programmatic use)
+- `-m` — Markdown tables
+- `--max N` — Budget limit (default 50)
+
+**When to use:** Before any code change, run `jigy context <spec>` to understand what you're touching.
+
+---
+
 ## The G-A-O-S-C-T Pyramid
 
 ```
@@ -245,11 +270,10 @@ Target: ~50 lines max. Architecture link in frontmatter handles the rest.
 ## CLI Commands
 
 ```bash
+jigy context S-042  # Explore graph neighborhood (ancestors + descendants)
 jigy validate       # Check references, partition, layers
-jigy impl rebuild   # Generate implementation graph
-jigy intent rebuild # Generate intent graph
+jigy rebuild        # Regenerate all graphs
 jigy layers         # Show layer structure
-jigy rebuild        # Runs validate, rebuild, layers
 ```
 
 ---
