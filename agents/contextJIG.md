@@ -272,9 +272,57 @@ Target: ~50 lines max. Architecture link in frontmatter handles the rest.
 ```bash
 jigy context S-042  # Explore graph neighborhood (ancestors + descendants)
 jigy validate       # Check references, partition, layers
+jigy validate -j    # JSON output with fix templates (for programmatic use)
+jigy mend --auto    # Apply all auto-fixable errors
+jigy mend --apply fixes.json  # Apply agent-filled fix templates
 jigy rebuild        # Regenerate all graphs
 jigy layers         # Show layer structure
 ```
+
+---
+
+## Validate/Mend Workflow
+
+Validation errors include **fix templates**. Use `jigy validate -j` to get structured JSON:
+
+```json
+{
+  "errors": [
+    {
+      "id": "err_001",
+      "code": "ORPHAN_OUTCOME_SPEC_LINK",
+      "message": "O-001 references S-034, but S-034 doesn't reference O-001",
+      "file": "jig/outcomes/O-001_Easy_Onboarding.md",
+      "fix": {
+        "action": "add_field_value",
+        "target": "S-034",
+        "field": "outcomes",
+        "value": "???"
+      },
+      "auto": false,
+      "suggestions": ["O-001"]
+    }
+  ]
+}
+```
+
+**Workflow:**
+
+1. **Run validation:** `jigy validate -j > errors.json`
+2. **Review errors:** Each error has a `fix` template with `action`, `target`, `params`
+3. **Fill in `???` values:** Replace placeholders using `suggestions` or your judgment
+4. **Apply fixes:** `jigy mend --apply errors.json` (for filled templates) or `jigy mend --auto` (for auto-fixable)
+5. **Re-validate:** `jigy validate` to confirm all issues resolved
+
+**Fix types:**
+- `auto: true` — Deterministic fix, applied by `mend --auto`
+- `auto: false` — Requires decision (e.g., which outcome owns a spec)
+
+**Common actions:**
+- `set_field` — Set frontmatter field value
+- `add_field_value` — Append to array field
+- `rename_file` — Fix filename to match ID/title
+- `sync_title` — Sync H1 header with frontmatter title
 
 ---
 
