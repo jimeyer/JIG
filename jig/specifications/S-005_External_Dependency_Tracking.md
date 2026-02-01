@@ -1,0 +1,109 @@
+---
+id: S-005
+title: External Dependency Tracking
+type: specification
+outcomes: [O-001]
+---
+
+# External Dependency Tracking
+
+## Constraints
+
+1. **Track `import networkx` → creates external_module node `M-networkx`**
+   - External modules get same ID scheme as internal: `M-{package_name}`
+   - Node type: `external_module` (vs `module` for internal)
+   - Minimal metadata: name, language, discovered from import statement
+
+2. **No version tracking (assume venv correct)**
+   - Don't parse requirements.txt, Pipfile, package.json, etc.
+   - Don't query installed package versions
+   - Assumption: If code imports it and runs, version is correct for analysis purposes
+   - Version tracking is a dependency management concern, not code structure concern
+
+3. **No symbol-level tracking (too granular for V1)**
+   - Track: `import networkx` → edge from module to `M-networkx`
+   - Track: `from networkx import Graph` → edge from module to `M-networkx`
+   - DON'T track: which specific symbols are imported (`Graph`, `DiGraph`, etc.)
+   - Rationale: Symbol-level tracking explodes graph size with marginal value for V1 use cases
+
+## External vs Internal Detection
+
+An import is **external** if:
+- The imported module is not found in the project source tree
+- Standard library modules are considered external (e.g., `json`, `pathlib`, `ast`)
+- Third-party packages are external (e.g., `networkx`, `click`, `pyyaml`)
+
+An import is **internal** if:
+- The imported module exists as a `.py` file in the project source tree
+- Resolved using project root and Python path conventions
+
+## Node Format
+
+External module node:
+```json
+{
+    "id": "M-networkx",
+    "type": "external_module",
+    "language": "python",
+    "name": "networkx"
+}
+```
+
+Standard library module:
+```json
+{
+    "id": "M-json",
+    "type": "external_module",
+    "language": "python",
+    "name": "json",
+    "stdlib": true
+}
+```
+
+## Edge Format
+
+Import edge:
+```json
+{
+    "source": "M-jig.core.graph",
+    "target": "M-networkx",
+    "type": "imports",
+    "line": 5
+}
+```
+
+## Implementation Approach
+
+1. During Python AST analysis, track all `import` and `from ... import` statements
+2. Extract imported module name (base package name, not submodules)
+3. Check if module exists in project source tree:
+   - Internal: create or reference existing module node
+   - External: create external_module node with minimal metadata
+4. Create import edge from current module to target
+
+## Standard Library Detection
+
+Python standard library modules can be detected by:
+- Checking against known stdlib module list (use `sys.stdlib_module_names` in Python 3.10+)
+- For older Python: maintain hardcoded list of common stdlib modules
+- Mark with `"stdlib": true` flag for filtering/visualization
+
+## Rationale
+
+External dependencies are important for:
+- Understanding coupling to third-party libraries
+- Impact analysis when considering library upgrades
+- Architectural reviews (are we depending on too many external packages?)
+- Security audits (surface area of external code)
+
+Package-level tracking is sufficient for these use cases. Symbol-level tracking would provide marginal additional value at significant cost:
+- Graph size explodes (every import statement → multiple nodes)
+- Analysis complexity increases (need to track which symbols come from which package)
+- Maintenance burden (need to handle aliasing: `from X import Y as Z`)
+
+## Future Extensions (V2+)
+
+- Symbol-level tracking for critical interfaces
+- Version tracking by parsing lock files
+- Transitive dependency graph (what does `networkx` depend on?)
+- Cross-language dependency tracking (Python importing Node.js via subprocess)

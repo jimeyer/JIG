@@ -1,0 +1,20 @@
+---
+id: S-053
+title: Verifies Decorator Extraction
+type: specification
+outcomes: [O-018]
+---
+
+# Verifies Decorator Extraction
+
+The verification graph extracts T→S edges from `@jig.verifies` decorators on test functions.
+
+**Acceptance Criteria:**
+- Parses `@jig.verifies("S-001")` single specification
+- Parses `@jig.verifies("S-001", "S-002")` multiple specifications
+- Parses `@verifies("S-001")` short form when imported as `from jig import verifies`
+- Validates spec ID format: pattern `^[SO]-\d+$`
+- Logs warning for invalid spec IDs (does not fail build)
+- Tests without decorator have empty `verifies` array (still included as nodes)
+
+**Rationale:** T→S edges are the primary verification relationship. Explicit decorators make verification intent traceable in code.

@@ -1,0 +1,50 @@
+---
+id: O-001
+title: Discoverable Implementation Structure
+type: outcome
+theme: [Alignment Graph]
+goals: [G-001, G-002]
+specifications: [S-001, S-003, S-005, S-006]
+---
+
+# Discoverable Implementation Structure
+
+**Value:** Developers can query actual code structure without manual documentation
+
+**Acceptance:** `jig impl rebuild` generates complete implementation graph in <2s for 10K LOC
+
+## AI Agent Benefit
+
+Agents can query actual code structure instead of hallucinating APIs. Without discoverable structure, agents guess at function signatures and module boundaries, leading to runtime errors and wasted iterations. The implementation graph provides ground truth that agents can traverse programmatically.
+
+## Rationale
+
+Manual documentation of code structure quickly becomes stale and unreliable. By automatically discovering the implementation structure from source code, developers can always query the current state of the system without relying on out-of-date documentation.
+
+This outcome enables:
+- Quick onboarding for new developers who need to understand the codebase
+- Architecture validation by comparing actual structure to intended design
+- Impact analysis when considering changes
+- Automated traceability from specifications to implementation
+
+## Success Criteria
+
+The implementation structure discovery must:
+1. Complete analysis of 10K lines of code in under 2 seconds
+2. Generate a complete implementation graph with all modules, classes, functions, and their relationships
+3. Require no manual configuration or annotation (beyond optional `@jig.implements()` decorators)
+4. Work on existing codebases without modification
+
+## Specified By
+
+This outcome is delivered through:
+- **S-001**: Python code structure extraction via AST analysis
+- **S-003**: NDJSON output format that is deterministic and git-friendly
+- **S-005**: External dependencies tracked at package level
+- **S-006**: Parse errors fail fast with clear file:line reporting
+
+## Constitution Linkage
+
+This outcome serves: **Part I: Alignment Graph** - Discovering Implementation
+Enables: Ground truth code structure, automated traceability, alignment measurement
+Without this: Agents hallucinate APIs; developers rely on stale documentation

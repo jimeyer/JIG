@@ -1,7 +1,7 @@
 # Task: Create JIGPLAN Document (taskMakeJIGPLAN)
 
-**Version:** 1.1.0
-**Date:** 2025-12-18
+**Version:** 2.0.0
+**Date:** 2026-01-08
 **Audience:** AI coding agents
 **Status:** Active
 **Related:** JigPlanOrchWorkflow.md, taskMakePLAN.md, taskDoPLAN.md, taskDoWU.md, contextBricks.md
@@ -14,7 +14,32 @@ Create a JIGPLAN document that defines the complete architectural plan for a fea
 
 ---
 
-## JIG Fundamentals
+## Inputs
+
+Before creating a JIGPLAN, you need:
+
+1. **SCOPE Document**: Problem description (human-authored)
+   - Located in `docs/wip/SCOPE-<feature>.md`
+   - May request backwards compatibility (if so, plan for it)
+
+2. **Existing JIG Artifacts**: Review before planning
+   - `jig/specifications/*.md` - existing specs (prefer REUSE over CREATE)
+   - `jig/outcomes/*.md` - existing outcomes
+   - `jig/bricks.yaml` - current brick structure
+
+3. **Codebase Analysis**: Understand what exists
+   - Relevant source code
+   - Existing @jig decorators
+   - Current layer structure
+
+4. **Charter Decision Philosophy**: Read before making architectural choices
+   - `jig/Charter.md` - Section "Decision Philosophy"
+   - Decision heuristics for resolving tradeoffs
+   - Anti-goals to avoid optimizing for
+
+---
+
+## Key Concepts
 
 ### The S-F-T Triangle
 
@@ -26,7 +51,7 @@ JIG measures alignment between **intent** (specifications), **implementation** (
        /   \
 implements  verifies
      /       \
-    F ———————→ T
+    F ————————→ T
        covers
 ```
 
@@ -194,26 +219,6 @@ def parse(content: str) -> ParseResult:
 
 ---
 
-## Inputs
-
-Before creating a JIGPLAN, you need:
-
-1. **SCOPE Document**: Problem description (human-authored)
-   - Located in `docs/wip/SCOPE-<feature>.md`
-   - May request backwards compatibility (if so, plan for it)
-
-2. **Existing JIG Artifacts**: Review before planning
-   - `jig/specifications/*.md` - existing specs (prefer REUSE over CREATE)
-   - `jig/outcomes/*.md` - existing outcomes
-   - `jig/bricks.yaml` - current brick structure
-
-3. **Codebase Analysis**: Understand what exists
-   - Relevant source code
-   - Existing @jig decorators
-   - Current layer structure
-
----
-
 ## Process
 
 ### Step 1: Analyze SCOPE
@@ -325,6 +330,109 @@ jigy layers  # Verify layer structure
 Create `docs/wip/JIGPLAN-<feature>.md` using the template below.
 
 The JIGPLAN references the O/S nodes you created - it does NOT embed their full content.
+
+### Step 9: Fresh Agent Review (Required)
+
+**Purpose:** Verify the JIGPLAN is complete and internally consistent before human approval.
+
+**Why a fresh agent:** The creating agent has JIGPLAN context in working memory. A fresh agent tests whether the document is self-contained - it catches assumptions baked into the creator's mental model that would confuse implementers.
+
+**Lens:** Architectural completeness (specs, bricks, layers, decorator coverage).
+
+#### 9.1: Scope Check
+
+For JIGPLANs affecting ≤2 specs with no brick changes, review categories 1 and 2 may be abbreviated (search existing specs, verify new specs are behavioral). Full review required otherwise.
+
+#### 9.2: Spawn Review Agent
+
+**Review agent has full codebase access** via Glob, Grep, Read tools.
+
+Use this prompt to spawn a fresh agent for review:
+
+```
+You are reviewing a JIGPLAN document before human approval.
+
+Read: <path to JIGPLAN file>
+
+Your task: Identify issues that would cause problems during implementation.
+
+## Review Categories
+
+### 1. Spec Audit Completeness
+- Search for existing specs related to the feature's domain
+- Are there specs that should be REUSE/UPDATE but are missing?
+- Are there specs that conflict with what's being proposed?
+
+### 2. Anti-Pattern Detection
+Check if new specs follow evergreen guidelines:
+- Do they describe BEHAVIOR or implementation details?
+- Could you write @jig.implements and @jig.verifies for them?
+
+Read the actual spec files created and verify.
+
+### 3. Brick/Layer Validation
+- Do layer assignments make sense given dependencies?
+- Are there circular dependency risks?
+- Verify FORBIDDEN bricks exist in bricks.yaml
+
+### 4. Decorator Completeness
+- Are all functions/classes that implement specs listed?
+- Are all tests that verify specs listed?
+- Any obvious gaps in coverage?
+
+### 5. Internal Consistency
+- Do specs reference each other correctly?
+- Are brick units consistent with decorator locations?
+- Any contradictions between specs?
+
+## Output Format
+
+For each issue:
+- **Category**: [1-5]
+- **Type**: MECHANICAL | JUDGMENT
+- **Severity**: BLOCKER | WARNING | NOTE
+- **Issue**: [description]
+- **Evidence**: [what you found]
+- **Recommendation**: [what to do]
+
+MECHANICAL = Can be fixed by applying clear rules
+JUDGMENT = Requires architectural decision
+
+If no issues in a category, state "No issues found."
+```
+
+#### 9.3: Resolve Issues
+
+For each issue from the review:
+
+**MECHANICAL issues** — Fix autonomously:
+- Missing decorators → Add them
+- Incomplete spec coverage → Expand
+- Naming inconsistencies → Normalize
+- Missing brick units → Add them
+- Audit gaps → Run additional searches
+
+**JUDGMENT issues** — Apply Charter philosophy:
+1. Read `jig/Charter.md` section "Decision Philosophy"
+2. Enumerate the options
+3. Score each option against the decision heuristics
+4. Choose the option that wins on highest-priority heuristic
+5. Document which heuristic drove the decision
+
+**Escalate to human only if:**
+- Heuristics conflict (two point to different options with no clear winner)
+- Novel situation: no existing heuristic directly applies AND analogical reasoning from existing heuristics yields conflicting answers
+- Ambiguity in original SCOPE intent that affects architectural direction
+
+#### 9.4: Re-Review If Needed
+
+If changes affected ≥3 specs or any brick definitions, run another review pass. Maximum 2 re-review iterations - if still finding BLOCKERs after 2 passes, escalate to human.
+
+**Exit criteria:**
+- Review agent reports no BLOCKER issues, OR
+- Review agent reports no issues at all → proceed directly to human approval
+- All MECHANICAL issues resolved
+- All JUDGMENT issues resolved via Charter philosophy OR escalated with documented rationale
 
 ---
 
@@ -552,6 +660,37 @@ If SCOPE requested backwards compatibility:
 
 ---
 
+## Fresh Agent Review Summary
+
+(Populated during Step 9)
+
+### Review Findings
+
+| Category | Type | Severity | Issue | Resolution |
+|----------|------|----------|-------|------------|
+| <1-5> | MECHANICAL/JUDGMENT | BLOCKER/WARNING/NOTE | <issue> | <how resolved> |
+
+### Judgment Decisions
+
+For each JUDGMENT issue resolved using Charter philosophy:
+
+**Issue:** <description>
+**Options considered:**
+1. <option A>
+2. <option B>
+
+**Heuristic analysis:**
+| Heuristic | Option A | Option B |
+|-----------|----------|----------|
+| Conceptual clarity | ✅/❌ | ✅/❌ |
+| Documentation value | ✅/❌ | ✅/❌ |
+| Clean breaks | ✅/❌ | ✅/❌ |
+| Single responsibility | ✅/❌ | ✅/❌ |
+
+**Decision:** Option X, driven by <heuristic name>
+
+---
+
 ## Approval Checklist
 
 Before human approval:
@@ -562,6 +701,9 @@ Before human approval:
 - [ ] FORBIDDEN bricks identified
 - [ ] @jig decorator plan complete
 - [ ] Clean break actions specified (unless compat requested)
+- [ ] **Fresh Agent Review completed (Step 9)**
+- [ ] All MECHANICAL issues resolved
+- [ ] All JUDGMENT issues resolved via Charter philosophy OR escalated
 
 ---
 
@@ -827,6 +969,7 @@ jigy validate
    - Layer/Dependency Analysis
    - @jig Decorator Changes (ADD/REMOVE/MODIFY)
    - Clean Break Actions
+   - Fresh Agent Review Summary
 
 ### Validation State
 
@@ -843,16 +986,19 @@ After JIGPLAN creation, `jigy rebuild && jigy validate` must pass.
 - **Omit FORBIDDEN bricks** - Sub-agents need clear boundaries
 - **Write implementation details as specs** - Specs are evergreen behavior
 - **Add compatibility shims by default** - Clean break unless SCOPE requests
+- **Skip Fresh Agent Review** - Catches issues before human review
 
 ### MUST
 
+- **Read Charter Decision Philosophy** - Before making architectural choices
 - **Write O/S node files to disk** - Specs must exist for implementation
 - **Run jigy validate before submitting** - No broken references
 - **Audit existing O/S nodes first** - Prevent specification sprawl
 - **Identify FORBIDDEN bricks** - Protect foundation layers
 - **Validate layer constraints** - No upward dependencies
 - **Plan @jig decorator changes** - Enables JIG summary at end
-- **Get human approval** - JIGPLAN is the architectural gate
+- **Complete Fresh Agent Review** - Resolve issues before human sees it
+- **Apply Charter heuristics to JUDGMENT issues** - Don't escalate prematurely
 
 ### PREFER
 
@@ -860,11 +1006,13 @@ After JIGPLAN creation, `jigy rebuild && jigy validate` must pass.
 - **UPDATE over CREATE** - Extend existing specs
 - **DELETE obsolete specs** - Don't let dead specs accumulate
 - **Conservative FORBIDDEN list** - Protect more than less
+- **Autonomous resolution** - Use philosophy to decide, escalate only when stuck
 
 ---
 
 ## Version History
 
+- **2.0.0** (2026-01-08): Added Fresh Agent Review (Step 9). Agents must resolve MECHANICAL issues autonomously and apply Charter Decision Philosophy to JUDGMENT issues before escalating to human. Added Fresh Agent Review Summary section to template. Added scope check for abbreviated review on small JIGPLANs. Clarified "novel situation" definition. Added max iteration limit (2) on re-review loops.
 - **1.1.0** (2025-12-18): O/S nodes now written to disk during JIGPLAN (not just documented). Added Steps 5-7 for file creation, bricks.yaml update, and validation.
 - **1.0.2** (2025-12-18): Expanded Bricks and Layers with derived properties, when to create vs extend, layer assignment, FORBIDDEN per-scope
 - **1.0.1** (2025-12-18): Expanded evergreen O/S node guidance with full anti-patterns

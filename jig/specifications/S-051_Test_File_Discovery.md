@@ -1,0 +1,20 @@
+---
+id: S-051
+title: Test File Discovery
+type: specification
+outcomes: [O-018]
+---
+
+# Test File Discovery
+
+The verification graph discovers all test files following pytest conventions.
+
+**Acceptance Criteria:**
+- Discovers files matching `test_*.py` pattern in test directories
+- Discovers files matching `*_test.py` pattern in test directories
+- Default test directory is `tests/` relative to project root
+- Excludes `__pycache__/`, `.venv/`, `node_modules/` directories
+- Returns paths in deterministic alphabetical order
+- Discovery is purely static (no test execution required)
+
+**Rationale:** Test discovery is the foundation of verification tracking. Consistent patterns ensure all tests are included in alignment measurement.

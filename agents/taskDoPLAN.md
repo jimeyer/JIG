@@ -168,6 +168,13 @@ SCOPE → JIGPLAN → PLAN → [You Are Here: Orchestrated Execution]
    See: docs/wip/PLAN-<feature>.md → WU<N>"
    ```
 
+   **Commit Hash Recording:** Use "update-on-next-WU" pattern to avoid infinite loops:
+   - Current WU completion record uses placeholder: `**Commit:** (this commit)`
+   - When next WU starts, first action is update previous WU's hash
+   - Hash update gets committed as part of the next WU's work
+
+   This avoids the loop where updating the hash dirties the file, requiring another commit.
+
 7. **Write journal entry**
    - Synthesize sub-agent report into journal entry
    - Include sub-agent's "Notable" observations

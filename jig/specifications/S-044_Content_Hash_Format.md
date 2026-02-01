@@ -1,0 +1,17 @@
+---
+id: S-044
+title: Content Hash Format
+type: specification
+outcomes: [O-017]
+---
+
+# Content Hash Format
+
+All JIG content hashes use SHA-256 truncated to 12 hexadecimal characters.
+
+**Acceptance Criteria:**
+- Hash output is exactly 12 lowercase hex characters
+- Same input always produces same output (deterministic)
+- Hash computed from UTF-8 encoded content
+
+**Rationale:** 12 chars (~281 trillion values) provides negligible collision probability for change detection. Matches git short hash conventions for familiarity.

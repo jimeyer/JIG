@@ -1,0 +1,1650 @@
+---
+title: "Delta Harvest and Distillation System"
+type: exploration
+status: implemented
+decision: "Superseded by newer deliberation"
+created: 1763493911
+created_human: "2025-11-18 13:25 CST"
+parent: "[[J001_JIG-Concept-v4]]"
+children: []
+---
+# Delta Harvest and Distillation System
+
+**Date:** 2025-11-15
+**Status:** Proposal
+**Context:** Systematic extraction of latent Intent from temporal Delta documents and integration into the canonical Intent Graph (OSTC)
+
+---
+
+## Executive Summary
+
+**The Challenge:**
+Deltas contain valuable insights buried in narrative text. Without systematic extraction, this knowledge is lost when Deltas are archived or deleted.
+
+**The Solution:**
+A three-phase pipeline with clear division of labor:
+
+1. **EXTRACT** (deterministic) - Find marked insights in Deltas
+2. **SYNTHESIZE** (LLM-assisted) - Understand, categorize, and propose Intent changes
+3. **INTEGRATE** (human-approved) - Merge into Intent Graph with traceability
+
+**Key Insight:**
+Deterministic code is fast but dumb. LLMs are smart but need guardrails. Humans are wise but scarce. Design the pipeline to maximize each strength.
+
+---
+
+## 1. The Three-Phase Pipeline
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              DELTA HARVEST & DISTILLATION               │
+└─────────────────────────────────────────────────────────┘
+
+Phase 1: EXTRACT (deterministic, fast, reliable)
+┌──────────────────────────────────────────┐
+│ Input: Deltas (markdown files)           │
+│ Process: Pattern matching, parsing       │
+│ Output: Harvest Report (structured data) │
+│ Duration: <1 second                      │
+│ Human involvement: None                  │
+└──────────────────────────────────────────┘
+              ↓
+Phase 2: SYNTHESIZE (LLM-assisted, slow, creative)
+┌──────────────────────────────────────────┐
+│ Input: Harvest Report + Intent Graph     │
+│ Process: Understand, categorize, propose │
+│ Output: Synthesis Proposal (for review)  │
+│ Duration: 30-60 seconds                  │
+│ Human involvement: None (but auditable)  │
+└──────────────────────────────────────────┘
+              ↓
+Phase 3: INTEGRATE (human-approved, deterministic execution)
+┌──────────────────────────────────────────┐
+│ Input: Approved Synthesis Proposal       │
+│ Process: Update OSTC files, add links    │
+│ Output: Updated Intent Graph             │
+│ Duration: <1 second                      │
+│ Human involvement: APPROVAL REQUIRED     │
+└──────────────────────────────────────────┘
+```
+
+---
+
+## 2. Phase 1: EXTRACT (Deterministic Harvest)
+
+### 2.1 Objective
+
+**Find all marked insights with zero false negatives.**
+
+Deterministic extraction should be:
+- **Fast** - scan entire docs/ in <1 second
+- **Exhaustive** - find every marker, no guessing
+- **Structured** - output machine-readable format
+- **Traceable** - link every extraction back to source
+
+### 2.2 Marker Design
+
+**Design principle:** Make implicit knowledge explicit through structured markers.
+
+#### Primary Markers (Inline)
+
+```markdown
+# In Delta documents
+
+#VIB:Value "User input must win over periodic updates"
+#VIB:Intent "GUI update loop must not override pending user edits"
+#VIB:Behavior "Text box reverts to old value when Return pressed"
+#VIB:Gap "No lock preventing cache updates during user interaction"
+
+#OSTC:Outcome "GUI responds to user input within 30ms"
+#OSTC:Spec "Text input widget locks cache updates while focused"
+#OSTC:Test "test_user_input_priority_over_cache_update"
+#OSTC:Code "gui_builder.py:234-267 (text entry lock mechanism)"
+
+#DECISION:001 "Chose WebSocket over gRPC for simpler deployment"
+#DECISION:002 "Rejected shared memory due to GUI thread safety"
+
+#DISCOVERY:001 "OR-Set requires hashable elements, lists must be expanded"
+#DISCOVERY:002 "Gateway relay needs independent ELC ownership"
+
+#LEARNED:001 "Multi-process shutdown requires kill timeout > 2x cleanup time"
+#LEARNED:002 "AsyncIO event loops can't cross process boundaries"
+
+#RELATES:O-MP-001 "This work contributes to multiprocess scaling outcome"
+#IMPLEMENTS:S-PS-004 "Message structure specification"
+#TESTS:T-WS-012 "WebSocket reconnection test"
+```
+
+**Why inline markers?**
+- Easy to write during development
+- No context switching to separate files
+- Natural narrative flow preserved
+- Grep-friendly for validation
+
+#### Secondary Markers (YAML Frontmatter)
+
+```yaml
+---
+delta_type: plan
+branch: bike-echoform-relay
+base_commit: 6abdec3
+merge_commit: a37d344
+harvest_status: pending
+harvest_priority: high
+retention_tier: long-term
+ostc_nodes:
+  contributes: [O-MP-001, O-NW-003]
+  implements: [S-PS-004, S-WS-001]
+  tests: [T-WS-012, T-CRDT-045]
+decisions:
+  - id: D-001
+    title: "WebSocket vs gRPC"
+    choice: websocket
+    rationale: "Simpler deployment, no protobuf compilation"
+discoveries:
+  - "OR-Set elements must be hashable"
+  - "Gateway relay needs ELC ownership"
+learnings:
+  - "Shutdown timeout needs 2x cleanup time"
+---
+```
+
+**Why YAML frontmatter?**
+- Structured metadata
+- Machine-readable
+- Can be auto-generated by templates
+- Supports complex relationships
+
+#### Tertiary Markers (Structured Blocks)
+
+````markdown
+```discovery
+**What:** OR-Set crashes when receiving list values
+**Where:** bike_echoform_replicator.py:342
+**Why:** Lists are unhashable, can't be set elements
+**Fix:** Expand list to N add operations (one per item)
+**OSTC:**
+  - Gap: No test for list-valued or_set elements
+  - Spec: OR-Set elements MUST be hashable
+```
+
+```decision
+**Question:** How to handle multi-device communication?
+**Options:**
+  1. Threading (rejected - GIL bottleneck)
+  2. AsyncIO single process (rejected - still serialized)
+  3. Multi-process + shared memory (rejected - GUI thread safety)
+  4. Multi-process + WebSocket (CHOSEN)
+**Rationale:** WebSocket bypasses GIL, enables true parallelism
+**Tradeoffs:** Process management complexity, graceful shutdown harder
+**Commitment:** Production architecture, no reverting
+```
+
+```learning
+**Context:** Implementing graceful multiprocess shutdown
+**What we thought:** 500ms timeout would be enough
+**What we learned:** Cleanup takes 1-2 seconds with 14 devices
+**Why:** Each device GUI needs event loop drain + WebSocket close
+**Pattern:** Shutdown timeout = N × max_cleanup_time + margin
+**Applied to:** launcher.py:456 (timeout = 14 × 200ms + 1000ms)
+```
+````
+
+**Why structured blocks?**
+- Rich context capture
+- Template-friendly
+- LLM can parse semantic structure
+- Human-readable and writable
+
+### 2.3 Extraction Algorithm
+
+```python
+# Pseudo-code for deterministic extraction
+
+def extract_deltas(delta_dir: Path) -> HarvestReport:
+    report = HarvestReport()
+
+    # Find all Delta markdown files
+    for delta_file in delta_dir.glob("**/*.md"):
+        content = delta_file.read_text()
+
+        # Extract YAML frontmatter
+        if frontmatter := parse_yaml_frontmatter(content):
+            report.add_frontmatter(delta_file, frontmatter)
+
+        # Extract inline markers (regex)
+        for match in re.finditer(r'#(VIB|OSTC|DECISION|DISCOVERY|LEARNED):(\S+)\s+"([^"]+)"', content):
+            marker_type, marker_id, text = match.groups()
+            line_num = content[:match.start()].count('\n') + 1
+            report.add_marker(
+                file=delta_file,
+                line=line_num,
+                type=marker_type,
+                id=marker_id,
+                text=text
+            )
+
+        # Extract structured blocks (code fence parsing)
+        for block_type in ['discovery', 'decision', 'learning']:
+            for block in extract_code_blocks(content, lang=block_type):
+                parsed = parse_structured_block(block.text, block_type)
+                report.add_block(
+                    file=delta_file,
+                    line=block.line_num,
+                    type=block_type,
+                    content=parsed
+                )
+
+        # Extract OSTC references
+        for match in re.finditer(r'#(RELATES|IMPLEMENTS|TESTS):(\S+)', content):
+            rel_type, node_id = match.groups()
+            report.add_reference(
+                file=delta_file,
+                relation=rel_type,
+                node_id=node_id
+            )
+
+    return report
+```
+
+### 2.4 Harvest Report Format
+
+```yaml
+# harvest-report-2025-11-15.yaml
+
+metadata:
+  timestamp: 2025-11-15T14:32:00Z
+  delta_dir: docs/wip/bike-echoform-relay/
+  file_count: 8
+  marker_count: 47
+  decision_count: 12
+  discovery_count: 23
+  learning_count: 8
+
+markers:
+  - file: docs/wip/PLAN_BikeEchoform_Relay.md
+    line: 234
+    type: VIB
+    subtype: Value
+    text: "User input must win over periodic updates"
+    harvest_status: pending
+
+  - file: docs/wip/ANALYSIS_CRDT_Relay_Issues.md
+    line: 67
+    type: DISCOVERY
+    id: "001"
+    text: "OR-Set requires hashable elements"
+    harvest_status: pending
+
+decisions:
+  - id: D-001
+    file: docs/wip/RETROSPECTIVE_multiprocess.md
+    line: 145
+    title: "WebSocket vs gRPC"
+    choice: websocket
+    rationale: "Simpler deployment, no protobuf compilation"
+    alternatives: [threading, asyncio, grpc]
+    tradeoffs:
+      pros: [simple, portable, browser-compatible]
+      cons: [process-management-complexity, shutdown-complexity]
+    harvest_status: pending
+
+discoveries:
+  - id: DISC-001
+    file: docs/wip/PLAN_Operations_Future_State.md
+    line: 342
+    what: "OR-Set crashes when receiving list values"
+    where: "bike_echoform_replicator.py:342"
+    why: "Lists are unhashable"
+    fix: "Expand to N add operations"
+    ostc_gap: "No test for list-valued or_set elements"
+    ostc_spec: "OR-Set elements MUST be hashable"
+    harvest_status: pending
+
+learnings:
+  - id: LEARN-001
+    file: docs/wip/RETROSPECTIVE_multiprocess.md
+    line: 567
+    context: "Graceful multiprocess shutdown"
+    assumption: "500ms timeout sufficient"
+    reality: "1-2 seconds needed with 14 devices"
+    reason: "GUI event loop drain + WebSocket close"
+    pattern: "timeout = N × max_cleanup_time + margin"
+    applied_to: "launcher.py:456"
+    harvest_status: pending
+
+references:
+  - from_file: docs/wip/PLAN_BikeEchoform_Relay.md
+    line: 23
+    relation: IMPLEMENTS
+    to_node: S-PS-004
+
+  - from_file: docs/wip/WU7_COMPLETION.md
+    line: 89
+    relation: TESTS
+    to_node: T-WS-012
+
+statistics:
+  vib_values: 12
+  vib_intents: 8
+  vib_behaviors: 15
+  vib_gaps: 11
+  ostc_outcomes: 5
+  ostc_specs: 18
+  ostc_tests: 14
+  ostc_code: 9
+  unclassified_markers: 2  # Requires review
+
+validation:
+  malformed_markers: []
+  orphaned_references: [O-BOGUS-001]  # References non-existent node
+  duplicate_ids: []
+  warnings:
+    - "File X has no harvest markers (intentional?)"
+```
+
+### 2.5 Extraction Tool Interface
+
+```bash
+# Extract from specific branch
+jigy extract --branch bike-echoform-relay --output harvest-report.yaml
+
+# Extract from all pending work
+jigy extract --all-wip --output harvest-all.yaml
+
+# Extract and validate references
+jigy extract --validate --check-ostc-refs
+
+# Dry run (show what would be extracted)
+jigy extract --dry-run --verbose
+
+# Extract specific marker types only
+jigy extract --types VIB,DISCOVERY --branch current
+
+# Output formats
+jigy extract --format yaml   # Machine-readable
+jigy extract --format md     # Human-readable report
+jigy extract --format json   # API integration
+```
+
+---
+
+## 3. Phase 2: SYNTHESIZE (LLM-Assisted Intelligence)
+
+### 3.1 Objective
+
+**Transform raw extractions into actionable Intent Graph updates.**
+
+LLM synthesis should:
+- **Understand context** - read narrative, not just markers
+- **Categorize** - determine OSTC node type (O/S/T/C)
+- **Deduplicate** - merge similar discoveries
+- **Relate** - find connections to existing Intent
+- **Propose** - suggest specific Intent Graph changes
+
+### 3.2 Why LLM (Not Deterministic Code)?
+
+**Capabilities only LLMs have:**
+
+1. **Semantic Understanding**
+   - "User input must win" → this is about interaction priorities → relates to GUI responsiveness
+   - Code can't infer this connection
+
+2. **Contextual Synthesis**
+   - Discovery A + Discovery B + Learning C = new architectural pattern
+   - Code can't recognize emergent patterns
+
+3. **Abstraction Level**
+   - "OR-Set crashes on lists" is implementation detail
+   - Abstract to: "CRDT operations must validate input types"
+   - Code can't elevate abstraction
+
+4. **Conflict Detection**
+   - New discovery contradicts existing Spec S-042
+   - LLM can identify semantic conflicts, not just text matches
+
+5. **Quality Improvement**
+   - Informal: "this is broken because lists don't work"
+   - Formal: "OR-Set requires hashable elements (RFC-style)"
+   - Code can't rewrite for clarity
+
+### 3.3 LLM Synthesis Prompt Template
+
+```markdown
+# SYSTEM PROMPT: Delta Synthesis for Intent Graph
+
+You are a software architect analyzing development artifacts to extract
+canonical knowledge into a structured Intent Graph (OSTC model).
+
+## Your Task
+Given a Harvest Report from temporal Delta documents, propose updates to
+the Intent Graph following these principles:
+
+1. **Elevate Abstraction**: Extract timeless principles, not temporal details
+2. **Formalize Language**: Convert informal discoveries to precise specifications
+3. **Detect Patterns**: Identify emergent architectural principles
+4. **Preserve Traceability**: Link every Intent node back to Delta source
+5. **Check Conflicts**: Flag contradictions with existing Intent
+
+## OSTC Node Types
+
+**Outcome (O-*)**: Business value or system property
+- Testable, measurable goal
+- Example: "O-MP-001: ASE scales to 30+ devices with <30ms GUI response"
+
+**Specification (S-*)**: Technical requirement or design decision
+- Precise, unambiguous constraint
+- Example: "S-PS-004: Message structure uses ELC for total ordering"
+
+**Test (T-*)**: Verification method
+- Automated test or acceptance criteria
+- Example: "T-WS-012: WebSocket reconnection recovers within 100ms"
+
+**Code (C-*)**: Implementation artifact
+- File path, function, module
+- Example: "C-PS-001: protocol/elc.py:EraLamportClock"
+
+## Input Format
+You will receive a Harvest Report (YAML) containing:
+- Markers: VIB, OSTC, DECISION, DISCOVERY, LEARNED
+- Structured blocks with rich context
+- References to existing OSTC nodes
+
+## Output Format
+Produce a Synthesis Proposal (YAML) containing:
+
+```yaml
+synthesis:
+  new_nodes:
+    - id: S-CRDT-042
+      type: specification
+      title: "CRDT operations validate input types"
+      content: |
+        All CRDT operation handlers MUST validate input types before processing.
+        OR-Set elements MUST be hashable (str, int, tuple).
+        Lists MUST be expanded to individual add operations.
+      source_deltas:
+        - file: docs/wip/ANALYSIS_CRDT_Relay.md
+          line: 67
+          marker: DISCOVERY:001
+      subsystem: crdt
+      priority: high
+
+    - id: O-GUI-003
+      type: outcome
+      title: "User input has priority over system updates"
+      content: |
+        When user is editing a value, system background updates MUST NOT
+        override the user's changes. User input wins all races.
+      source_deltas:
+        - file: docs/wip/PLAN_GUI_Race.md
+          line: 234
+          marker: VIB:Value
+      value_statement: "Prevents user frustration from lost edits"
+      subsystem: gui
+      priority: critical
+
+  modified_nodes:
+    - id: S-PS-004
+      action: extend
+      addition: |
+        Message timestamps use EraLamportClock for total ordering.
+        See ADR-027 for ELC ownership patterns in multi-actor systems.
+      rationale: "Delta work discovered ELC ownership as critical pattern"
+      source_delta: docs/wip/RETROSPECTIVE_multiprocess.md:456
+
+  new_relationships:
+    - from: S-CRDT-042
+      to: S-PS-004
+      relation: depends_on
+      rationale: "CRDT operations use Message timestamps for ordering"
+
+    - from: O-GUI-003
+      to: S-GUI-012
+      relation: requires
+      rationale: "Outcome requires input locking specification"
+
+  decisions_to_adr:
+    - id: D-001
+      title: "WebSocket vs gRPC for device communication"
+      adr_id: ADR-028
+      status: accepted
+      decision: "Use WebSocket for multi-device communication"
+      rationale: |
+        Simpler deployment (no protobuf), browser-compatible,
+        Python async ecosystem mature.
+      consequences:
+        positive:
+          - No compilation step
+          - Browser/mobile clients easy
+          - Debugging simple (text protocol)
+        negative:
+          - Process management complexity
+          - Graceful shutdown harder
+      source_delta: docs/wip/RETROSPECTIVE_multiprocess.md:145
+
+  conflicts:
+    - existing_node: S-CRDT-012
+      proposed_node: S-CRDT-042
+      conflict_type: semantic_contradiction
+      existing_says: "CRDT operations accept any Python type"
+      proposed_says: "CRDT operations validate types, reject lists"
+      resolution_needed: human_review
+      recommendation: "Update S-CRDT-012 to include type constraints"
+
+  patterns_discovered:
+    - name: "ELC Ownership Pattern"
+      description: |
+        In multi-actor CRDT systems, actors (Store, Relay) own ELC instances.
+        Data structures (CRDT) accept timestamps as parameters.
+        This separates identity generation from state merge.
+      evidence:
+        - docs/wip/ANALYSIS_CRDT_Relay.md:89 (relay crash on missing ELC)
+        - docs/OSTC_DISCOVERIES.md:12 (ADR scope ambiguity)
+      recommendation: "Create pattern document in docs/architecture/PATTERNS/"
+
+    - name: "User Input Priority Pattern"
+      description: |
+        GUI widgets must lock external updates while user has focus.
+        Lock acquired on focus, released on blur/commit.
+        Prevents race conditions between user edits and system updates.
+      evidence:
+        - docs/wip/PLAN_GUI_Race.md:234
+        - docs/VIB_DISCOVERIES.md:71
+      recommendation: "Add to GUI design guidelines"
+
+  harvest_quality:
+    well_documented: 42  # Markers with sufficient context
+    needs_clarification: 5  # Vague markers
+    orphaned: 2  # No clear OSTC mapping
+
+  questions_for_human:
+    - "Discovery DISC-003 suggests caching strategy change.
+       Is this important enough for Intent Graph or implementation detail?"
+    - "Learning LEARN-007 about shutdown timeout is very specific.
+       Abstract to general pattern or keep as code comment?"
+    - "VIB:Value about 'smooth animations' is qualitative.
+       How to make this measurable for Outcome node?"
+```
+
+### 3.4 LLM Synthesis Workflow
+
+```python
+# Pseudo-code for LLM synthesis
+
+def synthesize_harvest(harvest_report: HarvestReport, intent_graph: IntentGraph) -> SynthesisProposal:
+    # Load existing Intent Graph for context
+    ostc_context = intent_graph.to_context_string()
+
+    # Build LLM prompt
+    prompt = f"""
+    {SYNTHESIS_SYSTEM_PROMPT}
+
+    ## Existing Intent Graph Summary
+    {ostc_context}
+
+    ## Harvest Report to Synthesize
+    {harvest_report.to_yaml()}
+
+    Propose Intent Graph updates following the output format.
+    """
+
+    # Call LLM (with structured output)
+    response = llm.complete(
+        prompt=prompt,
+        model="claude-sonnet-4.5",
+        temperature=0.1,  # Low temp for consistency
+        max_tokens=8000,
+        response_format=SynthesisProposal  # Structured output
+    )
+
+    # Parse and validate
+    proposal = SynthesisProposal.from_yaml(response.content)
+    proposal.validate()  # Check IDs, references, structure
+
+    return proposal
+```
+
+### 3.5 Synthesis Tool Interface
+
+```bash
+# Synthesize from harvest report
+jigy synthesize --harvest harvest-report.yaml --output synthesis-proposal.yaml
+
+# Interactive synthesis with review
+jigy synthesize --harvest harvest-report.yaml --interactive
+
+# Synthesize with specific intent context
+jigy synthesize --harvest harvest-report.yaml --context .jig/
+
+# Dry run (show what LLM would propose)
+jigy synthesize --dry-run --verbose
+
+# Re-synthesize with different abstraction level
+jigy synthesize --harvest harvest-report.yaml --abstraction high
+
+# Synthesize and auto-apply low-risk changes
+jigy synthesize --auto-apply --risk-level low
+```
+
+---
+
+## 4. Phase 3: INTEGRATE (Human-Approved Execution)
+
+### 4.1 Objective
+
+**Merge approved synthesis into Intent Graph with full traceability.**
+
+Integration should:
+- **Require approval** - human reviews synthesis proposal
+- **Execute deterministically** - no surprises in file updates
+- **Maintain traceability** - bidirectional links Delta ↔ Intent
+- **Validate consistency** - run alignment checks
+- **Generate changelog** - document what changed
+
+### 4.2 Human Review Interface
+
+```bash
+# Review synthesis proposal (interactive TUI)
+jigy integrate --proposal synthesis-proposal.yaml --review
+
+# Terminal UI shows:
+┌─────────────────────────────────────────────────────────┐
+│           Synthesis Proposal Review                      │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│ [1/15] New Node: S-CRDT-042                             │
+│                                                          │
+│ Title: CRDT operations validate input types             │
+│ Type: Specification                                     │
+│ Subsystem: crdt                                         │
+│ Priority: high                                          │
+│                                                          │
+│ Content:                                                │
+│   All CRDT operation handlers MUST validate input       │
+│   types before processing. OR-Set elements MUST be      │
+│   hashable (str, int, tuple). Lists MUST be expanded    │
+│   to individual add operations.                         │
+│                                                          │
+│ Source: docs/wip/ANALYSIS_CRDT_Relay.md:67             │
+│ Marker: DISCOVERY:001                                   │
+│                                                          │
+│ Actions:                                                │
+│   [A]pprove   [E]dit   [S]kip   [R]eject   [Q]uit      │
+│                                                          │
+│ > _                                                     │
+└─────────────────────────────────────────────────────────┘
+
+# Batch approve low-risk changes
+jigy integrate --proposal synthesis-proposal.yaml --auto-approve new_nodes
+
+# Review only conflicts and high-priority
+jigy integrate --proposal synthesis-proposal.yaml --filter conflicts,high-priority
+
+# Export to PR for team review
+jigy integrate --proposal synthesis-proposal.yaml --export-pr
+```
+
+### 4.3 Integration Actions
+
+**For each approved change:**
+
+1. **Create/Update OSTC Files**
+   ```bash
+   # New Outcome
+   .jig/outcomes/O-GUI-003.md created
+
+   # New Specification
+   .jig/specifications/S-CRDT-042.md created
+
+   # Modified Specification
+   .jig/specifications/S-PS-004.md updated (section appended)
+   ```
+
+2. **Add Traceability Links**
+   ```yaml
+   # In .jig/specifications/S-CRDT-042.md frontmatter
+   ---
+   id: S-CRDT-042
+   type: specification
+   title: "CRDT operations validate input types"
+   subsystem: crdt
+   source_deltas:
+     - file: docs/wip/ANALYSIS_CRDT_Relay.md
+       line: 67
+       marker: DISCOVERY:001
+       commit: a37d344
+       branch: bike-echoform-relay
+   created: 2025-11-15T14:45:00Z
+   author: harvest-synthesis
+   ---
+   ```
+
+3. **Create Reverse Links**
+   ```yaml
+   # In docs/wip/ANALYSIS_CRDT_Relay.md (annotation)
+   <!-- @jig-harvested
+   line: 67
+   marker: DISCOVERY:001
+   integrated_to: S-CRDT-042
+   date: 2025-11-15
+   -->
+
+   #DISCOVERY:001 "OR-Set requires hashable elements"
+   ```
+
+4. **Update Intent Graph Index**
+   ```yaml
+   # .jig/graph-index.yaml
+   nodes:
+     S-CRDT-042:
+       file: .jig/specifications/S-CRDT-042.md
+       type: specification
+       subsystem: crdt
+       edges:
+         depends_on: [S-PS-004]
+         source_deltas:
+           - docs/wip/ANALYSIS_CRDT_Relay.md:67
+   ```
+
+5. **Generate ADRs for Decisions**
+   ```bash
+   # Create ADR from decision in synthesis
+   docs/architecture/ADR-028-websocket-vs-grpc.md created
+
+   # ADR links back to Delta
+   ## Context
+   During multiprocess architecture refactor (branch: multiprocess-websocket),
+   we evaluated communication mechanisms for 14+ concurrent device processes.
+
+   See: docs/done/multiprocess-websocket/RETROSPECTIVE.md:145
+   ```
+
+6. **Run Validation**
+   ```bash
+   # After integration, validate Intent Graph
+   jigy validate --check-all
+
+   # Checks:
+   ✓ All OSTC references valid
+   ✓ No orphaned nodes
+   ✓ Subsystem boundaries respected
+   ✓ No circular dependencies
+   ✗ S-CRDT-042 missing test reference (warning)
+   ```
+
+### 4.4 Integration Changelog
+
+```yaml
+# integration-changelog-2025-11-15.yaml
+
+integration:
+  timestamp: 2025-11-15T14:45:00Z
+  synthesis_proposal: synthesis-proposal-2025-11-15.yaml
+  harvest_report: harvest-report-2025-11-15.yaml
+  delta_branch: bike-echoform-relay
+
+  changes:
+    new_outcomes: 2
+    new_specifications: 5
+    new_tests: 3
+    new_code_refs: 8
+    modified_nodes: 3
+    new_edges: 12
+    new_adrs: 1
+
+  nodes_created:
+    - O-GUI-003: "User input has priority over system updates"
+    - O-CRDT-005: "Multi-actor CRDT sync maintains consistency"
+    - S-CRDT-042: "CRDT operations validate input types"
+    - S-CRDT-043: "OR-Set elements must be hashable"
+    - S-ELC-001: "Actors own ELC instances, data accepts timestamps"
+    - T-CRDT-089: "test_or_set_rejects_list_elements"
+    - T-CRDT-090: "test_relay_expands_list_to_add_operations"
+
+  nodes_modified:
+    - S-PS-004: Appended ELC ownership pattern reference
+    - C-CRDT-012: Updated with type validation code
+
+  adrs_created:
+    - ADR-028: "WebSocket vs gRPC for device communication"
+
+  patterns_documented:
+    - docs/architecture/PATTERNS/ELC_Ownership_Pattern.md
+    - docs/architecture/PATTERNS/User_Input_Priority.md
+
+  traceability:
+    delta_to_intent_links: 23
+    intent_to_delta_links: 23
+    orphaned_markers: 2  # Skipped as not Intent-worthy
+
+  warnings:
+    - "S-CRDT-042 has no test reference (TODO: add test)"
+    - "Pattern ELC_Ownership should reference existing ADR-015"
+
+  files_modified:
+    - .jig/outcomes/O-GUI-003.md (created)
+    - .jig/outcomes/O-CRDT-005.md (created)
+    - .jig/specifications/S-CRDT-042.md (created)
+    - .jig/specifications/S-CRDT-043.md (created)
+    - .jig/specifications/S-ELC-001.md (created)
+    - .jig/specifications/S-PS-004.md (modified)
+    - .jig/tests/T-CRDT-089.md (created)
+    - .jig/graph-index.yaml (updated)
+    - docs/architecture/ADR-028-websocket-vs-grpc.md (created)
+    - docs/architecture/PATTERNS/ELC_Ownership_Pattern.md (created)
+```
+
+### 4.5 Integration Tool Interface
+
+```bash
+# Integrate approved synthesis
+jigy integrate --proposal synthesis-proposal.yaml --approve all
+
+# Selective integration
+jigy integrate --proposal synthesis-proposal.yaml --approve new_nodes --skip modifications
+
+# Dry run (show what would change)
+jigy integrate --proposal synthesis-proposal.yaml --dry-run --verbose
+
+# Generate PR for team review before integration
+jigy integrate --proposal synthesis-proposal.yaml --create-pr
+
+# Integrate with custom commit message
+jigy integrate --proposal synthesis-proposal.yaml --message "Harvest from bike-echoform-relay branch"
+
+# Integration with validation gates
+jigy integrate --proposal synthesis-proposal.yaml --require-tests --require-subsystem
+```
+
+---
+
+## 5. Division of Labor: Deterministic vs LLM vs Human
+
+### 5.1 Deterministic Code (Fast, Reliable)
+
+**Responsibilities:**
+- Extract markers from Delta files (regex, parsing)
+- Validate marker syntax
+- Build reference graphs
+- Check ID uniqueness
+- Generate harvest reports (YAML/JSON)
+- Update Intent Graph files
+- Create bidirectional links
+- Run alignment validation
+- Generate changelogs
+
+**Why deterministic:**
+- Zero false negatives (finds every marker)
+- Fast (<1 second for 1000 files)
+- Reproducible (same input = same output)
+- No hallucination risk
+- Can run in CI/CD
+- Generates machine-readable output
+
+**Tool boundaries:**
+- Stop at: understanding narrative context
+- Stop at: categorizing by semantic meaning
+- Stop at: resolving ambiguity
+
+### 5.2 LLM (Smart, Creative)
+
+**Responsibilities:**
+- Read narrative context around markers
+- Understand semantic relationships
+- Categorize discoveries into OSTC types
+- Elevate abstraction level
+- Detect patterns across multiple Deltas
+- Identify conflicts with existing Intent
+- Suggest node relationships
+- Draft formal specification language
+- Propose architectural patterns
+- Ask clarifying questions
+
+**Why LLM:**
+- Semantic understanding of unstructured text
+- Can infer implicit relationships
+- Recognizes patterns humans miss
+- Elevates implementation details to principles
+- Translates informal → formal language
+- Handles ambiguity and context
+
+**Tool boundaries:**
+- Stop at: making final decisions
+- Stop at: executing file modifications
+- Stop at: determining business priority
+
+### 5.3 Human (Wise, Scarce)
+
+**Responsibilities:**
+- Decide what's Intent-worthy vs ephemeral
+- Determine business priority (critical/high/low)
+- Resolve conflicts between discoveries
+- Approve/reject synthesis proposals
+- Provide clarification when LLM is uncertain
+- Set abstraction level preferences
+- Define subsystem boundaries
+- Gate integration into canonical Intent
+
+**Why human:**
+- Understands business context LLM lacks
+- Makes value judgments (important vs noise)
+- Resolves semantic conflicts
+- Applies organizational knowledge
+- Accountable for Intent Graph quality
+
+**Tool boundaries:**
+- Avoid: tedious extraction (let code do it)
+- Avoid: reading every Delta in full (let LLM summarize)
+- Avoid: manual file updates (let code execute)
+
+### 5.4 Decision Matrix
+
+| Task | Deterministic | LLM | Human |
+|------|---------------|-----|-------|
+| Find `#VIB:` markers | ✅ | ❌ | ❌ |
+| Understand "user input must win" | ❌ | ✅ | ❌ |
+| Decide if it's Intent-worthy | ❌ | 🟡 suggest | ✅ approve |
+| Categorize as O/S/T/C | ❌ | ✅ | 🟡 review |
+| Find related OSTC nodes | 🟡 text match | ✅ semantic | ❌ |
+| Draft formal specification | ❌ | ✅ | 🟡 edit |
+| Approve for integration | ❌ | ❌ | ✅ |
+| Update OSTC files | ✅ | ❌ | ❌ |
+| Validate references | ✅ | 🟡 semantic | ❌ |
+| Set business priority | ❌ | 🟡 suggest | ✅ |
+
+**Legend:** ✅ Primary, 🟡 Assist, ❌ Not suitable
+
+---
+
+## 6. The Integration Verb: "Distill"
+
+### 6.1 Why "Distill"?
+
+The process of moving insights from Deltas to Intent is best described as **distillation**:
+
+```
+Raw Deltas (large volume, mixed quality, temporal context)
+         ↓ heat (extraction + synthesis)
+Distilled Intent (concentrated, pure, timeless essence)
+```
+
+**Distillation captures:**
+1. **Volume reduction** - 100 pages of Deltas → 5 OSTC nodes
+2. **Purification** - remove temporal context, keep universal truth
+3. **Concentration** - strengthen weak informal statements into formal specs
+4. **Separation** - wheat (Intent) from chaff (scaffolding)
+
+**Alternative verbs considered:**
+- Extract → too mechanical, doesn't capture transformation
+- Synthesize → too vague, could mean many things
+- Integrate → describes final step, not full process
+- Crystallize → poetic but unclear
+- Refine → good but less precise than distill
+
+**Proposal: Use "Distill" as the primary verb**
+
+```bash
+# Full pipeline
+jigy distill --branch bike-echoform-relay
+
+# Equivalent to:
+jigy extract --branch bike-echoform-relay --output harvest.yaml
+jigy synthesize --harvest harvest.yaml --output synthesis.yaml
+jigy integrate --synthesis synthesis.yaml --review
+```
+
+### 6.2 Distillation Quality Metrics
+
+**How to measure distillation effectiveness:**
+
+```yaml
+distillation_metrics:
+  # Volume metrics
+  deltas_processed: 8 files, 12,450 lines
+  markers_found: 47
+  intent_nodes_created: 12
+  compression_ratio: 1000:1  # 1000 lines → 1 OSTC node
+
+  # Quality metrics
+  well_formed_markers: 42 / 47 (89%)
+  successfully_categorized: 38 / 42 (90%)
+  required_human_clarification: 4 / 42 (10%)
+  conflicts_detected: 2
+  patterns_discovered: 2
+
+  # Coverage metrics
+  deltas_with_markers: 8 / 8 (100%)
+  markers_harvested: 42 / 47 (89%)
+  markers_integrated: 38 / 42 (90%)
+  markers_rejected: 4 / 42 (10%)
+  markers_orphaned: 5 (not Intent-worthy)
+
+  # Traceability metrics
+  delta_to_intent_links: 38
+  intent_to_delta_links: 38
+  bidirectional_coverage: 100%
+
+  # Outcome metrics
+  new_outcomes: 2
+  new_specifications: 5
+  new_tests: 3
+  new_patterns: 2
+  new_adrs: 1
+```
+
+---
+
+## 7. Practical Workflows
+
+### 7.1 Workflow 1: Continuous Harvest (During Development)
+
+**Goal:** Capture insights immediately, don't wait for branch completion.
+
+```bash
+# Developer adds discovery to Delta
+echo '#DISCOVERY:042 "Widget factory needs lazy initialization"' >> PLAN.md
+
+# Immediately harvest to staging area
+jigy distill --incremental --delta PLAN.md --stage
+
+# Staging area accumulates discoveries
+# .jig/staging/discoveries.yaml grows
+
+# At branch completion
+jigy distill --from-staging --review --integrate
+```
+
+**Benefits:**
+- No forgetting (capture insight when fresh)
+- Small batches (easier review)
+- Continuous feedback (LLM suggests improvements)
+
+### 7.2 Workflow 2: Batch Harvest (Branch Completion)
+
+**Goal:** Process all Deltas when branch merges.
+
+```bash
+# Branch ready to merge
+git checkout bike-echoform-relay
+
+# Run full distillation pipeline
+jigy distill --branch bike-echoform-relay --output distillation-report.md
+
+# Review in one session
+jigy integrate --proposal synthesis-proposal.yaml --review
+
+# Approve and merge
+jigy integrate --approve all --commit "Distill insights from bike-echoform-relay"
+git add .jig/ docs/
+git commit -m "Harvest: bike-echoform-relay → Intent Graph"
+
+# Archive Deltas
+jigy delta archive --branch bike-echoform-relay --retention long-term
+```
+
+**Benefits:**
+- Single review session
+- Full context (all discoveries together)
+- Clean merge (Intent + Code together)
+
+### 7.3 Workflow 3: Assisted Authoring (Proactive)
+
+**Goal:** LLM helps write better Deltas that harvest cleanly.
+
+```bash
+# Start new work
+jigy delta new --type plan --branch new-feature
+
+# LLM generates Delta template with marker placeholders
+# Developer fills in, LLM validates
+
+# Real-time harvest preview
+jigy distill --preview --delta PLAN.md
+
+# Shows what OSTC nodes would be created
+# Developer adjusts markers for better harvest
+```
+
+**Benefits:**
+- Higher quality markers (LLM-assisted)
+- Preview before commit (catch issues early)
+- Learning feedback (developer improves marker usage)
+
+### 7.4 Workflow 4: Retrospective Mining (Archaeological)
+
+**Goal:** Extract value from old Deltas not originally marked.
+
+```bash
+# Find old Deltas without harvest
+jigy delta audit --unharvested --age ">6 months"
+
+# LLM scans for implicit discoveries
+jigy distill --retroactive --deltas docs/done/old-work/* --confidence high
+
+# Review suggestions
+jigy integrate --proposal synthesis-proposal.yaml --filter confidence:high
+
+# Selective integration
+jigy integrate --approve-selected [1,4,7,12]
+```
+
+**Benefits:**
+- Recover lost knowledge
+- Clean up old work
+- Improve future harvest
+
+---
+
+## 8. Marker Design Guidelines
+
+### 8.1 Principles for Good Markers
+
+**1. Explicit over implicit**
+```markdown
+❌ "This is important" (vague)
+✅ #VIB:Value "User input must win over periodic updates" (specific)
+```
+
+**2. Atomic over compound**
+```markdown
+❌ #DISCOVERY:001 "OR-Set crashes on lists and dicts need special handling"
+✅ #DISCOVERY:001 "OR-Set crashes when receiving list values"
+✅ #DISCOVERY:002 "Dictionary values in CRDT need serialization handling"
+```
+
+**3. Formal over casual**
+```markdown
+❌ "We should probably validate inputs"
+✅ #OSTC:Spec "CRDT operations MUST validate input types before processing"
+```
+
+**4. Linked over isolated**
+```markdown
+❌ #DISCOVERY:001 "Shutdown timeout too short"
+✅ #DISCOVERY:001 "Shutdown timeout too short" #RELATES:O-MP-001
+```
+
+**5. Traceable over anonymous**
+```markdown
+❌ "This doesn't work" (no location)
+✅ #DISCOVERY:001 "OR-Set crashes" @bike_echoform_replicator.py:342
+```
+
+### 8.2 Marker Templates
+
+**Discovery Template:**
+```markdown
+#DISCOVERY:{id} "{one-line summary}"
+**What:** {detailed description}
+**Where:** {file:line or component}
+**Why:** {root cause}
+**Impact:** {user/system impact}
+**Fix:** {solution or workaround}
+**OSTC:**
+  - Gap: {missing test/spec}
+  - Spec: {required specification}
+  - Code: {implementation location}
+#RELATES:{existing-ostc-nodes}
+```
+
+**Decision Template:**
+```markdown
+#DECISION:{id} "{question decided}"
+**Options:**
+  1. {option A} (rejected - {reason})
+  2. {option B} (rejected - {reason})
+  3. {option C} (CHOSEN - {reason})
+**Rationale:** {why this choice}
+**Tradeoffs:**
+  - Pros: {benefits}
+  - Cons: {costs}
+**Commitment:** {irreversible or experimental}
+#RELATES:{ostc-outcomes-enabled}
+```
+
+**Learning Template:**
+```markdown
+#LEARNED:{id} "{pattern discovered}"
+**Context:** {what were we doing}
+**Assumption:** {what we thought}
+**Reality:** {what we learned}
+**Why:** {explanation}
+**Pattern:** {generalizable principle}
+**Applied:** {where we used this}
+#RELATES:{ostc-specs-updated}
+```
+
+**VIB Template:**
+```markdown
+#VIB:Value "{value statement}"
+#VIB:Intent "{design intent}"
+#VIB:Behavior "{observed behavior}"
+#VIB:Gap "{missing requirement}"
+```
+
+### 8.3 Marker Linting
+
+```bash
+# Check marker quality
+jigy lint --deltas docs/wip/current-branch/
+
+# Checks for:
+# - Malformed markers (syntax errors)
+# - Orphaned references (refers to non-existent OSTC nodes)
+# - Duplicate IDs (multiple markers with same ID)
+# - Missing templates (discovery without "What/Why/Fix")
+# - Vague language ("maybe", "should", "probably")
+# - Missing traceability (no RELATES/IMPLEMENTS)
+
+# Output:
+docs/wip/PLAN.md:45: Warning: Vague language in #DISCOVERY:003 ("probably")
+docs/wip/PLAN.md:67: Error: #RELATES:O-BOGUS-001 references non-existent node
+docs/wip/ANALYSIS.md:123: Warning: #DECISION:005 missing rationale
+```
+
+---
+
+## 9. Tooling Architecture
+
+### 9.1 Tool Components
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   jigy distill                          │
+│               (Orchestrator / CLI)                      │
+└─────────────────────────────────────────────────────────┘
+                         │
+         ┌───────────────┼───────────────┐
+         ↓               ↓               ↓
+
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│   Extractor  │  │ Synthesizer  │  │  Integrator  │
+│ (deterministic)│  │    (LLM)     │  │(deterministic)│
+└──────────────┘  └──────────────┘  └──────────────┘
+         │               │               │
+         ↓               ↓               ↓
+
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│   Harvest    │  │  Synthesis   │  │  Intent      │
+│   Report     │  │  Proposal    │  │  Graph       │
+│   (YAML)     │  │   (YAML)     │  │  (updated)   │
+└──────────────┘  └──────────────┘  └──────────────┘
+```
+
+### 9.2 Core Libraries
+
+```python
+# jigy/distill/extract.py
+class DeltaExtractor:
+    def extract_markers(self, delta_file: Path) -> List[Marker]
+    def extract_frontmatter(self, delta_file: Path) -> Dict
+    def extract_code_blocks(self, delta_file: Path) -> List[Block]
+    def extract_references(self, delta_file: Path) -> List[Reference]
+    def build_harvest_report(self, delta_dir: Path) -> HarvestReport
+
+# jigy/distill/synthesize.py
+class LLMSynthesizer:
+    def synthesize(self, harvest: HarvestReport, intent: IntentGraph) -> SynthesisProposal
+    def categorize_marker(self, marker: Marker) -> OSTCType
+    def detect_patterns(self, markers: List[Marker]) -> List[Pattern]
+    def find_conflicts(self, proposal: SynthesisProposal, intent: IntentGraph) -> List[Conflict]
+    def suggest_relationships(self, nodes: List[Node]) -> List[Edge]
+
+# jigy/distill/integrate.py
+class IntentIntegrator:
+    def create_node(self, node: Node, intent_graph: IntentGraph)
+    def update_node(self, node_id: str, updates: Dict, intent_graph: IntentGraph)
+    def add_relationship(self, edge: Edge, intent_graph: IntentGraph)
+    def create_traceability_links(self, node: Node, sources: List[DeltaSource])
+    def generate_adr(self, decision: Decision) -> Path
+    def validate_integration(self, intent_graph: IntentGraph) -> ValidationReport
+
+# jigy/distill/models.py
+@dataclass
+class Marker:
+    file: Path
+    line: int
+    type: str  # VIB, OSTC, DECISION, etc.
+    subtype: Optional[str]
+    id: Optional[str]
+    text: str
+    relations: List[str]
+
+@dataclass
+class HarvestReport:
+    metadata: Dict
+    markers: List[Marker]
+    decisions: List[Decision]
+    discoveries: List[Discovery]
+    learnings: List[Learning]
+    references: List[Reference]
+    statistics: Dict
+
+@dataclass
+class SynthesisProposal:
+    new_nodes: List[Node]
+    modified_nodes: List[NodeUpdate]
+    new_relationships: List[Edge]
+    decisions_to_adr: List[Decision]
+    conflicts: List[Conflict]
+    patterns_discovered: List[Pattern]
+    harvest_quality: Dict
+    questions_for_human: List[str]
+```
+
+### 9.3 Configuration
+
+```yaml
+# .jig/distill-config.yaml
+
+extraction:
+  marker_patterns:
+    vib: '#VIB:(\w+)\s+"([^"]+)"'
+    ostc: '#OSTC:(\w+)\s+"([^"]+)"'
+    discovery: '#DISCOVERY:(\S+)\s+"([^"]+)"'
+    decision: '#DECISION:(\S+)\s+"([^"]+)"'
+    learned: '#LEARNED:(\S+)\s+"([^"]+)"'
+
+  code_block_types:
+    - discovery
+    - decision
+    - learning
+
+  validate_references: true
+  check_duplicates: true
+
+synthesis:
+  llm:
+    model: claude-sonnet-4.5
+    temperature: 0.1
+    max_tokens: 8000
+
+  abstraction_level: medium  # low/medium/high
+  pattern_detection: true
+  conflict_detection: true
+
+  quality_thresholds:
+    min_confidence: 0.7
+    max_questions: 5
+
+integration:
+  require_approval: true
+  auto_approve:
+    - new_code_refs  # Low risk
+
+  validation:
+    check_references: true
+    check_subsystems: true
+    check_cycles: false
+
+  traceability:
+    bidirectional: true
+    include_commit_sha: true
+    include_branch: true
+
+retention:
+  after_harvest:
+    mark_harvested: true
+    compress_deltas: false
+
+  harvest_report:
+    retention_days: 90
+
+  synthesis_proposal:
+    retention_days: 180
+```
+
+---
+
+## 10. Success Metrics
+
+### 10.1 Harvest Effectiveness
+
+**Capture Rate:**
+```
+Markers integrated / Total markers found
+Target: >85%
+```
+
+**Discovery Quality:**
+```
+Discoveries requiring clarification / Total discoveries
+Target: <15%
+```
+
+**Pattern Recognition:**
+```
+Patterns discovered by LLM / Patterns found manually
+Target: >2 (LLM finds more than we would)
+```
+
+### 10.2 Integration Efficiency
+
+**Review Time:**
+```
+Human time to review synthesis proposal
+Target: <10 minutes per 20 discoveries
+```
+
+**Approval Rate:**
+```
+Synthesis proposals approved / Total proposals
+Target: >80%
+```
+
+**Conflict Rate:**
+```
+Conflicts detected / Nodes proposed
+Target: <5% (conflicts are rare)
+```
+
+### 10.3 Intent Graph Growth
+
+**Organic Growth:**
+```
+OSTC nodes from distillation / OSTC nodes from direct authoring
+Target: >50% (most Intent comes from Delta harvest)
+```
+
+**Traceability Coverage:**
+```
+OSTC nodes with Delta sources / Total OSTC nodes
+Target: >90%
+```
+
+**Knowledge Retention:**
+```
+Markers harvested before Delta deletion / Total markers
+Target: 100% (zero knowledge loss)
+```
+
+---
+
+## 11. Open Questions
+
+### 11.1 Technical Questions
+
+1. **Incremental vs Batch Synthesis?**
+   - Synthesize each marker immediately (streaming)?
+   - Batch all markers from a Delta (file-level)?
+   - Batch all markers from a branch (branch-level)?
+
+2. **LLM Context Window Management?**
+   - How to fit large Intent Graph + harvest report?
+   - Summarize existing Intent for LLM?
+   - Use RAG to fetch relevant Intent only?
+
+3. **Conflict Resolution Strategy?**
+   - Always defer to human?
+   - LLM proposes resolution?
+   - Deterministic rules for simple conflicts?
+
+4. **Version Control for Intent Graph?**
+   - Git is sufficient?
+   - Need specialized versioning?
+   - How to handle merge conflicts in .jig/?
+
+### 11.2 Process Questions
+
+1. **Harvest Frequency?**
+   - Continuous (every Delta edit)?
+   - Daily (end of day)?
+   - Per work unit?
+   - Branch completion only?
+
+2. **Marker Enforcement?**
+   - Pre-commit hook checks for markers?
+   - CI/CD fails if Delta has no markers?
+   - Optional vs required?
+
+3. **Quality Gates?**
+   - What's minimum marker quality to harvest?
+   - Require human review for all integrations?
+   - Auto-approve low-risk changes?
+
+4. **Retroactive Harvest?**
+   - Go back and harvest old Deltas?
+   - How far back?
+   - Worth the effort?
+
+---
+
+## 12. Recommendations for ASE
+
+### 12.1 Phase 1: Pilot (Next 2 Weeks)
+
+1. **Manual Harvest One Branch**
+   - Choose: `bike-echoform-relay` (well documented)
+   - Manually extract markers to YAML
+   - Use Claude to synthesize (manual prompting)
+   - Hand-craft integration
+   - Measure: time spent, insights gained
+
+2. **Design Marker Vocabulary**
+   - Finalize marker syntax
+   - Create templates
+   - Write author guidelines
+   - Add to CLAUDE.md
+
+3. **Build Extractor Prototype**
+   - Simple Python script
+   - Extract #VIB, #OSTC, #DISCOVERY
+   - Output YAML harvest report
+   - Validate on existing Deltas
+
+### 12.2 Phase 2: Automation (Weeks 3-4)
+
+1. **Implement Full Extractor**
+   - All marker types
+   - Frontmatter parsing
+   - Code block parsing
+   - Reference validation
+   - CLI: `jigy extract`
+
+2. **Implement LLM Synthesis**
+   - System prompt engineering
+   - Structured output parsing
+   - Pattern detection
+   - Conflict identification
+   - CLI: `jigy synthesize`
+
+3. **Test on Historical Deltas**
+   - Run on docs/done/multiprocess-websocket/
+   - Measure accuracy
+   - Tune prompts
+   - Adjust marker design
+
+### 12.3 Phase 3: Integration (Weeks 5-6)
+
+1. **Build Integrator**
+   - OSTC file creation
+   - Traceability linking
+   - Validation checks
+   - CLI: `jigy integrate`
+
+2. **Add Review Interface**
+   - Terminal UI for approval
+   - Diff view for changes
+   - Batch operations
+   - Export to PR
+
+3. **End-to-End Test**
+   - Pick current WIP branch
+   - Run full distillation pipeline
+   - Measure end-to-end time
+   - Validate Intent Graph quality
+
+### 12.4 Phase 4: Adoption (Weeks 7-8)
+
+1. **Author Training**
+   - Write marker guidelines
+   - Create examples
+   - Add to onboarding
+   - Update Delta templates
+
+2. **Process Integration**
+   - Add to branch completion checklist
+   - Pre-merge requirement
+   - CI/CD integration
+   - Metrics dashboard
+
+3. **Continuous Improvement**
+   - Track harvest quality metrics
+   - Refine marker patterns
+   - Improve LLM prompts
+   - Optimize workflows
+
+---
+
+## 13. Conclusion
+
+### 13.1 The Vision
+
+**Deltas capture the narrative. Distillation extracts the essence. Intent preserves the wisdom.**
+
+This system transforms development artifacts into permanent knowledge:
+- **Deterministic extraction** ensures nothing is lost
+- **LLM synthesis** elevates understanding
+- **Human approval** ensures quality
+- **Traceability** maintains connection to source
+
+### 13.2 The Promise
+
+**If we build this well:**
+- Zero knowledge loss when archiving Deltas
+- Intent Graph grows organically from work
+- Discoveries automatically captured
+- Patterns emerge without manual analysis
+- New developers can archaeology effectively
+- Business value traced to implementation
+
+### 13.3 The Philosophy
+
+**Distillation is not summarization.**
+
+Summarization makes things shorter.
+Distillation makes things **purer**.
+
+The Intent Graph should contain only timeless truth,
+extracted from temporal narratives,
+preserved for perpetuity,
+traceable to origin.
+
+**This is how software systems develop wisdom.**
+
+---
+
+**Next Steps:**
+1. Jim reviews and provides feedback
+2. Pilot manual harvest on one branch
+3. Design final marker vocabulary
+4. Build extractor prototype
+5. Test LLM synthesis prompts
+6. Implement full pipeline
+
+---
+
+**Document Status:** Proposal (awaiting review)
+**Reading Time:** ~25 minutes
+**Key Innovation:** Three-phase pipeline with clear division of labor (deterministic extract, LLM synthesize, human integrate)

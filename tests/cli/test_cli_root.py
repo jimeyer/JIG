@@ -66,20 +66,23 @@ def test_help_shows_expected_commands():
     assert "show" in result.output
 
 
-@jig.verifies("S-061")
-def test_only_help_and_version_global_options():
-    """Only --help and --version appear as global options."""
+@jig.verifies("S-061", "S-093")
+def test_global_options():
+    """Global options include help, version, output format flags, and no-rebuild."""
     runner = CliRunner()
     result = runner.invoke(cli, ["--help"])
 
     assert result.exit_code == 0
-    # These should NOT appear
+    # These should NOT appear (legacy/rejected options)
     assert "--project-root" not in result.output
-    assert "--verbose" not in result.output
     assert "--format" not in result.output
-    # These SHOULD appear
+    # These SHOULD appear (S-061: help, version, no-rebuild; S-093: output flags)
     assert "--help" in result.output
     assert "--version" in result.output
+    assert "--no-rebuild" in result.output
+    assert "--json" in result.output
+    assert "--markdown" in result.output
+    assert "--verbose" in result.output
 
 
 @jig.verifies("S-061")

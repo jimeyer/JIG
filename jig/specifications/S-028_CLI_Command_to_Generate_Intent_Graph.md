@@ -1,0 +1,30 @@
+---
+id: S-028
+title: CLI Command to Generate Intent Graph
+type: specification
+outcomes: [O-009]
+architecture: [A-002]
+---
+
+# CLI Command to Generate Intent Graph
+
+The `jigy intent rebuild` command MUST generate intent-graph.ndjson from specifications, outcomes, and bricks.yaml.
+
+**Acceptance Criteria**:
+- Command `jigy intent rebuild` exists and executes without errors
+- Reads all files matching `jig/specifications/S-*.md` and parses YAML frontmatter
+- Reads all files matching `jig/outcomes/O-*.md` and parses YAML frontmatter (optional, gracefully handles absence)
+- Reads `jig/bricks.yaml` and parses brick definitions
+- Outputs to `jig/generated/intent-graph.ndjson` (default, configurable via `--output`)
+- First line contains metadata object per A001 §6.1: `{"_meta": {"version": "1.0", "generated": "ISO-timestamp", "spec_count": N, "outcome_count": M, "brick_count": K}}`
+- Spec nodes follow A001 schema: `{"id":"S-001","type":"specification","file":"jig/specifications/S-001.md"}`
+- Outcome nodes follow A001 schema: `{"id":"O-001","type":"outcome","file":"jig/outcomes/O-001.md","specifications":["S-001","S-002"]}`
+- Brick nodes follow A001 schema with units extension: `{"id":"B-001","type":"brick","name":"Brick Name","file":"jig/bricks.yaml","units":["M-module","C-class"]}`
+- O→S edges created for outcome specifications relationships: `{"source":"O-001","target":"S-001","type":"specifications"}`
+- Help text available via `jigy intent rebuild --help`
+- Exit code 0 on success, non-zero on failure
+
+**Rationale**: Intent graph is foundational for alignment analysis. Must conform to A001 §6.1 to ensure compatibility with analysis tools.
+
+**References**:
+- A001 §6.1: Intent Graph specification

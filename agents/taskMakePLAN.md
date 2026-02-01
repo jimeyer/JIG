@@ -1,7 +1,7 @@
 # Task: Create PLAN Document (taskMakePLAN)
 
-**Version:** 1.1.0
-**Date:** 2025-12-18
+**Version:** 2.0.0
+**Date:** 2026-01-08
 **Audience:** AI coding agents
 **Status:** Active
 **Related:** JigPlanOrchWorkflow.md, taskMakeJIGPLAN.md, taskDoPLAN.md, taskDoWU.md, contextBricks.md
@@ -51,6 +51,14 @@ JIGPLAN defines constraints that flow into every WU:
 - **Clean break**: No compatibility shims (unless JIGPLAN says otherwise)
 
 **See:** `docs/jig/contextBricks.md` for brick/layer fundamentals.
+
+### Fresh Agent Review (New in v2)
+
+The agent creating the PLAN has JIGPLAN context in working memory. The executing agent won't. This context gap causes friction during execution.
+
+**Solution:** Before human approval, spawn a fresh agent to review the PLAN cold. This agent identifies ambiguities that would block execution. Resolve them via codebase exploration and update the PLAN.
+
+**Lens:** Execution readiness (types, locations, dependencies, naming consistency).
 
 ---
 
@@ -178,6 +186,17 @@ Guidance for sub-agent:
 - Decorators to add: @jig.verifies("S-147") on test_subscribe_*
 ```
 
+#### Resolved Context (New in v2)
+Findings from Fresh Agent Review - types, locations, decisions verified against codebase:
+
+```markdown
+**Resolved Context** (from pre-execution review):
+| Question | Answer | Source |
+|----------|--------|--------|
+| bike_elements type | Dict[str, Union[LWW, ORSet, PNCounter]] | bike_state.py:132 |
+| Posture location | device_state.py:32 (must extract) | grep class Posture |
+```
+
 #### Human Verification
 Commands human can run to verify:
 
@@ -229,6 +248,77 @@ These are filled in during/after execution, but create the structure:
 - [ ] Final jigy rebuild && jigy validate passed
 ```
 
+### Step 7: Fresh Agent Review (Required)
+
+**Purpose:** Verify the PLAN is self-contained before human approval. The creating agent has context the executing agent won't have.
+
+**Why this matters:**
+- Fresh eyes catch assumptions baked into creator's mental model
+- Questions expose missing context the executor will need
+- Resolution via exploration grounds the plan in actual code
+- Updated PLAN is self-contained (no hidden context required)
+
+#### 7.1: Spawn Review Agent
+
+**Review agent has full codebase access** via Glob, Grep, Read tools.
+
+Use this exact prompt:
+
+```
+You are reviewing a PLAN document before execution.
+
+Read: <path to PLAN file>
+
+Your task: Identify anything that would block or confuse an agent executing this plan.
+
+Categories:
+1. **Type ambiguity** - field mentioned but type unclear
+2. **Location unknown** - "import X" but from where?
+3. **Existence uncertain** - "use Y" but does Y exist?
+4. **Naming inconsistency** - plan says "lamport" but code says "counter"
+5. **Hidden dependency** - WU3 needs WU1 but not stated
+6. **Missing context** - assumes knowledge not in the document
+
+For each finding:
+- State the issue clearly
+- Classify: (A) resolvable via codebase exploration, (B) needs human input
+- If (A), suggest what to search for
+
+Do NOT execute any WU. Review only.
+```
+
+#### 7.2: Resolve Category (A) Issues
+
+For each issue the review agent marks as (A) resolvable:
+
+1. **Launch exploration agents** in parallel to investigate
+2. **Gather concrete answers** with file:line references
+3. **Update relevant WU sections** with findings
+
+Add findings to the **Resolved Context** table in each affected WU, or to a **Key Existing Code References** section if broadly applicable.
+
+#### 7.3: Escalate Category (B) Issues
+
+Issues requiring human input:
+- Present to human with context
+- Get decision
+- Document in PLAN
+
+#### 7.4: Re-Review If Needed
+
+If changes affected ≥3 WUs or introduced new dependencies, run another review pass. Maximum 2 re-review iterations - if still finding blocking issues after 2 passes, escalate to human.
+
+Exit when review agent reports no blocking ambiguities.
+
+#### 7.5: Exit Criteria
+
+Fresh Agent Review is complete when:
+- [ ] Review agent identifies no category (A) or (B) issues, OR review agent reports no issues at all → proceed directly to human approval
+- [ ] All (A) issues resolved via codebase exploration
+- [ ] All (B) issues resolved via human input OR escalated with documented rationale
+- [ ] All resolved context is documented in PLAN
+- [ ] PLAN is self-contained (executor needs no external context)
+
 ---
 
 ## PLAN Template
@@ -253,12 +343,45 @@ These are filled in during/after execution, but create the structure:
 - <brick> at layer N
 - No upward dependencies
 
+**Clean Break:**
+- <what to delete, no compat shims>
+
+---
+
+## Key Existing Code References
+
+(Populated during Fresh Agent Review)
+
+| Concern | Location | Notes |
+|---------|----------|-------|
+| <type/module> | <file:line> | <relevant context> |
+
+---
+
+## Execution Order
+
+(Dependency graph for parallel execution)
+
+```
+WU1 ──┬── WU3
+      └── WU4 ── WU5
+WU2 ────────────┘
+```
+
+---
+
+## Test Strategy
+
+- **New tests**: <what gets fresh tests>
+- **Existing tests**: <what must keep passing>
+- **Deleted tests**: <what goes away in cleanup>
+
 ---
 
 ## Work Unit Checklist
 
-- [ ] WU1: <title> — tests ☐ / code ☐ / docs ☐
-- [ ] WU2: <title> — tests ☐ / code ☐ / docs ☐
+- [ ] WU1: <title> — tests ☐ / code ☐
+- [ ] WU2: <title> — tests ☐ / code ☐
 - [ ] WU(N-1): Validation — SCOPE verified ☐
 - [ ] WUN: Cleanup — legacy deleted ☐ (if applicable)
 
@@ -291,6 +414,11 @@ These are filled in during/after execution, but create the structure:
 - Layer constraint violation detected
 - Ambiguity in spec acceptance criteria
 - Discovered need for backwards compatibility
+
+**Resolved Context** (from pre-execution review):
+| Question | Answer | Source |
+|----------|--------|--------|
+| <what was unclear> | <concrete answer> | <file:line> |
 
 **Implementation Notes**:
 - Files: <paths>
@@ -495,6 +623,9 @@ Before submitting PLAN:
 - [ ] Validation WU comes before Cleanup WU
 - [ ] Cleanup WU is last (if applicable)
 - [ ] Checklist matches WU list
+- [ ] **Fresh Agent Review completed** (Step 7)
+- [ ] All resolved context documented in WUs
+- [ ] Key Existing Code References populated
 
 ---
 
@@ -506,6 +637,7 @@ Before submitting PLAN:
 - **Create WUs for specs not in JIGPLAN** - Stay in scope
 - **Skip escalation triggers** - Sub-agents need guardrails
 - **Combine unrelated specs** - Keep WUs focused
+- **Skip Fresh Agent Review** - Executor needs self-contained plan
 
 ### MUST
 
@@ -514,23 +646,26 @@ Before submitting PLAN:
 - **Sequence by dependency** - Foundation before usage
 - **Include success gates** - Orchestrator needs verification criteria
 - **Size appropriately** - 60-90 min target
+- **Complete Fresh Agent Review** - Resolve ambiguities before human approval
 
 ### PREFER
 
 - **One spec per WU** - Easier to verify
 - **Conservative sizing** - Split if uncertain
 - **Explicit implementation notes** - Help sub-agents succeed
+- **Parallel exploration** - Batch codebase lookups for efficiency
 
 ---
 
 ## Version History
 
+- **2.0.0** (2026-01-08): Added Fresh Agent Review (Step 7). PLANs must be reviewed by fresh agent before human approval. Added Resolved Context section to WU template. Added Key Existing Code References, Execution Order, and Test Strategy sections to PLAN template. Added max iteration limit (2) on re-review loops. Clarified exit criteria for clean-pass case.
 - **1.1.0** (2025-12-18): Added Validation WU pattern (MUST). Verifies SCOPE is solved, not just specs implemented. Prefer Integration Test over Demo Script over Manual Checklist.
 - **1.0.1** (2025-12-18): Added note about JOURNAL file created during execution
 - **1.0.0** (2025-12-18): Initial version
 
 ---
 
-**Next:** After PLAN is created, execute with taskDoPLAN.md. The orchestrator:
+**Next:** After PLAN is created and Fresh Agent Review completed, execute with taskDoPLAN.md. The orchestrator:
 - Launches sub-agents following taskDoWU.md
 - Maintains JOURNAL-<feature>.md throughout execution (see taskDoPLAN.md)

@@ -1,106 +1,61 @@
 # JIG Context for AI Agents
 
-JIG measures alignment between **intent** (specifications), **implementation** (functions), and **verification** (tests). These form the S-F-T triangle:
-
-```
-         S (Specification)
-        / \
-       /   \
-implements  verifies
-     /       \
-    F ——————→ T
-      covers
-```
-
-Three relationships:
-- **F → S** (implements): Function implements specification via `@jig.implements("S-001")`
-- **T → S** (verifies): Test verifies specification via `@jig.verifies("S-001")`
-- **T → F** (covers): Test executes function (automatic via coverage)
-
-**Bricks** partition functions into architectural units. **Layers** stratify bricks (layer N depends only on layers < N).
+JIG measures alignment between **intent** (specifications), **implementation** (code), and **verification** (tests) through a seven-level hierarchy.
 
 ---
 
-## Artifacts
+## Start Here: Graph Exploration
 
-### Specifications (`jig/specifications/S-{number}.md`)
+Before modifying code, understand its context in the JIG graph:
 
-```yaml
+```bash
+jigy context S-042        # What implements/verifies this spec? What outcome owns it?
+jigy context G-001        # What outcomes and specs support this goal?
+jigy context F-jig.cli.main.validate  # What specs does this function implement?
+jigy context src/auth/tokens.py       # What specs do functions in this file implement?
+```
+
+**Output includes:**
+- **Ancestors** (negative depth): Charter, goals, outcomes that own the node
+- **Descendants** (positive depth): Code/tests that implement/verify, called functions
+- **`more` count**: How many nodes were truncated (use `--max N` to increase)
+
+**Flags:**
+- `-j` — JSON output (for programmatic use)
+- `-m` — Markdown tables
+- `--max N` — Budget limit (default 50)
+
+**When to use:** Before any code change, run `jigy context <spec>` to understand what you're touching.
+
 ---
-id: S-001
-type: specification
----
+
+## The G-A-O-S-C-T Pyramid
+
+```
+                      CHARTER
+                     (defines G-#)
+                    /            \
+                   /              \
+          ARCHITECTURE          OUTCOMES
+               A-###               O-###
+              goals               goals
+                │                   │
+                │ specifications    │ specifications
+                │    ┌──────────────┘
+                ▼    ▼
+            SPECIFICATIONS
+                 S-###
+           (outcomes, architecture)
+               /      \
+              /        \
+         verifies   implements
+            /            \
+           /              \
+       TESTS              CODE
+        T-###              C-###
 ```
 
-```markdown
-# Token Expiration
-
-Authentication tokens MUST expire after 15 minutes of inactivity.
-
-**Acceptance Criteria:**
-- Token created with expires_at = now() + 15 minutes
-- Token rejected if now() > last_activity + 15 minutes
-```
-
-### Outcomes (`jig/outcomes/O-{number}.md`) — OPTIONAL
-
-```yaml
----
-id: O-001
-type: outcome
-specifies: [S-001, S-002]
----
-```
-
-```markdown
-# Secure Authentication
-
-Users authenticate without managing passwords.
-
-**Value:** Reduces support burden and improves security.
-```
-
-### Bricks (`jig/bricks.yaml`)
-
-```yaml
-bricks:
-  - id: B-core-utils
-    name: Core Utilities
-    layer: 0
-    units:
-      - M-utils.io
-      - M-utils.yaml_utils
-
-  - id: B-auth-session
-    name: Authentication
-    layer: 1
-    units:
-      - M-auth.session
-      - C-auth.tokens.TokenValidator
-```
-
-Unit prefixes:
-- `M-{path}` — all functions in module
-- `C-{path}` — all methods of class
-- `F-{path}` — single function
-
-### Decorators (in source code)
-
-```python
-@jig.implements("S-001")
-def authenticate(user: str, password: str) -> Token:
-    ...
-
-@jig.verifies("S-001")
-def test_token_expiration():
-    ...
-```
-
-### Generated Files (`jig/generated/`) — NEVER EDIT
-
-- `intent-graph.ndjson` — specs, outcomes, bricks
-- `implementation-graph.ndjson` — functions, calls
-- `verification-graph.ndjson` — tests, coverage
+Every function should trace upward through this hierarchy to the Charter. Breaks indicate misalignment.
 
 ---
 
@@ -108,124 +63,313 @@ def test_token_expiration():
 
 | Type | Format | Example |
 |------|--------|---------|
+| Charter | `Charter` | `Charter` (singleton) |
+| Goal | `G-{number}` | G-1, G-2, G-3 |
+| Architecture | `A-{number}` | A-010, A-030 |
+| Outcome | `O-{number}` | O-101, O-107 |
 | Specification | `S-{number}` | S-001, S-042 |
-| Outcome | `O-{number}` | O-001 |
 | Brick | `B-{kebab-case}` | B-auth-session |
-| Function | `F-{path}` | F-auth.session.authenticate |
+| Code | `C-{path}` | C-jig.cli.main |
 | Module | `M-{path}` | M-auth.session |
 | Class | `C-{path}` | C-auth.tokens.TokenValidator |
 | Test | `T-{path}` | T-test_auth.test_token_expiration |
 
 ---
 
-## Writing Outcomes & Specifications
+## Seven Artifact Types
 
-### Outcomes = Evergreen Business Value
+| # | Artifact | Location | Authored By |
+|---|----------|----------|-------------|
+| 1 | Charter | `jig/Charter.md` | Human |
+| 2 | Architecture | `jig/architecture/A-###_{Title}.md` | Human |
+| 3 | Outcome | `jig/outcomes/O-###_{Title}.md` | Human |
+| 4 | Specification | `jig/specifications/S-###_{Title}.md` | Human |
+| 5 | Brick definitions | `jig/bricks.yaml` | Human |
+| 6 | @jig annotations | Source code | Human |
+| 7 | Graph files | `jig/generated/*.ndjson` | Machine (NEVER EDIT) |
 
-**Checklist:**
-- [ ] Describes WHY the system behaves this way
+### Filename Format
+
+Files must match: `{TYPE}-{NNN}_{Title_In_Snake_Case}.md`
+
+- Title derived from frontmatter `title` field
+- Spaces become underscores, hyphens preserved
+- Example: title `"Multi-Device State"` → `O-152_Multi-Device_State.md`
+
+### Frontmatter Schema
+
+Frontmatter contains **graph edges** (identity + relationships). Operational metadata goes in body.
+
+**Charter:**
+```yaml
+---
+id: Charter
+type: charter
+goals: [G-1, G-2, G-3]
+---
+```
+
+**Architecture:**
+```yaml
+---
+id: A-030
+type: architecture
+title: ANK Architecture
+goals: [G-1, G-3]
+specifications: [S-001, S-004, S-006]
+---
+```
+
+**Outcome:**
+```yaml
+---
+id: O-101
+type: outcome
+title: Distributed State Convergence
+goals: [G-2, G-3]
+architecture: [A-022, A-030]
+specifications: [S-001, S-002]
+---
+```
+
+**Specification:**
+```yaml
+---
+id: S-001
+type: specification
+title: CID Properties
+outcomes: [O-101, O-103]
+architecture: [A-030, A-022]
+---
+```
+
+**Not in frontmatter** (goes in body if needed): `status`, `related`, `brick`, `consolidates`
+
+### Decorators (in source code)
+
+```python
+@jig.implements("S-001")
+def authenticate(user: str, password: str) -> Token: ...
+
+@jig.verifies("S-001")
+def test_token_expiration(): ...
+```
+
+---
+
+## Bricks: Layer × Tower Model
+
+### Partition Property
+- Every function in exactly ONE brick (no gaps, no overlaps)
+- All methods of a class in SAME brick
+
+### Brick Definition
+
+```yaml
+bricks:
+  - id: B-cli
+    name: CLI Commands
+    layer: 1
+    tower: server        # Optional
+    units:
+      - M-jig.cli.main   # All functions in module
+      - C-jig.Parser     # All methods of class
+```
+
+### Layers (Horizontal Stratification)
+
+Brick at layer N depends ONLY on layers < N. Violations are errors.
+
+```
+Layer 0: Foundation (external libs only)
+Layer 1: Core logic (depends on Layer 0)
+Layer 2: Interface (depends on Layers 0-1)
+```
+
+### Towers (Vertical Partitioning)
+
+Cross-tower dependencies are **FORBIDDEN**. Towers communicate through shared specifications, not code imports.
+
+```
+          │  server  │  harness  │  device  │
+Layer 2   │   B-s2   │   B-h2    │          │
+Layer 1   │   B-s1   │   B-h1    │   B-d1   │
+Layer 0   │   B-s0   │   B-h0    │   B-d0   │
+```
+
+Single-tower projects omit `tower` field from all bricks.
+
+### FORBIDDEN Bricks (Per-JIGPLAN)
+
+Scope constraint for specific work. If sub-agent needs FORBIDDEN brick: STOP, escalate, wait for scope revision.
+
+---
+
+## Writing Evergreen Artifacts
+
+O and S nodes remain true FOREVER, not just until PR merges.
+
+### Outcomes = Business Value
+
+- [ ] WHY the system behaves this way
+- [ ] `goals` links to Charter goals
 - [ ] Remains true after project completes
-- [ ] Would make sense to new developer in 2 years
-- [ ] NOT: project goals, refactoring tasks, process improvements
+- [ ] NOT: project goals, refactoring tasks
 
-**Test:** Remove all project references. Does it still make sense?
+❌ BAD: "Achieve 90% test coverage"  
+✓ GOOD: "Critical behaviors verified to prevent production regressions"
 
-### Specifications = Evergreen Behavioral Requirements
+### Specifications = Behavioral Requirements
 
-**Checklist:**
-- [ ] Describes observable system behavior
-- [ ] Has testable acceptance criteria
+- [ ] Observable behavior with acceptance criteria
 - [ ] Can use `@jig.implements` on code
 - [ ] Can use `@jig.verifies` on tests
-- [ ] NOT: file paths, implementation details, refactoring tasks
+- [ ] NOT: file paths, implementation details
+
+❌ BAD: "Relocate file X to location Y"  
+✓ GOOD: "EraLamportClock state persists across restarts"
 
 **Test:** Can you write a decorator for it? If no, rewrite.
+
+### Specification Body Structure
+
+Specs are lean behavioral contracts. Architecture docs own structure/relationships; specs own invariants.
+
+**H1 Title:** Must exactly match frontmatter `title` field. Do NOT include ID prefix.
+
+| Section | Required | Content |
+|---------|----------|---------|
+| **Statement** | Yes | 1-3 sentences. What must be true. No "how." |
+| **Invariants** | Yes | Bullet list of always-true conditions. Each falsifiable. |
+| **Verification** | Yes | Acceptance criteria. What would a test assert? |
+| **Boundaries** | No | What's explicitly out of scope. |
+
+**Exclude:** Rationale (→ Outcome), architecture discussion (→ arch doc link), implementation hints, history.
+
+**Example:**
+```markdown
+# Staleness Tracking
+
+Heartbeat absence triggers staleness state within bounded time.
+
+## Invariants
+- Device marked stale after 2× heartbeat interval without contact
+- Staleness merge uses min-timestamp (earliest evidence wins)
+- Stale→fresh transition requires new heartbeat, not timeout
+
+## Verification
+- [ ] Device receiving heartbeat at t₀, none by t₀+2T → stale
+- [ ] Two hosts disagree on staleness → merge produces stale
+- [ ] Stale device sends heartbeat → immediately fresh
+```
+
+Target: ~50 lines max. Architecture link in frontmatter handles the rest.
 
 ---
 
 ## CLI Commands
 
 ```bash
+jigy context S-042  # Explore graph neighborhood (ancestors + descendants)
 jigy validate       # Check references, partition, layers
-jigy impl rebuild   # Generate implementation graph from code
-jigy intent rebuild # Generate intent graph from JIG artifacts
+jigy validate -j    # JSON output with fix templates (for programmatic use)
+jigy mend --auto    # Apply all auto-fixable errors
+jigy mend --apply fixes.json  # Apply agent-filled fix templates
+jigy rebuild        # Regenerate all graphs
 jigy layers         # Show layer structure
-jigy rebuild        # Runs validate, rebuild, layers commands in order
 ```
+
+---
+
+## Validate/Mend Workflow
+
+Validation errors include **fix templates**. Use `jigy validate -j` to get structured JSON:
+
+```json
+{
+  "errors": [
+    {
+      "id": "err_001",
+      "code": "ORPHAN_OUTCOME_SPEC_LINK",
+      "message": "O-001 references S-034, but S-034 doesn't reference O-001",
+      "file": "jig/outcomes/O-001_Easy_Onboarding.md",
+      "fix": {
+        "action": "add_field_value",
+        "target": "S-034",
+        "field": "outcomes",
+        "value": "???"
+      },
+      "auto": false,
+      "suggestions": ["O-001"]
+    }
+  ]
+}
+```
+
+**Workflow:**
+
+1. **Run validation:** `jigy validate -j > errors.json`
+2. **Review errors:** Each error has a `fix` template with `action`, `target`, `params`
+3. **Fill in `???` values:** Replace placeholders using `suggestions` or your judgment
+4. **Apply fixes:** `jigy mend --apply errors.json` (for filled templates) or `jigy mend --auto` (for auto-fixable)
+5. **Re-validate:** `jigy validate` to confirm all issues resolved
+
+**Fix types:**
+- `auto: true` — Deterministic fix, applied by `mend --auto`
+- `auto: false` — Requires decision (e.g., which outcome owns a spec)
+
+**Common actions:**
+- `set_field` — Set frontmatter field value
+- `add_field_value` — Append to array field
+- `rename_file` — Fix filename to match ID/title
+- `sync_title` — Sync H1 header with frontmatter title
 
 ---
 
 ## Validation Rules
 
-- All IDs unique within type
-- Brick IDs match `B-[a-z0-9-]+`
-- `@jig.implements` references existing spec IDs
-- `@jig.verifies` references existing spec or outcome IDs
-- Outcome `specifies` references existing spec IDs
-- Every function in exactly one brick (no gaps, no overlaps)
-- All methods of a class in same brick
+### Identity & References
+- All IDs unique within type, match required patterns
+- `@jig.implements` / `@jig.verifies` reference existing specs
+- `goals` references goals defined in Charter
+- `specifications` references existing specs
+- `outcomes` / `architecture` reference existing outcomes/arch docs
+
+### File Format
+- Filename matches `{TYPE}-{NNN}_{Title_Snake_Case}.md`
+- H1 exactly matches frontmatter `title` (no ID prefix)
+
+### Graph Integrity
+- **Bidirectional O↔S**: If spec lists outcome in `outcomes`, that outcome must list spec in `specifications`
+- **Outcome completeness**: Every outcome must have non-empty `specifications` array
+- **Spec coverage**: Every spec must appear in at least one outcome's `specifications` array
+
+### Brick Constraints
+- Every function in exactly one brick
 - Brick at layer N depends only on layers < N
-- No circular dependencies between bricks
+- Cross-tower dependencies forbidden (if towers used)
+- No circular dependencies
 
 ---
 
-## Anti-patterns
+## For AI Agents
 
-**Refactoring task as specification:**
-```
-BAD:  "Relocate era_persistence.py to protocol-core"
-GOOD: "EraLamportClock state persists across restarts"
-```
-
-**Project goal as outcome:**
-```
-BAD:  "Achieve 90% test coverage"
-GOOD: "Critical behaviors verified to prevent production regressions"
-```
-
-**Implementation detail as specification:**
-```
-BAD:  "Functions have @jig.implements decorators"
-GOOD: "Devices can be added, removed, and updated in shared CRDT"
-```
-
-**Process improvement as outcome:**
-```
-BAD:  "Code organization improved"
-GOOD: "Auth logic isolated, enabling independent modification"
-```
-
----
-
-## File Structure
-
-```
-project-root/
-├── jig/
-│   ├── specifications/     # Human-authored
-│   │   ├── S-001.md
-│   │   └── S-002.md
-│   ├── outcomes/           # Human-authored, optional
-│   │   └── O-001.md
-│   ├── bricks.yaml         # Human-authored
-│   └── generated/          # Machine-generated
-│       ├── intent-graph.ndjson
-│       ├── implementation-graph.ndjson
-│       └── verification-graph.ndjson
-├── src/                    # @jig.implements decorators
-└── tests/                  # @jig.verifies decorators
-```
+1. **Read before writing** — Query graphs to understand what exists
+2. **Link your work** — Use `@jig.implements()` and `@jig.verifies()`
+3. **Validate continuously** — Run `jigy validate` before committing
+4. **Understand intent first** — Read S-### and O-### before modifying code
+5. **Respect architecture** — Check layer and tower constraints
+6. **Trace to goals** — Know which G-### your work supports
 
 ---
 
 ## Quick Reference
 
-| Task                          | Action                                                    |
-| ----------------------------- | --------------------------------------------------------- |
-| Add new requirement           | Create `jig/specifications/S-{next}.md`                   |
-| Group specs into value        | Create `jig/outcomes/O-{next}.md` with `specifies: [...]` |
-| Mark function implements spec | Add `@jig.implements("S-001")` decorator                  |
-| Mark test verifies spec       | Add `@jig.verifies("S-001")` decorator                    |
-| Assign functions to brick     | Add module/class/function to `units` in `bricks.yaml`     |
-| Check everything valid        | Run `jigy rebuild`                                        |
-
+| Task | Action |
+|------|--------|
+| Add requirement | Create `jig/specifications/S-{next}.md` |
+| Group specs into value | Create `jig/outcomes/O-{next}.md` |
+| Mark function implements | `@jig.implements("S-001")` |
+| Mark test verifies | `@jig.verifies("S-001")` |
+| Assign to brick | Add to `units` in `bricks.yaml` |
+| Check validity | `jigy rebuild` |

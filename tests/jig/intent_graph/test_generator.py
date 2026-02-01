@@ -51,7 +51,7 @@ Another test specification.
         """---
 id: O-001
 type: outcome
-specifies: [S-001, S-002]
+specifications: [S-001, S-002]
 ---
 
 # Test Outcome 1
@@ -96,7 +96,7 @@ def test_generate_intent_graph_basic(temp_project):
     # First line: metadata
     metadata = json.loads(lines[0])
     assert "_meta" in metadata
-    assert metadata["_meta"]["version"] == "1.0"
+    assert metadata["_meta"]["version"] == "2.0"
     assert metadata["_meta"]["spec_count"] == 2
     assert metadata["_meta"]["outcome_count"] == 1
     assert metadata["_meta"]["brick_count"] == 1
@@ -124,7 +124,7 @@ def test_generate_intent_graph_basic(temp_project):
     assert len(outcome_nodes) == 1
     assert outcome_nodes[0]["id"] == "O-001"
     assert outcome_nodes[0]["file"] == "jig/outcomes/O-001.md"
-    assert outcome_nodes[0]["specifies"] == ["S-001", "S-002"]
+    assert outcome_nodes[0]["specifications"] == ["S-001", "S-002"]
 
     # Check brick nodes
     brick_nodes = [n for n in nodes if n["type"] == "brick"]
@@ -553,3 +553,278 @@ class TestIntentGraphGitBlob:
 
         # If git_blob is present, it should be the same across runs
         assert blobs1 == blobs2
+
+
+class TestIntentGraphV2Schema:
+    """Tests for V2 schema field names (S-028, S-084, S-085)."""
+
+    @pytest.fixture
+    def v2_project(self, tmp_path):
+        """Create a project with Charter, Goals, Architecture, Outcomes, and Specs."""
+        project_root = tmp_path / "v2_project"
+        project_root.mkdir()
+
+        # Create Charter.md with goals field (V2 schema)
+        charter_dir = project_root / "jig"
+        charter_dir.mkdir(parents=True)
+
+        (charter_dir / "Charter.md").write_text(
+            """---
+id: Charter
+goals: [G-001, G-002]
+---
+
+# Test Charter
+
+## Goals
+
+### G-001: First Goal
+
+First goal description.
+
+### G-002: Second Goal
+
+Second goal description.
+"""
+        )
+
+        # Create architecture directory with A-001.md (V2 schema)
+        arch_dir = project_root / "jig" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "A-001.md").write_text(
+            """---
+id: A-001
+title: Test Architecture
+type: architecture
+goals: [G-001]
+specifications: [S-001, S-002]
+---
+
+# Test Architecture
+
+Architecture content.
+"""
+        )
+
+        # Create specifications directory
+        spec_dir = project_root / "jig" / "specifications"
+        spec_dir.mkdir(parents=True)
+
+        (spec_dir / "S-001.md").write_text(
+            """---
+id: S-001
+type: specification
+---
+
+# Spec 1
+"""
+        )
+
+        (spec_dir / "S-002.md").write_text(
+            """---
+id: S-002
+type: specification
+---
+
+# Spec 2
+"""
+        )
+
+        # Create outcomes directory with V2 schema fields
+        outcome_dir = project_root / "jig" / "outcomes"
+        outcome_dir.mkdir(parents=True)
+
+        (outcome_dir / "O-001.md").write_text(
+            """---
+id: O-001
+type: outcome
+goals: [G-002]
+specifications: [S-001]
+---
+
+# Test Outcome
+
+Outcome content.
+"""
+        )
+
+        # Create bricks.yaml
+        (project_root / "jig" / "bricks.yaml").write_text(
+            """bricks:
+  - id: B-001
+    name: Test Brick
+    units:
+      - M-test.module
+"""
+        )
+
+        return project_root
+
+    @jig.verifies("S-028")
+    def test_charter_node_uses_goals_field(self, v2_project):
+        """Charter nodes use 'goals' field instead of 'defines_goals' (V2 schema)."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        charter_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "charter"' in line
+        ]
+
+        assert len(charter_nodes) == 1
+        charter = charter_nodes[0]
+        assert charter["id"] == "Charter"
+        assert charter["type"] == "charter"
+        # V2 schema: uses 'goals', not 'defines_goals'
+        assert "goals" in charter
+        assert charter["goals"] == ["G-001", "G-002"]
+        assert "defines_goals" not in charter
+
+    @jig.verifies("S-028", "S-082")
+    def test_architecture_node_uses_v2_field_names(self, v2_project):
+        """Architecture nodes use V2 field names: goals, specifications, no status."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        arch_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "architecture"' in line
+        ]
+
+        assert len(arch_nodes) == 1
+        arch = arch_nodes[0]
+        assert arch["id"] == "A-001"
+        # V2 schema: 'goals' instead of 'supports_goals'
+        assert "goals" in arch
+        assert arch["goals"] == ["G-001"]
+        assert "supports_goals" not in arch
+        # V2 schema: 'specifications' instead of 'constrains'
+        assert "specifications" in arch
+        assert arch["specifications"] == ["S-001", "S-002"]
+        assert "constrains" not in arch
+        # V2 schema: no 'status' field
+        assert "status" not in arch
+
+    @jig.verifies("S-028")
+    def test_outcome_node_uses_v2_field_names(self, v2_project):
+        """Outcome nodes use V2 field names: goals, specifications."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        outcome_nodes = [
+            json.loads(line)
+            for line in lines[1:]
+            if '"type": "outcome"' in line
+        ]
+
+        assert len(outcome_nodes) == 1
+        outcome = outcome_nodes[0]
+        assert outcome["id"] == "O-001"
+        # V2 schema: 'goals' instead of 'supports_goals'
+        assert "goals" in outcome
+        assert outcome["goals"] == ["G-002"]
+        assert "supports_goals" not in outcome
+        # V2 schema: 'specifications' instead of 'specifies'
+        assert "specifications" in outcome
+        assert outcome["specifications"] == ["S-001"]
+        assert "specifies" not in outcome
+
+    @jig.verifies("S-084")
+    def test_supports_goal_edges_generated(self, v2_project):
+        """supports_goal edges generated from goals field in A/O nodes."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        edges = [
+            json.loads(line)
+            for line in lines[1:]
+            if "source" in line and "target" in line
+        ]
+
+        supports_goal_edges = [e for e in edges if e["type"] == "supports_goal"]
+
+        # A-001 has goals: [G-001], so one A->G edge
+        # O-001 has goals: [G-002], so one O->G edge
+        assert len(supports_goal_edges) == 2
+        assert {"source": "A-001", "target": "G-001", "type": "supports_goal"} in supports_goal_edges
+        assert {"source": "O-001", "target": "G-002", "type": "supports_goal"} in supports_goal_edges
+
+    @jig.verifies("S-085")
+    def test_specifications_edges_replace_constrains(self, v2_project):
+        """Edge type 'specifications' replaces 'constrains' (V2 schema)."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        edges = [
+            json.loads(line)
+            for line in lines[1:]
+            if "source" in line and "target" in line
+        ]
+
+        # A-001 has specifications: [S-001, S-002]
+        # V2 schema: edge type is 'specifications', not 'constrains'
+        spec_edges = [e for e in edges if e["type"] == "specifications"]
+        constrains_edges = [e for e in edges if e["type"] == "constrains"]
+
+        assert len(constrains_edges) == 0, "V2 schema should not have 'constrains' edge type"
+        assert len(spec_edges) == 2
+        assert {"source": "A-001", "target": "S-001", "type": "specifications"} in spec_edges
+        assert {"source": "A-001", "target": "S-002", "type": "specifications"} in spec_edges
+
+    @jig.verifies("S-083")
+    def test_defines_goal_edges_use_goals_field(self, v2_project):
+        """defines_goal edges use 'goals' field from Charter (V2 schema)."""
+        output_path = v2_project / "jig" / "generated" / "intent-graph.ndjson"
+
+        generate_intent_graph(
+            project_root=v2_project,
+            output_path=output_path,
+            include_timestamp=False,
+        )
+
+        lines = output_path.read_text().strip().split("\n")
+        edges = [
+            json.loads(line)
+            for line in lines[1:]
+            if "source" in line and "target" in line
+        ]
+
+        defines_goal_edges = [e for e in edges if e["type"] == "defines_goal"]
+
+        # Charter has goals: [G-001, G-002]
+        assert len(defines_goal_edges) == 2
+        assert {"source": "Charter", "target": "G-001", "type": "defines_goal"} in defines_goal_edges
+        assert {"source": "Charter", "target": "G-002", "type": "defines_goal"} in defines_goal_edges

@@ -11,22 +11,24 @@ bricks:
     units:
       - M-jig.cli.main
       - M-jig.cli.validate
-      - M-jig.cli.layers
-      - M-jig.cli.verify
       - M-jig.cli.discovery
       - M-jig.cli.rebuild
       - M-jig.cli.show
       - M-jig.cli.audit
       - M-jig.cli.auto_rebuild
+      - M-jig.cli.output
+      - M-jig.cli.init
+      - M-jig.cli.mend
+      - M-jig.cli.context
+      - M-jig.cli.overview
 
   - id: B-validation
     name: Artifact Validation
-    layer: 0 
+    layer: 0
     units:
-      - M-jig.validation.intent
-      - M-jig.validation.bricks
       - M-jig.validation.models
       - M-jig.validation.reporting
+      - M-jig.validation.engine
 
   - id: B-impl-graph
     name: Implementation Graph
@@ -85,3 +87,48 @@ bricks:
     layer: 0
     units:
       - M-jig.staleness
+
+  - id: B-templates
+    name: Template Content
+    layer: 0
+    units:
+      - M-jig.templates.templates
+
+  - id: B-init
+    name: Project Initialization
+    layer: 0
+    units:
+      - M-jig.init
+
+  - id: B-rules
+    name: Rules Engine
+    layer: 0
+    units:
+      - M-jig.rules.base
+      - M-jig.rules.context
+      - M-jig.rules.registry
+      - M-jig.rules.types.__init__
+      - M-jig.rules.types.required_field
+      - M-jig.rules.types.id_format
+      - M-jig.rules.types.uniqueness
+      - M-jig.rules.types.filename_sync
+      - M-jig.rules.types.header_sync
+      - M-jig.rules.types.excluded_field
+      - M-jig.rules.types.field_type
+      - M-jig.rules.types.field_value
+      - M-jig.rules.types.reference_validity
+      - M-jig.rules.types.bidirectional_link
+      - M-jig.rules.types.coverage
+      - M-jig.rules.types.partition
+      - M-jig.rules.types.dag
+      - M-jig.rules.types.layer_constraint
+      - M-jig.rules.types.isolation
+
+  - id: B-mend
+    name: Mend Actions
+    layer: 0
+    units:
+      - M-jig.mend.__init__
+      - M-jig.mend.yaml_editor
+      - M-jig.mend.actions
+      - M-jig.mend.engine

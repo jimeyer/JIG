@@ -27,10 +27,13 @@ def project_dir():
         (project / "jig" / "generated").mkdir()
 
         # Create a valid specification
-        spec_file = project / "jig" / "specifications" / "S-001.md"
+        spec_file = project / "jig" / "specifications" / "S-001_Test_Specification.md"
         spec_file.write_text("""---
 id: S-001
 type: specification
+title: Test Specification
+outcomes: [O-001]
+architecture: []
 ---
 
 # Test Specification
@@ -42,11 +45,12 @@ A test specification for validation.
 """)
 
         # Create a valid outcome
-        outcome_file = project / "jig" / "outcomes" / "O-001.md"
+        outcome_file = project / "jig" / "outcomes" / "O-001_Test_Outcome.md"
         outcome_file.write_text("""---
 id: O-001
 type: outcome
-specifies:
+title: Test Outcome
+specifications:
   - S-001
 ---
 
@@ -80,10 +84,13 @@ def test_validate_uses_config_paths(project_dir):
     bricks_file.write_text("bricks: []\n")
 
     # Create a spec in custom location
-    spec_file = project_dir / "custom_jig" / "specifications" / "S-002.md"
+    spec_file = project_dir / "custom_jig" / "specifications" / "S-002_Custom_Specification.md"
     spec_file.write_text("""---
 id: S-002
 type: specification
+title: Custom Specification
+outcomes: [O-002]
+architecture: []
 ---
 
 # Custom Specification
@@ -95,11 +102,12 @@ A custom specification.
 """)
 
     # Create an outcome that specifies this spec
-    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-002.md"
+    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-002_Custom_Outcome.md"
     outcome_file.write_text("""---
 id: O-002
 type: outcome
-specifies:
+title: Custom Outcome
+specifications:
   - S-002
 ---
 
@@ -121,9 +129,10 @@ jig_root = "custom_jig"
         os.chdir(project_dir)
         result = runner.invoke(cli, ["validate", "intent"])
 
-    # Should find spec from custom path
+    # Should find spec from custom path and pass validation
     assert result.exit_code == 0, f"Output: {result.output}"
-    assert "1 files" in result.output
+    # New engine outputs "Validation passed." for success
+    assert "passed" in result.output.lower()
 
 
 @jig.verifies("S-065")
@@ -348,10 +357,13 @@ def test_full_workflow_with_config(project_dir):
     bricks_file.write_text("bricks: []\n")
 
     # Create specification
-    spec_file = project_dir / "custom_jig" / "specifications" / "S-100.md"
+    spec_file = project_dir / "custom_jig" / "specifications" / "S-100_Workflow_Test_Spec.md"
     spec_file.write_text("""---
 id: S-100
 type: specification
+title: Workflow Test Spec
+outcomes: [O-100]
+architecture: []
 ---
 
 # Workflow Test Spec
@@ -363,11 +375,12 @@ Test specification for full workflow.
 """)
 
     # Create outcome
-    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-100.md"
+    outcome_file = project_dir / "custom_jig" / "outcomes" / "O-100_Workflow_Test_Outcome.md"
     outcome_file.write_text("""---
 id: O-100
 type: outcome
-specifies:
+title: Workflow Test Outcome
+specifications:
   - S-100
 ---
 

@@ -32,6 +32,8 @@ def _make_test_config(tmp_path: Path) -> JigConfig:
         outcomes=jig_root / "outcomes",
         bricks=jig_root / "bricks.yaml",
         generated=generated,
+        charter=jig_root / "Charter.md",
+        architecture=jig_root / "architecture",
     )
 
     return JigConfig(
@@ -168,7 +170,7 @@ def test_coverage_command_shows_progress(tmp_path):
 
     assert "Running coverage audit" in messages_str
     assert "Running tests with coverage" in messages_str
-    assert "Extracting T→F edges" in messages_str
+    assert "Extracting T->F edges" in messages_str
     assert "Writing record file" in messages_str
 
 

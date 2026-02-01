@@ -1,0 +1,54 @@
+---
+id: O-018
+title: Test-to-Specification Traceability
+type: outcome
+theme: [Alignment Graph]
+goals: [G-001, G-004]
+specifications: [S-051, S-052, S-053, S-054, S-055, S-056]
+---
+
+# Test-to-Specification Traceability
+
+**Value:** Tests that verify specifications are discoverable and queryable, completing the T→S edge of the S-F-T alignment triangle.
+
+**Acceptance:** `@jig.verifies` decorators create machine-queryable T→S edges with 99%+ extraction accuracy.
+
+## AI Agent Benefit
+
+Agents can query "which specs have no verifying tests?" to identify verification gaps before claiming work is complete. Without T→S traceability, agents cannot verify their implementation work is properly tested - they would have to guess or rely on naming conventions that fail silently.
+
+## Rationale
+
+The S-F-T alignment triangle requires three edges: F→S (implements), T→S (verifies), and T→F (covers). Without T→S traceability, the triangle is incomplete - we know what code implements specs, but not what tests verify them.
+
+Testing without spec linkage is "testing theater" - tests pass, but we cannot prove they validate intended behavior. A test named `test_auth_flow` might test authentication or might test something tangentially related. Only explicit `@jig.verifies("S-001")` decorators create trustworthy verification claims.
+
+With T→S edges captured, JIG can answer critical questions: Which specs have zero tests? Which have redundant tests? Which tests verify multiple specs (integration tests)? These queries surface verification gaps that would otherwise hide until production failures.
+
+The verification graph enables coverage analysis that goes beyond line coverage to intent coverage - are we testing what matters, not just executing code paths?
+
+## Success Criteria
+
+The verification graph must:
+1. Discover all test files following pytest conventions
+2. Extract `@jig.verifies` decorators with 99%+ accuracy
+3. Create T→S edges linking tests to specifications
+4. Hash test function content for change detection
+5. Surface verification gaps in `jigy audit` output
+6. Complete verification graph build in <3 seconds for typical projects
+
+## Specified By
+
+This outcome is delivered through:
+- **S-051**: Test File Discovery - finds test files by pytest conventions
+- **S-052**: Test Node Schema - defines test node structure in verification graph
+- **S-053**: Verifies Decorator Extraction - parses `@jig.verifies` from test code
+- **S-054**: Test Function Hashing - enables change detection for tests
+- **S-055**: Verification Graph Generation - generates NDJSON verification graph
+- **S-056**: CLI Verify Rebuild Command - `jigy verify rebuild` command
+
+## Constitution Linkage
+
+This outcome serves: **Part I: Alignment Graph** - Closing the Triangle
+Enables: Complete S-F-T triangle, verification gap detection, intent coverage analysis
+Without this: Alignment triangle is incomplete; cannot prove tests verify intended behavior
