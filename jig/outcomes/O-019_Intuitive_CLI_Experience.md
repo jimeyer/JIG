@@ -4,7 +4,7 @@ title: Intuitive CLI Experience
 type: outcome
 theme: [Experience]
 goals: [G-002]
-specifications: [S-057, S-058, S-059, S-060, S-061]
+specifications: [S-057, S-058, S-061, S-110, S-114, S-115]
 ---
 
 # Intuitive CLI Experience
@@ -42,9 +42,10 @@ The CLI must:
 This outcome is delivered through:
 - **S-057**: Project Root Auto-Discovery - walks up directories to find project
 - **S-058**: Verb-First Rebuild Commands - consistent `jigy rebuild {target}` structure
-- **S-059**: Align Command - single command for full workflow
-- **S-060**: Show Command Structure - `jigy show` for structural queries
 - **S-061**: Minimal Global Options - only `--help` and `--version` globally
+- **S-110**: Context CLI Command - unified orientation and traversal
+- **S-114**: Project Overview Output - consolidated project context
+- **S-115**: CLI Command Aliases - maps hallucinated commands to real ones
 
 ## Constitution Linkage
 

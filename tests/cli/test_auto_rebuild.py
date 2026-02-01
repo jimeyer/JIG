@@ -188,41 +188,65 @@ class TestValidateAutoRebuild:
                         mock_intent.assert_called_once()
 
 
-class TestShowAutoRebuild:
-    """Tests for show command auto-rebuild integration."""
+class TestContextAutoRebuild:
+    """Tests for context command auto-rebuild integration."""
 
     @jig.verifies("S-070")
-    def test_show_overview_rebuilds_all(self, tmp_path: Path):
-        """jigy show rebuilds all stale graphs."""
+    def test_context_overview_rebuilds_all(self, tmp_path: Path):
+        """jigy context (bare) rebuilds all stale graphs."""
         config = make_config(tmp_path)
         (config.paths.bricks).parent.mkdir(parents=True, exist_ok=True)
+
+        # Create minimal graph files so context_command doesn't fail
+        config.paths.generated.mkdir(parents=True, exist_ok=True)
+        (config.paths.generated / "intent-graph.ndjson").write_text('{"_meta": {"version": "2.0"}}\n')
+        (config.paths.generated / "implementation-graph.ndjson").write_text('{"_meta": {"version": "1.0"}}\n')
+        (config.paths.generated / "verification-graph.ndjson").write_text('{"_meta": {"version": "1.0"}}\n')
+        (config.paths.bricks).write_text("bricks: []\n")
 
         with patch("jig.cli.auto_rebuild.is_stale", return_value=True):
             with patch("jig.cli.auto_rebuild._rebuild_impl_quietly") as mock_impl:
                 with patch("jig.cli.auto_rebuild._rebuild_verify_quietly") as mock_verify:
                     with patch("jig.cli.auto_rebuild._rebuild_intent_quietly") as mock_intent:
-                        from jig.cli.show import show_overview_command
-                        show_overview_command(config)
+                        from jig.cli.context import context_command
+                        context_command(
+                            identifier=None,  # Bare = overview
+                            project_root=tmp_path,
+                            skip_rebuild=False,
+                        )
 
                         mock_impl.assert_called_once()
                         mock_verify.assert_called_once()
                         mock_intent.assert_called_once()
 
     @jig.verifies("S-070")
-    def test_show_layers_rebuilds_impl_intent(self, tmp_path: Path):
-        """jigy show layers rebuilds impl + intent graphs."""
+    def test_context_traversal_rebuilds_all(self, tmp_path: Path):
+        """jigy context <id> rebuilds all stale graphs."""
         config = make_config(tmp_path)
         (config.paths.bricks).parent.mkdir(parents=True, exist_ok=True)
+
+        # Create minimal graph files
+        config.paths.generated.mkdir(parents=True, exist_ok=True)
+        (config.paths.generated / "intent-graph.ndjson").write_text(
+            '{"_meta": {"version": "2.0"}}\n{"id": "Charter", "type": "charter"}\n'
+        )
+        (config.paths.generated / "implementation-graph.ndjson").write_text('{"_meta": {"version": "1.0"}}\n')
+        (config.paths.generated / "verification-graph.ndjson").write_text('{"_meta": {"version": "1.0"}}\n')
+        (config.paths.bricks).write_text("bricks: []\n")
 
         with patch("jig.cli.auto_rebuild.is_stale", return_value=True):
             with patch("jig.cli.auto_rebuild._rebuild_impl_quietly") as mock_impl:
                 with patch("jig.cli.auto_rebuild._rebuild_verify_quietly") as mock_verify:
                     with patch("jig.cli.auto_rebuild._rebuild_intent_quietly") as mock_intent:
-                        from jig.cli.show import show_layers_command
-                        show_layers_command(config)
+                        from jig.cli.context import context_command
+                        context_command(
+                            identifier="Charter",
+                            project_root=tmp_path,
+                            skip_rebuild=False,
+                        )
 
                         mock_impl.assert_called_once()
-                        mock_verify.assert_not_called()
+                        mock_verify.assert_called_once()
                         mock_intent.assert_called_once()
 
 

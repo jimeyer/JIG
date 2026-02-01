@@ -1,4 +1,6 @@
-"""Tests verifying old commands have been removed (WU7).
+# ABOUTME: Tests verifying old commands have been removed.
+# ABOUTME: Ensures the clean break from old CLI structure is complete.
+"""Tests verifying old commands have been removed.
 
 These tests ensure the clean break from old CLI structure is complete.
 No @jig decorators since we're testing removal, not behavior.
@@ -63,24 +65,6 @@ def test_verify_rebuild_command_removed():
     assert "No such command" in result.output or "Error" in result.output
 
 
-def test_layers_command_removed():
-    """jigy layers fails with 'No such command'."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["layers"])
-
-    assert result.exit_code == 2
-    assert "No such command" in result.output or "Error" in result.output
-
-
-def test_layers_suggest_command_removed():
-    """jigy layers suggest fails with 'No such command'."""
-    runner = CliRunner()
-    result = runner.invoke(cli, ["layers", "suggest"])
-
-    assert result.exit_code == 2
-    assert "No such command" in result.output or "Error" in result.output
-
-
 def test_old_rebuild_command_removed():
     """jigy rebuild-old fails with 'No such command'."""
     runner = CliRunner()
@@ -90,12 +74,32 @@ def test_old_rebuild_command_removed():
     assert "No such command" in result.output or "Error" in result.output
 
 
-def test_new_commands_still_work():
-    """New verb-first commands are still available."""
+def test_align_command_removed():
+    """jigy align fails with 'No such command' (consolidated into context)."""
+    runner = CliRunner()
+    result = runner.invoke(cli, ["align"])
+
+    assert result.exit_code == 2
+    assert "No such command" in result.output or "Error" in result.output
+
+
+def test_core_commands_still_work():
+    """Core commands are still available."""
     runner = CliRunner()
 
-    # Just check --help works for each new command
-    for cmd in ["align", "rebuild", "show", "validate"]:
+    # Just check --help works for each core command
+    for cmd in ["rebuild", "validate", "context", "mend"]:
         result = runner.invoke(cli, [cmd, "--help"])
         assert result.exit_code == 0, f"{cmd} --help should work"
         assert "Usage:" in result.output
+
+
+def test_alias_commands_work():
+    """Alias commands are available and show (alias) in help."""
+    runner = CliRunner()
+
+    aliases = ["graph", "list", "show", "bricks", "layers", "towers", "fix"]
+    for alias in aliases:
+        result = runner.invoke(cli, [alias, "--help"])
+        assert result.exit_code == 0, f"{alias} --help should work"
+        assert "alias" in result.output.lower(), f"{alias} should show (alias)"

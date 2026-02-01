@@ -387,22 +387,62 @@ class TestContextCommand:
         assert "root" in result
         assert "nodes" in result
 
-    @jig.verifies("S-110")
-    def test_context_command_invalid_identifier_returns_error(self, context_project):
-        """Invalid identifier returns exit code 1 with error message."""
+    @jig.verifies("S-110", "S-111")
+    def test_context_command_invalid_identifier_returns_overview_with_note(self, context_project_full):
+        """Invalid identifier returns overview + note (graceful fallback per S-111)."""
         from jig.cli.context import context_command
 
         exit_code, output = context_command(
             identifier="invalid-thing",
-            project_root=context_project,
+            project_root=context_project_full,
             max_nodes=50,
             output_format="human",
+            skip_rebuild=True,
         )
 
-        assert exit_code == 1
-        assert "Error" in output or "error" in output.lower()
-        # Should mention valid patterns
-        assert "S-###" in output or "valid" in output.lower()
+        # Graceful fallback: returns 0 with overview + note
+        assert exit_code == 0
+        assert "Note:" in output
+        assert "invalid-thing" in output
+        # Should still show overview content
+        assert "Goals:" in output or "Specs:" in output
+
+    @jig.verifies("S-110")
+    def test_context_command_bare_returns_overview(self, context_project_full):
+        """Bare context command (no identifier) returns project overview."""
+        from jig.cli.context import context_command
+
+        exit_code, output = context_command(
+            identifier=None,
+            project_root=context_project_full,
+            max_nodes=50,
+            output_format="human",
+            skip_rebuild=True,
+        )
+
+        assert exit_code == 0
+        # Should have overview content
+        assert "JIG:" in output or "Goals:" in output
+        # Should not have traversal content
+        assert "Context for:" not in output
+
+    @jig.verifies("S-110", "S-111")
+    def test_context_command_nonexistent_spec_returns_overview_with_note(self, context_project_full):
+        """Non-existent spec ID returns overview + 'not found' note."""
+        from jig.cli.context import context_command
+
+        exit_code, output = context_command(
+            identifier="S-999",
+            project_root=context_project_full,
+            max_nodes=50,
+            output_format="human",
+            skip_rebuild=True,
+        )
+
+        assert exit_code == 0
+        assert "Note:" in output
+        assert "S-999" in output
+        assert "not found" in output.lower()
 
     @jig.verifies("S-110")
     def test_context_command_json_output(self, context_project):
@@ -627,7 +667,7 @@ class TestCliIntegration:
             with open("jig/generated/verification-graph.ndjson", "w") as f:
                 f.write('{"_meta": {"version": "1.0"}}\n')
 
-            result = runner.invoke(cli, ["context", "Charter", "-j"])
+            result = runner.invoke(cli, ["--no-rebuild", "context", "Charter", "-j"])
 
             assert result.exit_code == 0
             parsed = json.loads(result.output)
@@ -660,9 +700,9 @@ class TestCliIntegration:
             assert result.exit_code == 0
             assert "# Context:" in result.output
 
-    @jig.verifies("S-110")
-    def test_cli_context_invalid_identifier_shows_patterns(self):
-        """Invalid identifier shows valid patterns in error."""
+    @jig.verifies("S-110", "S-111")
+    def test_cli_context_invalid_identifier_returns_overview_with_note(self):
+        """Invalid identifier returns overview with note (graceful fallback per S-111)."""
         from click.testing import CliRunner
         from jig.cli.main import cli
 
@@ -670,7 +710,13 @@ class TestCliIntegration:
         with runner.isolated_filesystem():
             import os
             os.makedirs("jig/generated", exist_ok=True)
+            os.makedirs("jig/specifications", exist_ok=True)
 
+            # Create minimal files for overview
+            with open("jig.toml", "w") as f:
+                f.write('[jig]\nversion = "0.1.0"\n')
+            with open("jig/bricks.yaml", "w") as f:
+                f.write("bricks: []\n")
             with open("jig/generated/intent-graph.ndjson", "w") as f:
                 f.write('{"_meta": {"version": "2.0"}}\n')
             with open("jig/generated/implementation-graph.ndjson", "w") as f:
@@ -678,11 +724,12 @@ class TestCliIntegration:
             with open("jig/generated/verification-graph.ndjson", "w") as f:
                 f.write('{"_meta": {"version": "1.0"}}\n')
 
-            result = runner.invoke(cli, ["context", "invalid-thing"])
+            result = runner.invoke(cli, ["--no-rebuild", "context", "invalid-thing"])
 
-            assert result.exit_code == 1
-            # Error should show valid patterns
-            assert "S-###" in result.output or "valid" in result.output.lower()
+            # Graceful fallback: exit 0 with overview + note
+            assert result.exit_code == 0
+            assert "Note:" in result.output
+            assert "invalid-thing" in result.output
 
 
 @pytest.fixture
@@ -758,5 +805,109 @@ def context_project(tmp_path):
     # Verification graph
     with open(generated_dir / "verification-graph.ndjson", "w") as f:
         f.write('{"_meta": {"version": "1.0"}}\n')
+
+    return tmp_path
+
+
+@pytest.fixture
+def context_project_full(tmp_path):
+    """Create a full JIG project with actual files for overview testing."""
+    import os
+
+    jig_dir = tmp_path / "jig"
+    generated_dir = jig_dir / "generated"
+    specs_dir = jig_dir / "specifications"
+    outcomes_dir = jig_dir / "outcomes"
+
+    os.makedirs(generated_dir, exist_ok=True)
+    os.makedirs(specs_dir, exist_ok=True)
+    os.makedirs(outcomes_dir, exist_ok=True)
+
+    # Create jig.toml
+    (tmp_path / "jig.toml").write_text('[jig]\nversion = "0.1.0"\n')
+
+    # Create Charter
+    (jig_dir / "Charter_Test.md").write_text("""---
+id: Charter
+type: charter
+goals: [G-001]
+---
+
+# Test Project
+
+## G-001: Test Goal
+
+A test goal.
+""")
+
+    # Create spec
+    (specs_dir / "S-001_Test_Spec.md").write_text("""---
+id: S-001
+title: Test Spec
+type: specification
+outcomes: [O-001]
+---
+
+# Test Spec
+""")
+
+    # Create outcome
+    (outcomes_dir / "O-001_Test_Outcome.md").write_text("""---
+id: O-001
+title: Test Outcome
+type: outcome
+goals: [G-001]
+specifications: [S-001]
+---
+
+# Test Outcome
+""")
+
+    # Create bricks.yaml
+    (jig_dir / "bricks.yaml").write_text("""bricks:
+  - id: B-core
+    name: Core
+    layer: 0
+    units:
+      - M-core.utils
+""")
+
+    # Intent graph
+    intent_nodes = [
+        {"_meta": {"version": "2.0"}},
+        {"id": "Charter", "type": "charter", "file": "jig/Charter_Test.md"},
+        {"id": "G-001", "type": "goal", "title": "Test Goal"},
+        {"id": "O-001", "type": "outcome", "title": "Test Outcome"},
+        {"id": "S-001", "type": "specification", "title": "Test Spec"},
+    ]
+    intent_edges = [
+        {"source": "Charter", "target": "G-001", "type": "defines_goal"},
+        {"source": "O-001", "target": "G-001", "type": "supports_goal"},
+        {"source": "O-001", "target": "S-001", "type": "specifies"},
+    ]
+
+    with open(generated_dir / "intent-graph.ndjson", "w") as f:
+        for item in intent_nodes + intent_edges:
+            f.write(json.dumps(item) + "\n")
+
+    # Implementation graph
+    impl_items = [
+        {"_meta": {"version": "1.0"}},
+        {"id": "F-core.utils.helper", "type": "function"},
+        {"source": "F-core.utils.helper", "target": "S-001", "type": "implements"},
+    ]
+    with open(generated_dir / "implementation-graph.ndjson", "w") as f:
+        for item in impl_items:
+            f.write(json.dumps(item) + "\n")
+
+    # Verification graph
+    verify_items = [
+        {"_meta": {"version": "1.0"}},
+        {"id": "T-test.test_helper", "type": "test"},
+        {"source": "T-test.test_helper", "target": "S-001", "type": "verifies"},
+    ]
+    with open(generated_dir / "verification-graph.ndjson", "w") as f:
+        for item in verify_items:
+            f.write(json.dumps(item) + "\n")
 
     return tmp_path

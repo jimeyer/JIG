@@ -316,45 +316,6 @@ def test_rebuild_verify_json_flag():
 
 
 @jig.verifies("S-093")
-def test_align_json_flag():
-    """jigy align -j produces combined JSON (rebuild + validate)."""
-    import json
-
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_minimal_jig_project(root)
-
-        result = runner.invoke(cli, ["align", "-j"])
-
-        assert result.exit_code == 0
-        output = json.loads(result.output)
-        assert output["status"] == "success" or output["status"] == "aligned"
-        # Should have both rebuild and validate sections
-        assert "graphs" in output or "rebuild" in output
-        assert "validation" in output or "summary" in output
-
-
-@jig.verifies("S-093")
-def test_align_markdown_flag():
-    """jigy align -m produces markdown output."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_minimal_jig_project(root)
-
-        result = runner.invoke(cli, ["align", "-m"])
-
-        assert result.exit_code == 0
-        # Should be markdown with rebuild and validation info
-        assert "# " in result.output or "**" in result.output
-        output_lower = result.output.lower()
-        # Should mention graphs and validation
-        assert "graph" in output_lower or "rebuild" in output_lower
-        assert "validat" in output_lower or "aligned" in output_lower
-
-
-@jig.verifies("S-093")
 def test_rebuild_verbose_flag():
     """jigy rebuild -v produces verbose output."""
     runner = CliRunner()

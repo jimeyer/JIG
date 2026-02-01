@@ -3,7 +3,7 @@ id: O-030
 title: Graph Neighborhood Exploration
 type: outcome
 goals: [G-002, G-005]
-specifications: [S-110, S-111, S-112, S-113]
+specifications: [S-110, S-111, S-112, S-113, S-114]
 ---
 
 # Graph Neighborhood Exploration
@@ -50,6 +50,7 @@ This outcome is delivered through:
 - **S-111**: Context Identifier Resolution - parsing and resolving identifiers
 - **S-112**: Context Graph Traversal - the traversal algorithm
 - **S-113**: Context Response Schema - JSON structure for agent consumption
+- **S-114**: Project Overview Output - unified project context for orientation
 
 ## Charter Linkage
 

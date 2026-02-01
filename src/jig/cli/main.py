@@ -13,7 +13,7 @@ from jig.config import ConfigError, JigConfig, load_config
 class OrderedGroup(click.Group):
     """A Click group with explicit command ordering and commands-first help."""
 
-    COMMAND_ORDER = ["init", "align", "validate", "mend", "show", "context", "audit", "rebuild"]
+    COMMAND_ORDER = ["init", "validate", "mend", "context", "audit", "rebuild"]
 
     def list_commands(self, ctx):
         # Return commands in explicit order, then any others
@@ -90,21 +90,10 @@ from jig.cli.init import init_command
 from jig.cli.mend import mend_command
 from jig.cli.output import add_output_options, resolve_format
 from jig.cli.rebuild import (
-    align_command,
     rebuild_all_command,
     rebuild_impl_command,
     rebuild_intent_command,
     rebuild_verify_command,
-)
-from jig.cli.show import (
-    show_architecture_command,
-    show_bricks_command,
-    show_charter_command,
-    show_goals_command,
-    show_layers_command,
-    show_matrix_command,
-    show_overview_command,
-    show_towers_command,
 )
 from jig.cli.validate import (
     validate_bricks_command,
@@ -286,27 +275,6 @@ def rebuild_verify_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     sys.exit(exit_code)
 
 
-@cli.command()
-@add_output_options
-@click.pass_context
-@jig.implements("S-059", "S-065", "S-093")
-def align(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Run full alignment workflow.
-
-    Rebuilds all graphs, validates artifacts, and displays summary.
-    This is the "do everything" command for keeping JIG in sync.
-
-    Example:
-        jigy align
-        jigy align -j    # JSON output
-        jigy align -m    # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    exit_code = align_command(config, output_format, verbose)
-    sys.exit(exit_code)
-
-
 @cli.group(invoke_without_command=True)
 @add_output_options
 @click.pass_context
@@ -399,174 +367,9 @@ def full(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     sys.exit(exit_code)
 
 
-# Show command group (S-060)
-@cli.group(name="show", invoke_without_command=True)
-@add_output_options
-@click.pass_context
-@jig.implements("S-060", "S-065", "S-071", "S-093")
-def show_group(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display JIG structure information.
-
-    Shows bricks, layers, and other structural details.
-
-    Example:
-        jigy show           # Show overview
-        jigy show layers    # Show layer hierarchy
-        jigy show bricks    # Show brick details
-        jigy show -j        # JSON output
-        jigy show -m        # Markdown output
-    """
-    if ctx.invoked_subcommand is None:
-        # No subcommand = show overview
-        output_format = resolve_format(json, markdown)
-        config = get_config(ctx)
-        skip_rebuild = get_no_rebuild(ctx)
-        exit_code = show_overview_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-        sys.exit(exit_code)
-
-
-@show_group.command(name="layers")
-@add_output_options
-@click.pass_context
-@jig.implements("S-060", "S-065", "S-071", "S-093")
-def show_layers_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display layer hierarchy."""
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_layers_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="bricks")
-@add_output_options
-@click.pass_context
-@jig.implements("S-060", "S-065", "S-071", "S-093")
-def show_bricks_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display brick details."""
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_bricks_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="charter")
-@add_output_options
-@click.pass_context
-@jig.implements("S-072", "S-065", "S-071", "S-093")
-def show_charter_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display Charter.md content and goals.
-
-    Shows the project charter with defined goals.
-
-    Example:
-        jigy show charter
-        jigy show charter -j    # JSON output
-        jigy show charter -m    # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_charter_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="goals")
-@add_output_options
-@click.pass_context
-@jig.implements("S-075", "S-065", "S-071", "S-093")
-def show_goals_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display all goals with supporting artifacts.
-
-    Lists goals from Charter.md with their supporting
-    Outcomes and Architecture documents.
-
-    Example:
-        jigy show goals
-        jigy show goals -j    # JSON output
-        jigy show goals -m    # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_goals_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="architecture")
-@click.argument("arch_id", required=False, default=None)
-@add_output_options
-@click.pass_context
-@jig.implements("S-076", "S-065", "S-071", "S-093")
-def show_architecture_cli(ctx, arch_id: str | None, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display architecture documents.
-
-    Lists all architecture documents, or shows details
-    for a specific one if ARCH_ID is provided.
-
-    Example:
-        jigy show architecture         # List all
-        jigy show architecture A-001   # Show specific
-        jigy show architecture -j      # JSON output
-        jigy show architecture -m      # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_architecture_command(config, arch_id=arch_id, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="towers")
-@click.argument("tower_id", required=False, default=None)
-@add_output_options
-@click.pass_context
-@jig.implements("S-060", "S-090", "S-065", "S-071", "S-093")
-def show_towers_cli(ctx, tower_id: str | None, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display tower structure with brick counts.
-
-    Lists all towers with brick counts by layer.
-    For single-tower projects, shows appropriate message.
-
-    Example:
-        jigy show towers           # List all towers
-        jigy show towers backend   # Show specific tower
-        jigy show towers -j        # JSON output
-        jigy show towers -m        # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_towers_command(config, tower_id=tower_id, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
-@show_group.command(name="matrix")
-@add_output_options
-@click.pass_context
-@jig.implements("S-060", "S-091", "S-065", "S-071", "S-093")
-def show_matrix_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
-    """Display layer x tower grid.
-
-    Shows a matrix view of layers vs towers.
-    For single-tower projects, shows appropriate message.
-
-    Example:
-        jigy show matrix        # Display matrix
-        jigy show matrix -j     # JSON output
-        jigy show matrix -m     # Markdown output
-    """
-    output_format = resolve_format(json, markdown)
-    config = get_config(ctx)
-    skip_rebuild = get_no_rebuild(ctx)
-    exit_code = show_matrix_command(config, output_format=output_format, verbose=verbose, skip_rebuild=skip_rebuild)
-    sys.exit(exit_code)
-
-
 # Context command (S-110)
 @cli.command(name="context")
-@click.argument("identifier")
+@click.argument("identifier", required=False, default=None)
 @click.option(
     "--max",
     "max_nodes",
@@ -578,12 +381,13 @@ def show_matrix_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
 @click.pass_context
 @jig.implements("S-110")
 def context_cli(
-    ctx, identifier: str, max_nodes: int, json: bool, markdown: bool, verbose: bool
+    ctx, identifier: str | None, max_nodes: int, json: bool, markdown: bool, verbose: bool
 ) -> None:
-    """Get graph neighborhood for an identifier.
+    """Get project overview or graph neighborhood for an identifier.
 
-    Returns ancestors and descendants of a node in the JIG graphs.
-    Useful for understanding context before modifying code.
+    Without IDENTIFIER: Returns unified project overview (S-114).
+    With IDENTIFIER: Returns ancestors and descendants of the node.
+    With invalid IDENTIFIER: Returns overview + "not found" note.
 
     IDENTIFIER can be:
       S-### (specification), O-### (outcome), G-### (goal),
@@ -591,12 +395,14 @@ def context_cli(
       T-* (test), Charter, or a file path.
 
     Example:
-        jigy context S-042           # Human-readable output
-        jigy context S-042 -j        # JSON for agents
+        jigy context               # Project overview
+        jigy context S-042         # Graph neighborhood
+        jigy context S-042 -j      # JSON for agents
         jigy context S-042 --max 20  # Limit response size
-        jigy context Charter -m      # Markdown output
+        jigy context S-999         # Overview + "not found" note
     """
     output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
 
     try:
         project_root = find_project_root()
@@ -609,9 +415,296 @@ def context_cli(
         project_root=project_root,
         max_nodes=max_nodes,
         output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
     )
     click.echo(output)
     sys.exit(exit_code)
+
+
+# Alias commands (S-115)
+# Full aliases: graph, list → context (with optional identifier)
+@cli.command(name="graph")
+@click.argument("identifier", required=False, default=None)
+@click.option(
+    "--max",
+    "max_nodes",
+    type=int,
+    default=50,
+    help="Maximum total nodes in response (default: 50)",
+)
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def graph_alias(
+    ctx, identifier: str | None, max_nodes: int, json: bool, markdown: bool, verbose: bool
+) -> None:
+    """(alias) Graph traversal → jigy context."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=identifier,
+        project_root=project_root,
+        max_nodes=max_nodes,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+@cli.command(name="list")
+@click.argument("identifier", required=False, default=None)
+@click.option(
+    "--max",
+    "max_nodes",
+    type=int,
+    default=50,
+    help="Maximum total nodes in response (default: 50)",
+)
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def list_alias(
+    ctx, identifier: str | None, max_nodes: int, json: bool, markdown: bool, verbose: bool
+) -> None:
+    """(alias) List artifacts → jigy context."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=identifier,
+        project_root=project_root,
+        max_nodes=max_nodes,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+@cli.command(name="show")
+@click.argument("identifier", required=False, default=None)
+@click.option(
+    "--max",
+    "max_nodes",
+    type=int,
+    default=50,
+    help="Maximum total nodes in response (default: 50)",
+)
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def show_alias(
+    ctx, identifier: str | None, max_nodes: int, json: bool, markdown: bool, verbose: bool
+) -> None:
+    """(alias) Show info → jigy context."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=identifier,
+        project_root=project_root,
+        max_nodes=max_nodes,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+# Bare-only aliases: bricks, layers, towers → context (overview only)
+@cli.command(name="bricks")
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def bricks_alias(ctx, json: bool, markdown: bool, verbose: bool) -> None:
+    """(alias) Brick info → jigy context (overview)."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=None,  # Bare only - always overview
+        project_root=project_root,
+        max_nodes=50,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+@cli.command(name="layers")
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def layers_alias(ctx, json: bool, markdown: bool, verbose: bool) -> None:
+    """(alias) Layer info → jigy context (overview)."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=None,  # Bare only - always overview
+        project_root=project_root,
+        max_nodes=50,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+@cli.command(name="towers")
+@add_output_options
+@click.pass_context
+@jig.implements("S-115")
+def towers_alias(ctx, json: bool, markdown: bool, verbose: bool) -> None:
+    """(alias) Tower info → jigy context (overview)."""
+    output_format = resolve_format(json, markdown)
+    skip_rebuild = get_no_rebuild(ctx)
+
+    try:
+        project_root = find_project_root()
+    except ProjectNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+    exit_code, output = context_command(
+        identifier=None,  # Bare only - always overview
+        project_root=project_root,
+        max_nodes=50,
+        output_format=output_format.value,
+        verbose=verbose,
+        skip_rebuild=skip_rebuild,
+    )
+    click.echo(output)
+    sys.exit(exit_code)
+
+
+# Fix alias: fix → mend
+@cli.command(name="fix")
+@click.option(
+    "--auto",
+    "auto_mode",
+    is_flag=True,
+    default=False,
+    help="Apply all auto-fixable validation errors",
+)
+@click.option(
+    "--apply",
+    "apply_path",
+    type=click.Path(exists=True, path_type=Path),
+    default=None,
+    help="Apply explicit fixes from JSON file",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Show changes without modifying files",
+)
+@click.option(
+    "--no-iterate",
+    is_flag=True,
+    default=False,
+    help="Disable fixed point iteration (single pass only)",
+)
+@click.option(
+    "-j",
+    "--json",
+    "json_output",
+    is_flag=True,
+    default=False,
+    help="Output results as JSON",
+)
+@jig.implements("S-115")
+def fix_alias(
+    auto_mode: bool,
+    apply_path: Path | None,
+    dry_run: bool,
+    no_iterate: bool,
+    json_output: bool,
+) -> None:
+    """(alias) Fix artifacts → jigy mend."""
+    # Import here to avoid circular imports at module load
+    from jig.mend.engine import mend_apply, mend_auto, mend_combined
+
+    project_root = find_project_root()
+
+    # Same logic as mend_command
+    if auto_mode and apply_path:
+        result = mend_combined(
+            project_root=project_root,
+            auto_json_path=apply_path,
+            dry_run=dry_run,
+            iterate=not no_iterate,
+        )
+    elif apply_path:
+        result = mend_apply(
+            project_root=project_root,
+            apply_path=apply_path,
+            dry_run=dry_run,
+            iterate=not no_iterate,
+        )
+    elif auto_mode:
+        result = mend_auto(
+            project_root=project_root,
+            dry_run=dry_run,
+            iterate=not no_iterate,
+        )
+    else:
+        # Default to auto mode
+        result = mend_auto(
+            project_root=project_root,
+            dry_run=dry_run,
+            iterate=not no_iterate,
+        )
+
+    if json_output:
+        import json
+        click.echo(json.dumps(result, indent=2))
+    else:
+        # Import format function from mend module
+        from jig.cli.mend import _format_text_output
+        click.echo(_format_text_output(result, dry_run))
+
+    sys.exit(0 if result.get("success", True) else 1)
 
 
 # Mend command (S-105, S-106, S-107)

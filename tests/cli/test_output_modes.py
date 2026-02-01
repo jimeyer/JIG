@@ -1,4 +1,6 @@
-"""Integration tests for CLI output modes (WU8 Validation).
+# ABOUTME: Integration tests for CLI output modes.
+# ABOUTME: Verifies -j, -m, -v flags work on all commands and mutual exclusivity.
+"""Integration tests for CLI output modes.
 
 This module provides comprehensive integration tests verifying that:
 1. All commands accept -j, -m, -v flags
@@ -6,9 +8,8 @@ This module provides comprehensive integration tests verifying that:
 3. Markdown output has headers and structure
 4. Verbose adds detail to any format
 5. -j -m produces clear error (mutual exclusivity)
-6. Old standalone commands no longer exist
 
-These tests verify the SCOPE problem is solved at the system boundary.
+These tests verify the output format specs are correctly implemented.
 """
 
 import json
@@ -96,26 +97,12 @@ Architecture description.
 """
     )
 
-    # Create bricks.yaml with multiple towers
+    # Create bricks.yaml
     (root / "jig" / "bricks.yaml").write_text(
         """bricks:
-  - id: B-backend
-    name: Backend Brick
-    layer: 0
-    tower: backend
-    units:
-      - M-backend
-
-  - id: B-frontend
-    name: Frontend Brick
-    layer: 0
-    tower: frontend
-    units:
-      - M-frontend
-
   - id: B-core
     name: Core Brick
-    layer: 1
+    layer: 0
     units:
       - M-core
 """
@@ -125,16 +112,15 @@ Architecture description.
     impl_graph = root / "jig" / "generated" / "implementation-graph.ndjson"
     impl_graph.write_text(
         json.dumps({"_meta": {"version": "1.0"}}) + "\n"
-        + json.dumps({"type": "module", "id": "M-backend", "file": "src/backend.py"}) + "\n"
-        + json.dumps({"type": "module", "id": "M-frontend", "file": "src/frontend.py"}) + "\n"
         + json.dumps({"type": "module", "id": "M-core", "file": "src/core.py"}) + "\n"
-        + json.dumps({"type": "function", "id": "F-backend.func", "file": "src/backend.py", "line": 5}) + "\n"
     )
 
     # Create intent graph
     intent_graph = root / "jig" / "generated" / "intent-graph.ndjson"
     intent_graph.write_text(
-        json.dumps({"_meta": {"version": "1.0"}}) + "\n"
+        json.dumps({"_meta": {"version": "2.0"}}) + "\n"
+        + json.dumps({"type": "charter", "id": "Charter", "file": "jig/Charter.md"}) + "\n"
+        + json.dumps({"type": "goal", "id": "G-001", "title": "Test Goal"}) + "\n"
         + json.dumps({"type": "specification", "id": "S-001", "file": "jig/specifications/S-001_Test_Specification.md"}) + "\n"
     )
 
@@ -142,40 +128,14 @@ Architecture description.
     verify_graph = root / "jig" / "generated" / "verification-graph.ndjson"
     verify_graph.write_text(
         json.dumps({"_meta": {"version": "1.0"}}) + "\n"
-        + json.dumps({"type": "test", "id": "T-test.test_func", "file": "tests/test_example.py", "line": 5}) + "\n"
     )
 
     # Create src directory
     (root / "src").mkdir()
-    (root / "src" / "backend.py").write_text(
-        '''"""Backend module."""
-
-import jig
-
-
-@jig.implements("S-001")
-def backend_func():
-    """Backend function."""
-    pass
-'''
-    )
-    (root / "src" / "frontend.py").write_text('"""Frontend module."""\n')
     (root / "src" / "core.py").write_text('"""Core module."""\n')
 
     # Create tests directory
     (root / "tests").mkdir()
-    (root / "tests" / "test_example.py").write_text(
-        '''"""Example tests."""
-
-import jig
-
-
-@jig.verifies("S-001")
-def test_example():
-    """Example test."""
-    pass
-'''
-    )
 
 
 # ============================================================================
@@ -195,17 +155,8 @@ COMMANDS_WITH_OUTPUT_FLAGS = [
     (["rebuild", "impl"], "rebuild impl"),
     (["rebuild", "intent"], "rebuild intent"),
     (["rebuild", "verify"], "rebuild verify"),
-    # align command
-    (["align"], "align"),
-    # show commands
-    (["show"], "show"),
-    (["show", "layers"], "show layers"),
-    (["show", "bricks"], "show bricks"),
-    (["show", "charter"], "show charter"),
-    (["show", "goals"], "show goals"),
-    (["show", "architecture"], "show architecture"),
-    (["show", "towers"], "show towers"),
-    (["show", "matrix"], "show matrix"),
+    # context command
+    (["context"], "context"),
     # audit commands
     (["audit", "coverage"], "audit coverage"),
 ]
@@ -280,11 +231,7 @@ JSON_TESTABLE_COMMANDS = [
     (["--no-rebuild", "validate", "intent", "-j"], "validate intent -j"),
     (["--no-rebuild", "validate", "bricks", "-j"], "validate bricks -j"),
     (["--no-rebuild", "validate", "full", "-j"], "validate full -j"),
-    (["--no-rebuild", "show", "-j"], "show -j"),
-    (["--no-rebuild", "show", "layers", "-j"], "show layers -j"),
-    (["--no-rebuild", "show", "bricks", "-j"], "show bricks -j"),
-    (["--no-rebuild", "show", "towers", "-j"], "show towers -j"),
-    (["--no-rebuild", "show", "matrix", "-j"], "show matrix -j"),
+    (["--no-rebuild", "context", "-j"], "context -j"),
 ]
 
 
@@ -334,11 +281,7 @@ def test_json_output_is_single_line(cmd_args, cmd_name):
 MARKDOWN_TESTABLE_COMMANDS = [
     (["--no-rebuild", "validate", "-m"], "validate -m"),
     (["--no-rebuild", "validate", "intent", "-m"], "validate intent -m"),
-    (["--no-rebuild", "show", "-m"], "show -m"),
-    (["--no-rebuild", "show", "layers", "-m"], "show layers -m"),
-    (["--no-rebuild", "show", "bricks", "-m"], "show bricks -m"),
-    (["--no-rebuild", "show", "towers", "-m"], "show towers -m"),
-    (["--no-rebuild", "show", "matrix", "-m"], "show matrix -m"),
+    (["--no-rebuild", "context", "-m"], "context -m"),
 ]
 
 
@@ -386,8 +329,7 @@ def test_markdown_output_is_not_json(cmd_args, cmd_name):
 
 VERBOSE_TESTABLE_COMMANDS = [
     (["--no-rebuild", "validate", "-v"], "validate -v"),
-    (["--no-rebuild", "show", "-v"], "show -v"),
-    (["--no-rebuild", "show", "layers", "-v"], "show layers -v"),
+    (["--no-rebuild", "context", "-v"], "context -v"),
 ]
 
 
@@ -446,9 +388,7 @@ def test_markdown_verbose_combination():
 
 
 OLD_COMMANDS = [
-    (["towers"], "jigy towers"),
     (["matrix"], "jigy matrix"),
-    (["layers"], "jigy layers"),
     (["impl"], "jigy impl"),
     (["intent"], "jigy intent"),
     (["verify"], "jigy verify"),
@@ -456,7 +396,7 @@ OLD_COMMANDS = [
 
 
 @pytest.mark.parametrize("cmd_args,cmd_name", OLD_COMMANDS)
-@jig.verifies("S-060", "S-090", "S-091")
+@jig.verifies("S-115")
 def test_old_command_not_available(cmd_args, cmd_name):
     """Old standalone commands are not available."""
     runner = CliRunner()
@@ -473,150 +413,43 @@ def test_old_command_not_available(cmd_args, cmd_name):
 
 
 # ============================================================================
-# Test: New Commands Work Under Show Group
+# Test: Alias Commands Work
 # ============================================================================
 
 
-@jig.verifies("S-060", "S-090")
-def test_show_towers_works():
-    """jigy show towers works as replacement for jigy towers."""
+ALIAS_COMMANDS = [
+    (["graph"], "jigy graph"),
+    (["list"], "jigy list"),
+    (["show"], "jigy show"),
+    (["bricks"], "jigy bricks"),
+    (["layers"], "jigy layers"),
+    (["towers"], "jigy towers"),
+    (["fix", "--dry-run"], "jigy fix"),
+]
+
+
+@pytest.mark.parametrize("cmd_args,cmd_name", ALIAS_COMMANDS)
+@jig.verifies("S-115")
+def test_alias_command_works(cmd_args, cmd_name):
+    """Alias commands are available and work."""
     runner = CliRunner()
     with runner.isolated_filesystem() as tmpdir:
         root = Path(tmpdir)
         create_full_jig_project(root)
 
-        result = runner.invoke(cli, ["show", "towers"])
+        result = runner.invoke(cli, ["--no-rebuild"] + cmd_args)
 
-        assert result.exit_code == 0, "show towers should succeed"
-        # Should show tower info
-        assert "backend" in result.output.lower() or "frontend" in result.output.lower() or "tower" in result.output.lower()
+        assert result.exit_code == 0, \
+            f"{cmd_name} should work as alias: {result.output}"
 
 
-@jig.verifies("S-060", "S-091")
-def test_show_matrix_works():
-    """jigy show matrix works as replacement for jigy matrix."""
+@jig.verifies("S-115")
+def test_alias_commands_show_alias_in_help():
+    """Alias commands show (alias) in their help output."""
     runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
 
-        result = runner.invoke(cli, ["show", "matrix"])
-
-        assert result.exit_code == 0, "show matrix should succeed"
-
-
-@jig.verifies("S-060", "S-090")
-def test_show_towers_specific_tower():
-    """jigy show towers <id> shows specific tower."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["show", "towers", "backend"])
-
-        assert result.exit_code == 0, "show towers backend should succeed"
-        assert "backend" in result.output.lower()
-
-
-# ============================================================================
-# Test: Complete Command Matrix
-# ============================================================================
-
-
-# All commands x all flags matrix
-COMPLETE_COMMAND_FLAG_MATRIX = []
-for cmd_args, cmd_name in COMMANDS_WITH_OUTPUT_FLAGS:
-    for flags, flag_name in [
-        ([], "no flags"),
-        (["-j"], "-j"),
-        (["-m"], "-m"),
-        (["-v"], "-v"),
-        (["-j", "-v"], "-j -v"),
-        (["-m", "-v"], "-m -v"),
-    ]:
-        COMPLETE_COMMAND_FLAG_MATRIX.append(
-            (cmd_args, cmd_name, flags, flag_name)
-        )
-
-
-@pytest.mark.parametrize("cmd_args,cmd_name,flags,flag_name", COMPLETE_COMMAND_FLAG_MATRIX)
-@jig.verifies("S-093")
-def test_command_flag_combination_accepted(cmd_args, cmd_name, flags, flag_name):
-    """All command x flag combinations are accepted (no 'no such option' error)."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["--no-rebuild"] + cmd_args + flags)
-
-        # Should not have "no such option" error
-        assert "no such option" not in result.output.lower(), \
-            f"{cmd_name} {flag_name} should be accepted"
-
-
-# ============================================================================
-# Test: Rebuild Commands (require actual rebuild)
-# ============================================================================
-
-
-@jig.verifies("S-093")
-def test_rebuild_json_output():
-    """jigy rebuild -j produces valid JSON with graph info."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["rebuild", "-j"])
-
-        assert result.exit_code == 0, f"rebuild -j failed: {result.output}"
-        data = json.loads(result.output)
-        assert data["status"] == "success"
-        assert "graphs" in data
-        assert "duration_ms" in data
-
-
-@jig.verifies("S-093")
-def test_rebuild_markdown_output():
-    """jigy rebuild -m produces markdown output."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["rebuild", "-m"])
-
-        assert result.exit_code == 0, f"rebuild -m failed: {result.output}"
-        assert "#" in result.output or "**" in result.output
-
-
-@jig.verifies("S-093")
-def test_align_json_output():
-    """jigy align -j produces combined JSON output."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["align", "-j"])
-
-        assert result.exit_code == 0, f"align -j failed: {result.output}"
-        data = json.loads(result.output)
-        # Should have status and sections
-        assert "status" in data
-
-
-@jig.verifies("S-093")
-def test_align_markdown_output():
-    """jigy align -m produces markdown output."""
-    runner = CliRunner()
-    with runner.isolated_filesystem() as tmpdir:
-        root = Path(tmpdir)
-        create_full_jig_project(root)
-
-        result = runner.invoke(cli, ["align", "-m"])
-
-        assert result.exit_code == 0, f"align -m failed: {result.output}"
-        assert "#" in result.output or "**" in result.output
+    aliases = ["graph", "list", "show", "bricks", "layers", "towers", "fix"]
+    for alias in aliases:
+        result = runner.invoke(cli, [alias, "--help"])
+        assert result.exit_code == 0, f"{alias} --help should work"
+        assert "alias" in result.output.lower(), f"{alias} help should mention 'alias'"

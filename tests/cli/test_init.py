@@ -37,17 +37,17 @@ def test_init_in_command_order():
     # We need to find the position of "init" as a command, not in description text
     lines = output.split("\n")
     init_line_idx = None
-    align_line_idx = None
+    context_line_idx = None
     for idx, line in enumerate(lines):
         # Commands are listed as "  command_name  description"
         stripped = line.strip()
         if stripped.startswith("init ") or stripped == "init":
             init_line_idx = idx
-        if stripped.startswith("align ") or stripped == "align":
-            align_line_idx = idx
+        if stripped.startswith("context ") or stripped == "context":
+            context_line_idx = idx
     assert init_line_idx is not None, "init command should appear in help"
-    assert align_line_idx is not None, "align command should appear in help"
-    assert init_line_idx < align_line_idx, "init should appear before align in commands list"
+    assert context_line_idx is not None, "context command should appear in help"
+    assert init_line_idx < context_line_idx, "init should appear before context in commands list"
 
 
 # ========================================================================

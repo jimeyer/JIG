@@ -5,7 +5,7 @@ status: active
 created: 1737741600
 created_human: "2026-01-24 12:00 CST"
 parent: "[[E005_EXPLORATION_CLI_Tool_Usage_Analysis]]"
-children: []
+children: ["[[E023_JIGPLAN_CLI_Command_Consolidation]]"]
 ---
 # CLI Command Consolidation
 

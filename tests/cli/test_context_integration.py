@@ -99,18 +99,17 @@ class TestContextIntegration:
         assert data["more"] > 0, "Should indicate more nodes were truncated"
 
     @jig.verifies("S-110", "S-111")
-    def test_context_invalid_identifier_shows_patterns(self):
-        """Invalid identifier produces helpful error with valid patterns."""
+    def test_context_invalid_identifier_shows_overview_with_note(self):
+        """Invalid identifier returns overview + note (graceful fallback per S-111)."""
         runner = CliRunner()
         result = runner.invoke(cli, ["context", "INVALID"])
 
-        assert result.exit_code == 1, "Should fail with exit code 1"
+        # Graceful fallback: exit 0 with overview + note
+        assert result.exit_code == 0, f"Should succeed with overview: {result.output}"
 
-        # Error should list valid patterns
-        assert "S-###" in result.output, "Should mention S-### pattern"
-        assert "O-###" in result.output, "Should mention O-### pattern"
-        assert "G-###" in result.output, "Should mention G-### pattern"
-        assert "Charter" in result.output, "Should mention Charter pattern"
+        # Should mention the invalid identifier
+        assert "INVALID" in result.output, "Should mention the invalid identifier"
+        assert "Note:" in result.output, "Should have a note about the invalid identifier"
 
     @jig.verifies("S-110")
     def test_context_default_human_readable_output(self):

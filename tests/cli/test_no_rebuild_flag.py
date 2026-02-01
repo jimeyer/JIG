@@ -1,3 +1,5 @@
+# ABOUTME: Tests for --no-rebuild global flag.
+# ABOUTME: Verifies that --no-rebuild skips staleness detection and auto-rebuild.
 """Tests for --no-rebuild global flag.
 
 Verifies that --no-rebuild skips staleness detection and auto-rebuild.
@@ -66,34 +68,19 @@ class TestNoRebuildFlagCLI:
                 assert call_kwargs.get("skip_rebuild") is True
 
     @jig.verifies("S-071")
-    def test_flag_before_show(self):
-        """--no-rebuild works before show subcommand."""
+    def test_flag_before_context(self):
+        """--no-rebuild works before context subcommand."""
         runner = CliRunner()
 
-        with patch("jig.cli.main.show_overview_command") as mock_show:
-            mock_show.return_value = 0
-            with patch("jig.cli.main.get_config") as mock_config:
-                mock_config.return_value = None
-                result = runner.invoke(cli, ["--no-rebuild", "show"])
+        with patch("jig.cli.main.context_command") as mock_context:
+            mock_context.return_value = (0, "output")
+            with patch("jig.cli.main.find_project_root") as mock_find:
+                mock_find.return_value = Path("/tmp")
+                result = runner.invoke(cli, ["--no-rebuild", "context"])
 
                 # Should pass skip_rebuild=True
-                mock_show.assert_called_once()
-                call_kwargs = mock_show.call_args[1]
-                assert call_kwargs.get("skip_rebuild") is True
-
-    @jig.verifies("S-071")
-    def test_flag_before_show_layers(self):
-        """--no-rebuild works before show layers subcommand."""
-        runner = CliRunner()
-
-        with patch("jig.cli.main.show_layers_command") as mock_show:
-            mock_show.return_value = 0
-            with patch("jig.cli.main.get_config") as mock_config:
-                mock_config.return_value = None
-                result = runner.invoke(cli, ["--no-rebuild", "show", "layers"])
-
-                mock_show.assert_called_once()
-                call_kwargs = mock_show.call_args[1]
+                mock_context.assert_called_once()
+                call_kwargs = mock_context.call_args[1]
                 assert call_kwargs.get("skip_rebuild") is True
 
 
@@ -120,19 +107,19 @@ class TestNoRebuildSkipsStalenessCheck:
                     assert call_kwargs.get("skip_rebuild") is True
 
     @jig.verifies("S-071")
-    def test_show_with_no_rebuild_skips_staleness(self):
-        """show with --no-rebuild doesn't check staleness."""
+    def test_context_with_no_rebuild_skips_staleness(self):
+        """context with --no-rebuild doesn't check staleness."""
         runner = CliRunner()
 
         with patch("jig.cli.auto_rebuild.is_stale") as mock_is_stale:
-            with patch("jig.cli.main.show_overview_command") as mock_show:
-                mock_show.return_value = 0
-                with patch("jig.cli.main.get_config") as mock_config:
-                    mock_config.return_value = None
+            with patch("jig.cli.main.context_command") as mock_context:
+                mock_context.return_value = (0, "output")
+                with patch("jig.cli.main.find_project_root") as mock_find:
+                    mock_find.return_value = Path("/tmp")
 
-                    runner.invoke(cli, ["--no-rebuild", "show"])
+                    runner.invoke(cli, ["--no-rebuild", "context"])
 
-                    call_kwargs = mock_show.call_args[1]
+                    call_kwargs = mock_context.call_args[1]
                     assert call_kwargs.get("skip_rebuild") is True
 
 
