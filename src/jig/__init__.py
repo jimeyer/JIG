@@ -1,15 +1,14 @@
 """JIG (Jig Intent Graph) - Git-native constraint-driven development tool."""
 
-from typing import Callable, TypeVar, Union
+from typing import Callable, TypeVar
 
 __version__ = "0.2.0"
 
-# Type variable for decorated functions/classes
-F = TypeVar("F", bound=Callable)
-C = TypeVar("C", bound=type)
+# Type variable for decorated functions/classes (passthrough decorator)
+T = TypeVar("T")
 
 
-def implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]:
+def implements(*spec_ids: str) -> Callable[[T], T]:
     """Decorator to mark functions/classes as implementing specifications.
 
     Usage:
@@ -27,16 +26,16 @@ def implements(*spec_ids: str) -> Callable[[Union[F, C]], Union[F, C]]:
     Returns:
         Decorator function that adds implementation metadata
     """
-    def decorator(obj: Union[F, C]) -> Union[F, C]:
+    def decorator(obj: T) -> T:
         # Store spec IDs as metadata on the function/class
         if not hasattr(obj, "__jig_implements__"):
-            obj.__jig_implements__ = []
-        obj.__jig_implements__.extend(spec_ids)
+            obj.__jig_implements__: list[str] = []  # type: ignore[attr-defined]
+        obj.__jig_implements__.extend(spec_ids)  # type: ignore[attr-defined]
         return obj
     return decorator
 
 
-def verifies(*spec_ids: str) -> Callable[[F], F]:
+def verifies(*spec_ids: str) -> Callable[[T], T]:
     """Decorator to mark test functions as verifying specifications.
 
     Usage:
@@ -54,11 +53,11 @@ def verifies(*spec_ids: str) -> Callable[[F], F]:
     Returns:
         Decorator function that adds verification metadata
     """
-    def decorator(func: F) -> F:
+    def decorator(func: T) -> T:
         # Store spec IDs as metadata on the test function
         if not hasattr(func, "__jig_verifies__"):
-            func.__jig_verifies__ = []
-        func.__jig_verifies__.extend(spec_ids)
+            func.__jig_verifies__: list[str] = []  # type: ignore[attr-defined]
+        func.__jig_verifies__.extend(spec_ids)  # type: ignore[attr-defined]
         return func
     return decorator
 

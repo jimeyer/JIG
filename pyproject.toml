@@ -47,7 +47,7 @@ jigy = "jig.cli.main:cli"
 where = ["src"]
 
 [tool.setuptools.package-data]
-jig = ["agents/*.md"]
+jig = ["agents/*.md", "py.typed"]
 
 [tool.ruff]
 line-length = 100
