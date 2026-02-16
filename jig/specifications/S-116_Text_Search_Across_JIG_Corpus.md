@@ -3,6 +3,7 @@ id: S-116
 type: specification
 title: Text Search Across JIG Corpus
 outcomes: [O-031]
+architecture: [A-005]
 status: active
 ---
 

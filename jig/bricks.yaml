@@ -124,6 +124,16 @@ bricks:
       - M-jig.rules.types.layer_constraint
       - M-jig.rules.types.isolation
 
+  - id: B-query
+    name: Query Layer
+    layer: 0
+    units:
+      - M-jig.query.__init__
+      - M-jig.query.node
+      - M-jig.query.search
+      - M-jig.query.validate
+      - M-jig.query.overview
+
   - id: B-mend
     name: Mend Actions
     layer: 0
@@ -132,3 +142,10 @@ bricks:
       - M-jig.mend.yaml_editor
       - M-jig.mend.actions
       - M-jig.mend.engine
+
+  - id: B-mcp-server
+    name: MCP Server
+    layer: 1
+    units:
+      - M-jig.mcp.__init__
+      - M-jig.mcp.server

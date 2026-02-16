@@ -2,7 +2,7 @@
 id: O-031
 type: outcome
 title: Programmatic JIG Access for LLM Agents
-supports_goals: [G-001, G-002, G-004, G-005]
+goals: [G-001, G-002, G-004, G-005]
 specifications: [S-116, S-117]
 status: active
 ---

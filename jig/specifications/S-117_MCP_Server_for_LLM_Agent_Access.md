@@ -3,6 +3,7 @@ id: S-117
 type: specification
 title: MCP Server for LLM Agent Access
 outcomes: [O-031]
+architecture: [A-005]
 status: active
 ---
 
