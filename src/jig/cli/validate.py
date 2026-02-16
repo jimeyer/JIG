@@ -6,16 +6,18 @@ Validation CLI commands.
 Uses the rules-based validation engine for all validation.
 """
 
-import sys
-from pathlib import Path
 from typing import Any
 
 import click
 
 import jig
 from jig.config import JigConfig
+from jig.query.validate import (  # noqa: F401
+    BRICK_SPECS,
+    INTENT_SPECS,
+    filter_errors_by_specs,
+)
 from jig.validation.engine import validate
-from jig.validation.reporting import format_as_markdown
 
 
 def _format_engine_results_as_json(result: dict[str, Any]) -> dict[str, Any]:
@@ -182,28 +184,6 @@ def _output_human_results(
     click.echo(f"\nValidation failed: {total} errors ({auto_fixable} auto-fixable, {manual} manual)")
 
 
-def _filter_errors_by_specs(result: dict[str, Any], spec_ids: set[str]) -> dict[str, Any]:
-    """Filter validation result to only include errors for specific specs.
-
-    Args:
-        result: Engine result with 'errors' and 'summary'.
-        spec_ids: Set of spec IDs to include.
-
-    Returns:
-        Filtered result with only matching errors.
-    """
-    filtered_errors = [e for e in result.get("errors", []) if e.get("spec", "") in spec_ids]
-
-    return {
-        "errors": filtered_errors,
-        "summary": {
-            "total": len(filtered_errors),
-            "auto_fixable": sum(1 for e in filtered_errors if e.get("fix", {}).get("auto", False)),
-            "manual": sum(1 for e in filtered_errors if not e.get("fix", {}).get("auto", False)),
-        },
-    }
-
-
 @jig.implements("S-023", "S-026", "S-065", "S-070", "S-093", "S-094")
 def validate_intent_command(
     config: JigConfig,
@@ -233,8 +213,7 @@ def validate_intent_command(
     result = validate(config.project_root)
 
     # Filter to intent-related errors
-    intent_specs = {"S-018", "S-019", "S-020", "S-042", "S-043", "S-072", "S-079", "S-095"}
-    filtered_result = _filter_errors_by_specs(result, intent_specs)
+    filtered_result = filter_errors_by_specs(result, INTENT_SPECS)
 
     # Format output
     if output_format == "json":
@@ -293,8 +272,7 @@ def validate_bricks_command(
     result = validate(config.project_root)
 
     # Filter to brick-related errors
-    brick_specs = {"S-021", "S-022", "S-035", "S-036", "S-037", "S-038", "S-039", "S-086", "S-087", "S-088", "S-089"}
-    filtered_result = _filter_errors_by_specs(result, brick_specs)
+    filtered_result = filter_errors_by_specs(result, BRICK_SPECS)
 
     # Format output
     if output_format == "json":
