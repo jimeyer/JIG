@@ -39,6 +39,9 @@ dev = [
     "types-PyYAML",
     "types-toml",
 ]
+mcp = [
+    "fastmcp>=2.0.0",
+]
 
 [project.scripts]
 jigy = "jig.cli.main:cli"

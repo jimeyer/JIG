@@ -13,7 +13,7 @@ from jig.config import ConfigError, JigConfig, load_config
 class OrderedGroup(click.Group):
     """A Click group with explicit command ordering and commands-first help."""
 
-    COMMAND_ORDER = ["init", "validate", "mend", "context", "audit", "rebuild"]
+    COMMAND_ORDER = ["init", "validate", "mend", "context", "mcp", "audit", "rebuild"]
 
     def list_commands(self, ctx):
         # Return commands in explicit order, then any others
@@ -748,6 +748,28 @@ def audit_coverage_cli(ctx, json: bool, markdown: bool, verbose: bool) -> None:
     skip_rebuild = get_no_rebuild(ctx)
     exit_code = coverage_command(config, skip_rebuild=skip_rebuild, output_format=output_format, verbose=verbose)
     sys.exit(exit_code)
+
+
+# MCP server command (S-117)
+@cli.command(name="mcp")
+@jig.implements("S-117")
+def mcp_cli() -> None:
+    """Start MCP server (stdio transport) for LLM agent access.
+
+    Starts a Model Context Protocol server that exposes JIG query
+    tools over stdio transport for use by LLM coding agents.
+
+    Requires: pip install jig[mcp]
+
+    Example:
+        jigy mcp               # Start MCP server
+    """
+    try:
+        from jig.mcp.server import run_server
+    except ImportError:
+        click.echo("Error: MCP dependencies not installed. Run: pip install jig[mcp]", err=True)
+        sys.exit(1)
+    run_server()
 
 
 if __name__ == "__main__":
