@@ -1,6 +1,10 @@
 # Contributing to JIG
 
-Thank you for your interest in contributing to JIG! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to JIG! 
+
+THIS PROJECT IS PUBLIC BUT NOT FORMALLY LAUNCHED. 
+
+Feel free to explore, clone, modify as you wish.   Ping me if you are interested in discussing anything about this project. 
 
 ## Getting Started
 
