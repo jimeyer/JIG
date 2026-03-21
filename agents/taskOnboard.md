@@ -193,19 +193,83 @@ Create the project charter with goals that capture the *why* behind the project.
 
 ### Process
 
-#### 3.1: Interview the User
+The charter is the one artifact that must come primarily from the human. The code reveals *what* was built; only the human knows *why*. Asking "what are your goals?" directly produces platitudes. Instead, use three discovery lenses that progressively sharpen from concrete to abstract.
 
-The charter is the one artifact that must come primarily from the human. The code reveals *what* was built; only the human knows *why*.
+#### 3.1: Lens 1 — Purpose and Stakeholders
+
+Establish the factual foundation. Most users can answer these easily.
 
 **Ask:**
-- What problem does this project solve? For whom?
-- What are the 3-5 most important things this project must do well?
-- What are the anti-goals — things you explicitly don't optimize for?
-- If a new developer joins, what should they understand first?
+1. **"In one sentence, what does this project do?"** — Forces clarity. If they can't say it in one sentence, explore until they can.
+2. **"Who depends on it?"** — End users, other developers, other systems, operators. List them all.
+3. **"What would break if this project disappeared tomorrow?"** — More revealing than "what does it do" because it identifies what's *uniquely valuable*, not just what exists.
 
-#### 3.2: Propose Charter Draft
+The answers give you the **purpose statement** and a **stakeholder list**. The "what would break" answer often reveals the real purpose better than the project's README.
 
-Based on user input + codebase analysis, draft:
+#### 3.2: Lens 2 — Quality Priorities
+
+Move from description to prioritization. Present quality dimensions and ask the user to **rank and reject** — not check boxes.
+
+**Present this table:**
+
+| Quality | Meaning | Example Signal |
+|---------|---------|----------------|
+| Correctness | Produces right answers, always | Financial calculations, medical |
+| Reliability | Keeps working under adversity | Infrastructure, uptime-critical |
+| Performance | Fast enough for its use case | Real-time, high-throughput |
+| Extensibility | Easy to add new capabilities | Plugin systems, frameworks |
+| Operability | Easy to deploy, monitor, debug | Production services |
+| Usability | Easy for end users | Developer tools, APIs |
+| Security | Resists unauthorized access | Auth, data handling |
+| Maintainability | Easy for developers to change | Long-lived codebases |
+
+**Ask:**
+- **"Pick your top 3-4. Which matter MOST for this project?"**
+- **"Which ones do you explicitly NOT care about?"**
+
+**Rules:** "All of them" is not allowed. The user must choose. Qualities they reject become anti-goals. The ranking reveals real priorities — everyone wants everything, but the ordering is what matters for architectural decisions.
+
+#### 3.3: Lens 3 — Tensions and Tradeoffs
+
+This is the most revealing lens. Based on the user's top qualities from Lens 2, present concrete tension pairs and ask which side wins.
+
+**Generate 2-4 tension pairs from the user's top qualities. Examples:**
+
+- **Correctness vs Speed:** "Do you validate exhaustively, or accept occasional errors for throughput?"
+- **Flexibility vs Simplicity:** "Do you support every edge case, or keep the API surface small?"
+- **Backwards Compatibility vs Clean Design:** "Do you preserve old interfaces, or break them for better abstractions?"
+- **Developer Experience vs Runtime Performance:** "Do you optimize for the person writing code, or the machine running it?"
+- **Completeness vs Ship Date:** "Do you cover every case before releasing, or ship the 80% and iterate?"
+
+**Tailor tensions to the codebase.** If you see elaborate plugin systems, ask about flexibility vs simplicity. If you see defensive error handling everywhere, ask about correctness vs speed. The code informs which tensions are live for this project.
+
+Each resolved tension becomes a **decision heuristic** in the Decision Philosophy section.
+
+#### 3.4: Synthesize Goals
+
+Each goal should follow this structure:
+
+```
+[Specific problem this project faces] → [How the project addresses it]
+```
+
+**For each of the user's top 3-4 qualities, write a goal that:**
+1. Names the specific problem or challenge (not a generic aspiration)
+2. States how the project addresses it (not just "be good at X")
+3. Implies what success looks like (testable, not vague)
+
+**Example synthesis:**
+
+User said: "Correctness matters most. We do financial calculations. Performance matters but correctness always wins."
+
+> **G-1: Calculation Integrity**
+> Financial calculations must produce provably correct results. When correctness conflicts with performance or convenience, correctness wins. All calculation paths have explicit test coverage with known-good reference values.
+
+Compare to the bad version: "G-1: Be Correct — The system should produce correct results." This tells you nothing — every project wants correct results. The good version names the domain (financial calculations), takes a side on a tension (correctness over performance), and implies verification criteria (reference values).
+
+#### 3.5: Propose Charter Draft
+
+Assemble purpose (Lens 1), goals (synthesized from Lenses 2-3), anti-goals (rejected qualities from Lens 2), and decision philosophy (tension resolutions from Lens 3):
 
 ```markdown
 ---
@@ -217,34 +281,38 @@ goals: [G-1, G-2, G-3]
 
 ## Purpose
 
-<2-3 sentences: what problem this solves, for whom>
+<2-3 sentences from Lens 1: what problem this solves, for whom, what breaks without it>
 
 ## Goals
 
 ### G-1: <Goal Name>
-<What this means, why it matters>
+<Problem statement → how the project addresses it>
 
 ### G-2: <Goal Name>
-<What this means, why it matters>
+<Problem statement → how the project addresses it>
 
 ### G-3: <Goal Name>
-<What this means, why it matters>
+<Problem statement → how the project addresses it>
 
 ## Anti-Goals
-- <Things explicitly out of scope or deprioritized>
+- <Rejected qualities from Lens 2, stated as explicit non-priorities>
+- <Things the project deliberately does NOT optimize for>
 
 ## Decision Philosophy
-<Heuristics for resolving tradeoffs — which goals win when they conflict>
+<Tension resolutions from Lens 3, stated as heuristics>
+<e.g., "When correctness conflicts with performance, correctness wins.">
+<e.g., "Prefer clean breaks over backwards compatibility unless external consumers depend on the interface.">
 ```
 
-#### 3.3: Iterate with User
+#### 3.6: Iterate with User
 
 Present the draft. Expect 1-2 rounds of revision. Common adjustments:
 - Combining or splitting goals
 - Sharpening language from vague ("be reliable") to specific ("fail loudly and recover automatically")
 - Adding anti-goals the user forgot to mention
+- Adjusting tension resolutions after seeing them written down
 
-#### 3.4: Write Charter
+#### 3.7: Write Charter
 
 After approval, write to `jig/Charter_<Project>.md`.
 
@@ -252,6 +320,9 @@ After approval, write to `jig/Charter_<Project>.md`.
 
 - Charter file exists with valid frontmatter
 - Every goal ID in `goals:` array has a corresponding `## G-N:` section
+- Goals follow problem→mechanism structure, not generic aspirations
+- Anti-goals section is populated (at least 1 rejected quality)
+- Decision philosophy section has at least 1 tension resolution
 - `jigy validate intent` passes
 
 ---
