@@ -8,7 +8,7 @@
 
 ## Objective
 
-Bootstrap JIG into an existing project. Starting from a codebase with no JIG artifacts, produce a complete intent graph: bricks, charter, architecture docs, and specifications — all validated and aligned.
+Bootstrap JIG into an existing project. Starting from a codebase with no JIG artifacts, produce a complete intent graph: bricks, charter, architecture docs, specifications, and outcomes — all validated and aligned.
 
 **Onboarding is a conversation, not a script.** Each step proposes artifacts to the user, incorporates their feedback, and writes files only after approval. The agent discovers structure; the human provides intent.
 
@@ -32,10 +32,11 @@ Bootstrap JIG into an existing project. Starting from a codebase with no JIG art
 ```
 Step 1: Initialize ──→ jigy init (scaffold)
 Step 2: Discover   ──→ Explore codebase, propose bricks.yaml
-Step 3: Charter    ──→ Interview user, draft Charter + Goals
+Step 3: Charter    ──→ Interview user, draft Charter + Goals + outcome sketches
 Step 4: Architect  ──→ Propose architecture docs from charter + bricks
 Step 5: Specify    ──→ Write specs per brick, bottom-up by layer
-Step 6: Validate   ──→ Run jigy validate, fix errors, confirm alignment
+Step 6: Outcomes   ──→ Formalize outcomes from specs + charter sketches
+Step 7: Validate   ──→ Run jigy validate, fix errors, confirm alignment
 ```
 
 **Validation is continuous.** Run `jigy validate` after every step that writes artifacts, not just at the end. Fix errors before proceeding.
@@ -304,7 +305,31 @@ goals: [G-1, G-2, G-3]
 <e.g., "Prefer clean breaks over backwards compatibility unless external consumers depend on the interface.">
 ```
 
-#### 3.6: Iterate with User
+#### 3.6: Sketch Outcome Candidates
+
+Before leaving the charter conversation, capture lightweight outcome sketches while the user is still in "big picture" mode. These are *not* formal outcome documents — they're informal notes that guide spec writing in Step 5.
+
+**For each goal, ask:**
+> "For G-N, what 2-3 capabilities would tell you this goal is being met in practice?"
+
+The user's answers become outcome sketches — one-line descriptions attached to goals:
+
+```markdown
+## Outcome Sketches (informal — formalized in Step 6)
+
+- G-1 (Calculation Integrity):
+  - "All arithmetic operations produce exact decimal results"
+  - "Rounding rules are explicit and auditable"
+- G-2 (Developer Experience):
+  - "New contributors can run tests within 5 minutes of cloning"
+  - "Error messages point to the fix, not just the failure"
+```
+
+**Why now:** The user just finished articulating goals and tensions — outcome thinking is a natural continuation. These sketches cost very little (a few bullet points per goal) but provide top-down guidance that keeps spec writing oriented toward value delivery.
+
+**Why not formal yet:** You don't know what specs exist. Formal outcomes group specs, and you can't group what doesn't exist yet. These sketches will be revisited and formalized in Step 6 after specs are written.
+
+#### 3.7: Iterate with User
 
 Present the draft. Expect 1-2 rounds of revision. Common adjustments:
 - Combining or splitting goals
@@ -312,7 +337,7 @@ Present the draft. Expect 1-2 rounds of revision. Common adjustments:
 - Adding anti-goals the user forgot to mention
 - Adjusting tension resolutions after seeing them written down
 
-#### 3.7: Write Charter
+#### 3.8: Write Charter
 
 After approval, write to `jig/Charter_<Project>.md`.
 
@@ -509,9 +534,58 @@ After approval:
 4. Update architecture doc `specifications:` arrays
 5. Run `jigy rebuild && jigy validate`
 
-#### 5.3: Create Outcomes (After Specs)
+#### 5.3: Repeat Per Batch
 
-Once specs exist, group them into outcomes. Outcomes describe *business value*, not project goals:
+Work through all batches, layer by layer. Validate after each batch.
+
+### Gate (Per Batch)
+
+- All spec files have valid frontmatter
+- Architecture docs' `specifications:` arrays updated
+- `@jig.implements` decorators placed on code
+- `@jig.verifies` decorators placed on tests (where tests exist)
+- `jigy rebuild && jigy validate` passes
+
+---
+
+## Step 6: Formalize Outcomes
+
+### Goal
+
+Synthesize specifications into formal outcome documents that measure whether charter goals are being achieved. Outcomes are the KPI layer — they answer "how do we know goal G-N is being served?" by grouping the specs that collectively deliver a capability.
+
+### Why Outcomes Come After Specs
+
+Outcomes group specs. Writing them before specs exist forces you to guess at groupings, which inevitably need heavy revision. By waiting until specs are written:
+
+- **Natural clusters are visible** — after writing 15 specs, you can see "these 4 are all about the same user-facing capability"
+- **Grounded in reality** — you're codifying patterns that already emerged, not speculating
+- **Less revision** — formal outcomes are right the first time because they describe what actually exists
+- **Gaps surface naturally** — "we have specs for X and Y but no outcome captures their combined value" reveals missing outcomes
+
+The outcome sketches from Step 3.6 provide top-down guidance; this step grounds them in the actual spec landscape.
+
+### Process
+
+#### 6.1: Revisit Outcome Sketches
+
+Retrieve the outcome sketches captured during Step 3.6. For each sketch:
+
+1. **Match to actual specs** — Which specs from Step 5 correspond to this sketch?
+2. **Evaluate fit** — Does the sketch still make sense given what specs were actually written?
+3. **Note gaps** — Are there spec clusters that don't map to any sketch? These suggest new outcomes.
+
+#### 6.2: Identify Spec Clusters
+
+Beyond the original sketches, look for natural groupings:
+
+- Specs within the same brick that serve the same user-facing capability
+- Specs across bricks that collaborate on a single observable feature
+- Specs that a stakeholder (from Lens 1 of the charter) would group together when asking "does feature X work?"
+
+#### 6.3: Draft Outcome Documents
+
+For each outcome:
 
 ```markdown
 ---
@@ -524,31 +598,58 @@ specifications: [S-001, S-002, S-003]
 ---
 # <Value Statement>
 
-<What value this delivers and why it matters.>
+<What capability this delivers, why it matters, and how it serves the linked goal(s).>
 
 ## Specified By
 - [[S-001]] — <brief description>
 - [[S-002]] — <brief description>
+- [[S-003]] — <brief description>
 ```
 
-Update spec frontmatter to add `outcomes: [O-001]` back-references.
+**Guidelines:**
+- An outcome title is a *value statement*, not a feature name: "Calculations Produce Exact Decimal Results" not "Calculator Module"
+- Every outcome links to at least one goal — if it doesn't serve a goal, question whether it belongs
+- Every spec should appear in at least one outcome — orphan specs indicate a missing outcome or an unnecessary spec
+- Outcomes can share specs (a spec can serve multiple capabilities)
 
-#### 5.4: Repeat Per Batch
+#### 6.4: Propose to User
 
-Work through all batches, layer by layer. Validate after each batch.
+Present outcomes as a summary table showing how they bridge goals to specs:
 
-### Gate (Per Batch)
+```markdown
+## Proposed Outcomes
 
-- All spec files have valid frontmatter
-- Bidirectional O<->S links are consistent
-- Architecture docs' `specifications:` arrays updated
-- `@jig.implements` decorators placed on code
-- `@jig.verifies` decorators placed on tests (where tests exist)
-- `jigy rebuild && jigy validate` passes
+| Outcome | Title | Goals | Specs | Rationale |
+|---------|-------|-------|-------|-----------|
+| O-001 | Exact Decimal Arithmetic | G-1 | S-001, S-002, S-005 | Core calculation correctness |
+| O-002 | Auditable Rounding | G-1 | S-003, S-004 | Rounding transparency |
+| O-003 | Fast Test Feedback | G-2 | S-010, S-011 | Developer experience |
+```
+
+**Ask the user:**
+- Do these outcomes capture the right value clusters?
+- Are any specs orphaned (not in any outcome)?
+- Do the goal linkages feel right?
+- Should any outcomes be split or merged?
+
+#### 6.5: Write Outcome Files and Update Back-References
+
+After approval:
+1. Write outcome files to `jig/outcomes/`
+2. Update spec frontmatter to add `outcomes: [O-001]` back-references
+3. Run `jigy rebuild && jigy validate`
+
+### Gate
+
+- All outcome files have valid frontmatter
+- Every outcome links to at least one goal and at least one spec
+- Bidirectional O↔S links are consistent (outcome lists spec, spec lists outcome)
+- Every spec appears in at least one outcome
+- `jigy validate intent` passes
 
 ---
 
-## Step 6: Final Validation and Summary
+## Step 7: Final Validation and Summary
 
 ### Goal
 
@@ -648,6 +749,7 @@ Each step can be invoked independently as a skill for partial or resumed onboard
 | `/jig-charter` | 3 | `bricks.yaml` populated |
 | `/jig-architect` | 4 | Charter written |
 | `/jig-specify` | 5 | Architecture docs exist |
+| `/jig-outcomes` | 6 | Specs written |
 
 Each skill checks preconditions, detects what already exists, and picks up where the last session left off. The master `/jig-onboard` skill orchestrates all steps and skips completed ones.
 
@@ -685,7 +787,7 @@ A batch of 10+ specs is too large for meaningful user review. Keep batches at 3-
 - **Write specs for implementation details** — only observable behavior
 - **Place decorators without user approval** — propose first
 - **Skip validation between steps** — errors compound
-- **Create outcomes before specs** — outcomes group specs, not the reverse
+- **Formalize outcomes before specs exist** — sketch outcomes in Step 3, but formal O-### documents come after specs in Step 6
 
 ### MUST
 
