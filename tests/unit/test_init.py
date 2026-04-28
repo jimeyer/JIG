@@ -554,23 +554,23 @@ class TestInstallSkillsLocalInstallation:
 
     @jig.verifies("S-101")
     def test_creates_skill_md_file(self, tmp_path: Path):
-        """install_skills creates .agent/skills/jig/SKILL.md."""
+        """install_skills creates .claude/skills/jig/SKILL.md."""
         from jig.init import install_skills
 
         result = install_skills(tmp_path)
 
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         assert skill_path.exists()
         assert skill_path in result
 
     @jig.verifies("S-101")
     def test_creates_context_jig_md_file(self, tmp_path: Path):
-        """install_skills creates .agent/skills/jig/contextJIG.md."""
+        """install_skills creates .claude/skills/jig/contextJIG.md."""
         from jig.init import install_skills
 
         result = install_skills(tmp_path)
 
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
         assert context_path.exists()
         assert context_path in result
 
@@ -582,10 +582,11 @@ class TestInstallSkillsLocalInstallation:
         result = install_skills(tmp_path)
 
         assert isinstance(result, list)
-        assert len(result) == 2
-        # Both paths should be in the result
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        # 2 (jig/) + 2 (jig-context/) + 3 (jigplan/) + 3 (plan/) + 3 (do-plan/) = 13
+        assert len(result) == 13
+        # jig/ skill paths should be in the result
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
         assert skill_path in result
         assert context_path in result
 
@@ -597,7 +598,7 @@ class TestInstallSkillsLocalInstallation:
 
         install_skills(tmp_path)
 
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         content = skill_path.read_text()
         assert content == SKILL_MD_TEMPLATE
 
@@ -609,20 +610,20 @@ class TestInstallSkillsLocalInstallation:
 
         install_skills(tmp_path)
 
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
         content = context_path.read_text()
         assert content == CONTEXT_JIG_MD_TEMPLATE
 
     @jig.verifies("S-101")
     def test_creates_necessary_directories(self, tmp_path: Path):
-        """install_skills creates .agent/skills/jig/ directory structure."""
+        """install_skills creates .claude/skills/jig/ directory structure."""
         from jig.init import install_skills
 
         install_skills(tmp_path)
 
-        assert (tmp_path / ".agent").is_dir()
-        assert (tmp_path / ".agent" / "skills").is_dir()
-        assert (tmp_path / ".agent" / "skills" / "jig").is_dir()
+        assert (tmp_path / ".claude").is_dir()
+        assert (tmp_path / ".claude" / "skills").is_dir()
+        assert (tmp_path / ".claude" / "skills" / "jig").is_dir()
 
 
 class TestInstallSkillsGlobalInstallation:
@@ -630,7 +631,7 @@ class TestInstallSkillsGlobalInstallation:
 
     @jig.verifies("S-101")
     def test_global_install_uses_home_directory(self, tmp_path: Path, monkeypatch):
-        """--global-skills installs to ~/.agent/skills/ instead."""
+        """--global-skills installs to ~/.claude/skills/ instead."""
         from jig.init import install_skills
 
         # Use tmp_path as fake home directory
@@ -639,8 +640,8 @@ class TestInstallSkillsGlobalInstallation:
         result = install_skills(tmp_path / "project", global_install=True)
 
         # Should install to home directory, not project directory
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
         assert skill_path.exists()
         assert context_path.exists()
         assert skill_path in result
@@ -663,7 +664,7 @@ class TestInstallSkillsGlobalInstallation:
         install_skills(project_dir, global_install=True)
 
         # Should NOT have local skills
-        local_skill_path = project_dir / ".agent" / "skills" / "jig" / "SKILL.md"
+        local_skill_path = project_dir / ".claude" / "skills" / "jig" / "SKILL.md"
         assert not local_skill_path.exists()
 
 
@@ -679,7 +680,7 @@ class TestInstallSkillsOverwriteBehavior:
         install_skills(tmp_path)
 
         # Modify the skill file
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         skill_path.write_text("# Modified content")
 
         # Second install should overwrite
@@ -698,7 +699,7 @@ class TestInstallSkillsOverwriteBehavior:
         install_skills(tmp_path)
 
         # Modify the context file
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
         context_path.write_text("# Modified context")
 
         # Second install should overwrite
@@ -723,9 +724,9 @@ class TestInstallSkillsIndependence:
         # Should still work
         result = install_skills(tmp_path)
 
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         assert skill_path.exists()
-        assert len(result) == 2
+        assert len(result) == 13
 
     @jig.verifies("S-101")
     def test_works_without_jig_toml(self, tmp_path: Path):
@@ -738,6 +739,121 @@ class TestInstallSkillsIndependence:
         # Should still work
         result = install_skills(tmp_path)
 
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         assert skill_path.exists()
-        assert len(result) == 2
+        assert len(result) == 13
+
+
+class TestInstallSkillsNewSkills:
+    """Tests for S-101: new skill directories installed by install_skills()."""
+
+    @jig.verifies("S-101")
+    def test_jig_context_skill_installed(self, tmp_path: Path):
+        """install_skills creates .claude/skills/jig-context/ with SKILL.md and contextJIG.md."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        base = tmp_path / ".claude" / "skills" / "jig-context"
+        assert (base / "SKILL.md").exists()
+        assert (base / "contextJIG.md").exists()
+
+    @jig.verifies("S-101")
+    def test_jig_context_skill_has_user_invocable_false(self, tmp_path: Path):
+        """jig-context SKILL.md has user-invocable: false."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        content = (tmp_path / ".claude" / "skills" / "jig-context" / "SKILL.md").read_text()
+        assert "user-invocable: false" in content
+
+    @jig.verifies("S-101")
+    def test_jigplan_skill_installed(self, tmp_path: Path):
+        """install_skills creates .claude/skills/jigplan/ with SKILL.md, instructions.md, contextJIG.md."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        base = tmp_path / ".claude" / "skills" / "jigplan"
+        assert (base / "SKILL.md").exists()
+        assert (base / "instructions.md").exists()
+        assert (base / "contextJIG.md").exists()
+
+    @jig.verifies("S-101")
+    def test_jigplan_skill_has_disable_model_invocation(self, tmp_path: Path):
+        """jigplan SKILL.md has disable-model-invocation: true."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        content = (tmp_path / ".claude" / "skills" / "jigplan" / "SKILL.md").read_text()
+        assert "disable-model-invocation: true" in content
+
+    @jig.verifies("S-101")
+    def test_plan_skill_installed(self, tmp_path: Path):
+        """install_skills creates .claude/skills/plan/ with SKILL.md, instructions.md, contextJIG.md."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        base = tmp_path / ".claude" / "skills" / "plan"
+        assert (base / "SKILL.md").exists()
+        assert (base / "instructions.md").exists()
+        assert (base / "contextJIG.md").exists()
+
+    @jig.verifies("S-101")
+    def test_plan_skill_has_disable_model_invocation(self, tmp_path: Path):
+        """plan SKILL.md has disable-model-invocation: true."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        content = (tmp_path / ".claude" / "skills" / "plan" / "SKILL.md").read_text()
+        assert "disable-model-invocation: true" in content
+
+    @jig.verifies("S-101")
+    def test_do_plan_skill_installed(self, tmp_path: Path):
+        """install_skills creates .claude/skills/do-plan/ with SKILL.md, instructions.md, do-wu.md."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        base = tmp_path / ".claude" / "skills" / "do-plan"
+        assert (base / "SKILL.md").exists()
+        assert (base / "instructions.md").exists()
+        assert (base / "do-wu.md").exists()
+
+    @jig.verifies("S-101")
+    def test_do_plan_skill_has_disable_model_invocation(self, tmp_path: Path):
+        """do-plan SKILL.md has disable-model-invocation: true."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        content = (tmp_path / ".claude" / "skills" / "do-plan" / "SKILL.md").read_text()
+        assert "disable-model-invocation: true" in content
+
+    @jig.verifies("S-101")
+    def test_all_skill_dirs_created(self, tmp_path: Path):
+        """install_skills creates all five skill directories."""
+        from jig.init import install_skills
+
+        install_skills(tmp_path)
+
+        skills_root = tmp_path / ".claude" / "skills"
+        for skill_dir in ["jig", "jig-context", "jigplan", "plan", "do-plan"]:
+            assert (skills_root / skill_dir).is_dir(), f"{skill_dir}/ not created"
+
+    @jig.verifies("S-101")
+    def test_global_install_creates_new_skills_in_home(self, tmp_path: Path, monkeypatch):
+        """--global-skills installs all skill dirs under ~/.claude/skills/."""
+        from jig.init import install_skills
+
+        monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+        install_skills(tmp_path / "project", global_install=True)
+
+        skills_root = tmp_path / ".claude" / "skills"
+        for skill_dir in ["jig", "jig-context", "jigplan", "plan", "do-plan"]:
+            assert (skills_root / skill_dir).is_dir(), f"global {skill_dir}/ not created"

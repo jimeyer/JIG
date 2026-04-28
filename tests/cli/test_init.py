@@ -140,7 +140,7 @@ def test_init_no_skills_flag():
         # jig/ structure should exist
         assert (root / "jig" / "specifications").exists()
         # Skills should NOT exist
-        assert not (root / ".agent" / "skills" / "jig").exists()
+        assert not (root / ".claude" / "skills" / "jig").exists()
 
 
 @jig.verifies("S-103")
@@ -153,8 +153,8 @@ def test_init_skills_only_flag():
 
         assert result.exit_code == 0
         # Skills should exist
-        assert (root / ".agent" / "skills" / "jig" / "SKILL.md").exists()
-        assert (root / ".agent" / "skills" / "jig" / "contextJIG.md").exists()
+        assert (root / ".claude" / "skills" / "jig" / "SKILL.md").exists()
+        assert (root / ".claude" / "skills" / "jig" / "contextJIG.md").exists()
         # jig/ structure should NOT exist
         assert not (root / "jig").exists()
         assert not (root / "jig.toml").exists()
@@ -162,7 +162,7 @@ def test_init_skills_only_flag():
 
 @jig.verifies("S-103")
 def test_init_global_skills_flag():
-    """jigy init --global-skills installs to ~/.agent/skills/."""
+    """jigy init --global-skills installs to ~/.claude/skills/."""
     runner = CliRunner()
     with runner.isolated_filesystem() as tmpdir:
         root = Path(tmpdir)
@@ -180,7 +180,7 @@ def test_init_global_skills_flag():
 
             assert result.exit_code == 0
             # Skills should be in "global" location (fake home)
-            global_skills = fake_home / ".agent" / "skills" / "jig"
+            global_skills = fake_home / ".claude" / "skills" / "jig"
             assert global_skills.exists()
             assert (global_skills / "SKILL.md").exists()
         finally:
@@ -316,7 +316,7 @@ def test_init_idempotent_json():
         assert output2["success"] is True
         # jig/ structure paths should NOT be recreated, but skill paths are always reported
         # (skills always overwrite per S-101)
-        jig_struct_paths = [p for p in output2["paths_created"] if ".agent/skills" not in p]
+        jig_struct_paths = [p for p in output2["paths_created"] if ".claude/skills" not in p]
         assert len(jig_struct_paths) == 0, "jig/ structure should be idempotent"
 
 
@@ -371,7 +371,7 @@ def test_init_default_includes_skills():
 
         assert result.exit_code == 0
         # Skills should be installed
-        assert (root / ".agent" / "skills" / "jig" / "SKILL.md").exists()
+        assert (root / ".claude" / "skills" / "jig" / "SKILL.md").exists()
 
 
 # ========================================================================
@@ -414,10 +414,10 @@ def test_init_global_skills_with_full_init():
             assert (root / "jig").exists()
             assert (root / "jig.toml").exists()
             # Global skills should exist
-            global_skills = fake_home / ".agent" / "skills" / "jig"
+            global_skills = fake_home / ".claude" / "skills" / "jig"
             assert (global_skills / "SKILL.md").exists()
             # Local skills should NOT exist
-            assert not (root / ".agent" / "skills" / "jig").exists()
+            assert not (root / ".claude" / "skills" / "jig").exists()
         finally:
             if old_home is not None:
                 os.environ["HOME"] = old_home

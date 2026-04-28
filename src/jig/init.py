@@ -14,7 +14,15 @@ from jig.templates import (
     BRICKS_YAML_TEMPLATE,
     CHARTER_MD_TEMPLATE,
     CONTEXT_JIG_MD_TEMPLATE,
+    DO_PLAN_INSTRUCTIONS_TEMPLATE,
+    DO_PLAN_SKILL_MD_TEMPLATE,
+    DO_WU_TEMPLATE,
+    JIG_CONTEXT_SKILL_MD_TEMPLATE,
     JIG_TOML_TEMPLATE,
+    JIGPLAN_INSTRUCTIONS_TEMPLATE,
+    JIGPLAN_SKILL_MD_TEMPLATE,
+    PLAN_INSTRUCTIONS_TEMPLATE,
+    PLAN_SKILL_MD_TEMPLATE,
     SKILL_MD_TEMPLATE,
 )
 
@@ -219,14 +227,17 @@ def init_project(
 def install_skills(project_root: Path, global_install: bool = False) -> list[Path]:
     """Install JIG skill files for AI agents.
 
-    Creates skill files that help AI agents understand and work with JIG:
-        - SKILL.md - Skill definition for /jig command
-        - contextJIG.md - Universal JIG mental model
+    Creates skill directories under .claude/skills/:
+        - jig/         - /jig general reference skill
+        - jig-context/ - auto-loaded background JIG knowledge
+        - jigplan/     - /jigplan workflow skill
+        - plan/        - /plan workflow skill
+        - do-plan/     - /do-plan workflow skill
 
     Args:
         project_root: Path to the project root directory (used for local install).
-        global_install: If True, installs to ~/.agent/skills/jig/ instead of
-            project-local .agent/skills/jig/.
+        global_install: If True, installs to ~/.claude/skills/ instead of
+            project-local .claude/skills/.
 
     Returns:
         List of paths created/overwritten.
@@ -237,23 +248,63 @@ def install_skills(project_root: Path, global_install: bool = False) -> list[Pat
     """
     paths_created: list[Path] = []
 
-    # Determine installation directory
+    # Determine base skills directory
     if global_install:
-        install_dir = Path.home() / ".agent" / "skills" / "jig"
+        skills_root = Path.home() / ".claude" / "skills"
     else:
-        install_dir = project_root / ".agent" / "skills" / "jig"
+        skills_root = project_root / ".claude" / "skills"
 
-    # Create directory structure
-    install_dir.mkdir(parents=True, exist_ok=True)
+    # jig/ — general /jig reference skill
+    jig_dir = skills_root / "jig"
+    jig_dir.mkdir(parents=True, exist_ok=True)
+    for path, content in [
+        (jig_dir / "SKILL.md", SKILL_MD_TEMPLATE),
+        (jig_dir / "contextJIG.md", CONTEXT_JIG_MD_TEMPLATE),
+    ]:
+        path.write_text(content)
+        paths_created.append(path)
 
-    # Install SKILL.md (always overwrite)
-    skill_path = install_dir / "SKILL.md"
-    skill_path.write_text(SKILL_MD_TEMPLATE)
-    paths_created.append(skill_path)
+    # jig-context/ — auto-loaded background JIG knowledge (user-invocable: false)
+    jig_context_dir = skills_root / "jig-context"
+    jig_context_dir.mkdir(parents=True, exist_ok=True)
+    for path, content in [
+        (jig_context_dir / "SKILL.md", JIG_CONTEXT_SKILL_MD_TEMPLATE),
+        (jig_context_dir / "contextJIG.md", CONTEXT_JIG_MD_TEMPLATE),
+    ]:
+        path.write_text(content)
+        paths_created.append(path)
 
-    # Install contextJIG.md (always overwrite)
-    context_path = install_dir / "contextJIG.md"
-    context_path.write_text(CONTEXT_JIG_MD_TEMPLATE)
-    paths_created.append(context_path)
+    # jigplan/ — /jigplan workflow skill
+    jigplan_dir = skills_root / "jigplan"
+    jigplan_dir.mkdir(parents=True, exist_ok=True)
+    for path, content in [
+        (jigplan_dir / "SKILL.md", JIGPLAN_SKILL_MD_TEMPLATE),
+        (jigplan_dir / "instructions.md", JIGPLAN_INSTRUCTIONS_TEMPLATE),
+        (jigplan_dir / "contextJIG.md", CONTEXT_JIG_MD_TEMPLATE),
+    ]:
+        path.write_text(content)
+        paths_created.append(path)
+
+    # plan/ — /plan workflow skill
+    plan_dir = skills_root / "plan"
+    plan_dir.mkdir(parents=True, exist_ok=True)
+    for path, content in [
+        (plan_dir / "SKILL.md", PLAN_SKILL_MD_TEMPLATE),
+        (plan_dir / "instructions.md", PLAN_INSTRUCTIONS_TEMPLATE),
+        (plan_dir / "contextJIG.md", CONTEXT_JIG_MD_TEMPLATE),
+    ]:
+        path.write_text(content)
+        paths_created.append(path)
+
+    # do-plan/ — /do-plan workflow skill
+    do_plan_dir = skills_root / "do-plan"
+    do_plan_dir.mkdir(parents=True, exist_ok=True)
+    for path, content in [
+        (do_plan_dir / "SKILL.md", DO_PLAN_SKILL_MD_TEMPLATE),
+        (do_plan_dir / "instructions.md", DO_PLAN_INSTRUCTIONS_TEMPLATE),
+        (do_plan_dir / "do-wu.md", DO_WU_TEMPLATE),
+    ]:
+        path.write_text(content)
+        paths_created.append(path)
 
     return paths_created

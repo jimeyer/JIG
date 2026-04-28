@@ -58,8 +58,8 @@ class TestInitFullCycle:
         assert (tmp_path / ".gitignore").exists()
 
         # Verify skills installed
-        assert (tmp_path / ".agent" / "skills" / "jig" / "SKILL.md").exists()
-        assert (tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md").exists()
+        assert (tmp_path / ".claude" / "skills" / "jig" / "SKILL.md").exists()
+        assert (tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md").exists()
 
     @jig.verifies("S-097")
     def test_jig_toml_has_correct_sections(self, tmp_path: Path):
@@ -222,8 +222,8 @@ class TestSkillsInstallation:
             capture_output=True,
         )
 
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
-        context_path = tmp_path / ".agent" / "skills" / "jig" / "contextJIG.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
+        context_path = tmp_path / ".claude" / "skills" / "jig" / "contextJIG.md"
 
         assert skill_path.exists()
         assert context_path.exists()
@@ -240,7 +240,7 @@ class TestSkillsInstallation:
         # jig/ should exist
         assert (tmp_path / "jig").is_dir()
         # Skills should NOT exist
-        assert not (tmp_path / ".agent" / "skills" / "jig").exists()
+        assert not (tmp_path / ".claude" / "skills" / "jig").exists()
 
     @jig.verifies("S-101", "S-103")
     def test_skills_only_flag(self, tmp_path: Path):
@@ -252,7 +252,7 @@ class TestSkillsInstallation:
         )
 
         # Skills should exist
-        assert (tmp_path / ".agent" / "skills" / "jig" / "SKILL.md").exists()
+        assert (tmp_path / ".claude" / "skills" / "jig" / "SKILL.md").exists()
         # jig/ should NOT exist
         assert not (tmp_path / "jig").exists()
         assert not (tmp_path / "jig.toml").exists()
@@ -270,7 +270,7 @@ class TestSkillsInstallation:
         )
 
         # Modify skill
-        skill_path = tmp_path / ".agent" / "skills" / "jig" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "jig" / "SKILL.md"
         skill_path.write_text("# Modified content")
 
         # Second install
@@ -379,7 +379,7 @@ class TestGlobalSkillsInstallation:
 
     @jig.verifies("S-101", "S-103")
     def test_global_skills_flag(self, tmp_path: Path, monkeypatch):
-        """--global-skills installs to ~/.agent/skills/ instead of project-local.
+        """--global-skills installs to ~/.claude/skills/ instead of project-local.
 
         Note: Uses Click test runner with monkeypatch to avoid subprocess
         environment issues with HOME variable.
@@ -405,7 +405,7 @@ class TestGlobalSkillsInstallation:
             assert result.exit_code == 0, f"Failed: {result.output}"
 
             # Skills should be in global location (fake home)
-            global_skills = fake_home / ".agent" / "skills" / "jig"
+            global_skills = fake_home / ".claude" / "skills" / "jig"
             assert (global_skills / "SKILL.md").exists()
             assert (global_skills / "contextJIG.md").exists()
 
